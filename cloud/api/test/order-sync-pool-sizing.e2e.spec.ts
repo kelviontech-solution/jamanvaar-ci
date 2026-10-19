@@ -4,6 +4,7 @@ process.env.DB_POOL_SIZE = '20';
 
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { Agent } from 'node:http';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
@@ -26,12 +27,26 @@ describe('Order-sync throughput with a production-realistic DB_POOL_SIZE=20 (not
   let restaurantId: string;
   let planId: string;
   const deviceTokens: string[] = [];
+  // Bound transport concurrency explicitly. Opening 1,000 fresh loopback sockets in this same
+  // event loop benchmarks Windows' TCP accept backlog, not database admission. These tests
+  // offer all jobs concurrently over 50 reusable connections; external saturation remains a
+  // separate deployment benchmark and is not certified by this integration suite.
+  const connections = new Agent({ keepAlive: true, maxSockets: 50 });
 
   const authed = (method: 'get' | 'post', url: string, token: string) =>
-    request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
+    request(app.getHttpServer())[method](url).agent(connections).set('Authorization', `Bearer ${token}`);
+
+  const completeAll = async (requests: request.Test[]) => {
+    const outcomes = await Promise.allSettled(requests);
+    expect(outcomes.filter(outcome => outcome.status === 'rejected'), 'all offered requests finish without a transport error').toHaveLength(0);
+    return outcomes.flatMap(outcome => outcome.status === 'fulfilled' ? [outcome.value] : []);
+  };
 
   beforeAll(async () => {
     app = await createTestApp();
+    // Keep one listener for the whole burst. Otherwise Supertest owns an implicit ephemeral
+    // listener on the first request and closes it while other concurrent requests still connect.
+    await app.listen(0);
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
     const loginRes = await platformLogin(app, adminEmail, adminPassword);
@@ -58,19 +73,20 @@ describe('Order-sync throughput with a production-realistic DB_POOL_SIZE=20 (not
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     if (planId) await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planId } }));
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
+    connections.destroy();
     await app.close();
   });
 
   const orderEvent = (externalOrderId: string) => ({
-    externalOrderId, orderType: 'DINE_IN', status: 'PREPARING', tableId: `table-${externalOrderId}`, tableLabel: externalOrderId,
+    externalOrderId, orderType: 'TAKEAWAY', status: 'PREPARING',
     items: [{ externalItemId: 'item-1', name: 'Butter Naan', quantity: 2, unitPrice: 60, modifiers: [], kitchenStatus: 'PREPARING', lineTotal: 120 }],
     subtotal: 120, taxAmount: 6, discountAmount: 0, totalAmount: 126, updatedAt: new Date().toISOString()
   });
 
-  it.each([150, 300, 500, 1000])('%d concurrent order-sync pushes from 15 POS terminals in one restaurant: counted precisely, never a raw connection error', async (n) => {
+  it.each([150, 300, 500, 1000])('%d offered pushes over 50 reusable connections from 15 POS terminals: every request succeeds or receives clean admission backpressure', async (n) => {
     const pushes = Array.from({ length: n }, (_, i) => authed('post', '/api/v1/orders/sync', deviceTokens[i % deviceTokens.length]).send({ events: [orderEvent(`pool-ord-${n}-${i}`)] }));
     const t0 = Date.now();
-    const results = await Promise.all(pushes);
+    const results = await completeAll(pushes);
     const ms = Date.now() - t0;
 
     const okCount = results.filter((r) => r.status === 201).length;
@@ -79,12 +95,14 @@ describe('Order-sync throughput with a production-realistic DB_POOL_SIZE=20 (not
     const otherStatuses = results.filter((r) => r.status !== 201 && r.status !== 503).map((r) => r.status);
 
     const runtimeRes = await authed('get', '/api/v1/orders/sync/runtime', platformToken);
-    console.log(`[load] ${n} concurrent order-sync pushes at DB_POOL_SIZE=20: ${ms}ms total (${(ms / n).toFixed(1)}ms/push amortised, ${(n / (ms / 1000)).toFixed(1)}/sec), ${okCount} ok, ${busyCount} clean-503, ${otherCount} other${otherStatuses.length ? ' [' + otherStatuses.join(',') + ']' : ''}; admission runtime: ${JSON.stringify(runtimeRes.body.admission)}`);
+    console.log(`[load] ${n} offered pushes, transport concurrency <=50, DB_POOL_SIZE=20: ${ms}ms total (${(ms / n).toFixed(1)}ms/push amortised, ${(n / (ms / 1000)).toFixed(1)}/sec), ${okCount} ok, ${busyCount} clean-503, ${otherCount} other${otherStatuses.length ? ' [' + otherStatuses.join(',') + ']' : ''}; admission runtime: ${JSON.stringify(runtimeRes.body.admission)}`);
 
     // The one correctness bar that must never break regardless of scale: no raw, ungraceful
     // failure. Every push either succeeds or is told to retry — nothing just breaks.
     expect(otherCount).toBe(0);
     expect(okCount + busyCount).toBe(n);
+    expect(results.filter(result => result.status === 201 && (!Array.isArray(result.body.results) || result.body.results.some((event: { status: string }) => event.status !== 'ok'))), 'HTTP 201 must acknowledge a real accepted order mutation').toHaveLength(0);
+    expect(await prisma.runAsTenant(restaurantId, tx => tx.syncedOrder.count({ where: { restaurantId, externalOrderId: { startsWith: `pool-ord-${n}-` } } }))).toBe(okCount);
   }, 120_000);
 
   /**
@@ -105,11 +123,13 @@ describe('Order-sync throughput with a production-realistic DB_POOL_SIZE=20 (not
       const pushes = Array.from({ length: 50 }, (_, i) =>
         authed('post', '/api/v1/orders/sync', deviceTokens[i % deviceTokens.length]).send({ events: [orderEvent(`batched-${total}-${batch}-${i}`)] })
       );
-      const results = await Promise.all(pushes);
+      const results = await completeAll(pushes);
+      expect(results.filter(result => result.status === 201 && (!Array.isArray(result.body.results) || result.body.results.some((event: { status: string }) => event.status !== 'ok'))), 'each success must include the accepted business result').toHaveLength(0);
       for (const r of results) { if (r.status === 201) ok++; else if (r.status === 503) busy++; else { other++; otherCodes.push(r.status); } }
     }
     const ms = Date.now() - t0;
     console.log(`[diag] ${total} pushes, ${batches} waves of 50: ${ms}ms total (${(total / (ms / 1000)).toFixed(1)}/sec sustained), ${ok} ok, ${busy} busy, ${other} other${otherCodes.length ? ' [' + otherCodes.join(',') + ']' : ''}`);
     expect(other).toBe(0);
+    expect(await prisma.runAsTenant(restaurantId, tx => tx.syncedOrder.count({ where: { restaurantId, externalOrderId: { startsWith: `batched-${total}-` } } }))).toBe(ok);
   }, 180_000);
 });

@@ -1,4 +1,4 @@
-import type { StoreOp } from './sql_kv_engine';
+import type { StoreOp, DurableCommand, DurableCommandResult, DurableRecoverySnapshot } from './sql_kv_engine';
 import type { StorageBackend, StorageHooks } from './durable_storage';
 
 /**
@@ -39,7 +39,7 @@ export class ClusterBackend implements StorageBackend {
   private channel: Channel;
   private hooks: StorageHooks | null = null;
   private nextReq = 1;
-  private acks = new Map<number, { resolve: () => void; reject: (e: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  private acks = new Map<number, { resolve: (value: unknown) => void; reject: (e: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private snapshotWaiter: ((data: Record<string, string>) => void) | null = null;
   private closed = false;
   private releaseLeadership: (() => void) | null = null;
@@ -119,15 +119,53 @@ export class ClusterBackend implements StorageBackend {
       this.channel.postMessage({ t: 'ops', from: this.opts.windowId, ops });
       return;
     }
+    await this.request<void>({ t: 'write', ops });
+  }
+
+  async command(command: DurableCommand): Promise<DurableCommandResult> {
+    if (this.isLeader && this.leader) {
+      if (!this.leader.command) throw new Error('Local leader does not support durable operation replay');
+      const result = await this.leader.command(command);
+      this.channel.postMessage({ t: 'ops', from: this.opts.windowId, ops: this.commandOps(result) });
+      return result;
+    }
+    return this.request<DurableCommandResult>({ t: 'command', command });
+  }
+
+  private commandOps(result: Pick<DurableCommandResult, 'values'>): StoreOp[] {
+    return Object.entries(result.values).map(([key, value]) => value === null ? { op: 'remove', key } : { op: 'set', key, value });
+  }
+
+  async exportRecovery(scope: string): Promise<DurableRecoverySnapshot> {
+    if (this.isLeader && this.leader) {
+      if (!this.leader.exportRecovery) throw new Error('Local leader does not support complete recovery');
+      return this.leader.exportRecovery(scope);
+    }
+    return this.request<DurableRecoverySnapshot>({ t: 'recovery-export', scope });
+  }
+
+  async restoreRecovery(snapshot: DurableRecoverySnapshot, expectedScope: string): Promise<void> {
+    if (this.isLeader && this.leader) {
+      if (!this.leader.restoreRecovery) throw new Error('Local leader does not support complete recovery');
+      await this.leader.restoreRecovery(snapshot, expectedScope);
+      this.channel.postMessage({ t: 'ops', from: this.opts.windowId, ops: this.commandOps({ values: snapshot.values }) });
+      return;
+    }
+    await this.request<void>({ t: 'recovery-restore', snapshot, expectedScope });
+  }
+
+  private async request<T>(message: Record<string, unknown>): Promise<T> {
+    if (this.closed) throw new Error('Local database closed');
     const id = this.nextReq++;
     const timeoutMs = this.opts.requestTimeoutMs ?? 3000;
-    await new Promise<void>((resolve, reject) => {
+    return new Promise<T>((resolve, reject) => {
       const timer = setTimeout(() => {
         this.acks.delete(id);
         reject(new Error('The window that owns the local database did not respond'));
       }, timeoutMs);
-      this.acks.set(id, { resolve, reject, timer });
-      this.channel.postMessage({ t: 'write', from: this.opts.windowId, id, ops });
+      this.acks.set(id, { resolve: value => resolve(value as T), reject, timer });
+      try { this.channel.postMessage({ ...message, from: this.opts.windowId, id }); }
+      catch (error) { clearTimeout(timer); this.acks.delete(id); reject(error); }
     });
   }
 
@@ -151,8 +189,41 @@ export class ClusterBackend implements StorageBackend {
             this.channel.postMessage({ t: 'ops', from: m.from, ops: m.ops }); // everyone, including other followers
             this.channel.postMessage({ t: 'ack', to: m.from, id: m.id });
           } catch (err) {
-            this.channel.postMessage({ t: 'nack', to: m.from, id: m.id, error: (err as Error).message });
+            this.channel.postMessage({ t: 'nack', to: m.from, id: m.id, error: (err as Error).message, code: (err as { code?: string }).code });
           }
+        }
+        break;
+      case 'command':
+        if (this.isLeader && this.leader) {
+          try {
+            if (!this.leader.command) throw new Error('Local leader does not support durable operation replay');
+            const result = await this.leader.command(m.command as DurableCommand);
+            const ops = this.commandOps(result);
+            this.hooks?.remote(ops);
+            this.channel.postMessage({ t: 'ops', from: m.from, ops });
+            this.channel.postMessage({ t: 'ack', to: m.from, id: m.id, result });
+          } catch (err) {
+            this.channel.postMessage({ t: 'nack', to: m.from, id: m.id, error: (err as Error).message, code: (err as { code?: string }).code });
+          }
+        }
+        break;
+      case 'recovery-export':
+      case 'recovery-restore':
+        if (this.isLeader && this.leader) {
+          try {
+            let result: DurableRecoverySnapshot | undefined;
+            if (m.t === 'recovery-export') {
+              if (!this.leader.exportRecovery) throw new Error('Local leader does not support complete recovery');
+              result = await this.leader.exportRecovery(m.scope);
+            } else {
+              if (!this.leader.restoreRecovery) throw new Error('Local leader does not support complete recovery');
+              await this.leader.restoreRecovery(m.snapshot, m.expectedScope);
+              const ops = this.commandOps({ values: m.snapshot.values });
+              this.hooks?.remote(ops);
+              this.channel.postMessage({ t: 'ops', from: m.from, ops });
+            }
+            this.channel.postMessage({ t: 'ack', to: m.from, id: m.id, result });
+          } catch (err) { this.channel.postMessage({ t: 'nack', to: m.from, id: m.id, error: (err as Error).message }); }
         }
         break;
       case 'ack':
@@ -162,8 +233,8 @@ export class ClusterBackend implements StorageBackend {
         if (!w) break;
         this.acks.delete(m.id);
         clearTimeout(w.timer);
-        if (m.t === 'ack') w.resolve();
-        else w.reject(new Error(m.error ?? 'write refused'));
+        if (m.t === 'ack') w.resolve(m.result);
+        else w.reject(Object.assign(new Error(m.error ?? 'write refused'), { code: m.code }));
         break;
       }
     }

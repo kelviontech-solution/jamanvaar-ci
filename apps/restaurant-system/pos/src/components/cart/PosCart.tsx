@@ -1,5 +1,5 @@
 import { PosLoyaltyRewards } from '../customers/PosLoyaltyRewards';
-import { CachedImg } from '@jamanvaar/ui';
+import { CachedImg, useConfirm } from '@jamanvaar/ui';
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { PosTablePickerModal } from '../tables/PosTablePickerModal';
@@ -33,10 +33,15 @@ export const PosCart: React.FC = () => {
     orderNotes,
     updateItemQuantity,
     removeItemFromCart,
+    cancelSentItemDurably,
+    checkConcurrentEdit,
+    loadOrderForSettlement,
+    cartOrderBaseline,
+    runningOrderId,
     billDiscountPercent,
     clearCart,
     holdCurrentOrder,
-    sendKOT,
+    sendKOTDurably,
     setIsPaymentOpen,
     setActiveTab,
     addItemToCart,
@@ -46,6 +51,37 @@ export const PosCart: React.FC = () => {
     executeInstantBill,
     isInstantBillProcessing
   } = usePosStore();
+  const { prompt, notify, confirmDialog } = useConfirm();
+  const cancellingSentRef = useRef(false);
+  const [isCancellingSent, setIsCancellingSent] = useState(false);
+
+  // F-kitchen-amendments: a line already in the kitchen (kotSentQty > 0) can't be shrunk or
+  // removed by the plain quantity/trash buttons — cancelling it is a distinct action that needs a
+  // reason, updates the live kitchen ticket, and (unlike a silent cart edit) can never just vanish
+  // from the bill. Adding a replacement is a separate, deliberate menu action.
+  const handleCancelSentItem = async (cartItemId: string) => {
+    if (cancellingSentRef.current) return;
+    cancellingSentRef.current = true;
+    try {
+      const reason = await prompt({
+        title: 'Cancel this dish',
+        message: 'This dish has already been sent to the kitchen. Tell the kitchen why it\'s being cancelled — this clears it from the bill and from the ticket.',
+        inputLabel: 'Reason',
+        placeholder: 'e.g. Guest changed their mind, kitchen out of stock…',
+        confirmLabel: 'Cancel dish',
+        tone: 'danger',
+        required: true
+      });
+      if (reason === null) return;
+      setIsCancellingSent(true);
+      const ok = await cancelSentItemDurably(cartItemId, reason);
+      if (!ok) { sound.play('warning'); return; }
+      sound.play('remove');
+    } catch (error) {
+      setIsCancellingSent(false);
+      await notify({ title: 'Dish cancellation not confirmed', message: error instanceof Error ? error.message : 'Keep this bill and retry the same cancellation.' });
+    } finally { cancellingSentRef.current = false; setIsCancellingSent(false); }
+  };
 
   // Which cart items show their "Less Spicy / No Onion / …" note chips. Collapsed by default so a
   // full cart isn't wall-to-wall buttons — expand only the item you're actually noting.
@@ -76,12 +112,24 @@ export const PosCart: React.FC = () => {
     { id: 'TOKEN_QR', label: 'Token', icon: Ticket }
   ];
 
-  const handleSendKot = () => {
+  const handleSendKot = async () => {
     if (sendingKotRef.current) return;
+    // Simultaneous-edit protection: a second device may have changed this exact bill since it was
+    // opened here. Catching that before the KOT prints is the whole point — after printing, the
+    // kitchen has already acted on whichever version won.
+    const conflict = checkConcurrentEdit();
+    if (!conflict.ok) {
+      await notify({ title: 'Bill changed elsewhere', message: `${conflict.reason}`, confirmLabel: 'Refresh now' });
+      if (cartOrderBaseline) {
+        const result = loadOrderForSettlement(cartOrderBaseline.orderId);
+        if (!result.ok) await notify({ title: 'Could not refresh', message: result.reason });
+      }
+      return;
+    }
     sendingKotRef.current = true;
     setIsSendingKot(true);
     try {
-      const kots = sendKOT();
+      const kots = await sendKOTDurably();
       if (kots && kots.length > 0) {
         sound.play('kot');
         setKotSentState(true);
@@ -89,8 +137,11 @@ export const PosCart: React.FC = () => {
       } else {
         sound.play('warning');
       }
+    } catch (err) {
+      sound.play('warning');
+      await notify({ title: 'Cannot send to kitchen', message: err instanceof Error ? err.message : 'This order could not be sent.' });
     } finally {
-      // sendKOT updates sent quantities synchronously. That identity is the duplicate guard; a new cart need not wait on a timer.
+      // The acknowledged action updates sent quantities; retain the re-entry guard until it finishes.
       sendingKotRef.current = false;
       setIsSendingKot(false);
     }
@@ -103,6 +154,8 @@ export const PosCart: React.FC = () => {
   const stockShortages = InventoryRepository.getShortages(cart.items.map((ci) => ({ menuItemId: ci.menuItemId, quantity: ci.quantity })));
   const unsentCount = cart.items.reduce((n, ci) => n + Math.max(0, ci.quantity - (ci.kotSentQty || 0)), 0);
   const hasSentItems = cart.items.some((ci) => (ci.kotSentQty || 0) > 0);
+  const activeOrderId = runningOrderId ?? cartOrderBaseline?.orderId ?? selectedTable?.currentOrderId;
+  const activeOrder = activeOrderId ? db.orders.find(order => order.id === activeOrderId) : undefined;
   const canSendKot = hasItems && unsentCount > 0 && !isSendingKot;
   const kotLabel = kotSentState && unsentCount === 0
     ? 'SAVED ? WAITING TO SYNC'
@@ -116,14 +169,15 @@ export const PosCart: React.FC = () => {
   const quickFavorites = db.menuItems.filter((i) => i.isAvailable !== false).slice(0, 4);
 
   return (
-    <div className="pos-cart bg-white border border-jaman-border rounded-2xl flex flex-col h-full min-h-0 min-w-0 select-none shadow-xs z-10 overflow-hidden">
+    <fieldset disabled={isCancellingSent} aria-busy={isCancellingSent} className="pos-cart bg-white border border-jaman-border rounded-2xl flex flex-col h-full min-h-0 min-w-0 select-none shadow-xs z-10 overflow-hidden p-0">
+      {isCancellingSent && <p role="status" className="px-4 py-2 text-sm text-jaman-navy">Saving cancellation on this device…</p>}
       {/* Active Order Header */}
       <div className="px-3 pt-2 pb-2 border-b border-jaman-border bg-white shrink-0 space-y-1.5">
         {/* Order Identifier & Clear Button */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="font-bold text-[13px] text-jaman-deepNavy uppercase tracking-wide">
-              New Order — Unsaved
+              {activeOrder ? `${activeOrder.orderNumber} · ${unsentCount > 0 ? 'New dishes not sent' : 'Saved on this device'}` : 'New Order — Unsaved'}
             </span>
             <span className="text-[11px] text-slate-400 font-medium">
               • {currentUser?.fullName || 'Cashier'}
@@ -225,7 +279,13 @@ export const PosCart: React.FC = () => {
                 Low stock: {stockShortages.map((sh) => `${sh.itemName} (need ${Math.round(sh.needed * 100) / 100} ${sh.unit}, have ${Math.round(sh.available * 100) / 100})`).join(', ')}
               </div>
             )}
-            {cart.items.map((ci) => (
+            {cart.items.map((ci) => {
+              const sentQty = ci.kotSentQty || 0;
+              const isSent = sentQty > 0;
+              // Any decrement/removal that would cut into the sent portion must go through the
+              // cancel-reason flow instead of silently shrinking a ticket already at the kitchen.
+              const atSentFloor = ci.quantity <= sentQty;
+              return (
               <div
                 key={ci.cartItemId}
                 className="py-0.5 border-b border-[#ECE8E2] last:border-b-0"
@@ -247,23 +307,35 @@ export const PosCart: React.FC = () => {
                       <span className="font-bold text-base text-jaman-deepNavy leading-tight shrink-0 tabular-nums">₹{ci.itemTotal}</span>
                       <button
                         type="button"
-                        onClick={() => { sound.play('remove'); removeItemFromCart(ci.cartItemId); }}
+                        onClick={() => {
+                          if (isSent) { void handleCancelSentItem(ci.cartItemId); return; }
+                          sound.play('remove'); removeItemFromCart(ci.cartItemId);
+                        }}
                         className="w-7 h-7 -mt-1 -mr-1 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                        title="Remove item"
-                        aria-label={`Remove ${ci.item.name}`}
+                        title={isSent ? 'Cancel this dish (already sent to kitchen)' : 'Remove item'}
+                        aria-label={isSent ? `Cancel ${ci.item.name} (sent to kitchen)` : `Remove ${ci.item.name}`}
                       >
                         <Trash2 className="w-[18px] h-[18px]" />
                       </button>
                     </div>
+
+                    {isSent && (
+                      <div className="mt-0.5 inline-flex items-center gap-1 rounded-md bg-jaman-navy/10 px-1.5 py-0.5 text-[10px] font-bold text-jaman-navy">
+                        {sentQty < ci.quantity ? `${sentQty} sent to kitchen · ${ci.quantity - sentQty} new` : 'Sent to kitchen'}
+                      </div>
+                    )}
 
                     {/* Line 2: quantity stepper, SKU / unit price, inline Add note (kept on one line so ~5 rows fit) */}
                     <div className="flex items-center gap-2">
                       <div className="inline-flex items-center bg-jaman-cream border border-jaman-border rounded-xl shrink-0">
                         <button
                           type="button"
-                          onClick={() => { sound.play('remove'); updateItemQuantity(ci.cartItemId, -1); }}
+                          onClick={() => {
+                            if (atSentFloor) { void handleCancelSentItem(ci.cartItemId); return; }
+                            sound.play('remove'); updateItemQuantity(ci.cartItemId, -1);
+                          }}
                           className="w-7 h-8 rounded-l-xl hover:bg-slate-200 text-slate-700 flex items-center justify-center active:scale-95 cursor-pointer"
-                          title="Decrease quantity"
+                          title={atSentFloor ? 'Cancel this dish (already sent to kitchen)' : 'Decrease quantity'}
                         >
                           <Minus className="w-4 h-4 stroke-[2.5]" />
                         </button>
@@ -333,7 +405,8 @@ export const PosCart: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
 
             {/* Smart Suggestions: Often Ordered Together (compact horizontal strip) */}
             <div className="mt-1.5 pt-2 border-t border-[#ECE8E2]">
@@ -612,6 +685,7 @@ export const PosCart: React.FC = () => {
       />
       {/* Portalled to <body>: the cart root is its own stacking context, which would paint the sidebar over the picker. */}
       {createPortal(<PosTablePickerModal isOpen={tablePickerOpen} onClose={() => setTablePickerOpen(false)} />, document.body)}
-    </div>
+      {confirmDialog}
+    </fieldset>
   );
 };

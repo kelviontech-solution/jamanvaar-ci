@@ -55,7 +55,7 @@ export function OrderActivityView({ order, loadActivity }: { order: Order; loadA
       <p className="text-sm">
         Collected {formatINR(remote ? remote.balance.collectedPaise / 100 : payment.collected)} · Balance due{' '}
         {formatINR(remote ? remote.balance.outstandingPaise / 100 : payment.outstanding)}
-        {remote && remote.balance.refundedPaise > 0 ? ` · Refunded ${formatINR(remote.balance.refundedPaise / 100)}` : ''}
+        {(remote ? remote.balance.refundedPaise : payment.refunded * 100) > 0 ? ` · Refunded ${formatINR(remote ? remote.balance.refundedPaise / 100 : payment.refunded)}` : ''}
       </p>
       {error && (
         <p role="status" className="text-xs text-amber-800">

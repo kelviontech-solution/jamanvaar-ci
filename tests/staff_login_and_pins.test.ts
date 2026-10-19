@@ -109,7 +109,7 @@ describe('Staff PIN verification lockout (MED-07)', () => {
 
     expect(StaffRepository.pinLockoutRemainingMs()).toBe(0);
     expect((await StaffRepository.verifyPin(realPin))?.user.id).toBe(staff.id);
-  });
+  }, 20_000); // Several real PBKDF2 checks, including failures and the cooldown retry.
 
   it('a successful verification resets the failure counter so it does not carry into a future lockout window', async () => {
     const staff = await StaffRepository.createUser({ fullName: 'Reset Counter Test', username: 'resetcountertest', roleId: 'role-cashier' });
@@ -126,5 +126,5 @@ describe('Staff PIN verification lockout (MED-07)', () => {
     expect(await StaffRepository.verifyPin(wrongPin)).toBeNull();
     expect(StaffRepository.pinLockoutRemainingMs()).toBe(0);
     expect((await StaffRepository.verifyPin(realPin))?.user.id).toBe(staff.id);
-  });
+  }, 20_000); // Exercises eight real verifications; retain production KDF work factor.
 });

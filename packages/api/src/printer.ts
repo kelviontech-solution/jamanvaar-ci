@@ -77,14 +77,20 @@ export class PrinterService {
 
     if (target) {
       this.setActivePrinter(target.id);
-      target.status = 'READY';
-      target.lastTestAt = new Date().toISOString();
+      // EC-09: this used to set status='READY' and lastTestAt=now purely from selecting a
+      // destination — an OFFLINE printer became falsely READY the instant it was auto-picked, with
+      // no hardware probe involved. Selecting a printer is configuration, not a successful test;
+      // only a real dispatch outcome (queuePrintJob/dispatchAndFinalize) or an explicit Test Print
+      // may set READY or move lastTestAt. An already-READY printer (confirmed by a real earlier
+      // test) keeps that status; anything else becomes UNKNOWN — "selected, not yet verified" —
+      // rather than a fabricated READY.
+      // Preserve OFFLINE/ERROR evidence too; choosing a destination is not a new observation.
       db.notify();
 
       return {
         success: true,
         printer: target,
-        message: `Kiosk built-in thermal printer "${target.name}" automatically configured (${target.paperSize} • ${target.interfaceType})`
+        message: `Kiosk built-in thermal printer "${target.name}" selected (${target.paperSize} • ${target.interfaceType}) — print a test slip to confirm it's actually reachable`
       };
     }
 

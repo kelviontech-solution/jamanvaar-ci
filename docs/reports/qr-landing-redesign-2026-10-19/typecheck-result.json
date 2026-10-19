@@ -1,0 +1,6 @@
+{
+  "revision": "Website/menu separation",
+  "command": "tsc -b --pretty false",
+  "exitCode": 0,
+  "diagnostics": ""
+}

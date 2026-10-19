@@ -73,7 +73,9 @@ export const QR_CAPABILITY_LABELS: Record<string, string> = {
   QR_ORDER_HISTORY: 'Order history',
   QR_USAGE_LIMITS: 'Usage limits',
   QR_INVENTORY_SYNC: 'Inventory integration',
-  QR_ACCESSIBILITY: 'Accessibility settings'
+  QR_ACCESSIBILITY: 'Accessibility settings',
+  QR_RESERVATIONS: 'Table reservations',
+  QR_LOCATIONS: 'Multi-branch locations'
 };
 
 function ToggleRow({ spec, checked, disabled, onChange }: { spec: ToggleSpec; checked: boolean; disabled: boolean; onChange: (next: boolean) => void }) {

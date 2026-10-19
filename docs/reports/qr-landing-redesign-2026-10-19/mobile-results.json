@@ -1,0 +1,97 @@
+[
+  {
+    "screen": "real-public-page",
+    "width": 320,
+    "menuItemsAccessible": 40,
+    "menuOnDemand": true,
+    "mobileRefinement": true,
+    "overflow": false
+  },
+  {
+    "screen": "real-public-page",
+    "width": 360,
+    "menuItemsAccessible": 40,
+    "menuOnDemand": true,
+    "mobileRefinement": true,
+    "overflow": false
+  },
+  {
+    "screen": "real-public-page",
+    "width": 390,
+    "menuItemsAccessible": 40,
+    "menuOnDemand": true,
+    "mobileRefinement": true,
+    "overflow": false
+  },
+  {
+    "screen": "real-public-page",
+    "width": 430,
+    "menuItemsAccessible": 40,
+    "menuOnDemand": true,
+    "mobileRefinement": true,
+    "overflow": false
+  },
+  {
+    "screen": "real-public-page",
+    "width": 667,
+    "menuItemsAccessible": 40,
+    "menuOnDemand": true,
+    "mobileRefinement": true,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "HERITAGE",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "HERITAGE",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "CAFE",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "CAFE",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "MODERN",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "MODERN",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "INDIAN",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "INDIAN",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "screen": "real-editor-with-isolated-transport",
+    "width": 390,
+    "draftSave": true,
+    "publishAcknowledgement": true,
+    "overflow": false
+  }
+]

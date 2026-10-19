@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, ownerDeviceSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -30,8 +30,8 @@ describe('Restaurant identity sync across devices (B2-054)', () => {
     return red.body.deviceToken as string;
   }
   const getIdentity = (deviceToken: string) => request(app.getHttpServer()).get('/api/v1/devices/me/restaurant').set('Authorization', `Bearer ${deviceToken}`);
-  const patchIdentity = (deviceToken: string, body: Record<string, unknown>) =>
-    request(app.getHttpServer()).patch('/api/v1/devices/me/restaurant').set('Authorization', `Bearer ${deviceToken}`).send(body);
+  const patchIdentity = async (deviceToken: string, body: Record<string, unknown>) =>
+    request(app.getHttpServer()).patch('/api/v1/devices/me/restaurant').set('Authorization', `Bearer ${deviceToken}`).set('x-owner-authorization', await ownerDeviceSession(prisma, deviceToken)).send(body);
 
   beforeAll(async () => {
     app = await createTestApp();

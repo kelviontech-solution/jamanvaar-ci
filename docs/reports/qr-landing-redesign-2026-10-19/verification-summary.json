@@ -1,0 +1,30 @@
+{
+  "revision": "Restaurant website; menu on demand; explicit same-tab ordering destination",
+  "targetedTests": {
+    "passed": 21,
+    "failed": 0,
+    "files": 2
+  },
+  "browser": {
+    "passedScenarios": 16,
+    "publicPageScenarios": 5,
+    "templateScenarios": 8,
+    "editorScenarios": 2,
+    "orderingNavigationScenarios": 1
+  },
+  "builds": [
+    {
+      "application": "guest",
+      "exitCode": 0,
+      "publicAssetCopy": true
+    },
+    {
+      "application": "admin",
+      "exitCode": 0,
+      "publicAssetCopy": true
+    }
+  ],
+  "editorTransport": "isolated in-memory authentication/API; printing stubbed; no tenant publication",
+  "publicTransport": "real local API via IPv4 forwarding",
+  "deployment": "local source only"
+}

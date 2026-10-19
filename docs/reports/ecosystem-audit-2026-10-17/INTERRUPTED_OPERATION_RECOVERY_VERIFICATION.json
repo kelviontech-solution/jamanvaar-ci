@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-10-19T01:30:15.726Z",
+  "baseCommit": "ccf17d93288ede1a1bdf7bb2c150adf84ec88e72",
+  "programmeComplete": false,
+  "pushed": false,
+  "deployed": false,
+  "provisionalScores": {
+    "security": 7,
+    "codeQuality": 7,
+    "saasReadiness": 6.5
+  },
+  "focused": {
+    "file": ".jamanvaar/repair21-draft-followup.private.json",
+    "sha256": "1c2f2fb30ea4e95e560c067b13f5c8df197a13631627c8476420179777f83db0",
+    "files": 8,
+    "passed": 94,
+    "failed": 0,
+    "skipped": 0,
+    "success": true,
+    "failures": []
+  },
+  "fullRoot": {
+    "file": ".jamanvaar/repair21-full-root.private.json",
+    "sha256": "54af19d584e323b6a4dde87bb1bafcddacd4dc9504ad82f80b348163de9ff991",
+    "files": 336,
+    "passed": 2418,
+    "failed": 0,
+    "skipped": 0,
+    "success": true,
+    "failures": []
+  },
+  "cleanFullRootGate": true,
+  "frozenReleaseGate": false,
+  "intermediate": [
+    {
+      "file": ".jamanvaar/repair21-final-affected.private.json",
+      "sha256": "7734bb0976589c318088f95919a15eed87308cfd07e7f2923f2426c38d950a81",
+      "files": 8,
+      "passed": 91,
+      "failed": 1,
+      "skipped": 0,
+      "success": false,
+      "failures": [
+        "actual POS acknowledged checkout retains recovery when its final acknowledgement response is lost and permits safe re-review"
+      ]
+    }
+  ],
+  "intermediateExplanation": "Initial final-acknowledgement fault setup wrapped its existing mock recursively; fixed without removing the assertion. Actual already-acknowledged replay adoption was then repaired and covered.",
+  "types": [
+    {
+      "file": ".jamanvaar/repair21-draft-root-types.log",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": ".jamanvaar/repair21-post-template-api-types.log",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "workspaceContext": "QR template schema/types/styles were edited concurrently during the broad run. A missing exhaustive guest-page color mapping was repaired. A later saved-draft recovery guard has its own affected regression, type/build/browser follow-up. The broad run is working-tree regression evidence, not a frozen release certificate.",
+  "productionBundles": [
+    {
+      "app": "pos",
+      "exitCode": 0,
+      "scope": "Recovery-stage frontend bundle; QR guest additionally refreshed after concurrent template mapping fix",
+      "logSha256": "5d8c315e1bcdb93a64cf32987706495a0787a5380f526a2b00ea10db5dff9247"
+    },
+    {
+      "app": "pos-admin",
+      "exitCode": 0,
+      "scope": "Recovery-stage frontend bundle; QR guest additionally refreshed after concurrent template mapping fix",
+      "logSha256": "cb74f0e5a61d2abd8f58b20e3b308dec6a2386fd8c12476d02a5e8110e53c48f"
+    },
+    {
+      "app": "captain",
+      "exitCode": 0,
+      "scope": "Recovery-stage frontend bundle; QR guest additionally refreshed after concurrent template mapping fix",
+      "logSha256": "b9d9d0e2d75dc137935e618919d97c36d34433fe8fad74d2b695419bc261a254"
+    },
+    {
+      "app": "kiosk-user",
+      "exitCode": 0,
+      "scope": "Recovery-stage frontend bundle; QR guest additionally refreshed after concurrent template mapping fix",
+      "logSha256": "ff728f552831f8b93232a5c037ec119e47504b3f6ddcd0b130ce3adf0513a34e"
+    },
+    {
+      "app": "kds",
+      "exitCode": 0,
+      "scope": "Recovery-stage frontend bundle; QR guest additionally refreshed after concurrent template mapping fix",
+      "logSha256": "68e790b6eba8efd3f2e058a3ecb76142b3d84b4596553e55e12070e32a70d289"
+    },
+    {
+      "app": "qr-guest",
+      "exitCode": 0,
+      "scope": "Recovery-stage frontend bundle; QR guest additionally refreshed after concurrent template mapping fix",
+      "logSha256": "eb10bc177b5d27f0b7bb60a5e67daac9d520622ee75dd3359157dc466e77e2b9"
+    },
+    {
+      "app": "super-admin",
+      "exitCode": 0,
+      "scope": "Recovery-stage frontend bundle; QR guest additionally refreshed after concurrent template mapping fix",
+      "logSha256": "3a4dbe8e1ffdc99eb24802ab16a0b007b7e2b74a50c394340a3a8c7f0d777af5"
+    }
+  ],
+  "browser": {
+    "scope": "Real Chrome/SQLite OPFS with actual POS recovery/payment/cart/Bills and Captain/Admin components, Kiosk admission service fixture, fixture identities and hardware.",
+    "scenarios": 20,
+    "pageErrors": 0,
+    "mobileOverflowAssertions": "passed",
+    "recoveryScenarios": [
+      {
+        "scenario": "manager-reviewed-original-operation-after-refresh",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false,
+        "reviewHorizontalOverflow": false
+      },
+      {
+        "scenario": "manager-reviewed-original-operation-after-refresh",
+        "width": 1366,
+        "pageErrors": 0,
+        "horizontalOverflow": false,
+        "reviewHorizontalOverflow": false
+      }
+    ],
+    "kitchenSha256": "1678b1680de38f78500416b689e07e04e266a910c3624608d393097043f793d3",
+    "checkoutSha256": "2923a394ee56ad32b854fd46788d27137cc2ec2f7c72421afa38035fa742a147"
+  },
+  "limits": [
+    "POS manager recovery UI only; equivalent guided Captain/Kiosk/Admin recovery remains",
+    "Human decision about a separate cart remains necessary",
+    "Local role checks do not make clients tamper-proof; protected backend authority remains separate",
+    "Ten work packages remain incomplete; no provider/physical hardware/original signed upgrade/offsite key-loss or representative load acceptance",
+    "No new full API database-suite run; prior broad root timing failures remain historical evidence"
+  ],
+  "sources": [
+    {
+      "file": "packages/database/src/db.ts",
+      "sha256": "314d6120a17f36d1237a3735aa7542d30d47d6562d609433ce1be20ea934d319"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/services/interruptedOperationRecovery.ts",
+      "sha256": "9116e689869e4274b62558e1c48baf139c0ff30b236e1a2898778c4093777b90"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/InterruptedOperationRecoveryPanel.tsx",
+      "sha256": "e60c4cb648720d3a303b024b07efa19dadddc21d79010ba06c5be8bfc5ed4b12"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/PosSettingsView.tsx",
+      "sha256": "fe8869ea251e21bb9b0285e41ccac957ba6a7549f27fb151c4f42475bb4fd161"
+    },
+    {
+      "file": "tests/financial_repository_commit.test.ts",
+      "sha256": "040a4f063b6725ab7a9c5ae558e052abd3aeba509bb6bd42d45d38a622a128d9"
+    },
+    {
+      "file": "docs/reports/ecosystem-audit-2026-10-17/financial-checkout-browser.tsx",
+      "sha256": "4a84e069029b84d231119b9673bfdafd2ea5627967962573cc27ca8d6e794bad"
+    },
+    {
+      "file": "docs/reports/ecosystem-audit-2026-10-17/financial-checkout-browser.cjs",
+      "sha256": "0af208b1b11ea78f17b4682fe4459ab1604cce1fd3ae099d348e2ca5235bef21"
+    },
+    {
+      "file": "apps/qr-guest/src/App.tsx",
+      "sha256": "8d21d2c39cdfcc4ee58d1a55bcbde3459456481294611465afdcdb1c6def26ed"
+    }
+  ]
+}

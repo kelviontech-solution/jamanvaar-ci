@@ -17,6 +17,8 @@ export const QR_CAPABILITIES = {
   QR_ORDER_HISTORY: 'qrOrderHistory',
   QR_USAGE_LIMITS: 'qrUsageLimits',
   QR_INVENTORY_SYNC: 'qrInventorySync',
-  QR_ACCESSIBILITY: 'qrAccessibility'
+  QR_ACCESSIBILITY: 'qrAccessibility',
+  QR_RESERVATIONS: 'qrReservations',
+  QR_LOCATIONS: 'qrLocations'
 } as const;
 export type QrCapability = keyof typeof QR_CAPABILITIES;

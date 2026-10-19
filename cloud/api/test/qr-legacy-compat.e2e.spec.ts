@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession, ownerDeviceSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { QrRateLimiter } from '../src/modules/qr/qr-rate-limit';
 
@@ -37,8 +37,14 @@ describe('QR legacy codes and the deprecated guest adapter', () => {
     const res = await http().post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: type });
     return res.body.deviceToken as string;
   }
-  const push = (token: string, type: string, externalId: string, payload: Record<string, unknown>) =>
-    as('post', `/api/v1/entity-sync/${type}`, token).send({ events: [{ externalId, payload: { id: externalId, ...payload, updatedAt: new Date().toISOString() } }] });
+  const push = async (token: string, type: string, externalId: string, payload: Record<string, unknown>) => {
+    const req = as('post', `/api/v1/entity-sync/${type}`, token);
+    if (['MENU_ITEM', 'MENU_CATEGORY', 'TAX_GROUP', 'MODIFIER_GROUP'].includes(type)) req.set('x-staff-session', await refundManagerSession(app, prisma, token));
+    const result = await req.send({ events: [{ externalId, payload: { id: externalId, ...payload, updatedAt: new Date().toISOString() } }] });
+    expect(result.status).toBe(201);
+    expect(result.body.results[0].status).toBe('ok');
+    return result;
+  };
 
   let posA: string;
   let posB: string;
@@ -66,6 +72,9 @@ describe('QR legacy codes and the deprecated guest adapter', () => {
     await push(posA, 'MENU_CATEGORY', 'cat-l', { name: 'Mains', isActive: true, sortOrder: 1 });
     await push(posA, 'MENU_ITEM', 'itm-l', { categoryId: 'cat-l', name: 'Legacy Dish', price: 100, isAvailable: true, modifierGroupIds: [] });
     await push(posA, 'DINING_TABLE', 'tbl-l1', { tableNumber: '1', capacity: 4, isActive: true, qrToken: legacyToken, qrStatus: 'ACTIVE', branchId: branchA });
+    const consoleToken = await activate(restA, 'POS_ADMIN');
+    const published = await as('post', '/api/v1/menu/publish', consoleToken).set('x-owner-authorization', await ownerDeviceSession(prisma, consoleToken)).send({});
+    expect(published.status).toBe(201);
     const other = await restaurant('QrLegacyOther', plan.body.id);
     posOther = await activate(other, 'POS');
   }, 120_000);

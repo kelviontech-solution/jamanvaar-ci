@@ -1,6 +1,8 @@
 import { BranchCore } from './core';
 import { nextAttemptState } from '../../sync/src/sync_protocol';
 import { requiredConsoleApps } from '../../../cloud/api/src/common/security/admin-product-access';
+import { BRANCH_ENTITY_TYPES } from '../../../cloud/api/src/modules/entity-sync/branch-entity-scope';
+import { createHash } from 'node:crypto';
 
 /** Entity types (menu, staff, tables...) the core mirrors in both directions. */
 export const MIRRORED_ENTITY_TYPES = ['TAX_GROUP', 'MODIFIER_GROUP', 'RESERVATION', 'MENU_CATEGORY', 'MENU_ITEM', 'COMBO', 'COUPON', 'STAFF_USER', 'DINING_TABLE', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'SERVICE_MESSAGE', 'CUSTOMER_FEEDBACK', 'KIOSK_CONFIGURATION'];
@@ -32,6 +34,8 @@ export class CloudUplink {
   private cancelled = false;
   private activeRequest: AbortController | null = null;
   private enabledApps = new Set<string>();
+  private allowUnscopedBranchData = false;
+  private branchUploadCredentialVerified = false;
 
   resume(): void { this.cancelled = false; }
   cancel(): void { this.cancelled = true; this.activeRequest?.abort(); }
@@ -39,7 +43,12 @@ export class CloudUplink {
   constructor(
     private readonly core: BranchCore,
     private readonly opts: UplinkOptions
-  ) {}
+  ) {
+    const endpoint = new URL(opts.cloudBase);
+    const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(endpoint.hostname);
+    if ((endpoint.protocol !== 'https:' && !(endpoint.protocol === 'http:' && loopback)) || endpoint.username || endpoint.password || endpoint.search || endpoint.hash) throw new Error('Branch Core cloud connections require HTTPS, or HTTP on loopback for local development, without embedded credentials or query parameters');
+    this.opts = { ...opts, cloudBase: endpoint.href.replace(/\/+$/, '') };
+  }
 
   private async request(method: string, path: string, body?: unknown): Promise<{ status: number; data: any }> {
     if (this.cancelled) throw new Error('Cloud uplink stopped');
@@ -76,7 +85,12 @@ export class CloudUplink {
       }
       if (roster.status !== 200) throw new Error(`roster ${roster.status}`);
       out.reachable = true;
+      const credentialHash = createHash('sha256').update(this.opts.deviceToken).digest('hex');
+      const issuer = roster.data.devices.find((device: { tokenHash?: string }) => device.tokenHash === credentialHash);
+      if (issuer?.branchId && issuer.branchId !== this.core.cfg.branchId) throw new Error('BRANCH_BOUND_CORE_CREDENTIAL_REQUIRED: This credential belongs to another branch. Existing local trust and pending work were preserved.');
       this.core.applyRoster(roster.data);
+      this.allowUnscopedBranchData = roster.data.restaurantBranchCount === 1 && roster.data.branches.length === 1 && roster.data.branches[0].id === this.core.cfg.branchId;
+      this.branchUploadCredentialVerified = issuer?.type === 'POS_ADMIN' && issuer.status === 'ACTIVE' && issuer.branchId === this.core.cfg.branchId;
       this.enabledApps = new Set(roster.data.subscription.enabledApps);
 
       out.uploaded += await this.uploadOrders();
@@ -100,6 +114,7 @@ export class CloudUplink {
     for (;;) {
       const due = this.core.dueOutbox('order', 100);
       if (due.length === 0) return total;
+      this.requireBranchUploadCredential();
       const res = await this.request('POST', '/api/v1/orders/sync', { events: due.map((d) => d.payload) });
       if (res.status !== 201 && res.status !== 200) {
         this.fail(due, `orders ${res.status}`);
@@ -108,8 +123,9 @@ export class CloudUplink {
       const results: Array<{ status: string; error?: string; externalOrderId: string }> = res.data.results;
       const ok: number[] = [];
       const bad: Array<{ id: number; attempts: number; error: string }> = [];
-      due.forEach((d, i) => {
-        const r = results[i];
+      due.forEach((d) => {
+        const matches = results.filter(r => r.externalOrderId === d.payload.externalOrderId);
+        const r = matches.length === 1 ? matches[0] : undefined;
         if (r && r.status === 'ok') ok.push(d.id);
         else bad.push({ id: d.id, attempts: d.attempts, error: r?.error ?? 'not acknowledged' });
       });
@@ -125,16 +141,19 @@ export class CloudUplink {
     for (;;) {
       const due = this.core.dueOutbox('movement', 200);
       if (due.length === 0) return total;
+      this.requireBranchUploadCredential();
       const res = await this.request('POST', '/api/v1/inventory/movements', { movements: due.map((d) => d.payload) });
       if (res.status !== 201 && res.status !== 200) {
         this.fail(due, `movements ${res.status}`);
         throw new Error(`movements upload ${res.status}`);
       }
-      const results: Array<{ status: string; error?: string }> = res.data.results;
+      const results: Array<{ status: string; error?: string; movementId: string }> = res.data.results;
       const ok: number[] = [];
-      due.forEach((d, i) => {
-        if (results[i]?.status === 'ok') ok.push(d.id);
-        else this.fail([d], results[i]?.error ?? 'not acknowledged');
+      due.forEach((d) => {
+        const matches = results.filter(r => r.movementId === d.payload.movementId);
+        const result = matches.length === 1 ? matches[0] : undefined;
+        if (result?.status === 'ok') ok.push(d.id);
+        else this.fail([d], result?.error ?? 'not acknowledged');
       });
       this.core.markOutboxSent(ok);
       total += ok.length;
@@ -149,13 +168,16 @@ export class CloudUplink {
     dirty.forEach((d) => byType.set(d.type, [...(byType.get(d.type) ?? []), d]));
     for (const [type, records] of byType) {
       if (!requiredConsoleApps(`/api/v1/entity-sync/${type}`).some(app => this.enabledApps.has(app))) continue;
+      if (BRANCH_ENTITY_TYPES.has(type)) this.requireBranchUploadCredential();
       for (let offset = 0; offset < records.length; offset += 200) {
       const list = records.slice(offset, offset + 200);
       const res = await this.request('POST', `/api/v1/entity-sync/${type}`, { events: list.map((e) => ({ externalId: e.externalId, payload: e.payload })) });
       if (res.status !== 201 && res.status !== 200) throw new Error(`entities ${type} ${res.status}`);
-      (res.data.results as Array<{ externalId: string; status: string }>).forEach((r) => {
-        if (r.status === 'ok') {
-          this.core.clearDirty(type, r.externalId, list.find((record) => record.externalId === r.externalId)?.payload);
+      const results = res.data.results as Array<{ externalId: string; status: string }>;
+      list.forEach(record => {
+        const matches = results.filter(result => result.externalId === record.externalId);
+        if (matches.length === 1 && matches[0].status === 'ok') {
+          this.core.clearDirty(type, record.externalId, record.payload, record.syncVersion);
           total++;
         }
       });
@@ -176,14 +198,26 @@ export class CloudUplink {
     return this.core.store.getConfig(key);
   }
 
+  private ownsBranch(branchId: unknown): boolean {
+    return branchId === this.core.cfg.branchId || (branchId == null && this.allowUnscopedBranchData);
+  }
+
+  private requireBranchUploadCredential(): void {
+    // Cloud writes derive branch ownership from the registered credential. A
+    // local cfg.branchId or a client header cannot turn an owner-wide token
+    // into a branch-bound terminal. Retain all queued work until setup is fixed.
+    if (!this.branchUploadCredentialVerified) throw new Error('BRANCH_BOUND_CORE_CREDENTIAL_REQUIRED: Connect this Core using an active Restaurant Admin device registered to this branch. Pending local orders and stock are retained.');
+  }
+
   private async downloadOrders(): Promise<number> {
     let total = 0;
     for (let page = 0; page < 20; page++) {
       const after = Number(this.cursor('cloud_cursor_orders') ?? 0);
       const res = await this.request('GET', `/api/v1/orders/sync?afterSeq=${after}`);
       if (res.status !== 200) throw new Error(`orders download ${res.status}`);
-      const events = (res.data.orders as any[]).map((o) => ({
+      const events = (res.data.orders as any[]).filter(o => this.ownsBranch(o.branchId)).map((o) => ({
         eventId: `cloud:${o.externalOrderId}:${o.syncVersion}`,
+        branchId: this.core.cfg.branchId,
         externalOrderId: o.externalOrderId, orderType: o.orderType, status: o.status,
         tableId: o.tableId ?? undefined, tableLabel: o.tableLabel ?? undefined, items: o.items, subtotal: o.subtotal, taxAmount: o.taxAmount,
         discountAmount: o.discountAmount ?? 0, totalAmount: o.totalAmount, notes: o.notes ?? undefined, paymentStatus: o.paymentStatus ?? undefined,
@@ -208,7 +242,7 @@ export class CloudUplink {
       const after = Number(this.cursor('cloud_cursor_movements') ?? 0);
       const res = await this.request('GET', `/api/v1/inventory/movements?afterSeq=${after}`);
       if (res.status !== 200) throw new Error(`movements download ${res.status}`);
-      const list = (res.data.movements as any[]).map((m) => ({ movementId: m.movementId, itemId: m.itemId, itemName: m.itemName, type: m.type, quantityDelta: m.quantityDelta, unit: m.unit, orderId: m.orderId ?? undefined, reason: m.reason ?? '', occurredAt: typeof m.occurredAt === 'string' ? m.occurredAt : new Date(m.occurredAt).toISOString() }));
+      const list = (res.data.movements as any[]).filter(m => this.ownsBranch(m.branchId)).map((m) => ({ movementId: m.movementId, branchId: this.core.cfg.branchId, itemId: m.itemId, itemName: m.itemName, type: m.type, quantityDelta: m.quantityDelta, unit: m.unit, orderId: m.orderId ?? undefined, reason: m.reason ?? '', occurredAt: typeof m.occurredAt === 'string' ? m.occurredAt : new Date(m.occurredAt).toISOString() }));
       if (list.length > 0) {
         const applied = this.core.pushMovements({ id: 'cloud' }, list, 'cloud');
         const failed = applied.results.find((r) => r.status === 'error');
@@ -232,8 +266,12 @@ export class CloudUplink {
         if (res.status !== 200) throw new Error(`entities download ${type} ${res.status}`);
         const entities = res.data.entities as Array<{ externalId: string; payload: any; updatedAt: string }>;
         if (entities.length > 0) {
-          // An owner console credential can read every branch; this core mirrors only its own kiosk presentation.
-          const scoped = type === 'KIOSK_CONFIGURATION' ? entities.filter(e => e.payload.branchId === this.core.cfg.branchId) : entities;
+          // A restaurant-wide owner credential is not a branch Core read scope.
+          // Operational records require branch ownership; shared staff/catalog
+          // records remain shared unless they explicitly target another branch.
+          const scoped = entities.filter(e => BRANCH_ENTITY_TYPES.has(type)
+            ? this.ownsBranch(e.payload.branchId)
+            : e.payload.branchId == null || e.payload.branchId === this.core.cfg.branchId);
           const applied = this.core.pushEntities({ id: 'cloud' }, type, scoped.map((e) => ({ externalId: e.externalId, payload: e.payload })), 'cloud');
           if (applied.results.some((r) => r.status === 'error')) throw new Error(`Could not apply ${type} page`);
         }

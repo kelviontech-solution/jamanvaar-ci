@@ -12,6 +12,7 @@ import {
   Sparkles,
   BellRing,
   CalendarClock,
+  CalendarCheck,
   ChartColumnIncreasing,
   Paintbrush,
   LifeBuoy,
@@ -19,12 +20,13 @@ import {
 } from "lucide-react";
 
 export const QR_PAGES = [
- {id:'RESTAURANT_PAGE',label:'Restaurant Page',group:'Branding',icon:Paintbrush,description:'Design your restaurant website, branch contacts and mobile welcome page.'},
+ {id:'RESTAURANT_PAGE',label:'Business Page',group:'Branding',icon:Paintbrush,description:'Design your business website, branch contacts and mobile welcome page.'},
  {id:'OPERATIONS',label:'Operations Hub',group:'Live operations',icon:LayoutDashboard,description:'Branch service controls, guest follow-up, handovers and acceptance.'},
  {id:'ONBOARDING',label:'Guided Menu Setup',group:'Launch setup',icon:UtensilsCrossed,description:'Load cuisine templates, review pricing and publish your shared guest menu.'},
  {id:'ACCEPTANCE',label:'Payment Acceptance',group:'Payments',icon:CreditCard,description:'Check configuration and record a real phone checkout against verified payment.'},
  {id:'RECONCILIATION',label:'Collection Reconciliation',group:'Insights',icon:ReceiptText,description:'Close the day using collection-date totals by collector, method and branch.'},
  {id:'CALENDAR',label:'Pickup Calendar',group:'Live operations',icon:CalendarClock,description:'Review booked pickup slots and complete guest handovers.'},
+ {id:'RESERVATIONS',label:'Reservations',group:'Live operations',icon:CalendarCheck,description:'Confirm, decline or seat table requests sent from your restaurant website.'},
  {id:'PRINTPACK',label:'QR Print Packs',group:'Branding',icon:QrCode,description:'Download branded cards, print sheets and replacement inventory together.'},
   {id:"CRM",label:"Customers & Loyalty",group:"Menu & guests",icon:Users,description:"Manage shared customers, point balances, rewards and verified visit history."},
   {
@@ -158,7 +160,7 @@ export type QrTab = (typeof QR_PAGES)[number]["id"];
 // Service rules. "Restaurant default vs. branch override" is already called out per-page by the
 // scope banner in QrConsole.tsx (see the tab list there) — unaffected by this reshuffle.
 const GROUP_ORDER = ['Live operations', 'Launch setup', 'Guest experience', 'Menu & guests', 'Payments', 'Service rules', 'Branding', 'Insights', 'Help'];
-const TASK_ORDER: QrTab[] = ['OVERVIEW','OPERATIONS','ORDERS','SERVICE','CALENDAR','MENU','CRM','ONBOARDING','TABLES','PAYMENTS','ACCEPTANCE','RULES','BRAND','RESTAURANT_PAGE','DESIGN','PRINTPACK','ANALYTICS','RECONCILIATION','PERFORMANCE','PICKUP','SETTINGS','ADVANCED','SUPPORT'];
+const TASK_ORDER: QrTab[] = ['OVERVIEW','OPERATIONS','ORDERS','SERVICE','CALENDAR','RESERVATIONS','MENU','CRM','ONBOARDING','TABLES','PAYMENTS','ACCEPTANCE','RULES','BRAND','RESTAURANT_PAGE','DESIGN','PRINTPACK','ANALYTICS','RECONCILIATION','PERFORMANCE','PICKUP','SETTINGS','ADVANCED','SUPPORT'];
 export const QR_NAVIGATION = [...QR_PAGES].sort((a,b) => {
   const rank = (group: string) => {const index = GROUP_ORDER.indexOf(group);return index < 0 ? GROUP_ORDER.length : index;};
   return rank(a.group) - rank(b.group) || TASK_ORDER.indexOf(a.id) - TASK_ORDER.indexOf(b.id);

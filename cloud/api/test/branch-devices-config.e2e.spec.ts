@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { DEVICE_AUTH_CACHE } from '../src/common/guards/device-auth.guard';
 
@@ -86,7 +86,9 @@ describe('branch prices on devices, KDS stations, device verdict cache', () => {
     it('a branch terminal pushing the dish back cannot turn the branch price into the base price', async () => {
       const got = (await items(F.posA)).tea;
       expect(got.price).toBe(130);
-      await as('post', '/api/v1/entity-sync/MENU_ITEM', F.posA).send({ events: [{ externalId: 'tea', payload: { ...got, name: 'Tea (large)', updatedAt: now() } }] });
+      const edited = await as('post', '/api/v1/entity-sync/MENU_ITEM', F.posA).set('x-staff-session', await refundManagerSession(app, prisma, F.posA)).send({ events: [{ externalId: 'tea', payload: { ...got, name: 'Tea (large)', updatedAt: now() } }] });
+      expect(edited.status).toBe(201);
+      expect(edited.body.results[0].status).toBe('ok');
       const stored = await prisma.runAsPlatform((tx) => tx.syncedEntity.findFirstOrThrow({ where: { restaurantId: F.rid, entityType: 'MENU_ITEM', externalId: 'tea' } }));
       expect((stored.payload as any).price).toBe(100);
       expect((stored.payload as any).name).toBe('Tea (large)'); // the rest of the edit is kept

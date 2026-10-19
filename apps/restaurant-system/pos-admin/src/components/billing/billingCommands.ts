@@ -1,5 +1,5 @@
 import type { Order } from '@jamanvaar/types';
-import { db, KeyValueStore, OrderRepository } from '@jamanvaar/database';
+import { db, financialRequestFingerprint, OrderRepository } from '@jamanvaar/database';
 import { SessionPersistence } from '@jamanvaar/business';
 import { getOrderSource } from '@jamanvaar/utils';
 import { SyncOutboxEngine, syncShifts } from '@jamanvaar/sync';
@@ -14,22 +14,19 @@ function managerName(): string {
   return session.fullName;
 }
 
-/** Persisted across a lost response/reload. A changed reason is a new operation. */
-function refundAttempt(order: Order, amount: number, reason: string, method: string): string {
-  const key = `billing-refund:${db.restaurant.id}:${order.id}:${amount}:${method}:${reason}`;
-  const existing = KeyValueStore.get(key);
-  if (existing) return existing;
-  const attempt = crypto.randomUUID();
-  KeyValueStore.set(key, attempt);
-  return attempt;
+/** One opening ledger balance identifies one attempt even after a lost response/reload. */
+async function refundAttempt(order: Order): Promise<string> {
+  return `billing-return-${await financialRequestFingerprint(JSON.stringify({ restaurant: db.restaurant.id,
+    branch: db.outlet.id, orderId: order.id, refundedBefore: order.refundAmount ?? 0 }))}`;
 }
 
 export async function refundBillingOrder(order: Order, reason: string, returned: boolean, method: RefundMethod, amount: number = order.totalAmount, payingShiftId?: string): Promise<string> {
+  order = structuredClone(order);
   const actor = managerName();
   if (!reason.trim() || !returned) throw new Error('Enter a reason and confirm the money was returned to the customer.');
   if (order.paymentStatus !== 'SUCCESS' || order.refundAmount || ['REFUNDED', 'CANCELLED'].includes(order.orderStatus)) throw new Error('Only a fully paid, unrefunded bill can be refunded here. Use the payment ledger for partial refunds.');
   if (!Number.isFinite(amount) || amount <= 0 || amount > order.totalAmount) throw new Error('Enter a return amount greater than zero and no more than the paid bill.');
-  const key = refundAttempt(order, amount, reason.trim(), method);
+  const key = await refundAttempt(order);
   const qr = getOrderSource(order) === 'QR_TABLE';
   if (qr && order.paymentMethod === 'CASH_AT_COUNTER') {
     if (method !== 'CASH') throw new Error('This counter cash bill must be recorded as a cash refund.');
@@ -47,14 +44,27 @@ export async function refundBillingOrder(order: Order, reason: string, returned:
   if (payment) {
     const result = await createRefund(payment.id, Math.round(amount * 100), reason.trim(), actor, method, key);
     await SyncOutboxEngine.catchUpFromCloud().catch(() => undefined);
-    return result.status === 'SUCCESS' ? 'Returned payment recorded in the server ledger. Order synchronization requested.' : 'Refund recorded; confirmation is pending. Check the payment ledger before returning any more money.';
+    return ['SUCCESS', 'processed'].includes(result.status) ? 'Returned payment recorded in the server ledger. Order synchronization requested.' : 'Refund recorded; confirmation is pending. Check the payment ledger before returning any more money.';
   }
   if (qr || (!localCash && !localUpi)) throw new Error('No refundable online payment was found. Use the payment ledger to reconcile this bill; its status has not changed.');
   if ((localCash && method !== 'CASH') || (localUpi && method !== 'UPI_TO_CUSTOMER')) throw new Error('Return this local payment using its original tender. A different return method requires payment-ledger reconciliation.');
   const originalOpen = order.shiftId && db.shifts.some(shift => shift.id === order.shiftId && shift.status === 'OPEN');
   if (!originalOpen && !payingShiftId) throw new Error('Choose the open register recording this return.');
-  const refunded = OrderRepository.refundOrder(order.id, amount, reason.trim(), actor, payingShiftId ? { idempotencyKey: key, payingShiftId, method } : undefined);
-  if (!refunded) throw new Error('Bill unavailable. Refresh before retrying.');
+  const prepare = () => {
+    const current = OrderRepository.getOrderById(order.id);
+    if (!current || (current.refundAmount ?? 0) !== (order.refundAmount ?? 0)) throw new Error('The return ledger changed. Review the original return before recording another; do not pay the guest again.');
+    const refunded = OrderRepository.refundOrder(order.id, amount, reason.trim(), actor, payingShiftId ? { idempotencyKey: key, payingShiftId, method } : undefined);
+    if (!refunded) throw new Error('Bill unavailable. Refresh before retrying.');
+    return { orderId: refunded.id };
+  };
+  if (db.supportsFinancialCommands()) {
+    const saved = await db.commitFinancialMutation(await financialRequestFingerprint(JSON.stringify({ operation: 'ADMIN_LOCAL_RETURN_V1',
+      restaurant: db.restaurant.id, branch: db.outlet.id, orderId: order.id, amount, reason: reason.trim(), actor, method, payingShiftId, key })), prepare);
+    await db.acknowledgeFinancialMutation(saved.operationId);
+  } else {
+    // Compatibility-only legacy backend. This is not the SQLite acceptance path.
+    db.transaction(prepare);
+  }
   // The return belongs to its paying till; admin edits must push that till and
   // its cash-out record rather than relying on the counter to publish them.
   await syncShifts({push:true}).catch(() => undefined);
@@ -71,7 +81,15 @@ export async function voidBillingOrder(order: Order, reason: string): Promise<vo
     await QrAdminApi.orderAction(order.id, 'CANCELLED', current.version, reason.trim());
     await SyncOutboxEngine.catchUpFromCloud().catch(() => undefined);
   } else {
-    const result = OrderRepository.voidOrder(order.id, reason.trim(), actor);
-    if (!result) throw new Error('Bill unavailable. Refresh before retrying.');
+    const prepare = () => {
+      const result = OrderRepository.voidOrder(order.id, reason.trim(), actor);
+      if (!result) throw new Error('Bill unavailable. Refresh before retrying.');
+      return { orderId: result.id };
+    };
+    if (db.supportsFinancialCommands()) {
+      const saved = await db.commitFinancialMutation(await financialRequestFingerprint(JSON.stringify({ operation: 'ADMIN_VOID_V1',
+        restaurant: db.restaurant.id, branch: db.outlet.id, orderId: order.id, reason: reason.trim(), actor })), prepare);
+      await db.acknowledgeFinancialMutation(saved.operationId);
+    } else db.transaction(prepare);
   }
 }

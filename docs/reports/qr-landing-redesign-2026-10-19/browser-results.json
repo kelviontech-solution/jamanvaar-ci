@@ -1,0 +1,105 @@
+[
+  {
+    "screen": "shared-qr-console",
+    "layout": "workspace",
+    "allToolsReachable": true,
+    "search": true,
+    "overflow": false
+  },
+  {
+    "screen": "shared-qr-console",
+    "layout": "integrated",
+    "allToolsReachable": true,
+    "search": true,
+    "overflow": false
+  },
+  {
+    "screen": "recommendations",
+    "width": 320,
+    "signatureVariety": true,
+    "categoriesAndSearch": true,
+    "translatedNavigationAndDishes": true,
+    "openingStatus": true,
+    "overflow": false
+  },
+  {
+    "screen": "recommendations",
+    "width": 390,
+    "signatureVariety": true,
+    "categoriesAndSearch": true,
+    "translatedNavigationAndDishes": true,
+    "openingStatus": true,
+    "overflow": false
+  },
+  {
+    "screen": "recommendations",
+    "width": 1440,
+    "signatureVariety": true,
+    "categoriesAndSearch": true,
+    "translatedNavigationAndDishes": true,
+    "openingStatus": true,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "HERITAGE",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "HERITAGE",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "CAFE",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "CAFE",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "MODERN",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "MODERN",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "INDIAN",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "screen": "template-fixture",
+    "template": "INDIAN",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "screen": "real-editor-with-isolated-transport",
+    "width": 1440,
+    "draftSave": true,
+    "publishAcknowledgement": true,
+    "overflow": false
+  },
+  {
+    "screen": "real-editor-with-isolated-transport",
+    "width": 390,
+    "draftSave": true,
+    "publishAcknowledgement": true,
+    "overflow": false
+  }
+]

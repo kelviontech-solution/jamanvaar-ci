@@ -38,6 +38,8 @@ const envSchema = z.object({
   BACKUP_LOCAL_DIR: z.string().optional(),
   // 32 random bytes, base64. When set, every backup is AES-256-GCM encrypted before it is stored (BUG-074).
   BACKUP_ENCRYPTION_KEY_B64: z.string().optional(),
+  // Production always requires encryption. This also opts staging/local installations in.
+  BACKUP_REQUIRE_ENCRYPTION: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['true', 'false']).optional()),
   // 'off' disables the automatic per-restaurant snapshots (BUG-072/074). Off under test.
   BACKUP_SCHEDULE: z.string().optional(),
   // Optional: Razorpay payment gateway (see modules/payments). Payment operations return a clear 503 while unset.

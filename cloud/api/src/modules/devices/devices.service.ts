@@ -272,14 +272,17 @@ export class DevicesService {
     if (issuer.type !== 'POS_ADMIN') throw new ForbiddenException('Only a Restaurant Admin console can download the branch roster');
     return this.prisma.runAsTenant(issuer.restaurantId, async (tx) => {
       const scope = { restaurantId: issuer.restaurantId, ...(issuer.branchId ? { branchId: issuer.branchId } : {}) };
-      const [devices, branches, restaurant, subs] = await Promise.all([
+      const [devices, branches, restaurant, subs, restaurantBranchCount] = await Promise.all([
         tx.device.findMany({
           where: scope,
           select: { id: true, type: true, name: true, branchId: true, status: true, isLocked: true, deviceTokenHash: true }
         }),
         tx.branch.findMany({ where: { restaurantId: issuer.restaurantId, ...(issuer.branchId ? { id: issuer.branchId } : {}) }, select: { id: true, name: true, code: true, timezone: true, status: true } }),
         tx.restaurant.findUniqueOrThrow({ where: { id: issuer.restaurantId }, select: { id: true, name: true, status: true } }),
-        tx.subscription.findMany({ where: { restaurantId: issuer.restaurantId, status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt: { gt: new Date() } }, select: { id: true, expiresAt: true } })
+        tx.subscription.findMany({ where: { restaurantId: issuer.restaurantId, status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt: { gt: new Date() } }, select: { id: true, expiresAt: true } }),
+        // A branch-bound credential sees one branch even when the restaurant
+        // has five. Cores need the total before attributing legacy null scope.
+        tx.branch.count({ where: { restaurantId: issuer.restaurantId } })
       ]);
       const enabled = subs.length
         ? await tx.applicationEntitlement.findMany({ where: { subscriptionId: { in: subs.map((x) => x.id) }, enabled: true }, select: { appCode: true } })
@@ -291,6 +294,7 @@ export class DevicesService {
       return {
         restaurant,
         branches,
+        restaurantBranchCount,
         subscription: { active: subs.length > 0, expiresAt: latestExpiry?.toISOString() ?? null, enabledApps: [...enabledApps] },
         devices: devices.map((d) => ({
           id: d.id, type: d.type, name: d.name, branchId: d.branchId, status: d.status, isLocked: d.isLocked,

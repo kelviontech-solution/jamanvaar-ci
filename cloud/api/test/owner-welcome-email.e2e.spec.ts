@@ -52,14 +52,15 @@ describe('owner welcome email and Restaurant ID', () => {
     expect(mail.html).not.toContain('First-time password');
   });
 
-  it('a restaurant made without a mobile gets its Restaurant ID when a mobile is added later, once', async () => {
+  it('a restaurant without a mobile receives a stable fallback ID which survives later phone changes', async () => {
     const res = await post({ name: `TEST NoMobile ${stamp}`, ownerName: 'Meena', ownerEmail: `nomobile-${stamp}@test.example.com` });
     ids.push(res.body.restaurant.id);
-    expect(res.body.restaurant.restaurantCode).toBeNull();
+    const originalCode = res.body.restaurant.restaurantCode;
+    expect(originalCode).toMatch(/^JM\d{10}$/);
     const mobile = `7${String(stamp).slice(-9)}`;
     const patched = await request(app.getHttpServer()).patch(`/api/v1/restaurants/${res.body.restaurant.id}`).set('Authorization', `Bearer ${token}`).send({ mobile });
-    expect(patched.body.restaurantCode).toBe(`JM${mobile}`);
+    expect(patched.body.restaurantCode).toBe(originalCode);
     const again = await request(app.getHttpServer()).patch(`/api/v1/restaurants/${res.body.restaurant.id}`).set('Authorization', `Bearer ${token}`).send({ mobile: `6${String(stamp).slice(-9)}` });
-    expect(again.body.restaurantCode).toBe(`JM${mobile}`); // never follows a later phone change
+    expect(again.body.restaurantCode).toBe(originalCode);
   });
 });

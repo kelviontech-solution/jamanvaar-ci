@@ -1,5 +1,14 @@
 import { MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboSync, CouponSync, CustomerSync, FeedbackSync, LoyaltyTierSync, LoyaltyRewardSync, LoyaltyProgramSettingsSync, ShiftSync, CashMovementSync, ReservationSync, type CollectionSync } from '@jamanvaar/database';
 import { EntitySyncEngine } from './entity_sync';
+import { EndpointResolver } from './endpoint_resolver';
+
+const REVIEWED_CATALOG_TYPES = new Set(['MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP']);
+export function catalogRevisionScope(entityType: string): string { return EndpointResolver.cursorKey(`entity-revision-${entityType}`, `/api/v1/entity-sync/${entityType}`); }
+export function catalogSyncConflicts() {
+  return [{ entityType: 'MENU_ITEM', sync: MenuItemSync }, { entityType: 'MENU_CATEGORY', sync: CategorySync }, { entityType: 'MODIFIER_GROUP', sync: ModifierGroupSync }, { entityType: 'TAX_GROUP', sync: TaxGroupSync }]
+    .flatMap(({ entityType, sync }) => sync.getConflicts(catalogRevisionScope(entityType)).map(conflict => ({ entityType, conflict,
+      resolve: (choice: 'SERVER' | 'LOCAL') => sync.resolveConflict(conflict, choice) })));
+}
 
 /** The server accepts at most this many records per push. */
 const PUSH_BATCH = 200;
@@ -40,14 +49,23 @@ export async function syncCollection<T extends { updatedAt?: string }>(entityTyp
   if (!readOnlyCatalog) sync.stampChanges();
   EntitySyncEngine.ensureCatalogIntegrity(entityType, id => sync.hasRecord(id));
   if (SELF_HEALING_TYPES.has(entityType) && sync.isEmpty()) EntitySyncEngine.restartFromBeginning(entityType);
-  await EntitySyncEngine.catchUp(entityType, (remote) => sync.applyRemote(remote.payload, { authoritative: readOnlyCatalog }));
+  const scope = REVIEWED_CATALOG_TYPES.has(entityType) ? catalogRevisionScope(entityType) : undefined;
+  const apply = (remote: import('./entity_sync').CloudSyncedEntity) => sync.applyRemote(remote.payload, { authoritative: readOnlyCatalog, scope, syncVersion: remote.syncVersion });
+  await EntitySyncEngine.catchUp(entityType, apply);
   if (!push) return;
-  const records = sync.collectSyncRecords();
+  const records = sync.collectSyncRecords(scope);
   for (let i = 0; i < records.length; i += PUSH_BATCH) {
     const batch = records.slice(i, i + PUSH_BATCH);
-    const result = await EntitySyncEngine.pushSnapshot(entityType, batch);
-    if (result.failed === 0 && result.processed === batch.length) sync.markPushed(batch);
-    else break;
+    let conflict = false;
+    const result = await EntitySyncEngine.pushSnapshot(entityType, batch, (event, acknowledgement) => {
+      if (acknowledgement.status === 'ok') sync.markPushed([event], scope && acknowledgement.syncVersion !== undefined ? { scope, syncVersion: acknowledgement.syncVersion } : undefined);
+      else if (/ENTITY_VERSION_CONFLICT|ENTITY_DELETED/.test(acknowledgement.error ?? '')) conflict = true;
+    });
+    if (conflict) {
+      EntitySyncEngine.restartFromBeginning(entityType, { force: true });
+      await EntitySyncEngine.catchUp(entityType, apply);
+    }
+    if (result.failed > 0 || result.processed !== batch.length) break;
   }
 }
 

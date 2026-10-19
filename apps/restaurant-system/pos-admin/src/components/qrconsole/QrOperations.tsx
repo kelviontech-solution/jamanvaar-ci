@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { QrServiceInbox } from "@jamanvaar/ui";
 import { qrApi } from "../../cloud/cloudClient";
-import { QrAdminApi } from "../../cloud/qrAdminClient";
+import { QrAdminApi, type QrReservationRow } from "../../cloud/qrAdminClient";
 import { FeatureRequestButton } from "./FeatureRequestButton";
 const base = "/api/v1/restaurant/qr/operations";
 export const qrRequestsApi = async <T,>(
@@ -142,6 +142,118 @@ export function QrServiceOperations() {
 }
 export function QrPickupOperations() {
   return <OperationsSettings mode="pickup" />;
+}
+const RESERVATION_FILTERS = ["PENDING", "CONFIRMED", "SEATED", "ALL"] as const;
+export function QrReservationsInbox() {
+  const [rows, setRows] = useState<QrReservationRow[] | null>(null),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState<string | null>(null),
+    [filter, setFilter] = useState<(typeof RESERVATION_FILTERS)[number]>("PENDING");
+  const load = async () => {
+    try {
+      setRows(await QrAdminApi.reservations());
+      setError("");
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+  useEffect(() => {
+    void load();
+    const t = setInterval(() => void load(), 20000);
+    return () => clearInterval(t);
+  }, []);
+  const act = async (id: string, status: QrReservationRow["status"]) => {
+    setBusy(id);
+    try {
+      await QrAdminApi.reservationAction(id, status);
+      await load();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  };
+  if (!rows)
+    return error.includes("not included in the current license") ? (
+      <section className={box}>
+        <h2 className="text-xl font-bold">Table reservations</h2>
+        <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+          <p>{error}</p>
+          <FeatureRequestButton featureCode="QR_RESERVATIONS" featureLabel="Table reservations" />
+        </div>
+      </section>
+    ) : (
+      <p>{error || "Loading reservations…"}</p>
+    );
+  const visible = rows.filter((r) => filter === "ALL" || r.status === filter);
+  return (
+    <section className={box}>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold">Table reservations</h2>
+        <button className="rounded-xl border px-3 py-2 text-xs font-bold flex items-center gap-1.5" onClick={() => void load()}>
+          <RefreshCw size={14} /> Refresh
+        </button>
+      </div>
+      <p className="text-sm text-slate-600">Requests a guest sends from the restaurant website. Confirm, decline, mark seated or cancel.</p>
+      {error && (
+        <p role="alert" className="text-rose-700">
+          {error}
+        </p>
+      )}
+      <div className="flex flex-wrap gap-2">
+        {RESERVATION_FILTERS.map((f) => (
+          <button
+            key={f}
+            className={f === filter ? button : "rounded-xl border px-3 py-2 text-xs font-bold"}
+            onClick={() => setFilter(f)}
+          >
+            {f === "ALL" ? "All" : f[0] + f.slice(1).toLowerCase()} ({f === "ALL" ? rows.length : rows.filter((r) => r.status === f).length})
+          </button>
+        ))}
+      </div>
+      {!visible.length && <p className="text-sm text-slate-500">No reservations here.</p>}
+      {visible.map((r) => (
+        <div key={r.id} className="rounded-xl border p-4 text-sm space-y-2">
+          <div className="flex flex-wrap justify-between gap-2">
+            <b>{r.name}</b>
+            <span className="text-xs text-slate-500">
+              {new Date(r.date + "T" + r.time).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+            </span>
+          </div>
+          <p>
+            {r.guests} guests ·{" "}
+            <a className="underline" href={"tel:" + r.phone}>
+              {r.phone}
+            </a>
+          </p>
+          {r.note && <p className="text-slate-600">{r.note}</p>}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-jaman-ivory px-3 py-1 text-xs font-bold">{r.status}</span>
+            {r.status === "PENDING" && (
+              <>
+                <button className={button} disabled={busy === r.id} onClick={() => void act(r.id, "CONFIRMED")}>
+                  Confirm
+                </button>
+                <button className="rounded-xl border px-3 py-2 text-xs font-bold" disabled={busy === r.id} onClick={() => void act(r.id, "DECLINED")}>
+                  Decline
+                </button>
+              </>
+            )}
+            {r.status === "CONFIRMED" && (
+              <>
+                <button className={button} disabled={busy === r.id} onClick={() => void act(r.id, "SEATED")}>
+                  Mark seated
+                </button>
+                <button className="rounded-xl border px-3 py-2 text-xs font-bold" disabled={busy === r.id} onClick={() => void act(r.id, "CANCELLED")}>
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      ))}
+    </section>
+  );
 }
 function OperationsSettings({ mode }: { mode: "service" | "pickup" }) {
   const [data, setData] = useState<any>(null),
@@ -596,44 +708,50 @@ export function QrMenuPerformance() {
   return (
     <section className={box}>
       <h2 className="text-xl font-bold">Menu performance</h2>
-      <div className="flex flex-wrap gap-3">
-        <label>
-          From
-          <input
-            className={field}
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
-        </label>
-        <label>
-          To
-          <input
-            className={field}
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
-        </label>
-        <button className={button} onClick={() => void load()}>
-          Apply dates
-        </button>
-        {data && (
-          <button className={button} onClick={csv}>
-            Export CSV
-          </button>
-        )}
-      </div>
-      {error && (
-        <div role="alert" className="text-rose-700">
+      {error && error.includes("not included in the current license") ? (
+        <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
           <p>{error}</p>
-          {error.includes("not included in the current license") && (
-            <FeatureRequestButton
-              featureCode="QR_MENU_ANALYTICS"
-              featureLabel="Menu analytics"
-            />
-          )}
+          <FeatureRequestButton
+            featureCode="QR_MENU_ANALYTICS"
+            featureLabel="Menu analytics"
+          />
         </div>
+      ) : (
+        <>
+          <div className="flex flex-wrap gap-3">
+            <label>
+              From
+              <input
+                className={field}
+                type="date"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+              />
+            </label>
+            <label>
+              To
+              <input
+                className={field}
+                type="date"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+              />
+            </label>
+            <button className={button} onClick={() => void load()}>
+              Apply dates
+            </button>
+            {data && (
+              <button className={button} onClick={csv}>
+                Export CSV
+              </button>
+            )}
+          </div>
+          {error && (
+            <div role="alert" className="text-rose-700">
+              <p>{error}</p>
+            </div>
+          )}
+        </>
       )}
       {data && (
         <>

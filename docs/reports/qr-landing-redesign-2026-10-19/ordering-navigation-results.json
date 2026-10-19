@@ -1,0 +1,13 @@
+[
+  {
+    "source": "real local public page",
+    "navigation": "same tab",
+    "landingMenuHidden": true,
+    "onDemandMenu": true,
+    "orderDestinationHash": "menu",
+    "orderingDishes": 40,
+    "ordersCreated": 0,
+    "paymentsInitiated": 0,
+    "runtimeErrors": 0
+  }
+]

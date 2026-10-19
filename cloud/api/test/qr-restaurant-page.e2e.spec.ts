@@ -335,6 +335,21 @@ it('provides platform-only named bundles and validates capability names and stal
   expect((await http().patch(path).set('Authorization','Bearer '+platform).send(bad)).status).toBe(400);
   expect((await http().patch(path).set('Authorization','Bearer '+platform).send({...initial.body,revision:initial.body.revision+999})).status).toBe(409);
 });
+it('publishes structured hours, categories and server-rendered sharing metadata without leaking drafts', async()=>{
+  const hours={timezone:'Asia/Kolkata',weekly:Array.from({length:7},(_,day)=>({day,intervals:day===0?[]:[{start:'10:00',end:'22:00'}]})),exceptions:[{date:'2026-12-25',intervals:[]}]};
+  await save({enabled:true,businessHours:hours,seo:{title:'River Kitchen — West',description:'Our neighbourhood restaurant.',imageUrl:''}},branch);
+  await publish(branch);
+  const e=await editor(branch),slug=e.sharePath.split('/').at(-1),url='/api/v1/public/qr/sites/'+slug;
+  const page=await http().get(url);expect(page.status).toBe(200);
+  expect(page.body.content.businessHours).toEqual(hours);expect(Array.isArray(page.body.categories)).toBe(true);
+  const head=await http().get(url+'/head');expect(head.status).toBe(200);expect(head.headers['content-type']).toContain('text/html');expect(head.text).toContain('River Kitchen — West');expect(head.text).toContain('specialOpeningHoursSpecification');
+  await save({seo:{title:'Private unfinished headline',description:'Draft only',imageUrl:''}},branch);
+  const unchanged=await http().get(url+'/head');expect(unchanged.text).not.toContain('Private unfinished headline');expect(unchanged.text).toContain('River Kitchen — West');
+  const invalid=await editor(branch);
+  expect((await api('put',branch,'',{version:invalid.version,content:{...invalid.draft,businessHours:{...hours,timezone:'Not/AZone'}}})).status).toBe(400);
+  expect((await api('put',branch,'',{version:invalid.version,content:{...invalid.draft,seo:{title:'Bad image',description:'',imageUrl:'img:'+'a'.repeat(64)}}})).status).toBe(400);
+  expect((await http().get('/api/v1/public/qr/sites/not-a-real-page/head')).status).toBe(404);
+});
 it('turns off the landing page independently of base ordering and respects per-branch licensing', async () => {
   await save({ enabled: false }, second);
   await publish(second);
@@ -355,4 +370,6 @@ it('turns off the landing page independently of base ordering and respects per-b
   );
   expect(await app.get(QrRestaurantPageService).publicPage(rid, branch)).toBeNull();
   expect((await editor(branch)).capability.enabled).toBe(false);
+  const e=await editor(branch),slug=e.sharePath?.split('/').at(-1);
+  if(slug)expect((await http().get('/api/v1/public/qr/sites/'+slug+'/head')).status).toBe(404);
 });

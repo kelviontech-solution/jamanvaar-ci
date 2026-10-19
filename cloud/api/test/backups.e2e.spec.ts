@@ -365,7 +365,10 @@ describe('Real off-device backups (S3-compatible storage)', () => {
       const storage = app.get(BackupStorageService);
       const stored = JSON.parse(await storage.downloadAndDecompress((await backupRow(snapshotBackupId)).storageKey));
 
-      expect(stored.version).toBe(1);
+      expect(stored.version).toBe(2);
+      expect(stored.recoveryScope).toBe('OPERATIONAL_SNAPSHOT');
+      expect(Array.isArray(stored.orderPaymentEntries)).toBe(true);
+      expect(stored.counts.orderPaymentEntries).toBe(stored.orderPaymentEntries.length);
       expect(stored.restaurant.id).toBe(restaurantId);
       expect(stored.branches.map((b: { name: string }) => b.name)).toContain('Snapshot Branch');
       expect(stored.users.length).toBeGreaterThanOrEqual(1);

@@ -12,6 +12,7 @@
 export interface EntitySyncEvent {
   externalId: string;
   payload: Record<string, unknown>;
+  baseSyncVersion?: number;
 }
 
 export interface EntitySyncPushResult {
@@ -25,6 +26,7 @@ export interface CloudSyncedEntity {
   externalId: string;
   payload: Record<string, unknown>;
   updatedAt: string;
+  syncVersion?: number;
 }
 
 export interface EntitySyncTransport {
@@ -98,7 +100,7 @@ export class EntitySyncEngine {
     safeSet(key + ':catalog_checkpoint', JSON.stringify({ version: 1, ids: [], complete: false }));
   }
 
-  public static async pushSnapshot(entityType: string, records: EntitySyncEvent[]): Promise<{ processed: number; failed: number }> {
+  public static async pushSnapshot(entityType: string, records: EntitySyncEvent[], onResult?: (event: EntitySyncEvent, result: EntitySyncPushResult) => void): Promise<{ processed: number; failed: number }> {
     if (!this.transport || records.length === 0) return { processed: 0, failed: 0 };
     let processed = 0;
     let failed = 0;
@@ -110,8 +112,14 @@ export class EntitySyncEngine {
       visited += batch.length;
       try {
         const { results } = await transport.push(entityType, batch);
-        processed += results.filter((r) => r.status === 'ok').length;
-        failed += batch.length - results.filter((r) => r.status === 'ok').length;
+        if (transport !== this.transport || scope !== EndpointResolver.cursorKey(`entity-push-${entityType}`, `/api/v1/entity-sync/${entityType}`)) { failed += records.length - visited + batch.length; break; }
+        const byId = new Map(results.map(result => [result.externalId, result]));
+        for (const event of batch) {
+          const result = byId.get(event.externalId) ?? { externalId: event.externalId, status: 'error' as const, error: 'Not acknowledged by the server' };
+          try { onResult?.(event, result); }
+          catch { failed++; continue; }
+          if (result.status === 'ok') processed++; else failed++;
+        }
       } catch { failed += batch.length; }
     }
     return { processed, failed };
@@ -122,9 +130,9 @@ export class EntitySyncEngine {
    * at "now" (its local copy was wiped, e.g. the tablet was activated again) would otherwise never receive what the cloud
    * already has.
    */
-  public static restartFromBeginning(entityType: string): void {
+  public static restartFromBeginning(entityType: string, opts: { force?: boolean } = {}): void {
     // Once per session: an owner who really has none of these records should not re-download the whole history every tick.
-    if (restartedThisSession.has(entityType)) return;
+    if (!opts.force && restartedThisSession.has(entityType)) return;
     restartedThisSession.add(entityType);
     const cursorKey = EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`);
     try {
@@ -147,7 +155,7 @@ export class EntitySyncEngine {
 
   private static async pullPages(entityType: string, onEntity: (entity: CloudSyncedEntity) => void, cursorKey: string): Promise<{ pulled: number }> {
     const transport = this.transport;
-    if (!transport) return { pulled: 0 };
+    if (!transport || db.hasPendingFinancialMutation()) return { pulled: 0 };
     const predicted = EndpointResolver.serverKeyFor(`/api/v1/entity-sync/${entityType}`);
     // Rebuild once when upgrading timestamp cursors; earlier timestamp gaps must also be recovered.
     const saved = safeGet(cursorKey);
@@ -157,11 +165,21 @@ export class EntitySyncEngine {
     const checkpoint = CATALOG_TYPES.has(entityType) ? catalogCheckpoint(cursorKey) : null;
     const knownIds = checkpoint ? new Set(checkpoint.ids) : null;
     try {
+      await db.flushPersistence();
       for (let page = 0; page < 50; page++) {
+        if (db.hasPendingFinancialMutation()) break;
         const result = await transport.pull(entityType, cursor);
-        if (transport !== this.transport || cursorKey !== EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`)) break;
-        db.batch(() => result.entities.forEach(onEntity));
+        if (db.hasPendingFinancialMutation() || transport !== this.transport || cursorKey !== EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`)) break;
+        db.batch(() => {
+          result.entities.forEach(onEntity);
+          if (result.entities.length) db.notify();
+        });
+        // Consumers merge by stable identity and may have partially applied a
+        // failed page. Never acknowledge it before the resulting data is saved:
+        // retrying a page is safer than skipping records after a storage failure.
+        await db.flushPersistence();
         pulled += result.entities.length;
+        if (transport !== this.transport || cursorKey !== EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`)) break;
         if ((result.serverKey ?? EndpointResolver.lastResponder() ?? predicted) !== predicted) break;
         if (knownIds) {
           for (const entity of result.entities) {

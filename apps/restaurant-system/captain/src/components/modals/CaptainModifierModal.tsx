@@ -44,12 +44,15 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
 
   useEffect(() => {
     if (isOpen && item) {
-      setQuery('');setQuantity(1);
+      setQuery('');setQuantity(item.minQuantity ?? 1);
       setNotes('');
       setCourse('COURSE_1');
       setSelection(defaultModifierSelection(groups));
     }
   }, [isOpen, item?.id]);
+
+  const minQty = item?.minQuantity ?? 1;
+  const maxQty = item?.maxQuantity ?? Infinity;
 
   if (!isOpen || !item) return null;
 
@@ -175,15 +178,17 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              aria-label="Decrease dish quantity" onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer"
+              disabled={quantity <= minQty}
+              aria-label="Decrease dish quantity" onClick={() => setQuantity((q) => Math.max(minQty, q - 1))}
+              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Minus className="w-4 h-4" />
             </button>
             <span className="w-8 text-center text-lg font-bold font-mono text-jaman-navy">{quantity}</span>
             <button
               type="button"
-              aria-label="Increase dish quantity" onClick={() => setQuantity((q) => q + 1)}
+              disabled={quantity >= maxQty}
+              aria-label="Increase dish quantity" onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
               className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer"
             >
               <Plus className="w-4 h-4" />

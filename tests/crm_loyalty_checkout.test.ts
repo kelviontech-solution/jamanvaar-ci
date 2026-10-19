@@ -9,7 +9,7 @@ const phone = '9888888888';
 const pos = () => usePosStore.getState();
 const customer = () => CustomerRepository.getByPhone(phone)!;
 function startCart() {
-  const item = { ...db.menuItems[0], id: 'loyalty-item', price: 500, isAvailable: true };
+  const item = { ...db.menuItems[0], id: 'loyalty-item', price: 500, isAvailable: true, modifierGroupIds: [] };
   db.menuItems.push(item);
   pos().addItemToCart(item);
   pos().setSelectedCustomer(customer());
@@ -43,6 +43,13 @@ describe('configured loyalty rewards at the actual POS settlement boundary', () 
     OrderRepository.settleOrder(order.id, 'CASH', payable, 'loyalty-paid');
     expect(customer().totalVisits).toBe(1); expect(customer().loyaltyPoints).toBe(50 + order.loyaltyPointsEarned!);
     expect(pos().completePayment('CASH')).toBeNull();
+  });
+  it('deducts the selected reward once even when the remaining balance could fund a second deduction', () => {
+    CustomerRepository.addPoints(phone, 800);
+    startCart(); pos().selectLoyaltyReward('reward-100off');
+    const order = pos().completePayment('CASH', pos().cart.totalPayable, 'high-balance-reward')!;
+    expect(customer().loyaltyPoints).toBe(1000 - 150 + order.loyaltyPointsEarned!);
+    expect(Object.values(customer().loyaltyLedger ?? {}).filter(event => event.points === -150)).toHaveLength(1);
   });
   it('keeping points earns normally and a repeat purchase increments points, spend, visits and history', () => {
     startCart(); const first = pos().completePayment('CASH')!;

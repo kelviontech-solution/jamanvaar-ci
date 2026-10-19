@@ -30,6 +30,19 @@ export interface QrTableRow {
   };
 }
 
+export interface QrReservationRow {
+  id: string;
+  branchId: string;
+  name: string;
+  phone: string;
+  date: string;
+  time: string;
+  guests: number;
+  note: string;
+  status: 'PENDING' | 'CONFIRMED' | 'DECLINED' | 'SEATED' | 'CANCELLED';
+  createdAt: string;
+}
+
 export interface QrBranch {
   id: string;
   name: string;
@@ -95,7 +108,7 @@ export interface QrSettings {
 }
 export interface QrRules { hours: Array<{day:number;open:string;close:string}>; pausedUntil:string|null; minimumOrderPaise:number; preparationMinutes:number; maxPendingOrders:number; maxOrdersPerWindow:number; windowMinutes:number; customerInstructions:string; paymentInstructions:string; orderingModes:Array<'DINE_IN'|'TAKEAWAY'> }
 export interface QrAnalytics { timezone: string; from: string; to: string; byCode:Array<{codeId:string;table:string;branchId:string|null;version:number;status:string;scans:number;orders:number;sales:number}>; metrics: Record<string,number>; byBranch:Array<{branchId:string;orders:number;sales:number}>; trend:Array<{date:string;orders:number;sales:number}>; popular:Array<{name:string;quantity:number}>; payments:Array<{status:string;amount:number;createdAt:string;failureReason?:string;providerPaymentId?:string}> }
-export interface QrPrintDesign { template: 'minimal'|'premium'|'colorful'|'cafe'|'fine-dining'|'family'|'casual'|'takeaway'|'table'; accent:string; instruction:string; footer:string; showLogo:boolean; layout:'CARD'|'TENT'|'LABEL' }
+export interface QrPrintDesign { template: 'minimal'|'premium'|'colorful'|'cafe'|'fine-dining'|'family'|'casual'|'takeaway'|'table'|'lounge'|'rooftop'|'bakery'|'festival'|'website'; accent:string; instruction:string; footer:string; showLogo:boolean; layout:'CARD'|'TENT'|'LABEL' }
 
 export interface QrPrintData {
   logoUrl?: string | null;
@@ -139,9 +152,13 @@ export const QrAdminApi = {
   updateTable: (tableId: string, body: { tableNumber?: string; capacity?: number; isActive?: boolean }) => qrApi<unknown>(`${base}/tables/${encodeURIComponent(tableId)}`, { method: 'PUT', body: JSON.stringify(body) }),
   generate: (tableId: string, branchId?: string) => qrApi<{ id: string; url: string | null }>(`${base}/tables/${encodeURIComponent(tableId)}/generate`, json(branchId ? { branchId } : {})),
   menuCode: (branchId: string, label: string) => qrApi<{ id: string; url: string | null }>(`${base}/menu-codes`, json({ branchId, label })),
+  reservations: () => qrApi<QrReservationRow[]>(`${base}/reservations`),
+  reservationAction: (id: string, status: QrReservationRow['status']) =>
+    qrApi<QrReservationRow>(`${base}/reservations/${encodeURIComponent(id)}/action`, json({ status })),
   regenerate: (codeId: string) => qrApi<{ id: string; url: string | null }>(`${base}/codes/${codeId}/regenerate`, json({})),
   revoke: (codeId: string) => qrApi<unknown>(`${base}/codes/${codeId}/revoke`, json({})),
   disable: (codeId: string) => qrApi<unknown>(`${base}/codes/${codeId}/disable`, json({})),
   enable: (codeId: string) => qrApi<unknown>(`${base}/codes/${codeId}/enable`, json({})),
-  printData: (codeId: string) => qrApi<QrPrintData>(`${base}/codes/${codeId}/print-data`)
+  printData: (codeId: string) => qrApi<QrPrintData>(`${base}/codes/${codeId}/print-data`),
+  websitePrintData: (scope = 'restaurant') => qrApi<QrPrintData>(`/api/v1/tenant/qr-page/print-data?scope=${encodeURIComponent(scope)}`)
 };

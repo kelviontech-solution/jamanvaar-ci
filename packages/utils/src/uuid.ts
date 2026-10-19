@@ -34,18 +34,15 @@ export function generateOrderNumber(prefix: string = 'ORD'): string {
 }
 
 /**
- * The Web Crypto object, in a browser or in Node — both expose a global `crypto` with
- * `getRandomValues` (Node has since v19; every target browser always has). Falls back to
- * `Math.random()` only if truly unavailable, so callers never throw on an odd runtime.
+ * Credential/key entropy must come from Web Crypto. A runtime without it must
+ * report an error instead of silently issuing predictable credentials or keys.
  */
 export function secureRandomBytes(length: number): Uint8Array {
   const g: typeof globalThis & { crypto?: Crypto } = globalThis as any;
   if (g.crypto && typeof g.crypto.getRandomValues === 'function') {
     return g.crypto.getRandomValues(new Uint8Array(length));
   }
-  const bytes = new Uint8Array(length);
-  for (let i = 0; i < length; i++) bytes[i] = Math.floor(Math.random() * 256);
-  return bytes;
+  throw new Error('Secure randomness is unavailable on this device. Reload in a supported application before creating credentials or keys.');
 }
 
 /**
@@ -120,8 +117,8 @@ export function generateSecurePassword(length: number = 14): string {
  * caught (via `staff_pin.test.ts` never completing).
  */
 export function secureRandomIndex(exclusiveMax: number): number {
-  if (!Number.isInteger(exclusiveMax) || exclusiveMax <= 0) {
-    throw new Error('secureRandomIndex: exclusiveMax must be a positive integer');
+  if (!Number.isSafeInteger(exclusiveMax) || exclusiveMax <= 0 || exclusiveMax > 2 ** 48) {
+    throw new Error('secureRandomIndex: exclusiveMax must be a positive safe integer no greater than 2^48');
   }
   let byteLength = 1;
   while (256 ** byteLength < exclusiveMax) byteLength++;

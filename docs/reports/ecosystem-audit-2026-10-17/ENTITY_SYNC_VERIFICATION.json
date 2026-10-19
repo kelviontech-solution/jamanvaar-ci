@@ -1,0 +1,135 @@
+{
+  "generatedAt": "2026-10-19T01:35:15.457Z",
+  "baseCommit": "ccf17d93288ede1a1bdf7bb2c150adf84ec88e72",
+  "programmeComplete": false,
+  "pushed": false,
+  "deployed": false,
+  "frozenReleaseGate": false,
+  "provisionalScores": {
+    "security": 7,
+    "codeQuality": 7,
+    "saasReadiness": 6.5
+  },
+  "affected": {
+    "file": ".jamanvaar/repair22-final-affected.private.json",
+    "sha256": "5bac8a4b62f53ad785c66f500db29cd8836322bae64771dc893c844ca65cf4e4",
+    "success": true,
+    "files": 21,
+    "passed": 203,
+    "failed": 0,
+    "skipped": 0,
+    "failures": []
+  },
+  "beforeRepair": {
+    "file": ".jamanvaar/repair22-entity-before.private.json",
+    "sha256": "4c747be27ea3f9b8f70ecead6d296a72afa43a98a6f48cd3737fce57d0804c72",
+    "success": false,
+    "files": 1,
+    "passed": 1,
+    "failed": 5,
+    "skipped": 0,
+    "failures": [
+      "entity data persistence before cursor acknowledgement waits for 'MENU_CATEGORY' data before acknowledging its sequence",
+      "entity data persistence before cursor acknowledgement waits for 'CUSTOMER' data before acknowledging its sequence",
+      "entity data persistence before cursor acknowledgement waits for 'INVENTORY_ITEM' data before acknowledging its sequence",
+      "entity data persistence before cursor acknowledgement keeps its old cursor after disk failure and retries a partially materialized page without duplication",
+      "entity data persistence before cursor acknowledgement defers incoming customer balances while a financial operation needs recovery"
+    ]
+  },
+  "previousFullRoot": {
+    "file": ".jamanvaar/repair21-full-root.private.json",
+    "sha256": "54af19d584e323b6a4dde87bb1bafcddacd4dc9504ad82f80b348163de9ff991",
+    "success": true,
+    "files": 336,
+    "passed": 2418,
+    "failed": 0,
+    "skipped": 0,
+    "failures": [],
+    "scope": "Preceding working-tree baseline, not a new full gate after entity changes"
+  },
+  "types": [
+    {
+      "file": ".jamanvaar/repair22-final-root-types.log",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": ".jamanvaar/repair22-api-types.log",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "builds": [
+    {
+      "app": "pos",
+      "exitCode": 0,
+      "logSha256": "78696ab8078202b71d883144bcacb2f0db6ecafc73b37e638f6e36c8ed463f8e"
+    },
+    {
+      "app": "pos-admin",
+      "exitCode": 0,
+      "logSha256": "800f380277595624113b7547d1519808e47ccf488a5b11800e6bc365ccbf21b7"
+    },
+    {
+      "app": "captain",
+      "exitCode": 0,
+      "logSha256": "30ca7ed572499a625c6235efbf1b0d79be94a340f31de6f4f91070208f99e06e"
+    },
+    {
+      "app": "kiosk-user",
+      "exitCode": 0,
+      "logSha256": "4b427cb12992d82517fb9ea11be472bd559d8fef3395820d0ab89d0c24d72690"
+    },
+    {
+      "app": "kds",
+      "exitCode": 0,
+      "logSha256": "f39693bbe5d5397318edd3a68d479d0d29044917cf1b60fa4d85049fe6f7a82d"
+    },
+    {
+      "app": "qr-guest",
+      "exitCode": 0,
+      "logSha256": "1c8c2bca2673da28aebb04c00339ede42634e7874e76a7437001dd3dbcaa6277"
+    },
+    {
+      "app": "super-admin",
+      "exitCode": 0,
+      "logSha256": "c5f520f01c0a9e5155b756b77c31f9e040d34bb011cf44f7a52ef53f1a7c3bd4"
+    }
+  ],
+  "browser": {
+    "scenarios": 20,
+    "pageErrors": 0,
+    "scope": "Regression of actual POS/Captain/Admin components and Kiosk admission services on real Chrome/SQLite OPFS. Entity fault cases use real Node SQLite separately.",
+    "kitchenSha256": "1678b1680de38f78500416b689e07e04e266a910c3624608d393097043f793d3",
+    "checkoutSha256": "b9d394f7f2408c33ed68acf4ed3e64dd9b76af367bedecb321f3cfecf27d11d6"
+  },
+  "limitations": [
+    "Data/cursor ordering does not serialize every entity consumer or prevent all domain conflicts",
+    "Consumer callbacks must merge synchronously by stable identity; partial page preparation can require replay",
+    "Legacy policy, guided other-app recovery, rejection diagnostics and Core/cloud revision bridging remain",
+    "No provider, physical hardware, signed native upgrade, offsite/key-loss or representative sustained-load acceptance",
+    "No new complete API database-suite run; overlapping test counts are not additive"
+  ],
+  "sources": [
+    {
+      "file": "packages/sync/src/entity_sync.ts",
+      "sha256": "a6790aadbee6775d203d1fd94ea87905be5bb7a9995ebd9f6d4743a4eaad7e38"
+    },
+    {
+      "file": "packages/sync/src/outbox.ts",
+      "sha256": "f4328ffff32b6c37629048382b8a235ff334f8e62e745bff1226ce373a7b7e46"
+    },
+    {
+      "file": "packages/database/src/db.ts",
+      "sha256": "314d6120a17f36d1237a3735aa7542d30d47d6562d609433ce1be20ea934d319"
+    },
+    {
+      "file": "tests/entity_sync_durability.test.ts",
+      "sha256": "d46e53e5b862983a5fa126d28668e889b7a3e76ba98204e34ada83e1204a2479"
+    },
+    {
+      "file": "tests/inbound_sync_durability.test.ts",
+      "sha256": "eb452c549a7246580e510ab4be72f1bd9ed7880a6f8d6d7f4366165597dba82a"
+    }
+  ]
+}

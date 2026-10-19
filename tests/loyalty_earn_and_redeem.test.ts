@@ -88,6 +88,17 @@ describe('security-audit HIGH kiosk-loyalty-02: a requested redemption is only d
     // Settling also earns new points for this order's own total (the existing, already-correct
     // behaviour) -- the redemption is the ONE additional thing this fix adds: a -100 on top of that.
     expect(CustomerRepository.getByPhone(phone)!.loyaltyPoints).toBe(before + settled!.loyaltyPointsEarned! - 100);
+    expect(CustomerRepository.getByPhone(phone)!.loyaltyLedger?.[`redeem:${order.id}`]?.points).toBe(-100);
+  });
+
+  it('cannot use points earned by the same bill to fund an unaffordable legacy redemption', () => {
+    const phone = '9000000014';
+    CustomerRepository.createCustomer({ phone, name: 'Low balance', loyaltyPoints: 10 });
+    const order = OrderRepository.createOrder({ orderType: 'TAKEAWAY', items: [], subtotal: 10000, totalAmount: 9900, paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus: 'CONFIRMED', source_type: 'KIOSK', customerPhone: phone, loyaltyPointsRedeemed: 100 });
+    expect(() => OrderRepository.settleOrder(order.id, 'CASH', 9900, 'insufficient-points')).toThrow('Not enough loyalty points');
+    expect(CustomerRepository.getByPhone(phone)!.loyaltyPoints).toBe(10);
+    expect(CustomerRepository.getByPhone(phone)!.totalVisits ?? 0).toBe(0);
+    expect(OrderRepository.getOrderById(order.id)?.paymentStatus).toBe('PENDING');
   });
 
   it('re-settling the same order never deducts the redemption twice', () => {

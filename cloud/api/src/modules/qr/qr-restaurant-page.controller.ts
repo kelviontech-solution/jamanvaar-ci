@@ -32,6 +32,9 @@ export class QrRestaurantPageController {
   @Get('launch') launch(@CurrentTenantUser() u: User, @Query('scope') scope = 'restaurant') {
     return this.pages.launch(u, scope);
   }
+  @Get('print-data') printData(@CurrentTenantUser() u: User, @Query('scope') scope = 'restaurant') {
+    return this.pages.printData(u, scope);
+  }
   @Post('launch') recordLaunch(@CurrentTenantUser() u: User, @Query('scope') scope = 'restaurant', @Body() body: unknown) {
     return this.pages.recordLaunch(
       u,

@@ -15,6 +15,10 @@ import { loadCheckoutSdk, openQrCheckout } from './checkout';
 import { ApiError, QrApi, imageSrc, type Describe, type Menu, type MenuGroup, type MenuItem, type Placed, type Quote } from './api';
 import { addLine, emptyCart, itemCount, parseCart, removeLine, setQuantity, toOrderItems, unavailableLines, withAttempt, estimatedSubtotal, MAX_LINE_QUANTITY, type Cart, type CartLine } from './cart';
 
+const restaurantPageBackgrounds: Record<RestaurantPageView['content']['template'], string> = {
+  HERITAGE: '#FAF5EB', CAFE: '#FFF7ED', MODERN: '#F6F7F1', INDIAN: '#FBE9D0'
+};
+
 /** Money in the restaurant's own currency (from the server). Whole amounts stay whole; anything with a fraction shows both digits. */
 let currencyCode = 'INR';
 const inr = (n: number) => {
@@ -100,7 +104,7 @@ function DishPhoto({ source, name, className = '' }: { source?: string; name: st
 }
 
 export default function App() {
-  const site=/^\/q\/site\/([A-Za-z0-9_-]{24})\/?$/.exec(location.pathname);
+  const site=/^\/q\/site\/([A-Za-z0-9_-]{6,80})\/?$/.exec(location.pathname);
   if(site)return <PublicRestaurantSite slug={site[1]}/>;
   const token = tokenFromPath();
   if (!token) return <Message title="This QR code is not valid" text="Please scan the code on your table again, or ask a team member." />;
@@ -120,7 +124,8 @@ function PublicRestaurantSite({slug}:{slug:string}){
  const [page,setPage]=useState<(RestaurantPageView&{items:RestaurantPageDish[];menuReady:boolean})|null>(null),[error,setError]=useState('');
  useEffect(()=>{let alive=true,running=false;const refresh=async()=>{if(running||document.hidden)return;running=true;try{const value=await QrApi.site(slug);if(alive){setPage(value);setError('');}}catch(e){if(alive){setError((e as Error).message);if(e instanceof ApiError&&e.status===404)setPage(null);}}finally{running=false;}};void refresh();const timer=setInterval(()=>void refresh(),15000);return()=>{alive=false;clearInterval(timer);};},[slug]);
  if(!page)return <Message title={error?'Restaurant page unavailable':'Opening the restaurant'} text={error||'Please wait a moment.'}/>;
- return <><GuestRestaurantPage page={{...page,content:{...page.content,logoUrl:(imageSrc(page.content.logoUrl)||''),heroUrl:(imageSrc(page.content.heroUrl)||''),gallery:page.content.gallery.map(i=>({...i,url:(imageSrc(i.url)||'')}))}}} items={page.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)}))} onMenu={page.menuReady?()=>document.getElementById('public-restaurant-menu')?.scrollIntoView({behavior:'smooth'}):undefined} availability={page.menuReady?'Browse our menu here. Please contact the restaurant to place an order.':'Our menu is not available online yet. Please contact the restaurant.'}/>{page.menuReady&&<section className="rp-page" id="public-restaurant-menu" tabIndex={-1}><div className="rp-section"><h2>Our menu</h2><div className="rp-dishes">{page.items.map(d=><article className="rp-dish" key={d.id}>{d.imageUrl&&<DishPhoto source={d.imageUrl} name={d.name}/>}<div><h3>{d.name}</h3><p>{d.description}</p><b>{new Intl.NumberFormat('en-IN',{style:'currency',currency:page.currency}).format(d.price)}</b>{d.allergens?.length?<p>Allergens: {d.allergens.join(', ')}</p>:null}</div></article>)}</div></div></section>}</>;
+ // The website presents the restaurant. Menu browsing is on demand; ordering uses the branch's existing QR checkout.
+ return <GuestRestaurantPage browseMenu categories={page.categories} page={{...page,content:{...page.content,logoUrl:(imageSrc(page.content.logoUrl)||''),heroUrl:(imageSrc(page.content.heroUrl)||''),gallery:page.content.gallery.map(i=>({...i,url:(imageSrc(i.url)||'')}))}}} items={page.menuReady?page.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)})):[]} menuLabel="Explore the menu" availability={page.menuReady?(page.orderOnlineUrl?'':'Open Menu to browse dishes and prices. Contact the restaurant to place an order.'):'Our menu is not available online yet. Please contact the restaurant.'} onReserve={page.reservationsEnabled?(input)=>QrApi.reservation(slug,input):undefined}/>;
 }
 
 function Message({ title, text, action, busy, note }: { title: string; text?: string; action?: { label: string; run: () => void }; busy?: boolean; note?: string }) {
@@ -254,9 +259,9 @@ function Ordering({ token }: { token: string }) {
   };
 
   const restaurantPage=info.restaurantPage?{...info.restaurantPage,restaurantName:info.restaurant.name,branchName:info.branch.name,table:info.table?.displayNumber,currency:info.currency||'INR',content:{...info.restaurantPage.content,logoUrl:(imageSrc(info.restaurantPage.content.logoUrl)||''),heroUrl:(imageSrc(info.restaurantPage.content.heroUrl)||''),gallery:info.restaurantPage.content.gallery.map(i=>({...i,url:(imageSrc(i.url)||'')}))}}:null;
-  const effectiveBrand=restaurantPage?{...info.branding,welcomeTitle:restaurantPage.content.title||info.restaurant.name,welcomeMessage:restaurantPage.content.welcome,logoUrl:restaurantPage.content.logoUrl||info.branding?.logoUrl||null,coverUrl:restaurantPage.content.heroUrl||info.branding?.coverUrl,accentColor:restaurantPage.content.accent,backgroundColor:({HERITAGE:'#FAF5EB',CAFE:'#FFF7ED',MODERN:'#F6F7F1'})[restaurantPage.content.template]}:info.branding;
+  const effectiveBrand=restaurantPage?{...info.branding,welcomeTitle:restaurantPage.content.title||info.restaurant.name,welcomeMessage:restaurantPage.content.welcome,logoUrl:restaurantPage.content.logoUrl||info.branding?.logoUrl||null,coverUrl:restaurantPage.content.heroUrl||info.branding?.coverUrl,accentColor:restaurantPage.content.accent,backgroundColor:restaurantPageBackgrounds[restaurantPage.content.template]}:info.branding;
   const menuInfo=effectiveBrand?{...info,branding:{...effectiveBrand,footerMessage:effectiveBrand.footerMessage??null,orderButtonLabel:effectiveBrand.orderButtonLabel??null}}:info;
-  if(screen==='HOME'&&restaurantPage)return <GuestRestaurantPage page={restaurantPage} items={menu.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)}))} onMenu={info.ordering.menuReady?()=>navigate('MENU'):undefined} availability={!info.ordering.menuReady?'Our menu is not available online yet. Please contact the restaurant.':!info.ordering.enabled?info.ordering.availability?.message||'Ordering is currently unavailable. You can still browse the menu.':''} onDish={id=>{setFeaturedDish(id);navigate('MENU');}}/>;
+  if(screen==='HOME'&&restaurantPage)return <GuestRestaurantPage page={restaurantPage} categories={menu.categories} items={menu.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)}))} onMenu={info.ordering.menuReady?()=>navigate('MENU'):undefined} availability={!info.ordering.menuReady?'Our menu is not available online yet. Please contact the restaurant.':!info.ordering.enabled?info.ordering.availability?.message||'Ordering is currently unavailable. You can still browse the menu.':''} onDish={id=>{setFeaturedDish(id);navigate('MENU');}}/>;
 
   return (
     <div className={`app brand-${effectiveBrand?.layout??'CARDS'}`} style={{'--saffron':effectiveBrand?.accentColor||'#c2570c','--bg':effectiveBrand?.backgroundColor||'#faf7f2','--accent-ink':accentInk(effectiveBrand?.accentColor||'#c2570c'),'--accent-text':accentText(effectiveBrand?.accentColor||'#c2570c')} as React.CSSProperties}>
@@ -468,7 +473,13 @@ function useQuote(token: string, cart: Cart, couponCode='', loyaltyRewardId='') 
     window.addEventListener('online', onOnline);
     return () => window.removeEventListener('online', onOnline);
   }, []);
-  return { quote, error, retry: () => setRetryCount((c) => c + 1) };
+  return {
+    quote, error,
+    // F: measuring customer difficulty — a guest who has to retry the price check hit something
+    // that didn't work the first time; counting retries (not just the final success/fail) is what
+    // tells the restaurant this step is causing trouble, not just whether it eventually succeeded.
+    retry: () => { setRetryCount((c) => c + 1); void QrApi.event(token, 'QR_QUOTE_RETRY', sessionId).catch(() => undefined); }
+  };
 }
 
 function CartScreen({ token, menu, settings, cart, setCart, gone, onBack, onNext }: { token: string; menu: Menu; settings: Describe['ordering']['settings']; cart: Cart; setCart: (c: Cart) => void; gone: string[]; onBack: () => void; onNext: () => void }) {
@@ -629,6 +640,9 @@ export function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed
   const refresh=async()=>{if(checking.current||acting.current)return;checking.current=true;const version=revision.current;try{const p=await QrApi.status(placed.publicOrderId);if(mounted.current&&version===revision.current){setPlaced(p);setError(null);}}catch(e){if(mounted.current&&version===revision.current)setError((e as Error).message);}finally{checking.current=false;}};
   const changePayment=async(counter=false)=>{
     if(acting.current)return;acting.current=true;revision.current+=1;setBusy(true);setError(null);
+    // F: measuring customer difficulty — a guest retrying a FAILED payment (not just continuing a
+    // fresh one) is a direct difficulty signal worth counting, separate from the final outcome.
+    if (!counter && placed.payment?.status === 'FAILED') { const tk = tokenFromPath(); if (tk) void QrApi.event(tk, 'QR_PAYMENT_RETRY', sessionId).catch(() => undefined); }
     try{
       const p=await (counter?QrApi.switchToCounter(placed.publicOrderId):QrApi.retryPayment(placed.publicOrderId));
       if(!mounted.current)return;

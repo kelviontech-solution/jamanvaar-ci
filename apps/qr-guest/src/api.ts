@@ -85,7 +85,8 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
 
 export const QrApi = {
   pageEvent:async(slug:string,type:string)=>call(`/sites/${encodeURIComponent(slug)}/events`,{method:'POST',body:JSON.stringify({type})}),
-  site:async(slug:string)=>(await call<RestaurantPageView&{items:RestaurantPageDish[];menuReady:boolean}>(`/sites/${encodeURIComponent(slug)}`)).data!,
+  site:async(slug:string)=>(await call<RestaurantPageView&{items:RestaurantPageDish[];menuReady:boolean;reservationsEnabled:boolean}>(`/sites/${encodeURIComponent(slug)}`)).data!,
+  reservation:async(slug:string,body:{name:string;phone:string;date:string;time:string;guests:number;note:string})=>(await call<{id:string;status:string}>(`/sites/${encodeURIComponent(slug)}/reservations`,{method:'POST',body:JSON.stringify(body)})).data!,
   operations:async<T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/operations${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,
   loyalty: async <T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/loyalty${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,
   group: async <T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/groups${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,

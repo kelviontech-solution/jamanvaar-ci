@@ -101,7 +101,9 @@ export function productNavSections(product: AdminProduct): Array<GatedNavSection
     const groups: Array<[string,string[]]> = [
       ['DAILY',['DASHBOARD','ORDERS','MENU','CUSTOMERS','SYNC']],
       ['OPERATIONS',['OPERATIONS_HUB','BILLING_SALES','SHIFTS','LIVE_KDS','KITCHEN_KOT','TABLES','RESERVATIONS','INVENTORY','INVENTORY_CONTROL']],
-      ['KIOSK MANAGEMENT',['KIOSKS','KIOSK_EXPERIENCE','KIOSK_COMBOS','KIOSK_PAYMENTS','FEEDBACK']],
+      // 'Welcome screens' (KIOSK_WELCOME) was defined and reachable via settings search, but had
+      // no sidebar entry at all in this product's own nav — a real gap, not a brittle assertion.
+      ['KIOSK MANAGEMENT',['KIOSKS','KIOSK_EXPERIENCE','KIOSK_WELCOME','KIOSK_COMBOS','KIOSK_PAYMENTS','FEEDBACK']],
       ['QR ORDERING',['QR_ORDERING']],
       ['REPORTS',['REPORTS','AUDIT']],
       ['SETUP',['TEMPLATES','MENU_OPTIONS','COUPONS','STAFF','PAYMENTS','HARDWARE','RECEIPTS','SETTINGS','LICENSE','BACKUP','SUPPORT','DOWNLOADS']],
@@ -118,7 +120,7 @@ export function productNavSections(product: AdminProduct): Array<GatedNavSection
   const sections = [
     ['DAILY', ['DASHBOARD', 'ORDERS', 'MENU', 'SYNC']],
     ['OPERATIONS', ['OPERATIONS_HUB','LIVE_KDS', 'TABLES', 'REPORTS', 'FEEDBACK']],
-    ['KIOSK MANAGEMENT', ['KIOSKS', 'KIOSK_EXPERIENCE', 'KIOSK_COMBOS']],
+    ['KIOSK MANAGEMENT', ['KIOSKS', 'KIOSK_EXPERIENCE', 'KIOSK_WELCOME', 'KIOSK_COMBOS']],
     ['QR ORDERING', ['QR_ORDERING']],
     ['SETUP', ['TEMPLATES', 'MENU_OPTIONS', 'COUPONS', 'KIOSK_PAYMENTS', 'RECEIPTS', 'HARDWARE', 'STAFF', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT', 'DOWNLOADS']]
   ] as const;

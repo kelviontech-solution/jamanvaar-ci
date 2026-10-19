@@ -44,9 +44,9 @@ const admin = (method: 'get' | 'post', path: string, token = owner, b = branch) 
   http()
     [method](`/api/v1/tenant/operations/${path}${path.includes('?') ? '&' : '?'}branchId=${b}`)
     .set('Authorization', `Bearer ${token}`);
-const p = (url: string, body: unknown) =>
+const p = (url: string, body: string | object | undefined) =>
   http().post(url).set('Authorization', `Bearer ${platform}`).send(body);
-const device = (url: string, body: unknown) =>
+const device = (url: string, body: string | object | undefined) =>
   http()
     .post('/api/v1/operations/device/' + url)
     .set('Authorization', `Bearer ${posToken}`)
@@ -210,7 +210,7 @@ it('rejects unpurchased products and foreign feature flags',async()=>{
 it('schedules a branch restriction and leaves the other branch inherited',async()=>{
  const body=allocation(),preview=await branchApi('post','/preview').send(body);expect(preview.status,JSON.stringify(preview.body)).toBe(201);
  const saved=await branchApi('post').send({...body,previewHash:preview.body.previewHash,acknowledgeImpact:true});expect(saved.status,JSON.stringify(saved.body)).toBe(201);
- const resolve=(b:string)=>prisma.runAsTenant(rid,tx=>app.get(ApplicationEntitlementsService).resolve(tx,rid,'KDS',b));
+ const resolve=(b:string)=>prisma.runAsTenant(rid,tx=>(app.get(ApplicationEntitlementsService) as ApplicationEntitlementsService).resolve(tx,rid,'KDS',b));
  expect((await resolve(branch)).enabled).toBe(true);
  await prisma.runAsPlatform(tx=>tx.branchProductLicense.update({where:{id:saved.body.id},data:{effectiveAt:new Date(Date.now()-1000)}}));
  expect((await resolve(branch)).enabled).toBe(false);expect((await resolve(branchB)).enabled).toBe(true);
@@ -363,7 +363,7 @@ it('expires a branch license without falling back to an older grant and limits f
   const ent=await tx.applicationEntitlement.findFirstOrThrow({where:{restaurantId:rid,appCode:'QR_ORDERING',enabled:true}});await tx.applicationEntitlement.update({where:{id:ent.id},data:{config:{qrLoyalty:true}}});
   await tx.branchProductLicense.create({data:{restaurantId:rid,branchId:branch,appCode:'QR_ORDERING',enabled:true,revision:1,disabledFeatures:['qrLoyalty'],effectiveAt:new Date(Date.now()-2000),createdBy:ownerId}});
  });
- const service=app.get(ApplicationEntitlementsService);expect((await prisma.runAsTenant(rid,tx=>service.resolve(tx,rid,'QR_ORDERING',branch))).limits.qrLoyalty).toBe(false);expect((await prisma.runAsTenant(rid,tx=>service.resolve(tx,rid,'QR_ORDERING',branchB))).limits.qrLoyalty).toBe(true);
+ const service=app.get(ApplicationEntitlementsService) as ApplicationEntitlementsService;expect((await prisma.runAsTenant(rid,tx=>service.resolve(tx,rid,'QR_ORDERING',branch))).limits.qrLoyalty).toBe(false);expect((await prisma.runAsTenant(rid,tx=>service.resolve(tx,rid,'QR_ORDERING',branchB))).limits.qrLoyalty).toBe(true);
  await prisma.runAsTenant(rid,tx=>tx.branchProductLicense.create({data:{restaurantId:rid,branchId:branch,appCode:'QR_ORDERING',enabled:true,revision:2,disabledFeatures:[],effectiveAt:new Date(Date.now()-1000),expiresAt:new Date(Date.now()-500),createdBy:ownerId}}));
  expect((await prisma.runAsTenant(rid,tx=>service.resolve(tx,rid,'QR_ORDERING',branch))).enabled).toBe(false);
 });

@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
-import { SqlKvEngine, type StoreOp } from './sql_kv_engine';
+import { SqlKvEngine, type StoreOp, type DurableCommand, type DurableRecoverySnapshot } from './sql_kv_engine';
 import { WasmDriver, type WasmDb } from './wasm_driver';
 
 /**
@@ -12,6 +12,9 @@ import { WasmDriver, type WasmDb } from './wasm_driver';
 type Request =
   | { id: number; type: 'open'; name: string }
   | { id: number; type: 'write'; ops: StoreOp[] }
+  | { id: number; type: 'command'; command: DurableCommand }
+  | { id: number; type: 'recovery-export'; scope: string }
+  | { id: number; type: 'recovery-restore'; snapshot: DurableRecoverySnapshot; expectedScope: string }
   | { id: number; type: 'close' };
 
 let engine: SqlKvEngine | null = null;
@@ -36,13 +39,24 @@ self.onmessage = async (e: MessageEvent<Request>) => {
       if (!engine) throw new Error('database not open');
       engine.applyBatch(msg.ops);
       (self as unknown as Worker).postMessage({ id: msg.id, ok: true });
+    } else if (msg.type === 'command') {
+      if (!engine) throw new Error('database not open');
+      const result = engine.applyCommand(msg.command);
+      (self as unknown as Worker).postMessage({ id: msg.id, ok: true, result });
+    } else if (msg.type === 'recovery-export') {
+      if (!engine) throw new Error('database not open');
+      (self as unknown as Worker).postMessage({ id: msg.id, ok: true, snapshot: engine.exportRecovery(msg.scope) });
+    } else if (msg.type === 'recovery-restore') {
+      if (!engine) throw new Error('database not open');
+      engine.restoreRecovery(msg.snapshot, msg.expectedScope);
+      (self as unknown as Worker).postMessage({ id: msg.id, ok: true });
     } else if (msg.type === 'close') {
       engine?.close();
       engine = null;
       (self as unknown as Worker).postMessage({ id: msg.id, ok: true });
     }
   } catch (err) {
-    const error = err as Error;
-    (self as unknown as Worker).postMessage({ id: msg.id, ok: false, error: `${error?.name ?? 'Error'}: ${error?.message ?? String(err)}`, code: error?.name });
+    const error = err as Error & { code?: string };
+    (self as unknown as Worker).postMessage({ id: msg.id, ok: false, error: `${error?.name ?? 'Error'}: ${error?.message ?? String(err)}`, code: error?.code ?? error?.name });
   }
 };

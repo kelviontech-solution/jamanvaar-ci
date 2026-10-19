@@ -1,0 +1,214 @@
+{
+  "at": "2026-10-17T15:19:20.799Z",
+  "head": "ccf17d93288ede1a1bdf7bb2c150adf84ec88e72",
+  "status": [
+    "M apps/kiosk-system/kiosk-user/src/App.tsx",
+    " M apps/restaurant-system/pos/src/components/cart/PosCart.tsx",
+    " M apps/restaurant-system/pos/src/components/payment/PosPaymentModal.tsx",
+    " M apps/restaurant-system/pos/src/store/posStore.ts",
+    " M packages/types/src/domain.ts",
+    "?? docs/reports/ecosystem-audit-2026-10-17/"
+  ],
+  "files": [
+    {
+      "file": "cloud/api/src/modules/order-sync/order-sync.service.ts",
+      "sha256": "926841dfd627f7e9310cbd7d2477d42f10e7a5d2732aca615cbbbf3280ecdf9c",
+      "lines": 959
+    },
+    {
+      "file": "cloud/api/src/modules/order-sync/order-rules.ts",
+      "sha256": "0a31b7c7cfab11e3a9493d745cd73da5b1641467da7b82ee832aedea75c6ae9d",
+      "lines": 109
+    },
+    {
+      "file": "cloud/api/src/modules/order-sync/order-merge.ts",
+      "sha256": "db05c62ba1b983a20f5c2c75bd82c2f12f64d81344c29a2039c8d995ed4bba25",
+      "lines": 105
+    },
+    {
+      "file": "cloud/api/src/modules/order-sync/order-sync-admission.ts",
+      "sha256": "57c9280d72928e273e314a043ac5017260c177ed83557431583045ae9d8df3c4",
+      "lines": 83
+    },
+    {
+      "file": "cloud/api/src/modules/payments/payments.service.ts",
+      "sha256": "abe037527fa4591ed077294bcb1eb599d4f7c4091b4ebb0da80065e066490af1",
+      "lines": 1230
+    },
+    {
+      "file": "cloud/api/src/modules/payments/order-payment-ledger.ts",
+      "sha256": "9d235bbaa853df1f6007657a3a2f0d0759b04b6526972ce9fcd2946af55bef07",
+      "lines": 214
+    },
+    {
+      "file": "cloud/api/src/modules/payments/razorpay-gateway.service.ts",
+      "sha256": "05595b2b511748462301a9a8e7fbed778a618901ee83ed83c1f34617bfc62e18",
+      "lines": 187
+    },
+    {
+      "file": "cloud/api/src/modules/entity-sync/entity-sync.service.ts",
+      "sha256": "ca7c646d8c1d514e6e06bbacafe709e46348ad8950b6fef3830c78304f3677dd",
+      "lines": 360
+    },
+    {
+      "file": "cloud/api/src/modules/backups/backups.service.ts",
+      "sha256": "7f86add5a4c583063b9c535058d5a4f070c223cceeb365c94a113270fa88d560",
+      "lines": 606
+    },
+    {
+      "file": "cloud/api/src/modules/backups/backup-storage.service.ts",
+      "sha256": "e1e3b74e03388e8d393bb649014b0a500e9612f6bcd94917f7bebf5993a3b43b",
+      "lines": 212
+    },
+    {
+      "file": "cloud/api/src/modules/reports/reports.service.ts",
+      "sha256": "95490ed1208cff4ac9d1c4e46e47569dbab55b5af965707860d11972a2edfdd4",
+      "lines": 500
+    },
+    {
+      "file": "cloud/api/src/common/guards/device-auth.guard.ts",
+      "sha256": "1af1189dab725daa9364c7133a9f866d42984e81f41461cf491baf0ca18d0a86",
+      "lines": 269
+    },
+    {
+      "file": "cloud/api/src/common/guards/platform-auth.guard.ts",
+      "sha256": "4487d3e9b22aa6892eee536874c323df9c9f2ddcefd383cd3629cbda23e7bf00",
+      "lines": 89
+    },
+    {
+      "file": "cloud/api/src/common/security/branch-license.ts",
+      "sha256": "3bc965367aafffec8d17ef1d7d50d983eee340b7a66d54d8c40aae46d13974bf",
+      "lines": 50
+    },
+    {
+      "file": "cloud/api/src/prisma/prisma.service.ts",
+      "sha256": "278306324cee83e4976ecacfd4cfbe1b92cd737e10bdf8c3999436e915b03a70",
+      "lines": 149
+    },
+    {
+      "file": "cloud/api/src/common/realtime/realtime-bus.ts",
+      "sha256": "866a9828b0e2372d03c32d74ce0f845977d586981556b1caeee2f0d16efacf9b",
+      "lines": 143
+    },
+    {
+      "file": "cloud/api/src/common/realtime/realtime.controller.ts",
+      "sha256": "4011c561c35e667db064f4d42e6e34a771a8aa5c6c4fddf2b3d40c777ee31d27",
+      "lines": 52
+    },
+    {
+      "file": "cloud/api/prisma/schema.prisma",
+      "sha256": "92a3c8c9814dfc8ab8fb2afdacd04c0d4efe93ca6c1fba3b08eba0aab20d6668",
+      "lines": 1982
+    },
+    {
+      "file": "cloud/api/prisma/migrations/20261006040000_entity_recovery_sequence/migration.sql",
+      "sha256": "49359f7ac8757cc46e2b1115eeee75feabc0b77a3eb5192af46d573b33ce7354",
+      "lines": 31
+    },
+    {
+      "file": "packages/database/src/durable/durable_storage.ts",
+      "sha256": "1e652457c031e5ccd45ee9bb79908d09d7a0ade2a9ddcc1fe28a35789965b31f",
+      "lines": 221
+    },
+    {
+      "file": "packages/database/src/durable/browser_boot.ts",
+      "sha256": "5c9aeba6b269fd666ef5046bc2eabe178fe413ee67967d11aa381f2776fb3c65",
+      "lines": 125
+    },
+    {
+      "file": "packages/database/src/db.ts",
+      "sha256": "01e90a7e7d338fa7fe4960fb73930ee8801a34347fdf918693583cbec12c1465",
+      "lines": 1665
+    },
+    {
+      "file": "packages/database/src/key_value_store.ts",
+      "sha256": "05d89f4631e1b6f9f30a4a1fd8467e5056107fa51f925d9542511fceb6431ea0",
+      "lines": 90
+    },
+    {
+      "file": "packages/database/src/tenant_isolation.ts",
+      "sha256": "71ce315bf041ff9a7a32a61cd93c0fe98ebc23f951014e69ace5fd7b1698fbc7",
+      "lines": 122
+    },
+    {
+      "file": "packages/sync/src/outbox.ts",
+      "sha256": "6d2248780c79dc60761bf78948b35201b1b7881014272f5bd74578af8c1c830a",
+      "lines": 955
+    },
+    {
+      "file": "packages/sync/src/device_gate.ts",
+      "sha256": "df9674fce9c27f7d82a06a52287b1518d6bc67faeaf705c31b3bda934bf5d754",
+      "lines": 451
+    },
+    {
+      "file": "packages/api/src/printer.ts",
+      "sha256": "2a3e708663f923f4d8e42f9fd8e8a906f078d4786dce0638c09079e776c14b64",
+      "lines": 738
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/store/captainStore.ts",
+      "sha256": "7fc0bc29cd761ede57488a559bd1acb41d2eb13874c6852af0ee5e90f6300dba",
+      "lines": 1500
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/tables/CaptainTableWorkspaceModal.tsx",
+      "sha256": "e7a9ad7a9de6f45d55d7f4466a2f7535337bb34bb1f3f38064af8febc781907a",
+      "lines": 762
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/store/posStore.ts",
+      "sha256": "5302dd58b6a5e35fc2a7420e3342aba3c7ff71d3f3f2913ceb496d4e629493cd",
+      "lines": 2098
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosCart.tsx",
+      "sha256": "bd3d1ee2031722ac3f66e8a75858ec6b09fd82a7e2b04653356dbf2779c07a19",
+      "lines": 681
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "sha256": "67ba4b8f8480a2a48b6636b2848bab380b94fc20001fc8879c693297f55cf51c",
+      "lines": 4496
+    },
+    {
+      "file": "apps/qr-guest/src/App.tsx",
+      "sha256": "0345578ad09040286d436c1ee1f4ca9343d407f173a8c48b91d93a9def0483cb",
+      "lines": 705
+    },
+    {
+      "file": "apps/restaurant-system/kds/src/App.tsx",
+      "sha256": "cabef57617e1deb236df0bbb7d980b89490dd0bccfeb8e22e3575912acfef84f",
+      "lines": 700
+    },
+    {
+      "file": "apps/restaurant-system/pos/src-tauri/src/lib.rs",
+      "sha256": "bb5e8c57b9dab9121a2685eee37f00755f59529f63bdc63c4c55ee1342772d00",
+      "lines": 153
+    },
+    {
+      "file": ".github/workflows/quality-security.yml",
+      "sha256": "e7321c2853f4341a367d8e8487d50ed4eb1981413b43d5a9f0dafb5c1c061298",
+      "lines": 96
+    },
+    {
+      "file": "docker-compose.yml",
+      "sha256": "290599a6853491468b16400fcfbe7cef5fb45ba6700c0810871080e627272729",
+      "lines": 374
+    },
+    {
+      "file": "cloud/api/test/sync-chaos.e2e.spec.ts",
+      "sha256": "fb3a16da4236c75aae0a8bbda0ed5fa7635ff0cf20773b82484c9699ce9e8b9f",
+      "lines": 190
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/payment/PosPaymentModal.tsx",
+      "sha256": "6625990595790b96ffbfd69aa04a8eb35680de99e2b687ae963fec2696b511a5",
+      "lines": 1267
+    },
+    {
+      "file": "packages/types/src/domain.ts",
+      "sha256": "1150a00cd2b94d84382356cd9ba2109a440edc02d03665882abf605e0a7fb998",
+      "lines": 1876
+    }
+  ]
+}

@@ -17,6 +17,7 @@ describe('Disable-impact warning and per-app default quotas (Phase 14)', () => {
 
   async function redeem(deviceType: string) {
     const key = await api('post', '/api/v1/activation-keys').send({ restaurantId, allowedDeviceType: deviceType, expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    if (key.status !== 201) return key;
     return request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType });
   }
 
@@ -62,12 +63,16 @@ describe('Disable-impact warning and per-app default quotas (Phase 14)', () => {
 
   it('a Feature-level defaultDeviceQuota caps that app, overriding the plan-wide maxDevices', async () => {
     const kds = await prisma.runAsPlatform((tx) => tx.feature.findFirstOrThrow({ where: { appCode: 'KDS' } }));
+    try {
     const set = await api('patch', `/api/v1/features/${kds.id}`).send({ defaultDeviceQuota: 1 });
     expect(set.status).toBe(200);
 
     expect((await redeem('KDS')).status).toBe(201);
     const second = await redeem('KDS');
     expect(second.status).toBe(409);
-    expect(second.body.message).toMatch(/1 device/);
+    expect(second.body.message).toMatch(/1\s+(?:KDS\s+)?devices?/);
+    } finally {
+      await api('patch', `/api/v1/features/${kds.id}`).send({ defaultDeviceQuota: kds.defaultDeviceQuota });
+    }
   });
 });

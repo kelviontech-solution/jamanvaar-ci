@@ -1,0 +1,359 @@
+{
+  "generatedAt": "2026-10-18T18:06:24.677Z",
+  "programmeComplete": false,
+  "deployed": false,
+  "provisionalScores": {
+    "security": 7,
+    "codeQuality": 7,
+    "saasReadiness": 6.5
+  },
+  "tests": [
+    {
+      "scope": "Full root refresh; source corrections overlapped the run; not a frozen release gate",
+      "reportSha256": "eebc3bd51b539bff4cfdf5fd2b09feaed382a2ef22f9d13a16157ba791998045",
+      "files": 333,
+      "passed": 2362,
+      "failed": 11,
+      "skipped": 0,
+      "success": false,
+      "failures": [
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action replays dish cancellation with the repriced bill and kitchen line in the same SQLite commit"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action does not cancel a dish from a bill already paid at the counter"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action fires one course only after acknowledgement, then adds the second course to the same bill"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action preserves unfired cart state during a delayed real SQLite acknowledgement"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action replays a lost submission response without adding a second order or course"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action rejects a bill closed by the cashier rather than reopening it with new dishes"
+        },
+        {
+          "file": "tests/item_modal_edit_persists.test.tsx",
+          "test": "dish editor keeps what the person typed across the 2-second re-render a typed name survives a re-render that passes new object identities for the same dish"
+        },
+        {
+          "file": "tests/order_creation_integrity.test.ts",
+          "test": "OrderRepository.createOrder data integrity generates a unique order number for a large batch with no collisions"
+        },
+        {
+          "file": "tests/pos_discount_dialog.test.tsx",
+          "test": "discount checkout dialog a zero-payable reward still exposes an enabled settlement button"
+        },
+        {
+          "file": "tests/super_admin_workflow.test.tsx",
+          "test": "Reviewed branch copying requires impact preview and acknowledgement before writing the target"
+        },
+        {
+          "file": "packages/database/src/__tests__/pin_lockout_persistence.test.ts",
+          "test": "StaffRepository PIN lockout persistence keeps the lockout active after a simulated app restart"
+        }
+      ]
+    },
+    {
+      "scope": "Final financial subset; one worker and explicit 30-second test/hook budgets",
+      "reportSha256": "03b99fbccd2c2350f315e8a06f19f7b1084a4510e96419b9751099a5a631a457",
+      "files": 3,
+      "passed": 38,
+      "failed": 0,
+      "skipped": 0,
+      "success": true,
+      "failures": []
+    }
+  ],
+  "intermediateRuns": [
+    {
+      "scope": "Earlier full refresh, required-choice fixtures corrected subsequently",
+      "reportSha256": "84b76b7b3b784ed67eb90dcd5d569c284dd20a5ce4f01db6539ea6f2a65f07f4",
+      "files": 333,
+      "passed": 2364,
+      "failed": 3,
+      "skipped": 0,
+      "success": false,
+      "failures": [
+        {
+          "file": "tests/browser_audit_fix_regressions.test.ts",
+          "test": "browser audit financial and identity regressions SEND KOT followed by Instant Bill settles the same order and preserves item identity"
+        },
+        {
+          "file": "tests/crm_loyalty_checkout.test.ts",
+          "test": "configured loyalty rewards at the actual POS settlement boundary unpaid KOT does not earn/spend; attachment after KOT is retained at settlement"
+        },
+        {
+          "file": "tests/pos_fast_cashier_workflow.test.ts",
+          "test": "JAMANVAAR POS — Ultra-Fast Cashier Billing Workflow & Productivity Engine should route items correctly to Kitchen Stations during KOT"
+        }
+      ]
+    },
+    {
+      "scope": "Earlier affected-file run, cancellation assertion corrected subsequently",
+      "reportSha256": "19e51911146b0d34772cee8e95bef754971547f581ecc16571c4e6cd79387374",
+      "files": 8,
+      "passed": 96,
+      "failed": 1,
+      "skipped": 0,
+      "success": false,
+      "failures": [
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action replays dish cancellation with the repriced bill and kitchen line in the same SQLite commit"
+        }
+      ]
+    },
+    {
+      "scope": "Intermediate tax fixture correction was invalid and was reverted",
+      "reportSha256": "7b8459a75b98ddf182aabb2624e4b0c5ceba743388dcc2ea96d9319222387875",
+      "files": 3,
+      "passed": 32,
+      "failed": 6,
+      "skipped": 0,
+      "success": false,
+      "failures": [
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action replays dish cancellation with the repriced bill and kitchen line in the same SQLite commit"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action does not cancel a dish from a bill already paid at the counter"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action fires one course only after acknowledgement, then adds the second course to the same bill"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action preserves unfired cart state during a delayed real SQLite acknowledgement"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action replays a lost submission response without adding a second order or course"
+        },
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action rejects a bill closed by the cashier rather than reopening it with new dishes"
+        }
+      ]
+    },
+    {
+      "scope": "Concurrent-load failures retained separately; see final bounded subset",
+      "reportSha256": "e1fb847f6e0a16436188249d507694fcf553ce784d3de520acd5a7fec7666572",
+      "files": 3,
+      "passed": 36,
+      "failed": 2,
+      "skipped": 0,
+      "success": false,
+      "failures": [
+        {
+          "file": "tests/captain_durable_submission.test.ts",
+          "test": "actual Captain acknowledged kitchen action replays dish cancellation with the repriced bill and kitchen line in the same SQLite commit"
+        },
+        {
+          "file": "tests/financial_repository_commit.test.ts",
+          "test": "real repository preparation and durable financial acceptance encrypts the complete device snapshot and restores replay protection and the customer key into an empty SQLite target"
+        }
+      ]
+    }
+  ],
+  "typeGate": {
+    "command": "node node_modules/typescript/bin/tsc -b",
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "productionBuilds": [
+    {
+      "app": "pos",
+      "exitCode": 0,
+      "logSha256": "544e8f3cedf5986eb692171eee2f414c2fa0465355ce5313d8d2909aa2dfdf31"
+    },
+    {
+      "app": "captain",
+      "exitCode": 0,
+      "logSha256": "46ca212fd6086a4c936cee6b18fdc2bc6f630abb50b68e3645b696768f3fd884"
+    },
+    {
+      "app": "kiosk-user",
+      "exitCode": 0,
+      "logSha256": "4128ab6c428e96ed65c4638ef7647a0a884abf93aac5164a2dcdb6414f6a8e18"
+    }
+  ],
+  "browser": {
+    "kitchenScope": "Actual POS cart and Captain workspace components/actions; kiosk admission service fixture. Real SQLite OPFS, simulated identities and hardware; no provider or installed-device acceptance.",
+    "checkoutScope": "Actual POS payment component/store and real SQLite OPFS worker; isolated identities and simulated hardware. Not native power-loss or real printer acceptance.",
+    "scenarios": [
+      {
+        "screen": "pos",
+        "mode": "pause",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "screen": "pos",
+        "mode": "lost",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "screen": "captain",
+        "mode": "pause",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "screen": "captain",
+        "mode": "lost",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "screen": "kiosk",
+        "mode": "pause",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "screen": "kiosk",
+        "mode": "lost",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "screen": "refund",
+        "mode": "pause",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "screen": "refund",
+        "mode": "lost",
+        "width": 390,
+        "pageErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "scenario": "delayed-real-SQLite-acknowledgement",
+        "width": 390,
+        "pageErrors": 0
+      },
+      {
+        "scenario": "delayed-real-SQLite-acknowledgement",
+        "width": 1366,
+        "pageErrors": 0
+      },
+      {
+        "scenario": "lost-acknowledgement-close-reopen-real-OPFS",
+        "pageErrors": 0
+      },
+      {
+        "scenario": "actual-protected-recovery-download-wrong-password-then-verify",
+        "pageErrors": 0
+      }
+    ],
+    "kitchenSha256": "e97c42406c8b99bcd937001b8e69a40aa489252152761fcc10484ac2f9971dcc",
+    "checkoutSha256": "50bbee9a5a75ef9978f597b97c6d8f2414ae095d4ed7eb2daff471eecc62c000"
+  },
+  "limitations": [
+    "Other financial callers and guided pending-operation recovery remain",
+    "Kiosk browser coverage is a service fixture, not the complete activated app",
+    "Staff approval identities and hardware are fixtures",
+    "No provider/manual-return acceptance or distributed refund recovery drill",
+    "No signed Windows/Android upgrade or native power-loss acceptance",
+    "No offsite/key-loss recovery, production-scale capacity or restaurant pilot",
+    "No new full API database-suite run; backend source unchanged in this stage",
+    "Interrupted parallel production builds are not counted as completed builds"
+  ],
+  "sources": [
+    {
+      "file": "packages/database/src/db.ts",
+      "sha256": "a365ea343d565d4ec9ef61d238e52f9d9bdbff655f93ec278eeb36cb7f19d49d"
+    },
+    {
+      "file": "packages/database/src/index.ts",
+      "sha256": "23b97d8136d8cfb6700076c7158392e004f2dd275085a086f83cb988d3019ca3"
+    },
+    {
+      "file": "packages/database/src/durable/financial_request.ts",
+      "sha256": "2c161bea96a2e7da2f4b389bcc576bf513b444400649ec256fc82afda0b211a3"
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "sha256": "c7d3debc36e33430cc51d86015501f754a14017d285ee28c8083f509e2cdcf73"
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/kioskAdmission.ts",
+      "sha256": "867fef82561ea762efbad38b099eb79aa3f6afac79c90942dca0b4d08b7720dd"
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/store/captainStore.ts",
+      "sha256": "85c1557ff7701a7b4e95407f839ef16d0e7fa4e6f85df41ccc80e3a251d543e4"
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/tables/CaptainTableWorkspaceModal.tsx",
+      "sha256": "3b1dd5fd2a13d55e030c6c864d48a3ca2f51cd02283052d21e8ec36986d84c60"
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/modals/CaptainCancelDishModal.tsx",
+      "sha256": "d6a196860f341f27af32453281397a6df2f91f5cd298d485918c86e9d2a58aec"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/store/posStore.ts",
+      "sha256": "dd710b2158fe512b40488ede084cb142a8e9dc8f1fc5d3c77327f5c8d628c783"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/services/financialActions.ts",
+      "sha256": "34cb7f46290802e49bbf91492ac41bd3402667196531390fe2f04ac10b666758"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosCart.tsx",
+      "sha256": "529e019f24384ca951fffb960238a146212eb7bc257f46751a379fc4e424614b"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/bills/PosBillsView.tsx",
+      "sha256": "ff4c1a854f19337a36679ff31b6c90b24ac345773562c1730b378293e209941d"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/orders/PosOrdersView.tsx",
+      "sha256": "f4a09ee4cad0490ede50934a3af9fd432fd72c081dfe698742f1a3d0eaffdb91"
+    },
+    {
+      "file": "tests/kiosk_durable_admission.test.ts",
+      "sha256": "3d344b98148e677fdc71da746b775f61d4246fa8d6f255569db7a44dcb6ddf57"
+    },
+    {
+      "file": "tests/captain_durable_submission.test.ts",
+      "sha256": "ba2efd7ef6d1db761559a78f31e263f974947296c1de8ce9c0430d0a47fe8f59"
+    },
+    {
+      "file": "tests/financial_repository_commit.test.ts",
+      "sha256": "c73ca7eb0c7446f88b880c469549aec6c7b7b92c5e8dbf4bd6faa10497a966a3"
+    },
+    {
+      "file": "docs/reports/ecosystem-audit-2026-10-17/kitchen-flow-browser.cjs",
+      "sha256": "accdf8f04f979463114898e293ef0d7367d8f8b622f3f9c8de9fc8c0a8c97094"
+    },
+    {
+      "file": "docs/reports/ecosystem-audit-2026-10-17/kitchen-flow-browser.tsx",
+      "sha256": "05033ab8119ab086d8f60d5609401c3227ff02b8e57399cce314dea3cad7eecd"
+    }
+  ]
+}

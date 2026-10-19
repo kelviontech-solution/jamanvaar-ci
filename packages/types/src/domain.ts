@@ -657,6 +657,11 @@ export interface Order {
   paymentSplits?: PaymentSplit[];
   createdAt: string;
   updatedAt: string;
+  /** Who/what last wrote to this order — a cashier name and the terminal's own id. Compared against
+   * a cart's own baseline snapshot before payment/KOT so a bill edited by a second device mid-service
+   * surfaces as a conflict to refresh, instead of one edit silently overwriting the other. */
+  lastEditedBy?: string;
+  lastEditedByTerminalId?: string;
   pickupCounter?: string;
   pickupAt?: string;
   pickupTimezone?: string;

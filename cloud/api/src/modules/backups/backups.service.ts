@@ -1,6 +1,6 @@
 import { nextSyncSequence } from '../../common/sync-sequence';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
-import { createHash } from 'crypto';
+import { createHash, createHmac, timingSafeEqual } from 'crypto';
 import { gunzipSync } from 'zlib';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, NotImplementedException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -11,6 +11,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { BackupStorageService } from './backup-storage.service';
 import { buildBackupPdfBuffer } from './backup-pdf.util';
+import { COLLECTED_ORDER_STATUSES, paymentBalance } from '../payments/order-payment-ledger';
+
+// Operational snapshots cannot roll these balances/identities back independently of the
+// authoritative financial, stock, authentication and gateway recovery sets.
+const COMPLETE_RECOVERY_ENTITY_TYPES = new Set(['CUSTOMER', 'STAFF_USER', 'SHIFT', 'CASH_MOVEMENT', 'PAYMENT_TRANSACTION', 'INVENTORY_ITEM', 'OPS_STAFF_TRANSFER']);
 
 @Injectable()
 export class BackupsService {
@@ -54,14 +59,35 @@ export class BackupsService {
       subscriptions: await tx.subscription.findMany({ where: { restaurantId }, include: { plan: { select: { id: true, name: true, tier: true } } } }),
       applicationEntitlements: await tx.applicationEntitlement.findMany({ where: { restaurantId } }),
       syncedEntities: await tx.syncedEntity.findMany({ where: { restaurantId } }),
-      syncedOrders: await tx.syncedOrder.findMany({ where: { restaurantId } })
-    }));
+      syncedOrders: await tx.syncedOrder.findMany({ where: { restaurantId } }),
+      orderPaymentEntries: await tx.orderPaymentEntry.findMany({ where: { restaurantId } })
+    }), { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
     if (!data.restaurant) throw new NotFoundException('Restaurant not found');
 
     const counts = Object.fromEntries(
       Object.entries(data).filter(([, v]) => Array.isArray(v)).map(([k, v]) => [k, (v as unknown[]).length])
     );
-    return { version: 1, generatedAt: new Date().toISOString(), triggeredBy, counts, ...data };
+    const snapshot = { version: 2, recoveryScope: 'OPERATIONAL_SNAPSHOT', generatedAt: new Date().toISOString(), triggeredBy, counts, ...data };
+    return { ...snapshot, serverRecoverySignature: this.snapshotSignature(snapshot) };
+  }
+
+  /** Tenant-uploaded JSON is not proof that a collection occurred. Seal only server exports,
+   * using a domain-separated signing key, so a forged upload cannot mint confirmed entries
+   * merely because the storage service encrypted it. Existing encryption identities stay intact. */
+  private snapshotSignature(snapshot: unknown): string | null {
+    const secret = this.config.get<string>('BACKUP_ENCRYPTION_KEY_B64') || this.config.get<string>('JWT_ACCESS_SECRET');
+    if (!secret) return null;
+    const key = createHmac('sha256', secret).update('jamanvaar-operational-snapshot-signing-v1').digest();
+    return createHmac('sha256', key).update(JSON.stringify(snapshot)).digest('hex');
+  }
+
+  private trustedFinancialSnapshot(parsed: unknown, restaurantId: string): boolean {
+    if (!parsed || typeof parsed !== 'object') return false;
+    const { serverRecoverySignature, ...snapshot } = parsed as Record<string, unknown>;
+    if (typeof serverRecoverySignature !== 'string' || !/^[a-f0-9]{64}$/.test(serverRecoverySignature) ||
+        !snapshot.restaurant || (snapshot.restaurant as { id?: string }).id !== restaurantId) return false;
+    const expected = this.snapshotSignature(snapshot);
+    return expected !== null && timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(serverRecoverySignature, 'hex'));
   }
 
   /**
@@ -95,13 +121,18 @@ export class BackupsService {
   private restorePlan(parsed: unknown) {
     const obj = (parsed && typeof parsed === 'object' ? parsed : {}) as Record<string, unknown>;
     const entities = Array.isArray(obj.syncedEntities) ? obj.syncedEntities.length : null;
+    const protectedEntities = Array.isArray(obj.syncedEntities) ? obj.syncedEntities.filter(entity =>
+      entity && typeof entity === 'object' && COMPLETE_RECOVERY_ENTITY_TYPES.has(String(entity.entityType))).length : 0;
     const orders = Array.isArray(obj.syncedOrders) ? obj.syncedOrders.length : null;
     const restorableInCloud = entities !== null || orders !== null;
     return {
       restorableInCloud,
-      willRestore: restorableInCloud ? { syncedEntities: entities ?? 0, syncedOrders: orders ?? 0 } : null,
+      willRestore: restorableInCloud ? { syncedEntities: (entities ?? 0) - protectedEntities, syncedOrders: orders ?? 0 } : null,
+      protectedEntities,
+      recoveryScope: 'OPERATIONAL_SNAPSHOT',
+      settledOrderPolicy: 'PRESERVE_EXISTING_REQUIRE_LEDGER_FOR_RECREATION',
       notRestored: restorableInCloud
-        ? ['Staff accounts and PINs', 'Devices and activation keys', 'Subscription and billing', 'The restaurant record']
+        ? ['Staff accounts and PINs', 'Devices and activation keys', 'Subscription and billing', 'The restaurant record', 'Gateway attempts and provider refund records', 'Customer loyalty balances, cash shifts and stock balances', 'Inventory movement ledger', 'Uploaded assets and encryption keys', 'Complete disaster recovery requires coordinated database, object and key recovery']
         : ['This backup came from a terminal, so the cloud cannot restore it. Download it and import it in Restaurant Admin, under Backup & Restore.']
     };
   }
@@ -538,14 +569,19 @@ export class BackupsService {
     try {
       // A REAL safety snapshot of what is there now, so the restore can itself be undone.
       const safety = await this.triggerForRestaurant(job.restaurantId);
-      const data = inspected.parsed as { syncedEntities?: Array<Record<string, unknown>>; syncedOrders?: Array<Record<string, unknown>> };
+      const data = inspected.parsed as { syncedEntities?: Array<Record<string, unknown>>; syncedOrders?: Array<Record<string, unknown>>; orderPaymentEntries?: Array<Record<string, unknown>> };
+      const trustedFinancialEvidence = this.trustedFinancialSnapshot(inspected.parsed, job.restaurantId);
 
       const restored = await this.prisma.runAsTenant(job.restaurantId, async (tx) => {
         for (const id of [...new Set((data.syncedOrders ?? []).map((o) => String(o.externalOrderId)))].sort()) await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + job.restaurantId + ':' + id}))`;
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + job.restaurantId}))`;
         let syncedEntities = 0;
         let syncedOrders = 0;
+        let protectedOrders = 0;
+        let paymentEntries = 0;
+        let protectedEntities = 0;
         for (const e of data.syncedEntities ?? []) {
+          if (COMPLETE_RECOVERY_ENTITY_TYPES.has(String(e.entityType))) { protectedEntities++; continue; }
           await tx.syncedEntity.upsert({
             where: { restaurantId_entityType_externalId: { restaurantId: job.restaurantId, entityType: String(e.entityType), externalId: String(e.externalId) } },
             create: { restaurantId: job.restaurantId, entityType: String(e.entityType), externalId: String(e.externalId), payload: e.payload as Prisma.InputJsonValue, syncVersion: 1 },
@@ -554,20 +590,69 @@ export class BackupsService {
           syncedEntities++;
         }
         for (const o of data.syncedOrders ?? []) {
+          const externalOrderId = String(o.externalOrderId);
+          const existing = await tx.syncedOrder.findUnique({ where: { restaurantId_externalOrderId: { restaurantId: job.restaurantId, externalOrderId } } });
+          // An old snapshot must never reverse a newer collection/refund or delete its audit trail.
+          if (existing && (COLLECTED_ORDER_STATUSES.has(existing.paymentStatus ?? '') || await tx.orderPaymentEntry.count({ where: { restaurantId: job.restaurantId, orderId: existing.id } }))) {
+            protectedOrders++;
+            continue;
+          }
+          const entries = (data.orderPaymentEntries ?? []).filter(entry => entry.orderId === o.id);
+          if (entries.length && !trustedFinancialEvidence) {
+            throw new ConflictException('Confirmed collection evidence can only be restored from an authenticated server snapshot for this restaurant');
+          }
+          if (entries.some(entry => entry.restaurantId !== job.restaurantId || !['COLLECTION', 'REFUND'].includes(String(entry.kind)) || !Number.isSafeInteger(entry.amount) || Number(entry.amount) <= 0)) {
+            throw new ConflictException('Backup has invalid or cross-restaurant collection evidence');
+          }
+          const balance = paymentBalance(Number(o.totalAmount), entries.map(entry => ({ kind: String(entry.kind), amount: Number(entry.amount) })));
+          if (COLLECTED_ORDER_STATUSES.has(String(o.paymentStatus)) && balance.outstandingPaise !== 0) {
+            throw new ConflictException('This snapshot lacks confirmed collection evidence for a settled order. Use a complete database recovery; do not reconstruct financial history from a payment status alone');
+          }
+          if ((o.paymentStatus === 'PARTIALLY_REFUNDED' && (balance.refundedPaise <= 0 || balance.refundedPaise >= balance.totalPaise)) ||
+              (o.paymentStatus === 'REFUNDED' && balance.refundedPaise !== balance.totalPaise)) {
+            throw new ConflictException('Backup refund state does not match its confirmed refund evidence');
+          }
+          const originalMeta = o.meta && typeof o.meta === 'object' && !Array.isArray(o.meta) ? o.meta as Record<string, unknown> : {};
+          if (entries.length && typeof originalMeta.refundAmountPaise === 'number' && originalMeta.refundAmountPaise !== balance.refundedPaise) {
+            throw new ConflictException('Backup refund amount does not match its confirmed refund evidence');
+          }
+          if (o.branchId && !await tx.branch.findFirst({ where: { id: String(o.branchId), restaurantId: job.restaurantId } })) {
+            throw new ConflictException('Restore the original branch before restoring its orders');
+          }
+          const device = o.deviceId ? await tx.device.findFirst({ where: { id: String(o.deviceId), restaurantId: job.restaurantId }, select: { id: true } }) : null;
           const fields = {
             seq: await nextSyncSequence(tx, job.restaurantId), orderType: String(o.orderType), status: String(o.status), tableId: (o.tableId as string) ?? null, tableLabel: (o.tableLabel as string) ?? null,
             items: o.items as Prisma.InputJsonValue, subtotal: Number(o.subtotal), taxAmount: Number(o.taxAmount), discountAmount: Number(o.discountAmount ?? 0),
             totalAmount: Number(o.totalAmount), notes: (o.notes as string) ?? null, paymentStatus: (o.paymentStatus as string) ?? null, paymentMethod: (o.paymentMethod as string) ?? null,
-            meta: (o.meta as Prisma.InputJsonValue) ?? undefined, branchId: (o.branchId as string) ?? null
+            meta: entries.length ? { ...originalMeta, refundAmountPaise: balance.refundedPaise, paymentAllocationSummary: { collectedPaise: balance.collectedPaise, outstandingPaise: balance.outstandingPaise } } as Prisma.InputJsonValue : (o.meta as Prisma.InputJsonValue) ?? undefined, branchId: (o.branchId as string) ?? null,
+            source: typeof o.source === 'string' ? o.source : 'POS', publicOrderId: typeof o.publicOrderId === 'string' ? o.publicOrderId : null,
+            qrCodeId: typeof o.qrCodeId === 'string' ? o.qrCodeId : null, menuVersion: typeof o.menuVersion === 'number' ? o.menuVersion : null,
+            deviceId: device?.id ?? null, ...(typeof o.createdAt === 'string' ? { createdAt: new Date(o.createdAt) } : {})
           };
-          await tx.syncedOrder.upsert({
+          const saved = await tx.syncedOrder.upsert({
             where: { restaurantId_externalOrderId: { restaurantId: job.restaurantId, externalOrderId: String(o.externalOrderId) } },
-            create: { restaurantId: job.restaurantId, externalOrderId: String(o.externalOrderId), syncVersion: 1, ...fields },
+            create: { ...(typeof o.id === 'string' ? { id: o.id } : {}), restaurantId: job.restaurantId, externalOrderId, syncVersion: 1, ...fields },
             update: { ...fields, syncVersion: { increment: 1 } }
           });
+          for (const entry of entries) {
+            const reference = String(entry.reference);
+            const prior = await tx.orderPaymentEntry.findUnique({ where: { reference } });
+            if (prior) {
+              if (prior.restaurantId !== job.restaurantId || prior.orderId !== saved.id || prior.kind !== entry.kind || prior.amount !== entry.amount) throw new ConflictException('Backup payment reference conflicts with live financial history');
+              continue;
+            }
+            await tx.orderPaymentEntry.create({ data: {
+              ...(typeof entry.id === 'string' ? { id: entry.id } : {}), restaurantId: job.restaurantId, branchId: saved.branchId, orderId: saved.id,
+              kind: String(entry.kind), amount: Number(entry.amount), currency: typeof entry.currency === 'string' ? entry.currency : 'INR',
+              method: String(entry.method), reference, actorId: typeof entry.actorId === 'string' ? entry.actorId : null,
+              evidence: (entry.evidence as Prisma.InputJsonValue) ?? undefined,
+              ...(typeof entry.createdAt === 'string' ? { createdAt: new Date(entry.createdAt) } : {})
+            } });
+            paymentEntries++;
+          }
           syncedOrders++;
         }
-        return { syncedEntities, syncedOrders };
+        return { syncedEntities, syncedOrders, protectedOrders, paymentEntries, protectedEntities };
       });
 
       const updated = await this.prisma.runAsPlatform((tx) =>

@@ -550,9 +550,13 @@ export function OnboardRestaurantPage() {
             });
           } catch (keyErr) {
             console.warn('Key generation skipped for type:', type, keyErr);
+            // Used to say "create it manually from the Activation Keys tab" -- sending the operator
+            // to a different page when "Generate Activation Keys Now" below does the same thing on
+            // this one, and swallowing the real reason (e.g. the plan's device quota) into a
+            // console.warn no one reading the screen would ever see.
             setProvisioningWarnings((w) => [
               ...w,
-              `Activation key for ${type} was NOT generated — create it manually from the Activation Keys tab.`
+              `Activation key for ${type} was NOT generated${keyErr instanceof ApiError ? `: ${keyErr.message}` : ''} — use "Generate Activation Keys Now" below to retry.`
             ]);
           }
         }
@@ -1012,6 +1016,17 @@ export function OnboardRestaurantPage() {
               {plans.map((p) => {
                 const isSelected = planForm.planId === p.id;
                 const isPro = p.tier === 'PRO';
+                // What this plan actually turns on, computed server-side from productFamily+tier
+                // (see ApplicationEntitlementsService.appsForPlan) -- not a tier-name guess. A
+                // JAMANVAAR QR plan is tier 'QR', not 'PRO', so the old `isPro` check marked the
+                // one feature that product exists for -- QR Table Ordering -- with a ✕, while
+                // showing POS billing as included for every plan unconditionally, QR included or not.
+                const apps = new Set(p.defaultApps ?? []);
+                const hasPos = apps.has('POS');
+                const hasCaptain = apps.has('CAPTAIN');
+                const hasQr = apps.has('QR_ORDERING');
+                const hasKiosk = apps.has('KIOSK');
+                const hasKioskAdmin = apps.has('KIOSK_ADMIN');
                 const monthlyPrice = p.priceMonthly / 100;
                 return (
                   <div
@@ -1042,52 +1057,52 @@ export function OnboardRestaurantPage() {
                         <span>Up to {p.maxDevices} Registered Devices</span>
                       </li>
                       <li className="plan-feature-item">
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Offline Local POS Billing Engine</span>
-                      </li>
-                      <li className="plan-feature-item">
-                        {isPro ? (
+                        {hasPos ? (
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <span className="text-slate-400 font-bold">✕</span>
                         )}
-                        <span className={isPro ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
+                        <span className={hasPos ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
+                          Offline Local POS Billing Engine
+                        </span>
+                      </li>
+                      <li className="plan-feature-item">
+                        {hasCaptain ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        ) : (
+                          <span className="text-slate-400 font-bold">✕</span>
+                        )}
+                        <span className={hasCaptain ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
                           Captain Wireless Waiter App
                         </span>
                       </li>
                       <li className="plan-feature-item">
-                        {isPro ? (
+                        {hasQr ? (
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <span className="text-slate-400 font-bold">✕</span>
                         )}
-                        <span className={isPro ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
+                        <span className={hasQr ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
                           QR Table Ordering & Standees
                         </span>
                       </li>
-                      {/* Self-Order Kiosk + its admin console are a real,
-                          distinct AppCode pair (KIOSK / KIOSK_ADMIN) gated
-                          the same way Captain/QR are — PRO-tier only per
-                          the plan's computed defaultApps — but this card never listed them at
-                          all, so an onboarding admin had no way to see
-                          whether a plan included Kiosk. */}
                       <li className="plan-feature-item">
-                        {isPro ? (
+                        {hasKiosk ? (
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <span className="text-slate-400 font-bold">✕</span>
                         )}
-                        <span className={isPro ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
+                        <span className={hasKiosk ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
                           Self-Order Kiosk App
                         </span>
                       </li>
                       <li className="plan-feature-item">
-                        {isPro ? (
+                        {hasKioskAdmin ? (
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <span className="text-slate-400 font-bold">✕</span>
                         )}
-                        <span className={isPro ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
+                        <span className={hasKioskAdmin ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
                           Kiosk Admin Dashboard
                         </span>
                       </li>

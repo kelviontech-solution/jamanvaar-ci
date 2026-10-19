@@ -28,11 +28,22 @@ interface SyncState {
   pushed: Record<string, string>;
   /** Deleted records not yet pushed: id -> deletion time. */
   tombstones: Record<string, string>;
+  versions?: Record<string, number>;
+  conflicts?: Record<string, Omit<CollectionSyncConflict, 'local'>>;
+}
+
+export interface CollectionSyncConflict {
+  externalId: string;
+  scope: string;
+  syncVersion: number;
+  remote: Record<string, unknown>;
+  local: Record<string, unknown>;
 }
 
 export interface CollectionSyncRecord {
   externalId: string;
   payload: Record<string, unknown>;
+  baseSyncVersion?: number;
 }
 
 type Syncable = { updatedAt?: string };
@@ -87,7 +98,7 @@ export class CollectionSync<T extends Syncable> {
       this.memory = { pushed: {}, tombstones: {} };
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<SyncState>;
-        this.memory = { sigs: parsed.sigs, pushed: parsed.pushed ?? {}, tombstones: parsed.tombstones ?? {} };
+        this.memory = { sigs: parsed.sigs, pushed: parsed.pushed ?? {}, tombstones: parsed.tombstones ?? {}, versions: parsed.versions ?? {}, conflicts: parsed.conflicts ?? {} };
       }
     } catch {
       // Unreadable state just means this device re-baselines.
@@ -131,30 +142,38 @@ export class CollectionSync<T extends Syncable> {
     const state = this.load();
     state.tombstones[id] = now;
     if (state.sigs) delete state.sigs[id];
-    delete state.pushed[id];
+    // Keep the acknowledged baseline until the tombstone is accepted, so a pull
+    // of that unchanged baseline does not turn a deliberate deletion into a conflict.
     this.save();
   }
 
   /** Everything the cloud has not seen yet: changed records plus pending deletions. */
-  public collectSyncRecords(): CollectionSyncRecord[] {
+  public collectSyncRecords(scope?: string): CollectionSyncRecord[] {
     const state = this.load();
     const records: CollectionSyncRecord[] = [];
     for (const record of this.list()) {
       const asRecord = record as unknown as Record<string, unknown>;
-      if (state.pushed[this.idOf(record)] !== this.signature(asRecord)) {
-        records.push({ externalId: this.idOf(record), payload: structuredClone({ ...(this.serialize ? this.serialize(record) : asRecord), updatedAt: record.updatedAt ?? EPOCH }) });
+      const id = this.idOf(record);
+      if (state.conflicts?.[this.versionKey(scope, id)]) continue;
+      if (state.pushed[id] !== this.signature(asRecord)) {
+        records.push({ externalId: id, ...(scope ? { baseSyncVersion: state.versions?.[this.versionKey(scope, id)] ?? 0 } : {}), payload: structuredClone({ ...(this.serialize ? this.serialize(record) : asRecord), updatedAt: record.updatedAt ?? EPOCH }) });
       }
     }
     for (const [id, at] of Object.entries(state.tombstones)) {
-      records.push({ externalId: id, payload: { [this.idKey]: id, deleted: true, updatedAt: at } });
+      if (state.conflicts?.[this.versionKey(scope, id)]) continue;
+      records.push({ externalId: id, ...(scope ? { baseSyncVersion: state.versions?.[this.versionKey(scope, id)] ?? 0 } : {}), payload: { [this.idKey]: id, deleted: true, updatedAt: at } });
     }
     return records;
   }
 
   /** Call after the cloud confirmed a push. */
-  public markPushed(records: CollectionSyncRecord[]): void {
+  public markPushed(records: CollectionSyncRecord[], revision?: { scope: string; syncVersion: number }): void {
     const state = this.load();
     for (const r of records) {
+      if (revision && Number.isSafeInteger(revision.syncVersion) && revision.syncVersion > 0) {
+        const key = this.versionKey(revision.scope, r.externalId);
+        (state.versions ??= {})[key] = Math.max(state.versions[key] ?? 0, revision.syncVersion);
+      }
       if (r.payload.deleted) {
         delete state.tombstones[r.externalId];
         delete state.pushed[r.externalId];
@@ -166,13 +185,48 @@ export class CollectionSync<T extends Syncable> {
   }
 
   /** Applies one record pulled from the cloud. The newer change wins; an older one is ignored. */
-  public applyRemote(remote: Record<string, unknown>, opts: { authoritative?: boolean } = {}): void {
+  public applyRemote(remote: Record<string, unknown>, opts: { authoritative?: boolean; scope?: string; syncVersion?: number } = {}): void {
     const id = remote?.[this.idKey];
     if (typeof id !== 'string' || !id) return;
     const state = this.load();
     const remoteTime = time(remote.updatedAt);
     const list = this.list();
     const idx = list.findIndex((r) => this.idOf(r) === id);
+
+    if (opts.scope && Number.isSafeInteger(opts.syncVersion) && Number(opts.syncVersion) > 0 && !this.merge) {
+      const key = this.versionKey(opts.scope, id), version = opts.syncVersion!;
+      if (version < (state.versions?.[key] ?? 0)) return;
+      const local = idx >= 0 ? list[idx] as unknown as Record<string, unknown> : null;
+      const localDeleted = Boolean(state.tombstones[id]);
+      const remoteSig = this.signature(remote);
+      const localSig = local ? this.signature(local) : undefined;
+      const same = remote.deleted === true ? localDeleted : !localDeleted && localSig === remoteSig;
+      const dirty = localDeleted || local !== null && localSig !== state.pushed[id] && (state.pushed[id] !== undefined || time(local.updatedAt) > 0);
+      if (!opts.authoritative && dirty && !same) {
+        if (remoteSig !== state.pushed[id] || remote.deleted === true) {
+          const conflict = { externalId: id, scope: opts.scope, syncVersion: version, remote: structuredClone(remote) };
+          const changed = stable(state.conflicts?.[key]) !== stable(conflict);
+          (state.conflicts ??= {})[key] = conflict;
+          this.save();
+          if (changed) db.notify();
+          return;
+        }
+        // The server still has the exact baseline: keep the pending local work.
+        (state.versions ??= {})[key] = version;
+        if (state.conflicts) delete state.conflicts[key];
+        this.save(); return;
+      }
+      (state.versions ??= {})[key] = version;
+      if (state.conflicts) delete state.conflicts[key];
+      if (remote.deleted === true) {
+        if (idx >= 0) list.splice(idx, 1);
+        delete state.tombstones[id]; delete state.pushed[id];
+        if (state.sigs) delete state.sigs[id];
+        this.save(); if (idx >= 0) db.notify(); return;
+      }
+      // A server revision is authoritative even if this device's clock is wrong.
+      opts = { ...opts, authoritative: true };
+    }
 
     if (remote.deleted === true) {
       if (idx >= 0 && (opts.authoritative || time(list[idx].updatedAt) <= remoteTime)) {
@@ -227,6 +281,37 @@ export class CollectionSync<T extends Syncable> {
   /** Completeness checks use identity, not the visible/available item count. */
   public hasRecord(id: string): boolean {
     return this.list().some(record => this.idOf(record) === id);
+  }
+
+  private versionKey(scope: string | undefined, id: string): string { return JSON.stringify([scope ?? '', id]); }
+
+  public getConflicts(scope: string): CollectionSyncConflict[] {
+    const state = this.load();
+    return Object.values(state.conflicts ?? {}).filter(conflict => conflict.scope === scope).map(conflict => ({
+      ...structuredClone(conflict), local: structuredClone(state.tombstones[conflict.externalId]
+        ? { [this.idKey]: conflict.externalId, deleted: true }
+        : this.list().find(record => this.idOf(record) === conflict.externalId) as unknown as Record<string, unknown> ?? { [this.idKey]: conflict.externalId, deleted: true })
+    }));
+  }
+
+  public resolveConflict(conflict: CollectionSyncConflict, choice: 'SERVER' | 'LOCAL'): void {
+    const state = this.load(), key = this.versionKey(conflict.scope, conflict.externalId), saved = state.conflicts?.[key];
+    const live = this.getConflicts(conflict.scope).find(item => item.externalId === conflict.externalId);
+    if (!saved || !live || stable(saved.remote) !== stable(conflict.remote) || saved.syncVersion !== conflict.syncVersion || stable(live.local) !== stable(conflict.local)) throw new Error('This comparison changed. Review the latest versions before choosing.');
+    if (choice === 'LOCAL' && saved.remote.deleted === true) throw new Error('This record was removed. Use the published version, then add a new record if needed.');
+    (state.versions ??= {})[key] = saved.syncVersion;
+    delete state.conflicts![key];
+    if (choice === 'SERVER') {
+      delete state.tombstones[conflict.externalId];
+      this.save();
+      this.applyRemote(saved.remote, { authoritative: true, scope: saved.scope, syncVersion: saved.syncVersion });
+    } else {
+      state.pushed[conflict.externalId] = this.signature(saved.remote);
+      const local = this.list().find(record => this.idOf(record) === conflict.externalId);
+      if (local) local.updatedAt = new Date().toISOString();
+      else if (state.tombstones[conflict.externalId]) state.tombstones[conflict.externalId] = new Date().toISOString();
+      this.save(); db.notify();
+    }
   }
 
   /** Forget all bookkeeping: the next stamp is a fresh baseline (used when a device is activated to a restaurant). */

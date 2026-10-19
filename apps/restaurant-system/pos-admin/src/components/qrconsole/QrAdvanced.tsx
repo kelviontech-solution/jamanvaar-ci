@@ -11,6 +11,7 @@ import {
   type QrPrintDesign,
   type QrRules,
   type QrOrderRow,
+  type QrAnalytics,
 } from "../../cloud/qrAdminClient";
 import {
   DEFAULT_DESIGN,
@@ -216,18 +217,39 @@ export function QrDesignStudio({ showToast }: Props) {
           <div className="grid sm:grid-cols-3 gap-3 mt-4">
             {QR_DESIGNS.map((t) => {
               const isSelected = design.template === t.id;
+              // A real miniature of the actual card -- border style, accent band, photo-frame
+              // shape, dark-vs-light layout -- not a flat colour swatch. The nine options used to
+              // differ only by background colour here, so every design looked identical in shape
+              // and a restaurant owner had no way to tell "Premium" from "Fine dining" without
+              // picking each one and checking the separate preview panel.
+              const thumbSvg = samplePreview ? designSvg(samplePreview, { ...DEFAULT_DESIGN, template: t.id, accent: t.color }) : null;
               return (
                 <button
                   key={t.id}
                   aria-pressed={isSelected}
                   onClick={() => patch({ template: t.id, accent: t.color })}
-                  className={`relative overflow-hidden rounded-xl border p-3 text-left text-sm transition-all ${isSelected ? "ring-2 ring-brand border-brand shadow-sm" : "border-jaman-border hover:border-slate-300"}`}
+                  className={`relative overflow-hidden rounded-xl border text-left text-sm transition-all ${isSelected ? "ring-2 ring-brand border-brand shadow-sm" : "border-jaman-border hover:border-slate-300"}`}
                 >
-                  <div
-                    className="absolute inset-x-0 top-0 h-10"
-                    style={{ background: `linear-gradient(135deg, ${t.color}, ${t.color}cc)` }}
-                  />
-                  <div className="relative mt-5 flex items-center justify-between">
+                  {/* The full card is a 640x860 portrait (logo, name, QR, footer). Forcing both the
+                      SVG's width AND height to fill this short wide box independently stretched
+                      every element unevenly -- the QR's own finder squares and the footer text
+                      warped into illegible marks. Scaling by width only (h-auto) keeps the design
+                      undistorted; aspect-[640/240] fixes the crop window to exactly viewBox y 0-240
+                      (640 * 240/640 = 240) regardless of rendered width, which is the header/accent
+                      band every design actually differs in, landing well above the QR at y=250 --
+                      so the crop can never catch a half-rendered code or text. */}
+                  {/* dangerouslySetInnerHTML below wraps the svg in its own div, so it's a
+                      grandchild here, not a direct child -- [&_svg] (descendant) reaches it;
+                      [&>svg] silently matched nothing and let the svg render at its native
+                      640x860px, relying on luck rather than the crop math above. */}
+                  <div className="aspect-[640/240] w-full overflow-hidden bg-jaman-ivory [&_svg]:block [&_svg]:w-full [&_svg]:h-auto" aria-hidden="true">
+                    {thumbSvg ? (
+                      <div dangerouslySetInnerHTML={{ __html: thumbSvg }} />
+                    ) : (
+                      <div className="h-full w-full" style={{ background: `linear-gradient(135deg, ${t.color}, ${t.color}cc)` }} />
+                    )}
+                  </div>
+                  <div className="relative flex items-center justify-between p-3">
                     <span className="font-bold text-jaman-navy">{t.name}</span>
                     {isSelected && (
                       <span className="text-[10px] font-bold uppercase tracking-wide text-brand bg-brand/10 rounded-full px-2 py-0.5">
@@ -592,24 +614,28 @@ export function QrOrderingRules({
       )}
       <div className={box + " space-y-4"}>
         {switches.map(([key, label]) => (
-          <label
-            key={key}
-            className="flex items-center justify-between text-sm font-bold gap-4"
-          >
-            <span>{label}</span>
-            <input
-              type="checkbox"
-              disabled={
-                busy ||
-                !settings.data ||
-                (key === "allowOnlinePayment" &&
-                  !ready.data?.available &&
-                  !settings.data?.allowOnlinePayment)
-              }
-              checked={settings.data?.[key] ?? false}
-              onChange={(e) => void saveSwitch(key, e.target.checked)}
-            />
-          </label>
+          <div key={key}>
+            <label className="flex items-center justify-between text-sm font-bold gap-4">
+              <span>{label}</span>
+              <input
+                type="checkbox"
+                disabled={
+                  busy ||
+                  !settings.data ||
+                  (key === "allowOnlinePayment" &&
+                    !ready.data?.available &&
+                    !settings.data?.allowOnlinePayment)
+                }
+                checked={settings.data?.[key] ?? false}
+                onChange={(e) => void saveSwitch(key, e.target.checked)}
+              />
+            </label>
+            {key === "allowOnlinePayment" && settings.data?.allowOnlinePayment && !ready.data?.available && (
+              <p className="text-xs text-amber-700 mt-1">
+                Turned on, but guests can't pay online yet — the payment provider above isn't configured. Ask your Super Admin to activate it, or guests will see Cash at Counter only.
+              </p>
+            )}
+          </div>
         ))}
         {payments && rules && (
           <label className="block text-xs font-bold">
@@ -964,7 +990,7 @@ export function QrOperationalOrders({ showToast }: Props) {
       </div>
       <Failure error={orders.error} />
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-        <div className="flex flex-wrap gap-3 items-end rounded-2xl border bg-white p-4"><label>Order view<select aria-label="Order view" className={input} value={view} onChange={e=>setView(e.target.value)}><option value="OPEN">Actionable orders</option><option value="DUE">Unpaid accepted bills</option><option value="ALL">All order history</option></select></label><label>From (restaurant date)<input className={input} type="date" value={from} onChange={e=>setFrom(e.target.value)}/></label><label>To (restaurant date)<input className={input} type="date" value={to} onChange={e=>setTo(e.target.value)}/></label><span>{orders.data?.total??0} matching orders. Includes older unpaid bills.</span><button disabled={!previous.length} className={button} onClick={()=>{setCursor(previous.at(-1)||'');setPrevious(p=>p.slice(0,-1));}}>Previous orders</button><button className={button} disabled={!orders.data?.nextCursor} onClick={()=>{setPrevious(p=>[...p,cursor]);setCursor(orders.data?.nextCursor||'');}}>Next orders</button></div>
+        <div className="col-span-full flex flex-wrap gap-3 items-end rounded-2xl border bg-white p-4"><label>Order view<select aria-label="Order view" className={input} value={view} onChange={e=>setView(e.target.value)}><option value="OPEN">Actionable orders</option><option value="DUE">Unpaid accepted bills</option><option value="ALL">All order history</option></select></label><label>From (restaurant date)<input className={input} type="date" value={from} onChange={e=>setFrom(e.target.value)}/></label><label>To (restaurant date)<input className={input} type="date" value={to} onChange={e=>setTo(e.target.value)}/></label><span>{orders.data?.total??0} matching orders. Includes older unpaid bills.</span><button disabled={!previous.length} className={button} onClick={()=>{setCursor(previous.at(-1)||'');setPrevious(p=>p.slice(0,-1));}}>Previous orders</button><button className={button} disabled={!orders.data?.nextCursor} onClick={()=>{setPrevious(p=>[...p,cursor]);setCursor(orders.data?.nextCursor||'');}}>Next orders</button></div>
         {list.map((o) => (
           <article key={o.id} className={box}>
             <div className="flex justify-between gap-3">
@@ -1106,6 +1132,182 @@ export function QrOperationalOrders({ showToast }: Props) {
   );
 }
 
+const FUNNEL_KEYS = ["scans", "menuViews", "itemAdds", "carts", "checkoutStarts", "orders"];
+const STATUS_KEYS = ["completed", "preparing", "pending", "cancelled"];
+const STATUS_COLORS: Record<string, string> = {
+  completed: "#00A99D",
+  preparing: "#BF540F",
+  pending: "#E66817",
+  cancelled: "#E11D48",
+};
+const REVENUE_KEYS = [
+  "grossOrderValue",
+  "grossSales",
+  "netSales",
+  "collected",
+  "outstandingCounter",
+  "refunded",
+  "averageOrderValue",
+];
+const PAYMENT_TILE_KEYS = ["onlineSuccess", "onlineFailed", "onlinePending", "cashOrders"];
+
+function FunnelChart({
+  metrics,
+  labels,
+}: {
+  metrics: Record<string, number>;
+  labels: Record<string, string>;
+}) {
+  const base = Math.max(1, metrics[FUNNEL_KEYS[0]] ?? 0);
+  return (
+    <div className={box}>
+      <h3 className="font-bold mb-1">Ordering funnel</h3>
+      <p className="text-xs text-slate-500 mb-4">
+        How guests move from scanning a code to a placed order.
+      </p>
+      <div className="space-y-2.5">
+        {FUNNEL_KEYS.map((key, i) => {
+          const count = metrics[key] ?? 0;
+          const pct = Math.round((100 * count) / base);
+          const prevKey = i > 0 ? FUNNEL_KEYS[i - 1] : null;
+          const prev = prevKey ? (metrics[prevKey] ?? 0) : null;
+          const drop = prev && prev > 0 ? Math.round((100 * (prev - count)) / prev) : null;
+          return (
+            <div key={key}>
+              <div className="flex items-baseline justify-between text-sm">
+                <span className="text-slate-600">{labels[key]}</span>
+                <span className="font-bold text-jaman-navy">
+                  {count}
+                  {drop !== null && drop > 0 && (
+                    <span className="ml-2 text-xs font-normal text-rose-600">-{drop}%</span>
+                  )}
+                </span>
+              </div>
+              <div className="h-3 rounded-full bg-jaman-ivory mt-1">
+                <div
+                  className="h-3 rounded-full bg-brand"
+                  style={{ width: `${count > 0 ? Math.max(pct, 3) : 0}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-xs text-slate-500 mt-4">
+        Conversion (orders ÷ menu views):{" "}
+        <b className="text-jaman-navy">{(100 * (metrics.conversion ?? 0)).toFixed(1)}%</b>
+      </p>
+    </div>
+  );
+}
+
+function StatusDonut({ metrics }: { metrics: Record<string, number> }) {
+  const total = STATUS_KEYS.reduce((sum, k) => sum + (metrics[k] ?? 0), 0);
+  const circumference = 2 * Math.PI * 70;
+  let acc = 0;
+  return (
+    <div className={box}>
+      <h3 className="font-bold mb-4">Order status</h3>
+      <div className="flex flex-wrap items-center gap-6">
+        <div className="relative w-[160px] h-[160px] shrink-0 mx-auto">
+          <svg viewBox="0 0 180 180" width="160" height="160">
+            <g transform="rotate(-90 90 90)">
+              <circle cx="90" cy="90" r="70" fill="none" stroke="#EBE6DD" strokeWidth="24" />
+              {total > 0 &&
+                STATUS_KEYS.map((key) => {
+                  const value = metrics[key] ?? 0;
+                  const len = (value / total) * circumference;
+                  const el =
+                    len > 0 ? (
+                      <circle
+                        key={key}
+                        cx="90"
+                        cy="90"
+                        r="70"
+                        fill="none"
+                        stroke={STATUS_COLORS[key]}
+                        strokeWidth="24"
+                        strokeDasharray={`${len} ${circumference - len}`}
+                        strokeDashoffset={-acc}
+                      />
+                    ) : null;
+                  acc += len;
+                  return el;
+                })}
+            </g>
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-bold text-jaman-navy">{total}</span>
+            <span className="text-xs text-slate-500">orders</span>
+          </div>
+        </div>
+        <div className="space-y-2 text-sm flex-1 min-w-[160px]">
+          {STATUS_KEYS.map((key) => {
+            const value = metrics[key] ?? 0;
+            const pct = total > 0 ? Math.round((100 * value) / total) : 0;
+            return (
+              <div key={key} className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2 text-slate-600 capitalize">
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: STATUS_COLORS[key] }} />
+                  {key}
+                </span>
+                <span className="font-bold text-jaman-navy">
+                  {value} <span className="font-normal text-slate-400">({pct}%)</span>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TrendChart({ trend }: { trend: QrAnalytics["trend"] }) {
+  if (!trend.length) return <p className="text-sm text-slate-500">No orders in this period.</p>;
+  const w = 600, h = 160, padL = 4, padR = 4, padT = 12, padB = 22;
+  const maxSales = Math.max(1, ...trend.map((r) => r.sales));
+  const peak = trend.reduce((best, r) => (r.sales > best.sales ? r : best), trend[0]);
+  const stepX = trend.length > 1 ? (w - padL - padR) / (trend.length - 1) : 0;
+  const points = trend.map((r, i) => ({
+    x: padL + stepX * i,
+    y: padT + (h - padT - padB) * (1 - r.sales / maxSales),
+    r,
+  }));
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+  const areaPath = `${linePath} L${points[points.length - 1].x.toFixed(1)} ${h - padB} L${points[0].x.toFixed(1)} ${h - padB} Z`;
+  const tickIdx =
+    points.length <= 5 ? points.map((_, i) => i) : [0, Math.round((points.length - 1) / 2), points.length - 1];
+  return (
+    <>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-40" preserveAspectRatio="none">
+        <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="#EBE6DD" strokeWidth="1" />
+        <path d={areaPath} fill="#BF540F" opacity="0.1" />
+        <path d={linePath} fill="none" stroke="#BF540F" strokeWidth="2.5" />
+        {points.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r="3.5" fill="#FFFFFF" stroke="#BF540F" strokeWidth="2" />
+        ))}
+        {tickIdx.map((i) => (
+          <text
+            key={i}
+            x={points[i].x}
+            y={h - 6}
+            textAnchor={i === 0 ? "start" : i === points.length - 1 ? "end" : "middle"}
+            fontSize="10"
+            fill="#64748b"
+          >
+            {new Date(trend[i].date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+          </text>
+        ))}
+      </svg>
+      <p className="text-xs text-slate-500 mt-2">
+        Peak day: {new Date(peak.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} ·{" "}
+        <b className="text-jaman-navy">{money(peak.sales)}</b>
+      </p>
+    </>
+  );
+}
+
 export function QrAnalyticsView({
   paymentsOnly = false,
 }: {
@@ -1185,20 +1387,12 @@ export function QrAnalyticsView({
       </div>
       {stats.data && <p className="text-xs text-slate-500">Timezone: {stats.data.timezone}. Calendar days run midnight to midnight and include both selected dates. UTC export boundaries: {stats.data.from} to {stats.data.to} (exclusive).</p>}
       <Failure error={stats.error} />
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
-        {metricKeys.map((key) => (
+      {(() => {
+        const renderTile = (key: string) => (
           <div key={key} className={box}>
             <div className="text-xl font-bold text-jaman-navy">
               {stats.data
-                ? [
-                    "grossOrderValue",
-                    "grossSales",
-                    "netSales",
-                    "collected",
-                    "outstandingCounter",
-                    "refunded",
-                    "averageOrderValue",
-                  ].includes(key)
+                ? REVENUE_KEYS.includes(key)
                   ? money(stats.data.metrics[key])
                   : key === "conversion"
                     ? `${(100 * stats.data.metrics[key]).toFixed(1)}%`
@@ -1207,8 +1401,34 @@ export function QrAnalyticsView({
             </div>
             <div className="text-xs text-slate-500 mt-1">{labels[key]}</div>
           </div>
-        ))}
-      </div>
+        );
+        return paymentsOnly ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+            {metricKeys.map(renderTile)}
+          </div>
+        ) : (
+          <>
+            {stats.data && (
+              <div className="grid lg:grid-cols-2 gap-4">
+                <FunnelChart metrics={stats.data.metrics} labels={labels} />
+                <StatusDonut metrics={stats.data.metrics} />
+              </div>
+            )}
+            <div>
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Revenue</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                {REVENUE_KEYS.map(renderTile)}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Payments</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                {PAYMENT_TILE_KEYS.map(renderTile)}
+              </div>
+            </div>
+          </>
+        );
+      })()}
       <p className="text-xs text-slate-500">
         Landing sessions and menu views are deduplicated per code, signed
         browser session and restaurant day. Accepted orders exclude online
@@ -1221,48 +1441,54 @@ export function QrAnalyticsView({
         <div className="grid md:grid-cols-2 gap-4">
           <div className={box}>
             <h3 className="font-bold mb-3">Order-value trend</h3>
-            {stats.data.trend.map((row) => (
-              <div key={row.date} className="text-sm mb-3">
-                <div className="flex justify-between">
-                  <span>
-                    {row.date} · {row.orders} orders
-                  </span>
-                  <b>{money(row.sales)}</b>
-                </div>
-                <div className="h-2 rounded-full bg-jaman-ivory mt-1">
-                  <div
-                    className="h-2 rounded-full bg-brand"
-                    style={{
-                      width: `${(100 * row.sales) / Math.max(1, ...stats.data!.trend.map((r) => r.sales))}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
+            <TrendChart trend={stats.data.trend} />
           </div>
           <div className={box}>
             <h3 className="font-bold mb-3">Popular dishes</h3>
-            {stats.data.popular.map((row) => (
-              <p className="text-sm flex justify-between my-2" key={row.name}>
-                <span>{row.name}</span>
-                <b>{row.quantity}</b>
-              </p>
-            ))}
+            {stats.data.popular.length ? (
+              (() => {
+                const maxQty = Math.max(1, ...stats.data!.popular.map((r) => r.quantity));
+                return stats.data!.popular.map((row) => (
+                  <div key={row.name} className="text-sm mb-2.5">
+                    <div className="flex justify-between">
+                      <span>{row.name}</span>
+                      <b>{row.quantity}</b>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-jaman-ivory mt-1">
+                      <div
+                        className="h-1.5 rounded-full bg-jaman-teal"
+                        style={{ width: `${(100 * row.quantity) / maxQty}%` }}
+                      />
+                    </div>
+                  </div>
+                ));
+              })()
+            ) : (
+              <p className="text-sm text-slate-500">No items ordered in this period.</p>
+            )}
             <h3 className="font-bold mt-5">By table / QR version</h3>
-            {stats.data.byCode.map((row) => (
-              <p className="text-sm my-2" key={row.codeId}>
-                Table {row.table} · v{row.version}: {row.scans} visits ·{" "}
-                {row.orders} orders · {money(row.sales)}
-              </p>
-            ))}
+            {stats.data.byCode.length ? (
+              stats.data.byCode.map((row) => (
+                <p className="text-sm my-2" key={row.codeId}>
+                  Table {row.table} · v{row.version}: {row.scans} visits ·{" "}
+                  {row.orders} orders · {money(row.sales)}
+                </p>
+              ))
+            ) : (
+              <p className="text-sm text-slate-500">No table or QR code activity in this period.</p>
+            )}
             <h3 className="font-bold mt-5">By branch</h3>
-            {stats.data.byBranch.map((row) => (
-              <p className="text-sm my-2" key={row.branchId}>
-                {branches.data?.find((b) => b.id === row.branchId)?.name ||
-                  row.branchId}
-                : {row.orders} orders · {money(row.sales)}
-              </p>
-            ))}
+            {stats.data.byBranch.length ? (
+              stats.data.byBranch.map((row) => (
+                <p className="text-sm my-2" key={row.branchId}>
+                  {branches.data?.find((b) => b.id === row.branchId)?.name ||
+                    row.branchId}
+                  : {row.orders} orders · {money(row.sales)}
+                </p>
+              ))
+            ) : (
+              <p className="text-sm text-slate-500">No branch activity in this period.</p>
+            )}
           </div>
         </div>
       )}

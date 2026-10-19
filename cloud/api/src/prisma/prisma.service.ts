@@ -37,6 +37,51 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     await this.$connect();
     await this.checkRlsRole();
     await this.checkMigrationsApplied();
+    this.installTestCleanupGuard();
+  }
+
+  /**
+   * EC-13: dozens of e2e specs clean up their own fixtures in afterAll with a pattern like
+   * `tx.restaurant.deleteMany({ where: { id: restaurantId } })`, where `restaurantId` is only
+   * assigned partway through `beforeAll`. If `beforeAll` throws before that assignment — the exact
+   * "setup failed" case these suites must also survive — `restaurantId` is `undefined`, and Prisma's
+   * own documented behavior is to treat an explicitly-undefined filter value as "no filter on this
+   * field at all": `deleteMany({ where: { id: undefined } })` can become `deleteMany({ where: {} })`,
+   * an unbounded delete across every row of that table in the shared test database.
+   *
+   * Centralizing the guard here (rather than hand-patching the ~100+ affected spec files one at a
+   * time, an error-prone exercise that only protects whichever files happen to get touched) covers
+   * every current and future caller through the one PrismaService every suite already uses. It is
+   * only ever installed against a database whose name contains "test" (the same signal
+   * test/setup.ts already requires before any suite is allowed to run at all), so it can never
+   * activate against a real deployment's PrismaService.
+   */
+  private installTestCleanupGuard() {
+    if (process.env.NODE_ENV !== 'test') return;
+    const url = process.env.DATABASE_URL;
+    if (!url) return;
+    let isTestDb: boolean;
+    try {
+      isTestDb = /test/i.test(new URL(url).pathname);
+    } catch {
+      return;
+    }
+    if (!isTestDb) return;
+
+    this.$use(async (params, next) => {
+      if ((params.action === 'deleteMany' || params.action === 'delete') && params.args?.where && typeof params.args.where === 'object') {
+        for (const [key, value] of Object.entries(params.args.where)) {
+          if (value === undefined && /(^id$|Id$)/.test(key)) {
+            throw new Error(
+              `Refusing ${params.action} on ${params.model}: where.${key} is undefined. This almost always means a test fixture's ` +
+                `beforeAll failed before assigning it, and an unguarded cleanup would otherwise delete every row that matches the ` +
+                `remaining filters instead of only the fixtures this run actually owns (EC-13).`
+            );
+          }
+        }
+      }
+      return next(params);
+    });
   }
 
   /**
@@ -125,11 +170,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   /** Runs `fn` with platform-level RLS context — full cross-tenant visibility, always audited by the caller. */
-  async runAsPlatform<T>(fn: (tx: TxClient) => Promise<T>): Promise<T> {
+  async runAsPlatform<T>(fn: (tx: TxClient) => Promise<T>, options: { isolationLevel?: Prisma.TransactionIsolationLevel } = {}): Promise<T> {
     return this.$transaction(async (tx) => {
       await tx.$executeRawUnsafe(`SET LOCAL app.is_platform_context = 'true'`);
       return fn(tx);
-    }, this.txOptions);
+    }, { ...this.txOptions, ...options });
   }
 
   /** Runs `fn` scoped to exactly one restaurant's RLS context. */

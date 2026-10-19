@@ -1,0 +1,11 @@
+{
+  "url": "http://localhost:5190/q/site/jamanvaar-demo-restaurant-Ny2fFTbr",
+  "status": 200,
+  "title": "JAMANVAAR — Demo Restaurant · Demo Restaurant — Main Branch",
+  "canonical": true,
+  "openGraph": true,
+  "twitter": true,
+  "restaurantJsonLd": true,
+  "noJavascriptRequired": true,
+  "productionNginxRuntimeVerified": false
+}

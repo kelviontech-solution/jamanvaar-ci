@@ -1,0 +1,23 @@
+[
+  {
+    "business": "Tent Rooftop Restro & Cafe",
+    "ad_id": "917625763956942",
+    "http_status": 403,
+    "id_visible": true,
+    "active_visible": true
+  },
+  {
+    "business": "Sly Granny Ahmedabad",
+    "ad_id": "4603020376648789",
+    "http_status": 200,
+    "id_visible": true,
+    "active_visible": true
+  },
+  {
+    "business": "Atrangi by Bhagwati Foods",
+    "ad_id": "2807108559646097",
+    "http_status": 200,
+    "id_visible": true,
+    "active_visible": true
+  }
+]

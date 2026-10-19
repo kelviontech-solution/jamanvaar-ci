@@ -1,0 +1,3155 @@
+{
+  "at": "2026-10-17T15:18:22.718Z",
+  "rootInitial": {
+    "files": 321,
+    "passedFiles": 312,
+    "failedFiles": 9,
+    "tests": 2249,
+    "passed": 2238,
+    "failed": 11,
+    "durationSeconds": 816.84
+  },
+  "checks": [
+    {
+      "name": "root-tests-rerun",
+      "success": false,
+      "files": 321,
+      "passedFiles": 314,
+      "failedFiles": 7,
+      "tests": 2249,
+      "passed": 2241,
+      "failed": 8,
+      "skipped": 0,
+      "durationSeconds": 265,
+      "failedCases": [
+        {
+          "file": "tests/jamanvaar_startup_experience.test.ts",
+          "title": "JAMANVAAR — Branded Startup / Splash → Login Experience Matrix TEST 1: should provide authentic uncropped transparent JAMANVAAR logo assets",
+          "reason": "AssertionError: expected 'data:image/png;base64,iVBORw0KGgoAAAA…' to match /brand-assets\\/.*\\.png$/.*\\.png$"
+        },
+        {
+          "file": "tests/owner_daily_flow.test.tsx",
+          "title": "owner daily work and purchased-product setup keeps five daily tasks before occasional setup without duplicating pages",
+          "reason": "AssertionError: expected false to be true // Object.is equality"
+        },
+        {
+          "file": "tests/pos_admin_report_data_engine.test.ts",
+          "title": "ReportDataEngine — station performance derives real prep time from KOT timestamps returns zero counts (not a fake floor of 1/2) for a station with no activity in range",
+          "reason": "TypeError: Cannot read properties of undefined (reading 'kotCount')"
+        },
+        {
+          "file": "tests/pos_cashier_ux_overhaul.test.ts",
+          "title": "JAMANVAAR POS — Cashier UX Polish & Workflows 2. should hold current order and recall it without data loss",
+          "reason": "AssertionError: expected { ok: true } to be true // Object.is equality"
+        },
+        {
+          "file": "tests/restaurant_admin_kiosk_terminals_cta.test.ts",
+          "title": "Restaurant Admin: Kiosk Terminals empty state has a real action, not just text has a button that routes to Support to request an activation key",
+          "reason": "AssertionError: expected '' to match /setActiveTab\\('SUPPORT'\\)/"
+        },
+        {
+          "file": "tests/super_admin_qr_activation_key_label.test.ts",
+          "title": "Super Admin: generating a key for an app the restaurant's plan doesn't have enabled is blocked before it becomes a confusing dead end at login shows a clear, actionable warning instead of silently letting the key generate",
+          "reason": "AssertionError: expected '// deep import on purpose: the \\'@jam…' to match /isn.t enabled.*(restaurant|plan)|not…/s"
+        },
+        {
+          "file": "tests/super_admin_qr_activation_key_label.test.ts",
+          "title": "Super Admin: generating a key for an app the restaurant's plan doesn't have enabled is blocked before it becomes a confusing dead end at login disables the Generate key submit button while the app is not enabled, so a doomed key can't be created at all",
+          "reason": "AssertionError: expected '' to match /appEnabled === false/"
+        },
+        {
+          "file": "tests/usability_financial_integrity.test.ts",
+          "title": "Cash, table release and multi-register integrity counter settlement loads a released kiosk bill by ID and settles that exact bill once",
+          "reason": "AssertionError: expected { ok: true } to be true // Object.is equality"
+        }
+      ],
+      "filesStatus": [
+        {
+          "file": "tests/activation_notice_banner.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/admin_crud_and_reports.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/admin_flow_controls.test.tsx",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/admin_linked_branch.test.tsx",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/admin_product_branch_core.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/admin_product_context.test.ts",
+          "status": "passed",
+          "passed": 15,
+          "failed": 0
+        },
+        {
+          "file": "tests/admin_void_unpaid_bill.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/android_release_configuration.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/app_update_and_extension.test.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "tests/audit_customization_and_keyboard.test.tsx",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/audit_guest_assistance_and_cash_shift.test.tsx",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/audit_order_activity_and_deployment.test.tsx",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/audit_receipt_and_csv_regressions.test.tsx",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/authoritative_business_day_consistency.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/billing_collection_and_exports.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/bill_on_order.test.ts",
+          "status": "passed",
+          "passed": 17,
+          "failed": 0
+        },
+        {
+          "file": "tests/bill_request_handoff.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/branch_core.test.ts",
+          "status": "passed",
+          "passed": 24,
+          "failed": 0
+        },
+        {
+          "file": "tests/branch_core_authorization.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/branch_core_chaos.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/branch_core_discovery.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/branch_core_operations.test.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "tests/branch_core_outage_matrix.test.ts",
+          "status": "passed",
+          "passed": 22,
+          "failed": 0
+        },
+        {
+          "file": "tests/branch_core_secret_seal.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/browser_audit_fix_regressions.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/browser_branch_boot.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/business_day_cross_device_consistency.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/captain_app_workflows.test.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "tests/captain_courses_and_cancel.test.ts",
+          "status": "passed",
+          "passed": 16,
+          "failed": 0
+        },
+        {
+          "file": "tests/captain_customer_modal_no_full_browse.test.tsx",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/captain_menu_sync.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/captain_order_pricing.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/captain_session_restore.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/captain_store_service.test.ts",
+          "status": "passed",
+          "passed": 33,
+          "failed": 0
+        },
+        {
+          "file": "tests/captain_ui_guards.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/cash_watermark.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/central_reporting_consistency.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/chatbots.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/clipboard.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/connection_diagnostics.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/connection_panel_render.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/coupons.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/coupon_redemption.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/crm_loyalty_checkout.test.ts",
+          "status": "passed",
+          "passed": 25,
+          "failed": 0
+        },
+        {
+          "file": "tests/cross_app_sync_cluster.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/csv_export_safety.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/database_notification_scope.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/db_persistence_batching.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/description_matched_menu_photos.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/device_cloud_client.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/device_command_runner.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/device_gate.test.ts",
+          "status": "passed",
+          "passed": 25,
+          "failed": 0
+        },
+        {
+          "file": "tests/device_gate_disconnect.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/device_gate_overlay.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/dietary_badge_missing_metadata.test.tsx",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/display_scale.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/durable_cluster.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/durable_db_integration.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/durable_store.test.ts",
+          "status": "passed",
+          "passed": 14,
+          "failed": 0
+        },
+        {
+          "file": "tests/ebill.test.ts",
+          "status": "passed",
+          "passed": 14,
+          "failed": 0
+        },
+        {
+          "file": "tests/ebill_sync_retry.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/endpoint_resolver.test.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "tests/eod_new_business_day_lifecycle.test.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/escpos_command_injection.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/floor_sync_tick.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/fresh_activation_menu.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/fresh_restaurant_operations.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/gap_reports_and_split.test.ts",
+          "status": "passed",
+          "passed": 23,
+          "failed": 0
+        },
+        {
+          "file": "tests/gst_default_tax_group.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/heartbeat_health.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/i18n_key_parity.test.ts",
+          "status": "passed",
+          "passed": 27,
+          "failed": 0
+        },
+        {
+          "file": "tests/image_cache.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/india_compliance_validation.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/inventory_control.test.ts",
+          "status": "passed",
+          "passed": 23,
+          "failed": 0
+        },
+        {
+          "file": "tests/inventory_integrity.test.ts",
+          "status": "passed",
+          "passed": 19,
+          "failed": 0
+        },
+        {
+          "file": "tests/inventory_ledger_sync.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/item_modal_edit_persists.test.tsx",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/jamanvaar_auth_layout_shows_restaurant_name.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/jamanvaar_startup_experience.test.ts",
+          "status": "failed",
+          "passed": 6,
+          "failed": 1
+        },
+        {
+          "file": "tests/jaman_ai_access_and_menu.test.ts",
+          "status": "passed",
+          "passed": 19,
+          "failed": 0
+        },
+        {
+          "file": "tests/jaman_ai_cloud_config.test.ts",
+          "status": "passed",
+          "passed": 23,
+          "failed": 0
+        },
+        {
+          "file": "tests/jaman_ai_restaurant_intelligence.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/kds_logic.test.ts",
+          "status": "passed",
+          "passed": 15,
+          "failed": 0
+        },
+        {
+          "file": "tests/kds_ticket_served_gate.test.tsx",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/key_value_store.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_cloud_commands_with_core.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_combo_authoring.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_configuration.test.ts",
+          "status": "passed",
+          "passed": 15,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_configuration_delivery.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_connection_fixes.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_dining_table_sync.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_display_settings.test.ts",
+          "status": "passed",
+          "passed": 17,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_kot_once.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_kot_routing.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_order_lifecycle.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_payments_product_scope.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_receipt_touch.test.tsx",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_setup_flow.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_upi_retry.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/kiosk_welcome.test.ts",
+          "status": "passed",
+          "passed": 21,
+          "failed": 0
+        },
+        {
+          "file": "tests/kitchen_controls_and_captain.test.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "tests/kitchen_item_status.test.ts",
+          "status": "passed",
+          "passed": 24,
+          "failed": 0
+        },
+        {
+          "file": "tests/kot_status_from_orders.test.ts",
+          "status": "passed",
+          "passed": 14,
+          "failed": 0
+        },
+        {
+          "file": "tests/lan_mesh_sync_suite.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/lan_sync_bridge.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/license_certificate.test.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/license_entitlements.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/license_qr_tier_offline.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/lifecycle.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/local_core_health_scope.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/local_relay_pairing.test.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/local_relay_service.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/loyalty_earn_and_redeem.test.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_archive_delete_sync.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_authoring.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_builder.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_build_preserves_restaurant.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_completeness_recovery.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_csv_import.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_dedupe.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_edit_delete_sync.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_images.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_image_routes.test.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_load_integrity.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_starter_library_and_merge.test.ts",
+          "status": "passed",
+          "passed": 15,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_sync_cross_window.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/menu_version_tracker.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/modifiers.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/modifier_selection.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/multi_app_client_hardening.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/native_update_lifecycle.test.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "tests/notice_banner_layout.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/no_demo_identity_fallbacks.test.ts",
+          "status": "passed",
+          "passed": 25,
+          "failed": 0
+        },
+        {
+          "file": "tests/numbering_integration.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/number_allocator.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/offline_menu_image_cache.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/offline_routing_integration.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/order_creation_integrity.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/order_history_size.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/order_reaches_kitchen_fast.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/order_sync_fidelity.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/order_sync_flagging.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/outbox_reliability.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/outlet_identity_adoption.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/owner_console_plan_matrix.test.ts",
+          "status": "passed",
+          "passed": 130,
+          "failed": 0
+        },
+        {
+          "file": "tests/owner_daily_flow.test.tsx",
+          "status": "failed",
+          "passed": 6,
+          "failed": 1
+        },
+        {
+          "file": "tests/paged_query.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/payment_policy.test.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/pdf_report_identity.test.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/pdf_structure.test.ts",
+          "status": "passed",
+          "passed": 17,
+          "failed": 0
+        },
+        {
+          "file": "tests/persistence_atomicity.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/pin_scope_verification.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/platform_notice.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/platform_ports.test.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_active_tab_persistence.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_billing_invoices.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_cloud_logout.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_crm.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_customer_report.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_day_wise_orders.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_entitlements.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_eod_z_report.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_inventory_report.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_item_modal_kiosk_fields.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_kiosk_fleet_client.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_nav_gating_real_data.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_payment_connection_client.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_admin_report_data_engine.test.ts",
+          "status": "failed",
+          "passed": 5,
+          "failed": 1
+        },
+        {
+          "file": "tests/pos_admin_report_get_orders_scale.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_assistant.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_business_day_archive.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_captain_kds_signin_shows_restaurant_name.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_cart_and_billing.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_cashier_ux_overhaul.test.ts",
+          "status": "failed",
+          "passed": 4,
+          "failed": 1
+        },
+        {
+          "file": "tests/pos_cash_out_manager_gate.test.tsx",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_crash_recovery.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_customer_loyalty_no_fabrication.test.tsx",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_day_close_and_live_orders_reset.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_discount_dialog.test.tsx",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_discount_manager_approval.test.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_fast_cashier_workflow.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_fast_ordering_and_receipt.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_full_offline_sqlite.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_global_search_and_touch.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_instant_bill.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_inventory_and_availability.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_kiosk_integration.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_kot_and_stations.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_menu_crud_and_presets.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_print_queue.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_reports_and_pdf_export.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_running_order_flow.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_shift_and_drawer.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_terminal_lock_persistence.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_touch_and_printer_system.test.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_touch_first_no_shortcuts_ui.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/pos_to_admin_order_sync.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/pricing.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/printer_network_transport.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/printer_queue.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/print_isolation.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/print_layout_css.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/print_transport.test.ts",
+          "status": "passed",
+          "passed": 16,
+          "failed": 0
+        },
+        {
+          "file": "tests/probe_core_restaurant.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/production_sync_regressions.test.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "tests/pwa_alerts_and_small_screens.test.ts",
+          "status": "passed",
+          "passed": 23,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_feature_request_wiring.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_header_opaque_background.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_license_capability_labels.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_menu_performance_no_dead_column.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_nav_default_visibility.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_order_sound_persisted.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_overview_attention_panel.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_single_branding_editor.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_unlicensed_operations_settings.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_admin_whole_product_audit_fixes.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_brand_contrast.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_brand_studio_form_and_preview.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_checkout_sdk.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_code_generation.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_console_menu_availability_separation.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_console_tables_and_catalog_flow.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_design_studio.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_design_studio_preview.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_guest_cart.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_guest_error_messages.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_order_desk.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_order_propagation.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_order_session.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_page_enhancements.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_restaurant_page.test.tsx",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_restaurant_page_setup.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/qr_table_lifecycle.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/reactivation_keeps_cloud_data.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/realtime_client.test.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "tests/receipt_identity.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/recommendations.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/relative_time.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/reports.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/reservation_release.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/restaurant_admin_app_switcher_visible_label.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/restaurant_admin_branch_blocker_has_inline_picker.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/restaurant_admin_kiosk_terminals_cta.test.ts",
+          "status": "failed",
+          "passed": 0,
+          "failed": 1
+        },
+        {
+          "file": "tests/restaurant_admin_pin_sync_before_usable.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/restaurant_id_visibility.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/restaurant_menu_templates.test.ts",
+          "status": "passed",
+          "passed": 31,
+          "failed": 0
+        },
+        {
+          "file": "tests/restaurant_profile_adoption.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/restaurant_scenarios.test.ts",
+          "status": "passed",
+          "passed": 14,
+          "failed": 0
+        },
+        {
+          "file": "tests/role_specific_dbs.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/saas_plan_entitlements_architecture.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/secure_random_utils.test.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/security_audit_remediation.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/service_messages.test.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/shift_sync.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/split_payment_matrix.test.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "tests/split_payment_tenders.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/staff_cross_device_sync.test.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "tests/staff_login_and_pins.test.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/staff_login_selected_user.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/staff_pin.test.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/staff_pin_login_sync_race.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/staff_session.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/staff_sync_coalescing.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/suite_architecture_and_kds.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_announcements_feature.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_app_urls.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_backup_integrity_auto_check.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_bulk_change_plan.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_chart_bars_visible_dark_mode.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_css_classes.test.ts",
+          "status": "passed",
+          "passed": 29,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_dashboard_activity_badge_readable.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_devices_summary_tiles.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_dunning_overdue_email.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_feature_rollout_percent.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_margin_cost_view.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_onboard_steps_wrap.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_payouts_pending_excludes_unverified_banks.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_payouts_reconciliation_view.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_platform_payments_no_empty_card.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_qr_activation_key_label.test.ts",
+          "status": "failed",
+          "passed": 3,
+          "failed": 2
+        },
+        {
+          "file": "tests/super_admin_reports_has_real_charts.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_restaurant_branding_merges_not_replaces.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_restaurant_detail_plan_badge_real_price.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_restaurant_health_route_registered.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_restaurant_health_why_column_wraps.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_status_history_feature.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_tab_bar_wraps.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_tickets_status_distinguishable.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_weekly_digest.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/super_admin_workflow.test.tsx",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/sync_online_offline.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/sync_outbox_persistence.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/sync_protocol.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/table_bulk.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "tests/table_cross_device_sync.test.ts",
+          "status": "passed",
+          "passed": 18,
+          "failed": 0
+        },
+        {
+          "file": "tests/table_state.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/tax_labels_configured.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/tax_split_consistency.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/tax_split_display.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/template_photo_coverage.test.ts",
+          "status": "passed",
+          "passed": 14,
+          "failed": 0
+        },
+        {
+          "file": "tests/tenant_isolation.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/terminal_role_access.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/transliteration.test.ts",
+          "status": "passed",
+          "passed": 32,
+          "failed": 0
+        },
+        {
+          "file": "tests/ui_dialog_and_settings_primitives.test.tsx",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/ui_hourly_sales_complete_day.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "tests/unified_local_core_ecosystem.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/unpaid_orders_not_sales.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "tests/usability_financial_integrity.test.ts",
+          "status": "failed",
+          "passed": 7,
+          "failed": 1
+        },
+        {
+          "file": "tests/usability_found_gaps.test.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/usability_next_gaps.test.tsx",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "tests/usability_remaining_gaps.test.tsx",
+          "status": "passed",
+          "passed": 25,
+          "failed": 0
+        },
+        {
+          "file": "tests/usability_staff_and_journey.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "tests/usability_station_and_practice.test.tsx",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "tests/usability_sync_metadata.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "tests/voice.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "tests/whatsapp_bill_number_panel.test.tsx",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "tests/whatsapp_bill_template_pending_polls.test.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "packages/business/src/__tests__/discount_pricing.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "packages/database/src/__tests__/customer_pii_encryption.test.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "packages/database/src/__tests__/menu_integrity.test.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "packages/database/src/__tests__/pin_lockout_persistence.test.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "name": "api-tests",
+      "success": false,
+      "files": 165,
+      "passedFiles": 151,
+      "failedFiles": 14,
+      "tests": 1542,
+      "passed": 1522,
+      "failed": 20,
+      "skipped": 0,
+      "durationSeconds": 1206,
+      "failedCases": [
+        {
+          "file": "cloud/api/test/branch-devices-config.e2e.spec.ts",
+          "title": "branch prices on devices, KDS stations, device verdict cache branch prices reach the branch's own terminals a branch terminal pushing the dish back cannot turn the branch price into the base price",
+          "reason": "AssertionError: expected 'Tea' to be 'Tea (large)' // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/device-limit.e2e.spec.ts",
+          "title": "Plan device limit enforcement (BUG-061) redeems up to the plan limit for one app, then refuses the next one of that same app with a clear reason",
+          "reason": "AssertionError: expected undefined to be 409 // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/ecosystem.e2e.spec.ts",
+          "title": "ecosystem: every app, every channel, several branches and restaurants at once 2 restaurants x 2 branches; 5 POS + 5 Kiosk + 2 KDS + 10 Captain per branch plus QR, all creating orders at the same moment",
+          "reason": "AssertionError: every push and every QR order succeeds: expected [ …(28) ] to deeply equal []"
+        },
+        {
+          "file": "cloud/api/test/feature-disable-impact-and-quotas.e2e.spec.ts",
+          "title": "Disable-impact warning and per-app default quotas (Phase 14) a Feature-level defaultDeviceQuota caps that app, overriding the plan-wide maxDevices",
+          "reason": "AssertionError: expected 400 to be 409 // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/merged-admin-access.e2e.spec.ts",
+          "title": "Merged Restaurant Admin access after kiosk-key activation counts a merged POS_ADMIN console against a kiosk-only admin quota and leaves a refused key unused",
+          "reason": "AssertionError: expected 409 to be 201 // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/multi-branch-dashboard.e2e.spec.ts",
+          "title": "POS, Captain, Kiosk and a real QR checkout converge in one branch and KDS completion returns to every origin",
+          "reason": "AssertionError: expected false to be true // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/multi-family-subscriptions.e2e.spec.ts",
+          "title": "Multi-family subscriptions (Phase 2) device quota is enforced per app, independently — POS uses the RESTAURANT plan cap, KIOSK uses the KIOSK plan cap",
+          "reason": "AssertionError: expected 400 to be 409 // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/order-sync-pool-sizing.e2e.spec.ts",
+          "title": "Order-sync throughput with a production-realistic DB_POOL_SIZE=20 (not the bug-triggering unset/5 default) 300 concurrent order-sync pushes from 15 POS terminals in one restaurant: counted precisely, never a raw connection error",
+          "reason": "Error: ECONNREFUSED: Connection refused"
+        },
+        {
+          "file": "cloud/api/test/order-sync-pool-sizing.e2e.spec.ts",
+          "title": "Order-sync throughput with a production-realistic DB_POOL_SIZE=20 (not the bug-triggering unset/5 default) 500 concurrent order-sync pushes from 15 POS terminals in one restaurant: counted precisely, never a raw connection error",
+          "reason": "Error: ECONNREFUSED: Connection refused"
+        },
+        {
+          "file": "cloud/api/test/order-sync-pool-sizing.e2e.spec.ts",
+          "title": "Order-sync throughput with a production-realistic DB_POOL_SIZE=20 (not the bug-triggering unset/5 default) 1000 concurrent order-sync pushes from 15 POS terminals in one restaurant: counted precisely, never a raw connection error",
+          "reason": "Error: ECONNREFUSED: Connection refused"
+        },
+        {
+          "file": "cloud/api/test/order-sync-pool-sizing.e2e.spec.ts",
+          "title": "Order-sync throughput with a production-realistic DB_POOL_SIZE=20 (not the bug-triggering unset/5 default) 300 pushes sent as waves of 50 (not one simultaneous burst) — the backend/database ceiling, with the local test harness's own connection-accept limit isolated out",
+          "reason": "Error: ECONNREFUSED: Connection refused"
+        },
+        {
+          "file": "cloud/api/test/owner-console-plans.e2e.spec.ts",
+          "title": "generic owner entry, QR grants and AI under mixed subscriptions overlapping QR grants combine capabilities and platform overrides affect all grants",
+          "reason": "AssertionError: expected [ { …(3) }, { …(3) }, { …(3) }, …(15) ] to have a length of 17 but got 18"
+        },
+        {
+          "file": "cloud/api/test/owner-welcome-email.e2e.spec.ts",
+          "title": "owner welcome email and Restaurant ID a restaurant made without a mobile gets its Restaurant ID when a mobile is added later, once",
+          "reason": "AssertionError: expected 'JM9091590527' to be null"
+        },
+        {
+          "file": "cloud/api/test/qr-legacy-compat.e2e.spec.ts",
+          "title": "QR legacy codes and the deprecated guest adapter an order through a legacy code reaches the right branch by cursor and no other branch",
+          "reason": "AssertionError: {\"message\":\"Unknown menu item: itm-l\",\"error\":\"Bad Request\",\"statusCode\":400}: expected 400 to be 201 // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/qr-legacy-compat.e2e.spec.ts",
+          "title": "QR legacy codes and the deprecated guest adapter the deprecated /qr-guest adapter serves the old page through the new services: same authorization, pricing and idempotency",
+          "reason": "AssertionError: {\"statusCode\":410,\"code\":\"MENU_NOT_PUBLISHED\",\"message\":\"QR Ordering is currently unavailable for this restaurant.\"}: expected 410 to be 200 // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/restaurant-identity-sync.e2e.spec.ts",
+          "title": "Restaurant identity sync across devices (B2-054) an edit pushed from one device (Restaurant Admin's Settings) is visible to a GET from any other device",
+          "reason": "AssertionError: expected 403 to be 200 // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/restaurant-identity-sync.e2e.spec.ts",
+          "title": "Restaurant identity sync across devices (B2-054) the owner's Show JAMAN AI choice is saved in the cloud and every other terminal reads it",
+          "reason": "AssertionError: expected undefined to be false // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/restaurant-identity-sync.e2e.spec.ts",
+          "title": "Restaurant identity sync across devices (B2-054) rejects a malformed GSTIN/FSSAI the same way the platform API already does, rather than saving garbage to a real tax field",
+          "reason": "AssertionError: expected 403 to be 400 // Object.is equality"
+        },
+        {
+          "file": "cloud/api/test/restaurant-payouts.e2e.spec.ts",
+          "title": "Manual restaurant payouts (Route pending) pending includes captured collections before EOD and never counts refunded shares as payable",
+          "reason": "AssertionError: expected { grossCollection: 2510000, …(14) } to match object { grossCollection: 2510000, …(5) }"
+        },
+        {
+          "file": "cloud/api/test/restaurants.e2e.spec.ts",
+          "title": "Restaurant management (Phase 1a) allows restaurant creation with no mobile number, leaving restaurantCode null",
+          "reason": "AssertionError: expected 'JM7403372494' to be null"
+        }
+      ],
+      "filesStatus": [
+        {
+          "file": "cloud/api/prisma/backfill-restaurant-codes.spec.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/activation-redeem.e2e.spec.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/admin-product-access.e2e.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/admin-workflow.e2e.spec.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/ai-assistant.e2e.spec.ts",
+          "status": "passed",
+          "passed": 15,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/annual-billing-cadence.e2e.spec.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/application-entitlements-db-catalog.e2e.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/assessment-remediation.e2e.spec.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/audit-probes.e2e.spec.ts",
+          "status": "passed",
+          "passed": 19,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/backups-local.e2e.spec.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/backups.e2e.spec.ts",
+          "status": "passed",
+          "passed": 14,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/billing-applications-support.e2e.spec.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/branch-core-uplink.e2e.spec.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/branch-devices-config.e2e.spec.ts",
+          "status": "failed",
+          "passed": 6,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/branch-roster.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/branches-paging.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/business-day-profile.unit.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/catalog-endpoints-security.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/device-command-fleet.e2e.spec.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/device-enforcement.e2e.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/device-limit.e2e.spec.ts",
+          "status": "failed",
+          "passed": 2,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/device-sync-throttle.e2e.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/device-updates.e2e.spec.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/display-scale.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/ecosystem.e2e.spec.ts",
+          "status": "failed",
+          "passed": 0,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/entity-sync.e2e.spec.ts",
+          "status": "passed",
+          "passed": 29,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/feature-catalog-model.e2e.spec.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/feature-catalog.e2e.spec.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/feature-disable-impact-and-quotas.e2e.spec.ts",
+          "status": "failed",
+          "passed": 2,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/fleet-and-keys.e2e.spec.ts",
+          "status": "passed",
+          "passed": 20,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/found-gaps-policy.unit.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/inventory-ledger.e2e.spec.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/invoice-integrity.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/invoices-and-jobs.e2e.spec.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/kiosk-management.e2e.spec.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/kiosk-pro-remote-management.e2e.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/licensing.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/master-catalog-upload.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/menu-versioning.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/merged-admin-access.e2e.spec.ts",
+          "status": "failed",
+          "passed": 7,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/multi-branch-dashboard.e2e.spec.ts",
+          "status": "failed",
+          "passed": 42,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/multi-family-subscriptions.e2e.spec.ts",
+          "status": "failed",
+          "passed": 7,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/native-release-verification.unit.spec.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/number-leases.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/offline-policy.e2e.spec.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/onboarding-hardening.e2e.spec.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/operations-expansion.e2e.spec.ts",
+          "status": "passed",
+          "passed": 28,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/order-handoff.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/order-merge.unit.spec.ts",
+          "status": "passed",
+          "passed": 21,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/order-rules.unit.spec.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/order-sync-admission.unit.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/order-sync-and-suspension.e2e.spec.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/order-sync-payload.e2e.spec.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/order-sync-pool-sizing.e2e.spec.ts",
+          "status": "failed",
+          "passed": 3,
+          "failed": 4
+        },
+        {
+          "file": "cloud/api/test/owner-activation.e2e.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/owner-console-plans.e2e.spec.ts",
+          "status": "failed",
+          "passed": 15,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/owner-login.e2e.spec.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/owner-welcome-email.e2e.spec.ts",
+          "status": "failed",
+          "passed": 2,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/password-reset.e2e.spec.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payment-connections.e2e.spec.ts",
+          "status": "passed",
+          "passed": 32,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payments-device-signature.e2e.spec.ts",
+          "status": "passed",
+          "passed": 10,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payments-kiosk-flow.e2e.spec.ts",
+          "status": "passed",
+          "passed": 23,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payments-menu-sync.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payments-orders.e2e.spec.ts",
+          "status": "passed",
+          "passed": 18,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payments-pentest.e2e.spec.ts",
+          "status": "passed",
+          "passed": 23,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payments-refund-webhook.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payments-refund.e2e.spec.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/payments-webhook.e2e.spec.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/plans-dynamic-entitlements.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/plans-product-family.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/platform-activation.e2e.spec.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/platform-auth.e2e.spec.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/platform-branding.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/platform-notice.e2e.spec.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/platform-notifications-area-scope.e2e.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/platform-notifications.e2e.spec.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/platform-payments.e2e.spec.ts",
+          "status": "passed",
+          "passed": 20,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/platform-sessions.e2e.spec.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-feature-request.e2e.spec.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-legacy-compat.e2e.spec.ts",
+          "status": "failed",
+          "passed": 3,
+          "failed": 2
+        },
+        {
+          "file": "cloud/api/test/qr-live-availability.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-menu-control.e2e.spec.ts",
+          "status": "passed",
+          "passed": 18,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-mobile-payments.e2e.spec.ts",
+          "status": "passed",
+          "passed": 22,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-module.e2e.spec.ts",
+          "status": "passed",
+          "passed": 45,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-operations.e2e.spec.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-ordering-saas.e2e.spec.ts",
+          "status": "passed",
+          "passed": 54,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-ordering.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-restaurant-page.e2e.spec.ts",
+          "status": "passed",
+          "passed": 17,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/qr-service-request-pickup-entitlement.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/razorpay-payment-link.test.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/rbac.e2e.spec.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/realtime-recheck-storm.e2e.spec.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/realtime-stream.e2e.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/receipts.e2e.spec.ts",
+          "status": "passed",
+          "passed": 32,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/release-provenance.unit.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/restaurant-gstin-fssai.e2e.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/restaurant-identity-sync.e2e.spec.ts",
+          "status": "failed",
+          "passed": 2,
+          "failed": 3
+        },
+        {
+          "file": "cloud/api/test/restaurant-lookup.e2e.spec.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/restaurant-menu.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/restaurant-payouts.e2e.spec.ts",
+          "status": "failed",
+          "passed": 12,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/restaurant-sales.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/restaurant-tickets.e2e.spec.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/restaurants.e2e.spec.ts",
+          "status": "failed",
+          "passed": 15,
+          "failed": 1
+        },
+        {
+          "file": "cloud/api/test/rls-platform-reads.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/saas-modules.e2e.spec.ts",
+          "status": "passed",
+          "passed": 27,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/security-audit-regressions.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/security-hardening.e2e.spec.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/security-hardening.unit.spec.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/service-maturity.e2e.spec.ts",
+          "status": "passed",
+          "passed": 23,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/spec-58-user-journey.e2e.spec.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/status-sync.e2e.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/subscription-extend.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/support-tickets.e2e.spec.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/sync-chaos.e2e.spec.ts",
+          "status": "passed",
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/sync-events-and-sequence.e2e.spec.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/sync-reconciliation.e2e.spec.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/tenant-auth-kiosk-admin-retirement.e2e.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/tenant-auth.e2e.spec.ts",
+          "status": "passed",
+          "passed": 35,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/tenant-billing.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/tenant-isolation.spec.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/tenant-my-applications.e2e.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/tenant-session-enforcement.e2e.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/welcome-design-access.e2e.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-bill-settings.e2e.spec.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-channel-entitlement.e2e.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-channel-menu.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-channel-outbound-hooks.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-channel-payments.e2e.spec.ts",
+          "status": "passed",
+          "passed": 13,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-channel-security.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-channel.e2e.spec.ts",
+          "status": "passed",
+          "passed": 11,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-ordering-admin.e2e.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/test/whatsapp-outbound-webhook.e2e.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/cors.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/device-health.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/paging.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/version.spec.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/config/env.validation.spec.ts",
+          "status": "passed",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/config/seed-options.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/prisma/rls-role.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/rbac/access.spec.ts",
+          "status": "passed",
+          "passed": 27,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/security/admin-product-access.spec.ts",
+          "status": "passed",
+          "passed": 20,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/security/credential-encryption.util.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/security/geo.spec.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/security/step-up.util.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/validation/gstin.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/validation/password.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/common/validation/phone.spec.ts",
+          "status": "passed",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/application-entitlements/rollout.util.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/menu-publications/menu-publications.service.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/menu-publications/menu-snapshot.spec.ts",
+          "status": "passed",
+          "passed": 6,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/offline-policy/signing-status.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/operations/operations-analytics.spec.ts",
+          "status": "passed",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/operations/operations-policy.spec.ts",
+          "status": "passed",
+          "passed": 19,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/operations/recurring-menu.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/operations/wait-estimate.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/payments/commission.util.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/payments/kitchen-admission.util.spec.ts",
+          "status": "passed",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/payments/menu-sync.service.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/payments/pricing.util.spec.ts",
+          "status": "passed",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/payments/razorpay-gateway.service.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/payments/refund-authorization.guard.spec.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/qr/qr-operations.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/qr/qr-rules.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/restaurant-health/health-score.util.spec.ts",
+          "status": "passed",
+          "passed": 9,
+          "failed": 0
+        },
+        {
+          "file": "cloud/api/src/modules/restaurants/restaurant-code.util.spec.ts",
+          "status": "passed",
+          "passed": 5,
+          "failed": 0
+        }
+      ]
+    },
+    {
+      "name": "probes",
+      "success": true,
+      "files": 1,
+      "passedFiles": 1,
+      "failedFiles": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "durationSeconds": 32,
+      "failedCases": [],
+      "filesStatus": [
+        {
+          "file": "docs/reports/ecosystem-audit-2026-10-17/probes.test.ts",
+          "status": "passed",
+          "passed": 4,
+          "failed": 0
+        }
+      ]
+    }
+  ],
+  "typechecks": {
+    "root": {
+      "exit": 1,
+      "errorCount": 8
+    },
+    "apiAll": {
+      "exit": 1,
+      "errorCount": 10
+    },
+    "apiProductionSource": {
+      "exit": 0
+    }
+  },
+  "frontendBundles": {
+    "passed": [
+      "super",
+      "admin",
+      "pos",
+      "kiosk",
+      "captain",
+      "kds",
+      "qr"
+    ],
+    "scope": "Vite bundling; public assets not fully copied; native packages not built"
+  },
+  "npmProductionAdvisories": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0
+  }
+}

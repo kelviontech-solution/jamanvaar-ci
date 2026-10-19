@@ -4,12 +4,12 @@ import { ThaliRefills } from './ThaliRefills';
 import { db } from '@jamanvaar/database';
 import { deviceFetch } from '../../cloud/cloudClient';
 const loadOrderActivity = async (id: string): Promise<CanonicalOrderActivity> => {const r=await deviceFetch(`/api/v1/orders/sync/${encodeURIComponent(id)}/activity`);if(!r.ok)throw new Error('Activity unavailable');return r.json();};
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, CartItemEntry, COURSES, type Course } from '../../store/captainStore';
 import { DiningTable, MenuItem, SelectedModifier } from '@jamanvaar/types';
 import { formatINR, restaurantGstRate, taxLabels, outstandingBillAmount } from '@jamanvaar/utils';
-import { priceOrderLines } from '@jamanvaar/business';
+import { priceOrderLines, resolveModifierGroups, dishNeedsChoiceBeforeAdd } from '@jamanvaar/business';
 import { captainDb, isBillWaiting } from '@jamanvaar/database';
 import { CachedImg, EmptyState, useConfirm, ModalBackdrop, OrderActivityView, type CanonicalOrderActivity } from '@jamanvaar/ui';
 import { CaptainModifierModal } from '../modals/CaptainModifierModal';
@@ -53,8 +53,11 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   onOpenSendMessage,
   onOpenTransferMerge
 }) => {
-  const { confirm, confirmDialog } = useConfirm();
-  useEscapeToClose(isOpen, onClose);
+  const { confirm, notify, confirmDialog } = useConfirm();
+  const savingKotRef = useRef(false);
+  const [savingKot, setSavingKot] = useState(false);
+  const closeWorkspace = () => { if (!savingKotRef.current) onClose(); };
+  useEscapeToClose(isOpen, closeWorkspace);
   const {
     currentCaptain,
     categories,
@@ -67,7 +70,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     setCartItemSeat,
     guestCount,
     clearCart,
-    sendKOT,
+    sendKOTDurably,
     requestBill,
     repeatPreviousOrder,
     markItemServed,
@@ -159,14 +162,20 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     return undefined;
   };
 
-  const handleFireKot = (courses?: Course[]) => {
-    const kots = sendKOT(courses);
+  const handleFireKot = async (courses?: Course[]) => {
+    if (savingKotRef.current) return;
+    savingKotRef.current = true; setSavingKot(true);
+    try {
+    const kots = await sendKOTDurably(courses);
     if (kots) {
       const label = courses ? courses.map((c) => COURSES.find((x) => x.id === c)?.label).join(', ') : 'Everything';
-      setKotSuccessAlert(`${label} sent to the kitchen.`);
+      setKotSuccessAlert(`${label} saved.`);
       setTimeout(() => setKotSuccessAlert(''), 3000);
       setActiveWorkspaceTab('ORDER');
     }
+    } catch (error) {
+      await notify({ title: 'Kitchen submission needs attention', message: error instanceof Error ? error.message : 'Keep this order and retry to recover the original submission.' });
+    } finally { savingKotRef.current = false; setSavingKot(false); }
   };
 
   // The bill belongs to the order: it is "sent" while the order is waiting for the counter, whatever the table record says.
@@ -195,7 +204,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             <button
               key={g.id}
               type="button"
-              onClick={() => handleFireKot([g.id])}
+              disabled={savingKot} onClick={() => handleFireKot([g.id])}
               className="px-2.5 py-1.5 rounded-xl bg-white border border-jaman-saffron text-jaman-saffron text-[11px] font-bold cursor-pointer min-h-[44px]"
             >
               Send {g.label} ({g.items.length})
@@ -206,12 +215,12 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
       <button
         type="button"
         onClick={() => handleFireKot()}
-        disabled={unFiredCartItems.length === 0}
+        disabled={savingKot || unFiredCartItems.length === 0}
         className="w-full min-h-[48px] py-3 px-4 rounded-2xl bg-gradient-to-r from-jaman-saffron to-[#EA580C] disabled:opacity-50 hover:brightness-105 text-white font-bold text-sm shadow-md shadow-jaman-saffron/25 active:scale-98 transition-all cursor-pointer flex items-center justify-between"
       >
         <span className="flex items-center gap-2">
           <Flame className="w-4 h-4 fill-white" />
-          {multiCourse ? `SEND ALL (${unFiredCartItems.length})` : `SEND KOT (${unFiredCartItems.length})`}
+          {savingKot ? 'SAVING ON THIS DEVICE?' : multiCourse ? `SEND ALL (${unFiredCartItems.length})` : `SEND KOT (${unFiredCartItems.length})`}
         </span>
         <ArrowRight className="w-4 h-4" />
       </button>
@@ -232,7 +241,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   return (
     <>
     <ModalBackdrop className="flex items-stretch sm:items-center justify-center sm:p-4">
-      <div className="w-full sm:max-w-5xl h-dvh sm:h-[92dvh] bg-white sm:rounded-3xl shadow-md sm:border border-jaman-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <fieldset disabled={savingKot} aria-busy={savingKot} className="min-w-0 p-0 m-0 border-0 w-full sm:max-w-5xl h-dvh sm:h-[92dvh] bg-white sm:rounded-3xl shadow-md sm:border border-jaman-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="bg-jaman-navy text-white px-3 py-2.5 sm:p-4 flex items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -282,7 +291,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
               <Receipt className="w-4 h-4" />
               <span className="hidden sm:inline">{billWaiting ? 'Bill sent · re-send' : 'Request Bill'}</span>
             </button>
-            <button type="button" onClick={onClose} aria-label="Close" className="min-w-[44px] min-h-[44px] rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center justify-center">
+            <button type="button" onClick={closeWorkspace} disabled={savingKot} aria-label="Close" className="min-w-[44px] min-h-[44px] rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center justify-center">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -399,7 +408,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-xs font-bold text-jaman-navy">{g.short} course: {g.label}</span>
                               {multiCourse && (
-                                <button type="button" onClick={() => handleFireKot([g.id])} className="px-3 py-1.5 rounded-xl bg-jaman-saffron text-white text-[11px] font-bold cursor-pointer min-h-[44px]">
+                                <button type="button" disabled={savingKot} onClick={() => handleFireKot([g.id])} className="px-3 py-1.5 rounded-xl bg-jaman-saffron text-white text-[11px] font-bold cursor-pointer min-h-[44px]">
                                   Send now
                                 </button>
                               )}
@@ -678,10 +687,20 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                         </div>
                         <div className="flex items-center justify-between pt-1 border-t border-slate-100">
                           <span className="font-bold font-mono text-xs sm:text-sm text-jaman-navy">{formatINR(item.price)}</span>
-                          {/* Adds with the default options; tapping the card opens Customize for a real change. */}
+                          {/* EC-03: this used to always add with empty modifiers and quantity one, even for a dish
+                              with a required choice or a configured minimum above one — the same bypass already
+                              fixed in POS/Kiosk/QR. Open Customize instead whenever the dish can't be added with
+                              bare defaults; only a genuinely optional-everything dish still adds directly. */}
                           <button
                             type="button"
-                            onClick={(e) => { e.stopPropagation(); addItemToCart(item, [], '', 'COURSE_1', 1); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (dishNeedsChoiceBeforeAdd(item, resolveModifierGroups(item, db.modifierGroups))) {
+                                setCustomizingItem(item);
+                                return;
+                              }
+                              addItemToCart(item, [], '', 'COURSE_1', 1);
+                            }}
                             className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-bold text-base hover:bg-jaman-saffron hover:text-white transition-colors cursor-pointer active:scale-90 disabled:opacity-40"
                             title={soldOut ? 'Sold out' : 'Quick Add'}
                             aria-label={soldOut ? `${item.name} is sold out` : `Add ${item.name}`}
@@ -740,7 +759,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             </div>
           )}
         </div>
-      </div>
+      </fieldset>
 
       <CaptainModifierModal
         item={customizingItem}

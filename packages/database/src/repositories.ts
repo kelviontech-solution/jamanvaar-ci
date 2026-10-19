@@ -466,6 +466,18 @@ export function isUnpaidOpenOrder(o: Pick<Order, 'orderStatus' | 'paymentStatus'
  * connection is re-established; the cloud sync is what carries orders between devices.
  */
 function postToLocalService(path: string, method: 'POST' | 'PATCH', body: unknown): void {
+  const frozen = structuredClone(body);
+  db.afterTransaction(() => {
+    // Creating and settling inside one durable command queues both deliveries.
+    // Send the final acknowledged order for each, so a slower creation request
+    // cannot overwrite the paid state with its earlier pending snapshot.
+    const id = (frozen as { id?: string } | null)?.id;
+    const current = path === '/api/orders' && id ? db.orders.find(order => order.id === id) : undefined;
+    dispatchToLocalService(path, method, current ? structuredClone(current) : frozen);
+  });
+}
+
+function dispatchToLocalService(path: string, method: 'POST' | 'PATCH', body: unknown): void {
   if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
   if (db.isLocalCoreUnauthorized()) return;
   // The relay replicates already-priced app orders. Its legacy create endpoint
@@ -769,6 +781,10 @@ export class OrderRepository {
   }
 
   public static updateOrderStatus(id: string, status: OrderStatus, actor: string = 'Admin'): Order | null {
+    return db.transaction(() => this.applyOrderStatus(id, status, actor));
+  }
+
+  private static applyOrderStatus(id: string, status: OrderStatus, actor: string): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
     const prevStatus = order.orderStatus;
@@ -816,6 +832,10 @@ export class OrderRepository {
     actor: string = 'Cashier',
     splits?: PaymentSplit[]
   ): Order | null {
+    return db.transaction(() => this.applySettlement(id, paymentMethod, tenderedAmount, transactionId, actor, splits));
+  }
+
+  private static applySettlement(id: string, paymentMethod: PaymentMethod, tenderedAmount: number | undefined, transactionId: string | undefined, actor: string, splits?: PaymentSplit[]): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
     if (order.orderStatus === 'REFUNDED' || order.orderStatus === 'CANCELLED' || order.paymentStatus === 'REFUNDED' || order.paymentStatus === 'CANCELLED') throw new Error('A cancelled or refunded bill cannot be settled again');
@@ -837,6 +857,17 @@ export class OrderRepository {
 
     if (!order.serverQrLoyalty && order.loyaltyRedemption && !order.loyaltyPointsRedeemed) {
       CustomerRepository.commitOrderRedemption(order);
+    }
+    // Compatibility with older local kiosk drafts that carried a point request
+    // without a catalog reward. Debit before earning, using the order ledger key.
+    // Configured rewards were already debited by commitOrderRedemption above.
+    if (!order.serverQrLoyalty && !order.loyaltyRedemption && order.loyaltyPointsRedeemed !== undefined && order.loyaltyPointsRedeemed !== 0) {
+      const customer = CustomerRepository.getByPhone(order.customerPhone ?? '');
+      const key = `redeem:${order.id}`;
+      if (!customer?.loyaltyLedger?.[key]) {
+        if (!customer || !Number.isSafeInteger(order.loyaltyPointsRedeemed) || order.loyaltyPointsRedeemed < 0 || customer.loyaltyPoints < order.loyaltyPointsRedeemed) throw new Error('Not enough loyalty points for this reward');
+        CustomerRepository.recordLoyaltyEvent(customer, key, -order.loyaltyPointsRedeemed);
+      }
     }
     const now = new Date().toISOString();
     const collectingShift = ShiftRepository.getActiveShift();
@@ -894,14 +925,6 @@ export class OrderRepository {
     if (!order.serverQrLoyalty && order.customerPhone && order.loyaltyPointsEarned === undefined) {
       CustomerRepository.getOrCreateAccount(order.customerPhone, order.customerName);
       order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount, order.id);
-      // security-audit HIGH kiosk-loyalty-02: a points redemption applied at order creation (the
-      // kiosk's cash-at-counter flow) used to deduct the points immediately, before the order was
-      // actually paid -- now it is only requested (order.loyaltyPointsRedeemed) and deducted here,
-      // at the same real, payment-confirmed moment the earn above already waits for. Guarded by
-      // the same loyaltyPointsEarned check so a retried settle can never double-deduct.
-      if (order.loyaltyPointsRedeemed) {
-        CustomerRepository.redeemPoints(order.customerPhone, order.loyaltyPointsRedeemed);
-      }
     }
 
     db.notify();

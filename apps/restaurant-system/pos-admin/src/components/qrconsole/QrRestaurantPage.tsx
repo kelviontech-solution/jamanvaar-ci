@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { request, cloudQrAccount } from '../../cloud/cloudClient';
+import { QrAdminApi } from '../../cloud/qrAdminClient';
+import { printCards, downloadCardPng, withLogo } from './qrPrint';
 import { RestaurantPage } from '../../../../../../packages/ui/src/restaurant-page/RestaurantPage';
-import { DEFAULT_RESTAURANT_PAGE, type RestaurantPageContent, type RestaurantPageDish } from '../../../../../../packages/ui/src/restaurant-page/types';
+import { DEFAULT_RESTAURANT_PAGE, type RestaurantPageContent, type RestaurantPageDish, type RestaurantPageCategory } from '../../../../../../packages/ui/src/restaurant-page/types';
+import { diverseSignatureDishes } from '../../../../../../packages/ui/src/restaurant-page/restaurant-hours';
+import { RestaurantHoursEditor } from './RestaurantPageDetails';
 import { useQrUnsavedChanges, requestQrLeave } from './useQrUnsavedChanges';
 import { resolveMenuImage } from '../../../../../../packages/utils/src/menu_image';
+import { menuDishImage } from '../../../../../../packages/utils/src/dish_photos';
 import { FeatureRequestButton } from './FeatureRequestButton';
 import { fillPageDetails, pagePublicationStatus, pagePublishIssue } from './restaurantPageSetup';
 import { optimizePageImage } from './optimizePageImage';
@@ -27,29 +32,32 @@ type Editor = {
   defaultAddress: string;
   branches: { id: string; name: string; address: string | null }[];
   items: RestaurantPageDish[];
+  categories?:RestaurantPageCategory[];
   menuReady: boolean;
   sharePath: string | null;
   shareUrl: string | null;
+  orderOnlineUrl?: string | null;
   history: { id: string; at: string; title: string; template: string }[];
 };
 const templates = [
   { id: 'HERITAGE', name: 'Heritage', caption: 'Warm ivory · editorial serif · side-by-side story', colour: '#A84816' },
   { id: 'CAFE', name: 'Café', caption: 'Soft peach · bold type · playful rounded photos', colour: '#68422C' },
-  { id: 'MODERN', name: 'Modern', caption: 'Full-bleed photo · clean type · deep green', colour: '#245B45' }
+  { id: 'MODERN', name: 'Modern', caption: 'Full-bleed photo · clean type · deep green', colour: '#245B45' },
+  { id: 'INDIAN', name: 'Indian Restaurant', caption: 'Arched photo frame · jewel-tone welcome panel · gold accents', colour: '#9A3324' }
 ] as const;
 const endpoint = (scope: string, path = '') => '/api/v1/tenant/qr-page' + path + '?scope=' + encodeURIComponent(scope);
 const label: Record<string, string> = {
-  title: 'Restaurant page heading',
+  title: 'Page heading',
   tagline: 'Cuisine or short tagline',
   welcome: 'Welcome message',
-  about: 'Your restaurant story',
+  about: 'Your story',
   phone: 'Public phone number',
   whatsapp: 'WhatsApp number (country code + digits)',
   instagram: 'Instagram profile link',
   mapsUrl: 'Google Maps directions link',
   reviewUrl: 'Google review link',
   address: 'Public address',
-  hours: 'Physical restaurant opening hours',
+  hours: 'Physical opening hours',
   notice: 'Service notice',
   footer: 'Footer message'
 };
@@ -103,7 +111,7 @@ function BranchPageLinks({ data }: { data: Editor }) {
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(page.shareUrl!);
-                  setMessage('Public restaurant page link copied.');
+                  setMessage('Public business page link copied.');
                 } catch {
                   setMessage('Copy is unavailable in this browser. Open the live page and copy its address.');
                 }
@@ -115,7 +123,7 @@ function BranchPageLinks({ data }: { data: Editor }) {
         ) : (
           <p className="qpb-help">
             {!page.capability.enabled
-              ? 'This branch does not have restaurant page access. Ask Super Admin to check its branch license.'
+              ? 'This branch does not have business page access. Ask Super Admin to check its branch license.'
               : !page.published?.enabled
                 ? 'This branch page is not live. Check its published page settings.'
                 : 'The platform administrator must configure the public website address before sharing.'}
@@ -133,7 +141,7 @@ function BranchPageLinks({ data }: { data: Editor }) {
     </div>
   );
 }
-export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, scope:string) => void } = {}) {
+export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, scope: string) => void } = {}) {
   const previewArea = useRef<HTMLDivElement>(null);
   const [previewRoom, setPreviewRoom] = useState(430);
   const [previewLanguage, setPreviewLanguage] = useState('en'),
@@ -236,7 +244,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
     void run(async () => {
       const issue = pagePublishIssue(draft);
       if (issue) {
-        openStep(issue.startsWith('Notice') ? 'qpb-schedule' : 'qpb-first-impression');
+        openStep(issue.startsWith('Opening hours') ? 'qpb-contact' : issue.startsWith('Notice') ? 'qpb-schedule' : 'qpb-first-impression');
         throw new Error(issue);
       }
       // Saving is still a draft-only action. Publication requires the separate review acknowledgement.
@@ -264,7 +272,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
   if (!data)
     return (
       <section className="qr-page-builder">
-        <h2>Restaurant page</h2>
+        <h2>Business page</h2>
         {error ? (
           <>
             <p role="alert">{error}</p>
@@ -296,13 +304,14 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
     heroUrl: imageUrl(draft.heroUrl),
     gallery: draft.gallery.map((i) => ({ ...i, url: imageUrl(i.url) }))
   };
+  const previewItems = data.items.map((item) => ({ ...item, imageUrl: imageUrl(menuDishImage(item.imageUrl, item.name) || '') }));
   const selectedBranch = data.branches.find((b) => b.id === scope);
   return (
     <section className="qr-page-builder">
       <header className="qpb-heading">
         <div>
           <p className="qpb-eyebrow">YOUR RESTAURANT, YOUR WELCOME</p>
-          <h2>Restaurant page studio</h2>
+          <h2>Business page studio</h2>
           <p>Design a warm first impression. Your menu, table and checkout stay connected.</p>
         </div>
         <label>
@@ -316,7 +325,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
               if (!dirty || (await requestQrLeave())) setScope(next);
             }}
           >
-            {data.canEditGlobal && <option value="restaurant">Restaurant-wide defaults</option>}
+            {data.canEditGlobal && <option value="restaurant">Business-wide defaults</option>}
             {data.branches.map((b) => (
               <option value={b.id} key={b.id}>
                 {b.name}
@@ -326,42 +335,42 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
         </label>
       </header>
       <div className="qpb-scope">
-        <strong>{scope === 'restaurant' ? 'Applies to branches using restaurant defaults' : selectedBranch?.name}</strong>
+        <strong>{scope === 'restaurant' ? 'Applies to branches using business defaults' : selectedBranch?.name}</strong>
         <span>
           {scope === 'restaurant'
             ? `${data.branches.length} active branches; branches with their own published page keep their override.`
             : data.inherited
-              ? 'Currently inherits the restaurant page. Publish here to create a branch override.'
+              ? 'Currently inherits the business page. Publish here to create a branch override.'
               : 'This branch has its own page.'}
         </span>
       </div>
       {locked && (
         <div className="qpb-locked" role="status">
-          <strong>Restaurant page is not included for this scope.</strong>
-          <p>Your Super Admin can enable “Restaurant website & mobile page builder” for the plan or restaurant. Existing QR menu ordering continues.</p>
+          <strong>Business page is not included for this scope.</strong>
+          <p>Your Super Admin can enable “Business website & mobile page builder” for the plan or restaurant. Existing QR menu ordering continues.</p>
           <p>
             {data.capability.reason === 'PRODUCT_UNAVAILABLE'
               ? 'Your platform administrator must also make this feature available in the feature catalogue.'
-              : 'Ask your platform administrator to check this restaurant and branch’s page access.'}
+              : 'Ask your platform administrator to check this business and branch’s page access.'}
           </p>
-          <FeatureRequestButton featureCode="QR_RESTAURANT_PAGE" featureLabel="Restaurant page" />
+          <FeatureRequestButton featureCode="QR_RESTAURANT_PAGE" featureLabel="Business page" />
           <button type="button" disabled={busy} onClick={() => void run(reload)}>
             Check access again
           </button>
         </div>
       )}
       {!locked && (
-        <section className="qpb-setup" aria-label="Restaurant page setup">
-          <div className="qpb-setup-heading">
-            <div>
-              <p className="qpb-eyebrow">A FEW STEPS TO YOUR FIRST PAGE</p>
-              <h3>Set up your restaurant welcome</h3>
-            </div>
+        <details className="qpb-setup" aria-label="Business page setup" open={!data.published}>
+          <summary className="qpb-setup-heading">
+            <strong>Setup guide · 5 steps to your welcome page</strong>
             <span className="qpb-status" role="status">
               {pagePublicationStatus(data.published, draft, !locked)}
             </span>
-          </div>
-          <p>Your changes stay private until you review and publish. Photos, social links and a gallery are optional.</p>
+          </summary>
+          <p>
+            Your changes stay private until you review and publish. Start with your headline, a cover photo and a few dishes, then add your story and contact
+            details.
+          </p>
           <div className="qpb-checklist">
             <button disabled={busy} onClick={() => openStep('qpb-design')}>
               1. Choose a design{' '}
@@ -377,8 +386,15 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
               3. Check contact details{' '}
               <small>{draft.address || data.defaultAddress ? 'Address available · check links and hours' : 'Optional · add how guests can reach you'}</small>
             </button>
+            <button disabled={busy} onClick={() => openStep('qpb-story')}>
+              4. Tell your story & choose dishes{' '}
+              <small>
+                {draft.featuredItemIds.length ? `${draft.featuredItemIds.length} featured dishes chosen` : '3 dishes from different categories shown automatically'} ·{' '}
+                {draft.about.trim() ? 'Story added' : 'Add your restaurant story'}
+              </small>
+            </button>
             <button disabled={busy} onClick={saveAndReview}>
-              4. Preview & publish <small>Review the design and affected branches</small>
+              5. Preview & publish <small>Review the design and affected branches</small>
             </button>
           </div>
           {(!draft.title.trim() || !draft.welcome.trim()) && (
@@ -388,19 +404,19 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 setDraft(fillPageDetails(draft, data.restaurantName, data.defaultAddress));
                 setReview(false);
                 setAck(false);
-                setNotice('Restaurant heading and welcome filled where empty. Edit the wording, choose when this page opens, then review and publish.');
+                setNotice('Page heading and welcome filled where empty. Edit the wording, choose when this page opens, then review and publish.');
                 openStep('qpb-first-impression');
               }}
             >
-              Fill missing restaurant details
+              Fill missing business details
             </button>
           )}
           <p className="qpb-help">
             {data.menuReady
               ? 'Menu published. Guests can continue to the existing ordering flow.'
-              : 'Menu not published yet. You can publish restaurant information now; publish your menu before accepting orders.'}
+              : 'Menu not published yet. You can publish business information now; publish your menu before accepting orders.'}
           </p>
-        </section>
+        </details>
       )}
       {error && (
         <p className="qpb-error" role="alert">
@@ -439,7 +455,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                       }}
                     >
                       <span className="qpb-mini">
-                        <i />
+                        {content.heroUrl||previewItems[0]?.imageUrl?<img src={content.heroUrl||previewItems[0].imageUrl} alt=""/>:<i />}
                         <b>{t.name}</b>
                         <i />
                       </span>
@@ -449,13 +465,13 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   ))}
                 </div>
                 <label>
-                  <input type="checkbox" checked={draft.enabled} onChange={(e) => update('enabled', e.target.checked)} /> Enable published restaurant page
+                  <input type="checkbox" checked={draft.enabled} onChange={(e) => update('enabled', e.target.checked)} /> Enable published business page
                 </label>
                 <label>
                   When customers scan
                   <select aria-label="When customers scan" value={draft.entryMode} onChange={(e) => update('entryMode', e.target.value as 'PAGE' | 'MENU')}>
                     <option value="MENU">Open menu directly</option>
-                    <option value="PAGE">Show restaurant page first</option>
+                    <option value="PAGE">Show business page first</option>
                   </select>
                 </label>
                 <p className="qpb-help">Payment returns and existing order/cart tasks resume directly. Existing printed table QR codes keep working.</p>
@@ -465,12 +481,12 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 </label>
               </div>
             </details>
-            <details open id="qpb-first-impression">
+            <details id="qpb-first-impression">
               <summary>02 · Photos & first impression</summary>
               <div className="qpb-fields">
                 {(['logoUrl', 'heroUrl'] as const).map((k) => (
                   <label key={k}>
-                    {k === 'logoUrl' ? 'Restaurant logo' : 'Hero photograph'}
+                    {k === 'logoUrl' ? 'Business logo' : 'Hero photograph'}
                     <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => void upload(e.target.files?.[0], (ref) => update(k, ref))} />
                     {draft[k] && (
                       <>
@@ -482,6 +498,13 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                     )}
                   </label>
                 ))}
+                {!draft.heroUrl && (
+                  <p className="qpb-image-note">
+                    {previewItems.some((item) => item.imageUrl)
+                      ? 'Your first published dish photo is used as the cover until you upload your own restaurant or food photograph. The same fallback appears on the live page.'
+                      : 'Add a cover photograph to give your page a strong first impression. Without photos, the page uses a neutral background.'}
+                  </p>
+                )}
                 <label>
                   Photo focal point · {draft.heroPosition}%
                   <input type="range" min="0" max="100" value={draft.heroPosition} onChange={(e) => update('heroPosition', Number(e.target.value))} />
@@ -513,69 +536,181 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 ))}
               </div>
             </details>
-            <details className="qpb-more">
-              <summary>More options · story, gallery, contact & languages</summary>
+            <details id="qpb-contact">
+              <summary>03 · Contact, social links & footer</summary>
               <div className="qpb-fields">
-                <details id="qpb-story">
-                  <summary>03 · Story, dishes & gallery</summary>
-                  <div className="qpb-fields">
+                <p className="qpb-help">
+                  Use this branch’s own address, review link and hours. Hours here describe physical opening; online ordering hours stay under Ordering Rules.
+                </p>
+                {(['address', 'hours', 'phone', 'whatsapp', 'instagram', 'mapsUrl', 'reviewUrl', 'notice', 'footer'] as const).map((k) => (
+                  <label key={k}>
+                    {label[k]}
+                    {['address', 'hours', 'notice', 'footer'].includes(k) ? (
+                      <textarea
+                        aria-label={label[k]}
+                        maxLength={k === 'hours' ? 600 : k === 'address' ? 500 : 250}
+                        placeholder={k === 'address' ? data.defaultAddress : undefined}
+                        value={draft[k]}
+                        onChange={(e) => update(k, e.target.value)}
+                      />
+                    ) : (
+                      <input
+                        type={['phone', 'whatsapp'].includes(k) ? 'tel' : 'url'}
+                        value={draft[k]}
+                        maxLength={1200}
+                        onChange={(e) => update(k, e.target.value)}
+                        placeholder={k === 'whatsapp' ? '+919876543210' : undefined}
+                      />
+                    )}
+                  </label>
+                ))}
+                <p className="qpb-help">
+                  Google review opens Google’s own review form. Private feedback remains separate; review submission is not tracked or rewarded.
+                </p>
+                <RestaurantHoursEditor value={draft.businessHours} onChange={value=>update('businessHours',value)}/>
+              </div>
+            </details>
+            <details id="qpb-story">
+              <summary>04 · Story, dishes & gallery</summary>
+              <div className="qpb-fields">
+                <label>
+                  {label.about}
+                  <textarea aria-label={label.about} rows={5} maxLength={2000} value={draft.about} onChange={(e) => update('about', e.target.value)} />
+                </label>
+                <fieldset className="qpb-featured-picker">
+                  <legend>Featured published dishes · {draft.featuredItemIds.length}/8</legend>
+                  <p className="qpb-help">
+                    Choose your own dishes below. With none selected, 3 published dishes from different categories appear automatically. Hide the Featured dishes section
+                    below to remove the showcase.
+                  </p>
+                  <button type="button" onClick={()=>update('featuredItemIds',diverseSignatureDishes(data.items,[]).map(item=>item.id))}>Choose 3 varied dishes for me</button>
+                  <div>
+                    {previewItems.map((item) => (
+                      <label key={item.id}>
+                        <input
+                          type="checkbox"
+                          checked={draft.featuredItemIds.includes(item.id)}
+                          disabled={!draft.featuredItemIds.includes(item.id) && draft.featuredItemIds.length >= 8}
+                          onChange={(event) =>
+                            update(
+                              'featuredItemIds',
+                              event.target.checked ? [...draft.featuredItemIds, item.id] : draft.featuredItemIds.filter((id) => id !== item.id)
+                            )
+                          }
+                        />
+                        {item.imageUrl && <img src={item.imageUrl} alt="" loading="lazy" />}
+                        <span>{item.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+                {!data.menuReady && <p className="qpb-help">Publish your menu to choose dishes. The business information page can be published first.</p>}
+                <label>
+                  Add gallery photograph (up to 8)
+                  <input
+                    disabled={draft.gallery.length >= 8}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={(e) => void upload(e.target.files?.[0], (ref) => update('gallery', [...draft.gallery, { url: ref, caption: '' }]))}
+                  />
+                </label>
+                {draft.gallery.map((g, i) => (
+                  <div key={g.url + i} className="qpb-gallery-row">
+                    <img src={imageUrl(g.url)} alt={g.caption || 'Gallery photo'} />
                     <label>
-                      {label.about}
-                      <textarea aria-label={label.about} rows={5} maxLength={2000} value={draft.about} onChange={(e) => update('about', e.target.value)} />
-                    </label>
-                    <label>
-                      Featured published dishes (up to 8)
-                      <select
-                        aria-label="Featured published dishes (up to 8)"
-                        multiple
-                        value={draft.featuredItemIds}
+                      Photo {i + 1} caption
+                      <input
+                        value={g.caption}
+                        maxLength={120}
                         onChange={(e) =>
                           update(
-                            'featuredItemIds',
-                            Array.from(e.target.selectedOptions)
-                              .map((o) => o.value)
-                              .slice(0, 8)
+                            'gallery',
+                            draft.gallery.map((p, j) => (j === i ? { ...p, caption: e.target.value } : p))
                           )
                         }
-                      >
-                        {data.items.map((i) => (
-                          <option key={i.id} value={i.id}>
-                            {i.name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    {!data.menuReady && <p className="qpb-help">Publish your menu to choose dishes. The restaurant information page can be published first.</p>}
-                    <label>
-                      Add gallery photograph (up to 8)
-                      <input
-                        disabled={draft.gallery.length >= 8}
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp"
-                        onChange={(e) => void upload(e.target.files?.[0], (ref) => update('gallery', [...draft.gallery, { url: ref, caption: '' }]))}
                       />
                     </label>
-                    {draft.gallery.map((g, i) => (
-                      <div key={g.url + i} className="qpb-gallery-row">
-                        <img src={imageUrl(g.url)} alt={g.caption || 'Gallery photo'} />
+                    <button
+                      onClick={() =>
+                        update(
+                          'gallery',
+                          draft.gallery.filter((_, j) => j !== i)
+                        )
+                      }
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                <h3>Page sections</h3>
+                {(['FEATURED', 'ABOUT', 'GALLERY', 'VISIT'] as const).map((s) => (
+                  <label key={s}>
+                    <input
+                      type="checkbox"
+                      checked={draft.sections.includes(s)}
+                      onChange={(e) => update('sections', e.target.checked ? [...draft.sections, s] : draft.sections.filter((v) => v !== s))}
+                    />
+                    {{ FEATURED: 'Featured dishes', ABOUT: 'Our story', GALLERY: 'Photo gallery', VISIT: 'Visit & opening hours' }[s]}
+                  </label>
+                ))}
+                <p className="qpb-help">
+                  Your website shows signature dishes, story, gallery and visit details. The full menu opens from Menu; Order online opens your existing
+                  ordering page. Empty sections are hidden automatically.
+                </p>
+              </div>
+            </details>
+            <details className="qpb-more">
+              <summary>More options · search previews, languages & extras</summary>
+              <div className="qpb-fields">
+                <details id="qpb-sharing"><summary>Search & social sharing preview</summary><div className="qpb-fields"><p className="qpb-help">These settings are published with your website. Leave them blank to use your restaurant name, welcome and cover photo. A search engine decides how and when it indexes your page.</p>
+                  <label>Search title<input maxLength={80} value={draft.seo?.title||''} onChange={event=>update('seo',{...DEFAULT_RESTAURANT_PAGE.seo!,...draft.seo,title:event.target.value})}/></label>
+                  <label>Search description<textarea maxLength={180} value={draft.seo?.description||''} onChange={event=>update('seo',{...DEFAULT_RESTAURANT_PAGE.seo!,...draft.seo,description:event.target.value})}/></label>
+                  <label>Sharing photograph<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event=>void upload(event.target.files?.[0],ref=>update('seo',{title:'',description:'',...draft.seo,imageUrl:ref}))}/></label>
+                  {draft.seo?.imageUrl&&<><img className="qpb-upload" src={imageUrl(draft.seo.imageUrl)} alt="Sharing preview"/><button type="button" onClick={()=>update('seo',{...draft.seo!,imageUrl:''})}>Use cover photo instead</button></>}
+                  <div className="qpb-search-preview"><small>Search & link preview · draft · {selectedBranch?.name||data.branchName}</small><strong>{draft.seo?.title||`${data.restaurantName} · ${selectedBranch?.name||data.branchName}`}</strong><p>{draft.seo?.description||draft.welcome}</p></div>
+                </div></details>
+                <details id="qpb-testimonials">
+                  <summary>05 · Testimonials & press</summary>
+                  <div className="qpb-fields">
+                    <p className="qpb-help">
+                      Each section only appears on the public page once you add at least one entry here. Keep quotes short and genuine — written by you, not
+                      generated.
+                    </p>
+                    <h3>Guest testimonials (up to 6)</h3>
+                    {draft.testimonials.map((t, i) => (
+                      <div key={i} className="qpb-gallery-row">
                         <label>
-                          Photo {i + 1} caption
-                          <input
-                            value={g.caption}
-                            maxLength={120}
+                          Quote {i + 1}
+                          <textarea
+                            maxLength={300}
+                            value={t.quote}
                             onChange={(e) =>
                               update(
-                                'gallery',
-                                draft.gallery.map((p, j) => (j === i ? { ...p, caption: e.target.value } : p))
+                                'testimonials',
+                                draft.testimonials.map((p, j) => (j === i ? { ...p, quote: e.target.value } : p))
+                              )
+                            }
+                          />
+                        </label>
+                        <label>
+                          Guest name
+                          <input
+                            maxLength={60}
+                            value={t.author}
+                            onChange={(e) =>
+                              update(
+                                'testimonials',
+                                draft.testimonials.map((p, j) => (j === i ? { ...p, author: e.target.value } : p))
                               )
                             }
                           />
                         </label>
                         <button
+                          type="button"
                           onClick={() =>
                             update(
-                              'gallery',
-                              draft.gallery.filter((_, j) => j !== i)
+                              'testimonials',
+                              draft.testimonials.filter((_, j) => j !== i)
                             )
                           }
                         >
@@ -583,52 +718,60 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                         </button>
                       </div>
                     ))}
-                    <h3>Page sections</h3>
-                    {(['FEATURED', 'ABOUT', 'GALLERY', 'VISIT'] as const).map((s) => (
-                      <label key={s}>
-                        <input
-                          type="checkbox"
-                          checked={draft.sections.includes(s)}
-                          onChange={(e) => update('sections', e.target.checked ? [...draft.sections, s] : draft.sections.filter((v) => v !== s))}
-                        />
-                        {{ FEATURED: 'Featured dishes', ABOUT: 'Our story', GALLERY: 'Photo gallery', VISIT: 'Visit & opening hours' }[s]}
-                      </label>
-                    ))}
-                    <p className="qpb-help">Sections appear in selection order. Empty sections are hidden automatically.</p>
-                  </div>
-                </details>
-                <details id="qpb-contact">
-                  <summary>04 · Contact, social links & footer</summary>
-                  <div className="qpb-fields">
-                    <p className="qpb-help">
-                      Use this branch’s own address, review link and hours. Hours here describe physical opening; online ordering hours stay under Ordering
-                      Rules.
-                    </p>
-                    {(['address', 'hours', 'phone', 'whatsapp', 'instagram', 'mapsUrl', 'reviewUrl', 'notice', 'footer'] as const).map((k) => (
-                      <label key={k}>
-                        {label[k]}
-                        {['address', 'hours', 'notice', 'footer'].includes(k) ? (
-                          <textarea
-                            aria-label={label[k]}
-                            maxLength={k === 'hours' ? 600 : k === 'address' ? 500 : 250}
-                            placeholder={k === 'address' ? data.defaultAddress : undefined}
-                            value={draft[k]}
-                            onChange={(e) => update(k, e.target.value)}
-                          />
-                        ) : (
+                    {draft.testimonials.length < 6 && (
+                      <button type="button" onClick={() => update('testimonials', [...draft.testimonials, { quote: '', author: '' }])}>
+                        Add testimonial
+                      </button>
+                    )}
+                    <h3>Press & awards mentions (up to 8)</h3>
+                    {draft.press.map((p, i) => (
+                      <div key={i} className="qpb-gallery-row">
+                        <label>
+                          Label
                           <input
-                            type={['phone', 'whatsapp'].includes(k) ? 'tel' : 'url'}
-                            value={draft[k]}
-                            maxLength={1200}
-                            onChange={(e) => update(k, e.target.value)}
-                            placeholder={k === 'whatsapp' ? '+919876543210' : undefined}
+                            maxLength={120}
+                            placeholder="e.g. Featured in Times of India"
+                            value={p.label}
+                            onChange={(e) =>
+                              update(
+                                'press',
+                                draft.press.map((row, j) => (j === i ? { ...row, label: e.target.value } : row))
+                              )
+                            }
                           />
-                        )}
-                      </label>
+                        </label>
+                        <label>
+                          Link (optional)
+                          <input
+                            type="url"
+                            maxLength={1200}
+                            value={p.url}
+                            onChange={(e) =>
+                              update(
+                                'press',
+                                draft.press.map((row, j) => (j === i ? { ...row, url: e.target.value } : row))
+                              )
+                            }
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            update(
+                              'press',
+                              draft.press.filter((_, j) => j !== i)
+                            )
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
                     ))}
-                    <p className="qpb-help">
-                      Google review opens Google’s own review form. Private feedback remains separate; review submission is not tracked or rewarded.
-                    </p>
+                    {draft.press.length < 8 && (
+                      <button type="button" onClick={() => update('press', [...draft.press, { label: '', url: '' }])}>
+                        Add press mention
+                      </button>
+                    )}
                   </div>
                 </details>
                 <PageContentOptions
@@ -642,7 +785,14 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
               </div>
             </details>
           </fieldset>
-          {!locked && <PageLaunchChecklist key={scope!+data.publishedAt} scope={scope!} publication={data.publishedAt} onNavigate={next=>onNavigate?.(next,scope!)} />}
+          {!locked && (
+            <PageLaunchChecklist
+              key={scope! + data.publishedAt}
+              scope={scope!}
+              publication={data.publishedAt}
+              onNavigate={(next) => onNavigate?.(next, scope!)}
+            />
+          )}
           <section className="qpb-publish">
             <p>
               <strong>{pagePublicationStatus(data.published, draft, !locked)}</strong>
@@ -675,7 +825,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 <PageComparison before={data.published} after={draft} />
                 <p>
                   {scope === 'restaurant'
-                    ? `Updates ${data.affectedBranches.filter((b) => b.licensed).length} licensed branches using restaurant defaults.`
+                    ? `Updates ${data.affectedBranches.filter((b) => b.licensed).length} licensed branches using business defaults.`
                     : selectedBranch?.name + ' only.'}
                 </p>
                 {scope === 'restaurant' && (
@@ -692,8 +842,8 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   {draft.enabled
                     ? draft.entryMode === 'PAGE'
                       ? 'Fresh scans will open this page first.'
-                      : 'Scans open the menu directly; restaurant information stays accessible.'
-                    : 'The restaurant page is disabled. Existing menu ordering continues.'}
+                      : 'Scans open the menu directly; business information stays accessible.'
+                    : 'The business page is disabled. Existing menu ordering continues.'}
                 </p>
                 <label>
                   <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} /> I reviewed the design, contact links and affected scope.
@@ -703,7 +853,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   onClick={() =>
                     void run(async () => {
                       install(await request<Editor>(endpoint(scope!, '/publish'), { method: 'POST', body: { version: data.version } }));
-                      setNotice('Restaurant page published. New visitors receive this version.');
+                      setNotice('Business page published. New visitors receive this version.');
                     })
                   }
                 >
@@ -718,23 +868,23 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   void run(async () => {
                     if (dirty && !(await requestQrLeave())) return;
                     install(await request<Editor>(endpoint(scope!, '/inherit'), { method: 'POST', body: { version: data.version } }));
-                    setNotice('This branch now uses the published restaurant defaults.');
+                    setNotice('This branch now uses the published business defaults.');
                   })
                 }
               >
-                Use restaurant defaults
+                Use business defaults
               </button>
             )}
             {data.shareUrl && data.published?.enabled && !locked && (
               <p>
                 <a href={data.shareUrl} target="_blank" rel="noopener noreferrer">
-                  Open shareable restaurant page ↗
+                  Open shareable business page ↗
                 </a>
                 <button
                   onClick={() =>
                     void run(async () => {
                       await navigator.clipboard.writeText(data.shareUrl!);
-                      setNotice('Public restaurant page link copied.');
+                      setNotice('Public business page link copied.');
                     })
                   }
                 >
@@ -742,6 +892,35 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 </button>
                 <small>The share link browses the menu without assigning a table.</small>
               </p>
+            )}
+            {data.shareUrl && data.published?.enabled && !locked && (
+              <div className="qpb-actions">
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    void run(async () => {
+                      printCards([await QrAdminApi.websitePrintData(scope!).then(withLogo)]);
+                    })
+                  }
+                >
+                  Print website QR poster
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    void run(async () => {
+                      const card = await QrAdminApi.websitePrintData(scope!).then(withLogo);
+                      await downloadCardPng(card, data.restaurantName + '-' + (selectedBranch?.name ?? 'branch') + '-website-qr');
+                      setNotice('Website QR poster downloaded.');
+                    })
+                  }
+                >
+                  Download QR poster PNG
+                </button>
+                <small>
+                  A distinct poster QR for your door, counter or table tents — scanning it opens this business page, never the table-ordering menu codes.
+                </small>
+              </div>
             )}
             {scope === 'restaurant' && data.published?.enabled && !locked && <BranchPageLinks data={data} />}
             {data.sharePath && !data.shareUrl && (
@@ -775,20 +954,20 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
           </section>
           {!locked && (
             <div className="qpb-extra-reports">
-              <PageEngagement key={scope!+data.publishedAt} scope={scope!} publication={data.publishedAt} />
+              <PageEngagement key={scope! + data.publishedAt} scope={scope!} publication={data.publishedAt} />
               {data.canEditGlobal && <PageBranchCopy key={scope} scope={scope!} version={data.version} dirty={dirty} branches={data.branches} />}
             </div>
           )}
         </div>
         <aside className="qpb-preview">
           <div className="qpb-preview-tools">
-            <strong>Live mobile preview</strong>
+            <strong>Live website preview</strong>
             <label>
               Preview width
               <select aria-label="Preview width" value={width} onChange={(e) => setWidth(Number(e.target.value))}>
-                {[360, 390, 430, 960].map((n) => (
+                {[360, 390, 430, 1280].map((n) => (
                   <option value={n} key={n}>
-                    {n === 960 ? 'Desktop' : n + ' px'}
+                    {n === 1280 ? 'Desktop · 1280 px' : n + ' px'}
                   </option>
                 ))}
               </select>
@@ -811,10 +990,14 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
             </label>
             <button onClick={() => setPreviewTime('')}>Use current time</button>
           </div>
+          <p className="qpb-help">
+            This preview shows your draft design and menu. Ordering and reservation availability on the live page follow the selected branch’s settings.
+          </p>
           <div className="qpb-device-scroll" ref={previewArea}>
             <div className="qpb-device" style={{ width, maxWidth: 'none', zoom: Math.min(1, (previewRoom - 12) / width) }}>
               <RestaurantPage
                 preview
+                browseMenu
                 language={previewLanguage}
                 onLanguageChange={setPreviewLanguage}
                 now={previewTime ? new Date(previewTime).getTime() : undefined}
@@ -822,10 +1005,12 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   content,
                   restaurantName: data.restaurantName,
                   branchName: data.branchName,
-                  table: scope === 'restaurant' ? null : '1',
+                  table: null,
+                  orderOnlineUrl: data.orderOnlineUrl,
                   currency: data.currency
                 }}
-                items={data.items.map((i) => ({ ...i, imageUrl: imageUrl(i.imageUrl || '') }))}
+                items={previewItems}
+                categories={data.categories}
                 onMenu={() => setNotice('Preview only: this opens the existing menu in the customer flow. No real order or payment is created.')}
                 onDish={() => setNotice('Preview only: dish customization opens in the real menu. No cart was changed.')}
               />

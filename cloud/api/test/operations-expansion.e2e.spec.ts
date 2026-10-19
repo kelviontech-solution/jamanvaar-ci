@@ -38,9 +38,9 @@ const admin = (method: 'get' | 'post', path: string, token = owner, b = branch) 
   http()
     [method](`/api/v1/tenant/operations/${path}${path.includes('?') ? '&' : '?'}branchId=${b}`)
     .set('Authorization', `Bearer ${token}`);
-const p = (url: string, body: unknown) =>
+const p = (url: string, body: string | object | undefined) =>
   http().post(url).set('Authorization', `Bearer ${platform}`).send(body);
-const device = (url: string, body: unknown) =>
+const device = (url: string, body: string | object | undefined) =>
   http()
     .post('/api/v1/operations/device/' + url)
     .set('Authorization', `Bearer ${posToken}`)

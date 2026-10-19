@@ -181,32 +181,51 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     }
   });
 
+  // A genuinely standalone product: DEFAULT_APPS_BY_FAMILY_TIER['RESTAURANT:QR'] grants only
+  // QR_ORDERING (see application-entitlements.service.ts) -- no POS, Captain or KDS app code is
+  // ever included for this tier, regardless of what flags this JSON carries. The entitlements
+  // object used to spread `...proEntitlements` (captainApp, posTerminal, offlineBilling,
+  // shiftAndCashDrawer, inventoryManagement, ...) and the description read "Everything in Pro,
+  // plus QR table ordering" -- a restaurant buying this plan at a price above Pro would have been
+  // billed for POS/Captain/KDS access the engine never actually grants, and Super Admin's own
+  // plan-review screen would have listed all of it as "included" based on those stray flags.
+  // ₹3,000/yr is a placeholder for a lighter, QR-only product tier pending a real pricing
+  // decision -- confirm before this plan is offered commercially.
+  // maxDevices: verified live (not assumed) by actually onboarding a QR-only test restaurant
+  // and logging into QR Admin as its owner -- the login screen at /qr/login/ is served by the
+  // same pos-admin app bundle as Restaurant Admin, and cloudLoginOwner() always sends
+  // `deviceType: 'POS_ADMIN'` on first login regardless of the /qr/ path, so QR Admin itself
+  // requires one POS_ADMIN-type device activation before an owner can sign in at all. A
+  // maxDevices of 0 made first login for a genuinely standalone QR restaurant impossible --
+  // the Super Admin "Connect a device" dialog itself refused with "No capacity" even for the
+  // dedicated "QR Ordering Console (solo)" key type. 3 covers an owner plus a couple of branch
+  // managers signing in from their own browsers; no physical POS/Kiosk hardware is implied.
   await tx.plan.upsert({
     where: { id: 'seed-plan-qr' },
     update: {
       tier: 'QR',
       productFamily: 'RESTAURANT',
       name: 'JAMANVAAR QR',
-      description: 'Everything in Pro, plus QR table ordering for guest self-service.',
-      priceMonthly: 75000, // ₹750/mo amortized
-      priceYearly: 900000, // paise = ₹9,000/yr
+      description: 'Standalone QR table ordering for guest self-service -- no POS terminal or subscription required.',
+      priceMonthly: 25000, // ₹250/mo amortized -- placeholder, confirm real pricing
+      priceYearly: 300000, // paise = ₹3,000/yr -- placeholder, confirm real pricing
       maxBranches: 5,
-      maxDevices: 20,
-      maxUsers: 50,
-      entitlements: { ...proEntitlements, qrTableOrdering: true }
+      maxDevices: 3,
+      maxUsers: 20,
+      entitlements: { qrTableOrdering: true }
     },
     create: {
       id: 'seed-plan-qr',
       tier: 'QR',
       productFamily: 'RESTAURANT',
       name: 'JAMANVAAR QR',
-      description: 'Everything in Pro, plus QR table ordering for guest self-service.',
-      priceMonthly: 75000,
-      priceYearly: 900000,
+      description: 'Standalone QR table ordering for guest self-service -- no POS terminal or subscription required.',
+      priceMonthly: 25000,
+      priceYearly: 300000,
       maxBranches: 5,
-      maxDevices: 20,
-      maxUsers: 50,
-      entitlements: { ...proEntitlements, qrTableOrdering: true }
+      maxDevices: 3,
+      maxUsers: 20,
+      entitlements: { qrTableOrdering: true }
     }
   });
 
@@ -505,7 +524,9 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
     // in the seed so a fresh catalog exposes its plan option without a manual feature.
     { code: 'QR_SERVICE_REQUESTS', name: 'QR Service Requests', description: "Lets a guest ask their table for water, cutlery, napkins, assistance or the bill directly from the QR menu, routed to the floor team's live request inbox.", categoryCode: 'qr_ordering' },
     { code: 'QR_SCHEDULED_PICKUP', name: 'QR Scheduled Pickup', description: 'Lets a guest schedule a QR order for pickup at a chosen time instead of immediate preparation.', categoryCode: 'qr_ordering' },
-    { code: 'QR_RESTAURANT_PAGE', name: 'Restaurant landing page & page builder', description: 'Published restaurant website, mobile designs, branch contacts and live preview.', categoryCode: 'qr_ordering', legacyEntitlementKey: 'qrRestaurantPage' }
+    { code: 'QR_RESTAURANT_PAGE', name: 'Restaurant landing page & page builder', description: 'Published restaurant website, mobile designs, branch contacts and live preview.', categoryCode: 'qr_ordering', legacyEntitlementKey: 'qrRestaurantPage' },
+    { code: 'QR_RESERVATIONS', name: 'QR Table Reservations', description: 'Lets a guest request a table booking from the restaurant website, routed to a staff inbox to confirm, decline or seat.', categoryCode: 'qr_ordering', legacyEntitlementKey: 'qrReservations' },
+    { code: 'QR_LOCATIONS', name: 'QR Multi-Branch Locations', description: 'Lists every active branch (address, hours, contact) on the restaurant website for guests choosing where to visit.', categoryCode: 'qr_ordering', legacyEntitlementKey: 'qrLocations' }
   ];
 
   const featureIdByCode = new Map<string, string>();

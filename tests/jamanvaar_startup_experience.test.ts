@@ -20,7 +20,9 @@ describe('JAMANVAAR — Branded Startup / Splash → Login Experience Matrix', (
     expect(JAMANVAAR_LOGOS.horizontal).toBeDefined();
     expect(JAMANVAAR_LOGOS.full).toBeDefined();
     expect(JAMANVAAR_LOGOS.mark).toBeDefined();
-    expect(JAMANVAAR_LOGOS.horizontal).toMatch(/brand-assets\/.*\.png$/);
+    // Logos are now embedded as PNG data URLs (never a broken/missing-asset file path across
+    // every installed app), not a brand-assets/*.png file reference — EC-12.
+    expect(JAMANVAAR_LOGOS.horizontal).toMatch(/^data:image\/png;base64,/);
   });
 
   // TEST 2: Session Key Guard Isolation

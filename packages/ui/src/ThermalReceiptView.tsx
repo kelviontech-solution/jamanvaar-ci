@@ -1,5 +1,5 @@
 import React from 'react';
-import { Order, ReceiptConfig, KOTRecord } from '@jamanvaar/types';
+import { Order, ReceiptConfig, KOTRecord, recordedOrderBalance } from '@jamanvaar/types';
 import { formatDate, formatTime, splitTax, buildUpiPaymentUri, generateQrDataUrl } from '@jamanvaar/utils';
 import { JAMANVAAR_LOGOS } from './assets';
 import 'lucide-react';
@@ -59,13 +59,12 @@ export function paymentLabelFor(method: string | undefined): string {
 }
 
 /** Amounts come from confirmed allocations; choosing a tender is not a collection. */
-export function receiptPaymentSummary(order: Pick<Order, 'totalAmount' | 'paymentStatus' | 'paymentMethod' | 'paymentAllocationSummary'>) {
-  const total = Math.max(0, Math.round((order.totalAmount || 0) * 100));
-  const confirmed = ['SUCCESS', 'PAID', 'REFUNDED', 'PARTIALLY_REFUNDED', 'REFUND_PENDING'].includes(order.paymentStatus || '');
-  const collected = Math.max(0, order.paymentAllocationSummary?.collectedPaise ?? (confirmed ? total : 0));
-  const outstanding = Math.max(0, order.paymentAllocationSummary?.outstandingPaise ?? (confirmed ? 0 : total - collected));
+export function receiptPaymentSummary(order: Pick<Order, 'totalAmount' | 'paymentStatus' | 'paymentMethod' | 'paymentAllocationSummary'> & Partial<Pick<Order, 'orderStatus' | 'refundAmount'>>) {
+  const balance = recordedOrderBalance(order);
+  const collected = balance.collectedPaise, outstanding = balance.outstandingPaise;
+  const confirmed = !['DRAFT', 'CANCELLED'].includes(order.orderStatus ?? '') && ['SUCCESS', 'PAID', 'REFUNDED', 'PARTIALLY_REFUNDED', 'REFUND_PENDING'].includes(order.paymentStatus || '');
   const label = outstanding > 0 ? (order.paymentMethod === 'CASH_AT_COUNTER' || order.paymentMethod === 'CASH' ? 'PAYMENT DUE AT COUNTER' : 'PAYMENT PENDING') : confirmed || collected > 0 ? 'PAID VIA' : 'PAYMENT STATUS';
-  return { collected: collected / 100, outstanding: outstanding / 100, label };
+  return { collected: collected / 100, outstanding: outstanding / 100, refunded: balance.refundedPaise / 100, label };
 }
 
 /** Four slanted rows of the word, light enough to read the bill through it. */

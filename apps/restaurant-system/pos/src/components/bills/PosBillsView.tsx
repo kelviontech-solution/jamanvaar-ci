@@ -1,10 +1,11 @@
 import { ModalBackdrop } from '@jamanvaar/ui';
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { createRefund, CloudApiError } from '../../cloud/cloudClient';
 import { usePosStore } from '../../store/posStore';
 import { PosPrinterService } from '../../services/printerService';
+import { commitOrderReturn } from '../../services/financialActions';
 import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilder';
-import { db, OrderRepository, AuditRepository, isUnpaidOpenOrder } from '@jamanvaar/database';
+import { db, OrderRepository, AuditRepository, ShiftRepository, financialRequestFingerprint, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { CentralReportingService, CentralDatePreset } from '@jamanvaar/business';
 import { Order } from '@jamanvaar/types';
 import { formatINR, splitTax, formatSplitTax, toCsvRow } from '@jamanvaar/utils';
@@ -13,6 +14,8 @@ import { Receipt, Search, Printer, RotateCcw, Ban, Calendar, Download, FileSprea
 type TimePeriod = 'TODAY' | 'YESTERDAY' | 'THIS_WEEK' | 'THIS_MONTH' | 'ALL' | 'CUSTOM';
 
 export const PosBillsView: React.FC = () => {
+  const [dataRevision, setDataRevision] = useState(0);
+  useEffect(() => db.subscribe(() => setDataRevision(revision => revision + 1)), []);
   const {
     currentUser,
     setLastCompletedOrder,
@@ -42,6 +45,8 @@ export const PosBillsView: React.FC = () => {
   const [refundModalBill, setRefundModalBill] = useState<Order | null>(null);
   const [refundAmountInput, setRefundAmountInput] = useState('');
   const [refundReasonInput, setRefundReasonInput] = useState('Customer Request');
+  const [refundReturned, setRefundReturned] = useState(false);
+  const [refundReturnMethod, setRefundReturnMethod] = useState<'CASH' | 'UPI_TO_CUSTOMER'>('CASH');
   const [reopenModalBill, setReopenModalBill] = useState<Order | null>(null);
   const [reopenReasonInput, setReopenReasonInput] = useState('Bill Modification Needed');
 
@@ -101,7 +106,7 @@ export const PosBillsView: React.FC = () => {
     })
       .filter((o) => !isUnpaidOpenOrder(o))
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [db.orders.length, selectedPeriod, customStartDate, customEndDate]);
+  }, [dataRevision, selectedPeriod, customStartDate, customEndDate]);
 
   // Compute Period Overview Card Metrics (for Today, Yesterday, Week, Month)
   const periodOverview = useMemo(() => {
@@ -126,7 +131,7 @@ export const PosBillsView: React.FC = () => {
       week: { count: weekSummary.ordersCount, sales: weekSummary.netSales },
       month: { count: monthSummary.ordersCount, sales: monthSummary.netSales }
     };
-  }, [db.orders.length]);
+  }, [dataRevision]);
 
   // Apply Search, Filters, and Optional Date Drilldown
   const finalFilteredBills = useMemo(() => {
@@ -267,7 +272,7 @@ export const PosBillsView: React.FC = () => {
       if (o.cashierName) set.add(o.cashierName);
     });
     return Array.from(set);
-  }, [db.orders.length]);
+  }, [dataRevision]);
 
   // Actions
   const handleReprint = (bill: Order) => {
@@ -279,44 +284,63 @@ export const PosBillsView: React.FC = () => {
 
   const handleOpenRefundModal = (bill: Order) => {
     setRefundModalBill(bill);
-    setRefundAmountInput(String(bill.totalAmount));
+    setRefundAmountInput(String(Math.max(0, bill.totalAmount - (bill.refundAmount ?? 0))));
+    setRefundReturned(false);
   };
 
-  const handleConfirmRefund = (e: React.FormEvent) => {
+  const handleConfirmRefund = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!refundModalBill) return;
+    if (!refundReturned) { showToast('Confirm that the money has already been returned to the guest.'); return; }
 
-    const amt = Number(refundAmountInput) || refundModalBill.totalAmount;
-    const bill = refundModalBill;
+    const amt = Number(refundAmountInput);
+    if (!Number.isFinite(amt) || amt <= 0 || Math.round(amt * 100) / 100 !== amt || amt > refundModalBill.totalAmount - (refundModalBill.refundAmount ?? 0)) {
+      showToast('Enter a valid refund amount within the remaining refundable balance.'); return;
+    }
+    if (!db.supportsFinancialCommands()) { showToast('Refund recording needs SQLite storage. Restore local storage before issuing a refund.'); return; }
+    const payingShift = ShiftRepository.getActiveShift();
+    if (!payingShift) { showToast('Open the paying register in Shift & Cash before recording a return.'); return; }
+    const bill = structuredClone(refundModalBill);
+    const reason = refundReasonInput, method = refundReturnMethod;
     const isGatewayPayment = bill.paymentMethod === 'UPI' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(bill.paymentTransactionId ?? '');
-    const approvalScope = isGatewayPayment ? { action: 'REFUND' as const, paymentId: bill.paymentTransactionId!, amountPaise: Math.round(amt * 100), idempotencyKey: crypto.randomUUID() } : undefined;
+    // The same opening refundable balance represents the same return attempt,
+    // including after a reload/lost cloud response. Changed amount/reason must
+    // conflict on the server rather than create another return accidentally.
+    let idempotencyKey: string;
+    try {
+      idempotencyKey = `pos-return-${await financialRequestFingerprint(JSON.stringify({ restaurant: db.restaurant.id,
+        branch: db.outlet.id, orderId: bill.id, paymentId: bill.paymentTransactionId, refundedBefore: bill.refundAmount ?? 0 }))}`;
+    } catch { showToast('Secure return recording is unavailable. Keep the original bill and contact support.'); return; }
+    const approvalScope = isGatewayPayment ? { action: 'REFUND' as const, paymentId: bill.paymentTransactionId!, amountPaise: Math.round(amt * 100), idempotencyKey } : undefined;
 
     requestManagerOverride(
       'REFUND',
       `Process Refund on Invoice #${bill.orderNumber}`,
       `Refunding ₹${amt} on settled bill #${bill.orderNumber}`,
       async (mgr) => {
-        // Only a real Razorpay UPI payment has a paymentTransactionId that
-        // matches a cloud PaymentTransaction — a locally-generated cash
-        // receipt id never does, so cash/card orders fall straight through
-        // to the existing local-only refund, unchanged.
+        // This endpoint records a restaurant-paid manual return. It does
+        // not initiate a Razorpay transfer to the guest.
         if (isGatewayPayment && bill.paymentTransactionId) {
           try {
-            const refund = await createRefund(bill.paymentTransactionId, Math.round(amt * 100), refundReasonInput, mgr, approvalScope?.idempotencyKey);
+            const refund = await createRefund(bill.paymentTransactionId, Math.round(amt * 100), reason, mgr, approvalScope?.idempotencyKey, method);
             if (refund.status !== 'processed') {
               setRefundModalBill(null);
-              showToast(`Refund requested for Invoice #${bill.orderNumber}. Awaiting payment-provider confirmation.`);
+              showToast(`Return recording for Invoice #${bill.orderNumber} needs reconciliation. Keep the original reference; do not return money twice.`);
               return;
             }
           } catch (err) {
             const message = err instanceof CloudApiError ? err.message : 'Refund request failed';
-            showToast(`Refund failed for Invoice #${bill.orderNumber}: ${message}`);
+            showToast(`Return recording was not confirmed for Invoice #${bill.orderNumber}: ${message}. Do not return the money again; retry the same record.`);
             return; // never flip local status on a failed cloud refund
           }
         }
 
         try {
-          OrderRepository.refundOrder(bill.id, amt, refundReasonInput, mgr);
+          const savedReturn = await commitOrderReturn({ kind: 'REFUND', orderId: bill.id, amount: amt, reason, actor: mgr,
+            expectedRefundBefore: bill.refundAmount ?? 0, returnOptions: { idempotencyKey, payingShiftId: payingShift.id, method } });
+          setRefundModalBill(null);
+          try { await db.acknowledgeFinancialMutation(savedReturn.operationId); }
+          catch { showToast('Refund recorded; local acknowledgement needs recovery. Do not issue it again.'); return; }
         } catch (err: any) {
           showToast(`Refund failed for Invoice #${bill.orderNumber}: ${err?.message || 'Unknown error'}`);
           return;
@@ -324,7 +348,7 @@ export const PosBillsView: React.FC = () => {
         AuditRepository.log({
           action: 'REFUND_INVOICE',
           category: 'PAYMENT',
-          details: `Refunded ₹${amt} on #${bill.orderNumber}. Reason: ${refundReasonInput}`,
+          details: `Refunded ₹${amt} on #${bill.orderNumber}. Reason: ${reason}`,
           username: mgr
         });
         setRefundModalBill(null);
@@ -1113,6 +1137,7 @@ export const PosBillsView: React.FC = () => {
                 </label>
                 <input
                   type="number"
+                  step="0.01"
                   required
                   min="1"
                   max={refundModalBill.totalAmount}
@@ -1120,6 +1145,17 @@ export const PosBillsView: React.FC = () => {
                   onChange={(e) => setRefundAmountInput(e.target.value)}
                   className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-lg font-mono font-black text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
+              </div>
+
+              <div className="space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-3">
+                <p>This records money you returned to the guest. It does not send a Razorpay refund.</p>
+                <label className="block font-bold">Return method
+                  <select aria-label="Return method" value={refundReturnMethod} onChange={event => setRefundReturnMethod(event.target.value as 'CASH' | 'UPI_TO_CUSTOMER')} className="mt-1 w-full rounded-lg border p-2">
+                    <option value="CASH">Cash handed to guest</option>
+                    <option value="UPI_TO_CUSTOMER">UPI sent from restaurant account</option>
+                  </select>
+                </label>
+                <label className="flex items-start gap-2"><input type="checkbox" checked={refundReturned} onChange={event => setRefundReturned(event.target.checked)} />I confirm the money has already been returned. Recording or retrying this must not pay the guest again.</label>
               </div>
 
               <div>
@@ -1149,6 +1185,7 @@ export const PosBillsView: React.FC = () => {
                 </button>
                 <button
                   type="submit"
+                  disabled={!refundReturned}
                   className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black shadow-xs"
                 >
                   Confirm Refund

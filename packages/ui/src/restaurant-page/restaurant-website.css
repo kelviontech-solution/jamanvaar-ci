@@ -1,0 +1,593 @@
+/* Restaurant website: a short editorial journey. The full catalogue lives in the menu dialog. */
+.rp-heritage .rp-hero {
+  position: relative;
+  display: block;
+  padding: 0;
+  min-height: 650px;
+  background: #172e29;
+  overflow: hidden;
+}
+.rp-heritage .rp-hero-photo {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.rp-heritage .rp-hero-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #071d19eb, #071d19ad 43%, #071d1930);
+}
+.rp-heritage .rp-hero-photo > img {
+  object-position: 75% 50%;
+}
+.rp-heritage .rp-hero-copy {
+  position: relative;
+  z-index: 1;
+  min-height: 650px;
+  max-width: 940px;
+  padding: 84px 7%;
+  color: #fff9ed;
+  gap: 26px;
+}
+.rp-heritage .rp-hero-copy h1 {
+  font-size: clamp(44px, 5.8cqw, 84px);
+  line-height: 1.03;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.rp-heritage .rp-hero-copy .rp-kicker {
+  color: #e6c894;
+}
+.rp-heritage .rp-hero-copy .rp-welcome {
+  max-width: 490px;
+  color: #f2ece0;
+  font-size: 16px;
+}
+.rp-page .rp-hero-copy .rp-secondary {
+  border-color: currentColor;
+}
+.rp-heritage .rp-hero-copy .rp-secondary {
+  color: #fff9ed;
+  border-color: #f4e7d780;
+}
+.rp-heritage .rp-hero .rp-photo-caption {
+  left: auto;
+  right: 5%;
+  bottom: 26px;
+  z-index: 2;
+  max-width: 35%;
+}
+.rp-heritage .rp-hero .rp-branch {
+  color: #f2e5cf;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.rp-signatures {
+  padding-top: 76px;
+  padding-bottom: 64px;
+}
+.rp-section-intro {
+  margin-top: 14px !important;
+  max-width: 560px;
+  color: var(--rp-ink);
+  opacity: 0.75;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.rp-signatures .rp-dishes {
+  gap: 26px;
+}
+.rp-signatures .rp-dish {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+.rp-signatures .rp-dish > img,
+.rp-signatures .rp-dish > .rp-photo-empty {
+  border-radius: 120px 120px 10px 10px;
+  height: 285px;
+  aspect-ratio: auto;
+}
+.rp-signatures .rp-dish > div:not(.rp-photo-empty) {
+  padding: 22px 0 12px;
+}
+.rp-signatures .rp-dish h3 {
+  font:
+    500 23px/1.25 Georgia,
+    serif;
+}
+.rp-signatures .rp-dish p {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.rp-signatures .rp-dish-price {
+  border-top: 1px solid var(--rp-line);
+  padding-top: 14px;
+}
+.rp-page .rp-about {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 8%;
+  margin: 0;
+  padding: 70px 6%;
+  border: 0;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--rp-accent) 6%, var(--rp-bg));
+}
+.rp-story-photo {
+  position: relative;
+  align-self: stretch;
+  min-height: 400px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.rp-story-photo > img,
+.rp-story-photo > .rp-photo-empty {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+}
+.rp-story-photo-label {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  width: fit-content;
+  padding: 8px 14px;
+  background: #16332ce6;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 11px;
+}
+.rp-about h2 {
+  margin-block: 18px 24px;
+  font-size: clamp(32px, 3.5cqw, 52px);
+  line-height: 1.1;
+}
+.rp-about > div > p:last-of-type {
+  font-size: 15px;
+  line-height: 1.9;
+  white-space: pre-line;
+}
+.rp-gallery-section {
+  padding-block: 70px;
+}
+.rp-gallery-section .rp-carousel {
+  margin-top: 30px;
+}
+.rp-gallery-section .rp-carousel-slide img {
+  border-radius: 12px;
+}
+.rp-menu-invitation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 36px;
+  padding: 54px 6%;
+  background: #183c32;
+  color: #fff7e8;
+}
+.rp-menu-invitation .rp-kicker {
+  color: #e5c48d;
+}
+.rp-menu-invitation h2 {
+  font:
+    500 clamp(30px, 3.6cqw, 48px)/1.12 Georgia,
+    serif;
+  margin: 12px 0;
+}
+.rp-menu-invitation p:last-child {
+  font-size: 14px;
+  opacity: 0.8;
+}
+.rp-menu-invitation .rp-secondary {
+  flex-shrink: 0;
+  color: #fff7e8;
+  border-color: #fff7e880;
+}
+.rp-visit {
+  padding-block: 70px;
+}
+.rp-visit > div:first-child h2 {
+  margin-block: 14px;
+}
+.rp-visit > div:nth-child(2) {
+  background: color-mix(in srgb, white 50%, var(--rp-bg));
+  border: 1px solid var(--rp-line);
+  padding: 28px;
+  border-radius: 14px;
+}
+.rp-page .rp-map {
+  margin-top: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.rp-load-map {
+  width: 100%;
+  min-height: 245px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 24px;
+  border: 0;
+  background:
+    repeating-linear-gradient(35deg, transparent 0 40px, #c5d5ca55 40px 42px), repeating-linear-gradient(125deg, transparent 0 65px, #c5d5ca66 65px 68px),
+    #edf0e5;
+  color: #163c30;
+  text-align: center;
+}
+.rp-load-map .rp-map-pin {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #163c30;
+  color: #fff;
+  font-size: 30px;
+}
+.rp-load-map strong {
+  font-size: 15px;
+}
+.rp-load-map > span:not(.rp-map-pin),
+.rp-load-map small {
+  font-size: 11px;
+  line-height: 1.6;
+  max-width: 270px;
+}
+.rp-testimonials {
+  margin-top: 30px;
+}
+.rp-testimonial {
+  border-radius: 12px;
+  padding: 26px;
+}
+.rp-footer {
+  border-top: 1px solid #ffffff30;
+}
+
+.rp-page .rp-menu-dialog {
+  color: var(--rp-ink);
+  background: var(--rp-bg);
+  border: 0;
+  border-radius: 18px;
+  padding: 0;
+  width: min(1100px, calc(100vw - 48px));
+  max-width: none;
+  height: min(880px, calc(100dvh - 48px));
+  max-height: none;
+  margin: auto;
+  overflow: auto;
+  box-shadow: 0 30px 100px #0005;
+  font: inherit;
+}
+.rp-menu-dialog::backdrop {
+  background: #091d1bd9;
+  backdrop-filter: blur(5px);
+}
+.rp-page .rp-menu-dialog[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+.rp-menu-dialog .rp-menu-section {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.rp-sticky-action[hidden] {
+  display: none !important;
+}
+.rp-menu-dialog-heading {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 5%;
+  border-bottom: 1px solid var(--rp-line);
+  background: var(--rp-bg);
+}
+.rp-menu-dialog-heading h2 {
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 6px 0;
+}
+.rp-menu-dialog-heading p:last-child {
+  font-size: 12px;
+  opacity: 0.7;
+  max-width: 420px;
+}
+.rp-menu-close {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--rp-line);
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  font-size: 28px !important;
+  line-height: 1;
+}
+.rp-menu-dialog .rp-menu-section {
+  padding: 28px 5%;
+}
+.rp-menu-dialog .rp-menu-section .rp-section-title {
+  display: none;
+}
+.rp-menu-dialog-order {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 5%;
+  background: var(--rp-bg);
+  border-top: 1px solid var(--rp-line);
+}
+.rp-menu-dialog-order p {
+  font-size: 13px;
+}
+.rp-menu-dialog-order .rp-order {
+  min-width: 0;
+  margin: 0;
+  padding: 12px 24px;
+}
+@container rp-layout (max-width: 760px) {
+  .rp-page .rp-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto 44px;
+    gap: 8px;
+    padding: 12px 5%;
+  }
+  .rp-header .rp-wordmark {
+    font-size: 12px;
+    line-height: 1.4;
+    gap: 8px;
+  }
+  .rp-wordmark > span[title] {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .rp-header .rp-brand-initial,
+  .rp-header .rp-wordmark img {
+    width: 36px;
+    height: 36px;
+  }
+  .rp-header .rp-nav-toggle {
+    width: 44px;
+    height: 44px;
+  }
+  .rp-header .rp-nav {
+    grid-column: 1 / -1;
+  }
+  .rp-header .rp-header-actions {
+    min-width: 0;
+    margin: 0;
+  }
+  .rp-header .rp-nav-order {
+    font-size: 12px;
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+  .rp-page .rp-hero-actions > * {
+    min-height: 48px;
+    font-size: 13px;
+  }
+  .rp-page input,
+  .rp-page select,
+  .rp-page textarea {
+    font-size: 16px;
+    min-height: 48px;
+  }
+  .rp-page .rp-reserve-form input,
+  .rp-page .rp-reserve-form textarea {
+    font-size: 16px;
+    width: 100%;
+    min-width: 0;
+    padding: 13px 12px;
+  }
+  .rp-reserve-form button {
+    align-self: stretch;
+    min-height: 48px;
+  }
+  .rp-page .rp-footer nav {
+    gap: 8px;
+    align-items: stretch;
+  }
+  .rp-footer nav a {
+    border: 1px solid #ffffff30;
+    border-radius: 8px;
+    padding: 10px 12px;
+    min-height: 44px;
+    font-size: 12px;
+    text-decoration: none;
+  }
+  .rp-page .rp-sticky-action {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .rp-sticky-action .rp-order {
+    min-height: 48px;
+  }
+  .rp-heritage .rp-hero,
+  .rp-heritage .rp-hero-copy {
+    min-height: 510px;
+  }
+  .rp-heritage .rp-hero-copy {
+    padding: 40px 6% 74px;
+    max-width: 100%;
+    gap: 22px;
+  }
+  .rp-heritage .rp-hero-copy h1 {
+    font-size: clamp(36px, 10cqw, 58px);
+  }
+  .rp-heritage .rp-hero-photo {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+  }
+  .rp-heritage .rp-hero-photo::after {
+    background: linear-gradient(90deg, #071d19e8, #071d19a8), linear-gradient(0deg, #071d19a8, transparent);
+  }
+  .rp-heritage .rp-hero-copy .rp-welcome {
+    font-size: 15px;
+  }
+  .rp-heritage .rp-hero .rp-photo-caption {
+    right: auto;
+    left: 6%;
+    bottom: 22px;
+    max-width: 85%;
+  }
+  .rp-signatures,
+  .rp-gallery-section,
+  .rp-visit {
+    padding-block: 42px;
+  }
+  .rp-signatures .rp-dishes {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 12px;
+  }
+  .rp-signatures .rp-dish {
+    flex: 0 0 84%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+  .rp-signatures .rp-dish > img,
+  .rp-signatures .rp-dish > .rp-photo-empty {
+    height: 270px;
+    border-radius: 80px 80px 10px 10px;
+  }
+  .rp-page .rp-about {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 42px 6%;
+  }
+  .rp-story-photo {
+    min-height: 300px;
+  }
+  .rp-story-photo > img,
+  .rp-story-photo > .rp-photo-empty {
+    min-height: 300px;
+  }
+  .rp-menu-invitation {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 40px 6%;
+  }
+  .rp-visit > div:nth-child(2) {
+    padding: 20px;
+  }
+  .rp-page .rp-menu-dialog {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+  }
+  .rp-menu-dialog-heading {
+    padding: max(16px, env(safe-area-inset-top)) 5% 16px;
+  }
+  .rp-menu-dialog-heading .rp-kicker {
+    max-width: 220px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .rp-menu-dialog .rp-menu-section {
+    padding: 16px 5%;
+  }
+  .rp-menu-dialog .rp-menu-toolbar {
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .rp-menu-dialog .rp-menu-toolbar label {
+    flex-basis: 100%;
+  }
+  .rp-menu-dialog .rp-dishes-compact .rp-dish {
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 14px;
+  }
+  .rp-menu-dialog .rp-dishes-compact .rp-dish > img,
+  .rp-menu-dialog .rp-dishes-compact .rp-dish > .rp-photo-empty {
+    width: 76px;
+    height: 84px;
+  }
+  .rp-menu-dialog-order {
+    padding: 12px 5% max(12px, env(safe-area-inset-bottom));
+  }
+  .rp-menu-dialog-order .rp-order {
+    min-height: 48px;
+    font-size: 14px;
+    padding: 12px 18px;
+  }
+  .rp-menu-dialog-heading h2 {
+    font-size: 26px;
+  }
+  .rp-menu-dialog-order p {
+    max-width: 130px;
+    font-size: 12px;
+  }
+}
+@container rp-layout (max-width: 350px) {
+  .rp-page .rp-header {
+    padding-inline: 12px;
+    gap: 6px;
+  }
+  .rp-header .rp-wordmark {
+    font-size: 11px;
+  }
+  .rp-header .rp-brand-initial {
+    display: none;
+  }
+  .rp-page .rp-hero-actions {
+    gap: 10px;
+  }
+  .rp-page .rp-hero-actions > * {
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+  .rp-page .rp-reserve-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rp-menu-dialog-heading h2 {
+    font-size: 23px;
+  }
+  .rp-menu-dialog-order p {
+    max-width: 105px;
+  }
+}
+.rp-page .rp-menu-categories {display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scroll-padding:8px;}
+.rp-page .rp-menu-categories button {flex:0 0 auto;min-height:44px;padding:10px 16px;border:1px solid var(--rp-border,#d8ddd5);border-radius:999px;background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer;}
+.rp-page .rp-menu-categories button[aria-pressed="true"] {background:var(--rp-accent,#245b45);color:white;border-color:transparent;}
+.rp-page .rp-opening-status {display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 16px;padding:14px 20px;background:#f4f5ee;color:#263d2b;font-size:14px;}
+.rp-page .rp-opening-status strong::before {content:'';display:inline-block;width:8px;height:8px;margin-right:8px;background:#35784c;border-radius:50%;}
+.rp-page .rp-opening-status.is-closed strong::before {background:#9a623c;}
+.rp-page .rp-opening-status small {opacity:.8;}

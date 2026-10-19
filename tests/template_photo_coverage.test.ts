@@ -29,7 +29,7 @@ describe('complete template photo delivery', () => {
       }
     }
     expect({ dishes, categories, combos }).toEqual({ dishes: 652, categories: 199, combos: 27 });
-  });
+  }, 20_000); // Hundreds of real file checks; not an application response-time assertion.
   it('uses template identity for category covers and preserves restaurant category uploads', () => {
     expect(TEMPLATE_CATEGORY_PHOTOS).toHaveLength(199);
     for (const photo of TEMPLATE_CATEGORY_PHOTOS) {
@@ -55,7 +55,7 @@ describe('complete template photo delivery', () => {
         expect(crypto.createHash('sha256').update(delivered).digest('hex')).toBe(photo.sha256);
       }
     }
-  }, 20000);
+  }, 60_000); // Hash every byte in all six deliveries, including slow Windows/OneDrive I/O.
   it('never shares a photo between different dish names, combos or template categories', () => {
     const dishPhotos = new Map<string, string>();
     const categories: string[] = [], combos: string[] = [];

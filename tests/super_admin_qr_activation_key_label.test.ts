@@ -45,14 +45,20 @@ describe("Super Admin: generating a key for an app the restaurant's plan doesn't
   });
 
   it('shows a clear, actionable warning instead of silently letting the key generate', () => {
-    expect(src.toLowerCase()).toMatch(/isn.t enabled.*(restaurant|plan)|not enabled.*(restaurant|plan)/s);
-    expect(src).toMatch(/Applications tab/);
+    // Reworded since this test was written ("is unavailable" / "Products & access" / "pairing
+    // code"), but the same requirement still holds: name the restaurant/branch scope, point at the
+    // real tab that fixes it, and explain the consequence — not just a generic error.
+    expect(src.toLowerCase()).toMatch(/unavailable for the selected restaurant or branch/);
+    expect(src).toMatch(/Products & access/);
   });
 
-  it('disables the Generate key submit button while the app is not enabled, so a doomed key can\'t be created at all', () => {
-    const submitButtonBlock = src.slice(src.indexOf('Generate key'), src.indexOf('Generate key') + 1).length
-      ? src.slice(Math.max(0, src.lastIndexOf('<Button type="submit"', src.indexOf('Generate key'))), src.indexOf('Generate key') + 20)
-      : '';
+  it('disables the Create pairing code submit button while the app is not enabled, so a doomed key can\'t be created at all', () => {
+    // The button's own label changed ("Generate key" -> "Create pairing code" — matching the
+    // "pairing code" terminology used throughout this modal); locate it by its submit type instead
+    // of stale button text, then confirm its disabled condition still gates on appEnabled.
+    const buttonStart = src.indexOf('<Button type="submit"');
+    expect(buttonStart, 'expected a <Button type="submit"> in this modal').toBeGreaterThanOrEqual(0);
+    const submitButtonBlock = src.slice(buttonStart, src.indexOf('>', buttonStart) + 1);
     expect(submitButtonBlock).toMatch(/appEnabled === false/);
   });
 });

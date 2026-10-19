@@ -107,6 +107,16 @@ describe('Branch Core: authorization (works with the internet down)', () => {
     h.core.applyRoster(roster);
     expect((await h.call(tok('pos2'), 'GET', '/api/v1/orders/sync?afterSeq=0')).body.code).toBe('DEVICE_REVOKED');
   });
+  it('stops branch operations when the refreshed roster deactivates or omits the branch, while allowing device recovery polling', async () => {
+    h = await start();
+    const roster = ROSTER(); roster.branches[0].status = 'INACTIVE'; h.core.applyRoster(roster);
+    expect((await h.call(tok('pos1'), 'GET', '/api/v1/orders/sync?afterSeq=0')).body.code).toBe('BRANCH_INACTIVE');
+    expect((await h.call(tok('pos1'), 'PATCH', '/api/v1/devices/me/heartbeat', {})).status).toBe(200);
+    roster.branches = []; h.core.applyRoster(roster);
+    expect((await h.call(tok('pos1'), 'GET', '/api/v1/orders/sync?afterSeq=0')).body.code).toBe('BRANCH_INACTIVE');
+    h.core.applyRoster(ROSTER());
+    expect((await h.call(tok('pos1'), 'GET', '/api/v1/orders/sync?afterSeq=0')).status).toBe(200);
+  });
 
   it('offline policy: keeps working for 7 days after last cloud contact even past subscription expiry, then stops', async () => {
     h = await start();
@@ -250,9 +260,37 @@ describe('Branch Core: exactly-once and crash safety', () => {
     expect(s2.schemaVersion).toBe(SCHEMA_VERSION);
     s2.close();
   });
+  it('adds stock branch provenance to a v2 installation without dropping its historical movement or pending work', () => {
+    const file = join(dir, 'branch-provenance.sqlite3');
+    const previous = new BranchStore(file);
+    previous.db.exec('DROP INDEX movements_by_branch_seq; ALTER TABLE movements DROP COLUMN branch_id; PRAGMA user_version = 2');
+    previous.run("INSERT INTO movements (movement_id, device_id, item_id, item_name, type, quantity_delta, unit, reason, occurred_at, seq) VALUES ('old-stock', 'cloud', 'rice', 'Rice', 'PURCHASE', 10, 'kg', '', '2026-10-18', 1)");
+    previous.run("INSERT INTO cloud_outbox (kind, dedupe_key, payload, created_at) VALUES ('order', 'pending-bill', '{}', 0)");
+    previous.close();
+    const migrated = new BranchStore(file);
+    try {
+      expect(migrated.schemaVersion).toBe(SCHEMA_VERSION);
+      expect(migrated.get("SELECT movement_id, quantity_delta, branch_id FROM movements WHERE movement_id = 'old-stock'")).toEqual({ movement_id: 'old-stock', quantity_delta: 10, branch_id: null });
+      expect(migrated.get("SELECT status FROM cloud_outbox WHERE dedupe_key = 'pending-bill'")).toEqual({ status: 'PENDING' });
+    } finally { migrated.close(); }
+  });
 });
 
 describe('Branch Core: multi-device business rules', () => {
+  it('keeps kiosk order reads and writes private after POS edits and refuses a forged creator', async () => {
+    h = await start();
+    await h.call(tok('pos1'), 'POST', '/api/v1/orders/sync', { events: [order('counter-private', { eventId: 'staff-private' })] });
+    const own = order('guest-own', { eventId: 'guest-private', meta: { originDeviceId: 'pos1', customerName: 'Guest' } });
+    expect((await h.call(tok('kiosk1'), 'POST', '/api/v1/orders/sync', { events: [own] })).body.results[0].status).toBe('ok');
+    expect((await h.call(tok('kiosk1'), 'GET', '/api/v1/orders/sync?afterSeq=0')).body.orders.map((row: any) => row.externalOrderId)).toEqual(['guest-own']);
+    expect((await h.call(tok('kiosk1'), 'GET', '/api/v1/orders/sync')).body.orders.map((row: any) => row.externalOrderId)).toEqual(['guest-own']);
+    const attack = await h.call(tok('kiosk1'), 'POST', '/api/v1/orders/sync', { events: [order('counter-private', { eventId: 'steal-private', meta: { originDeviceId: 'kiosk1' } })] });
+    expect(attack.body.results[0]).toMatchObject({ status: 'error', error: expect.stringContaining('ORDER_NOT_AVAILABLE') });
+    await h.call(tok('pos1'), 'POST', '/api/v1/orders/sync', { events: [{ ...own, eventId: 'counter-acknowledged', status: 'CONFIRMED', meta: { originDeviceId: 'pos1' } }] });
+    const visible = (await h.call(tok('kiosk1'), 'GET', '/api/v1/orders/sync?afterSeq=0')).body.orders;
+    expect(visible).toHaveLength(1); expect(visible[0]).toMatchObject({ externalOrderId: 'guest-own', status: 'CONFIRMED', meta: { originDeviceId: 'kiosk1' } });
+    expect((await h.call(tok('pos1'), 'GET', '/api/v1/orders/sync?afterSeq=0')).body.orders).toHaveLength(2);
+  });
   it('two terminals cannot both pay one order', async () => {
     h = await start();
     const paid = (txn: string) => order('pay-1', { status: 'COMPLETED', paymentStatus: 'SUCCESS', paymentMethod: 'CASH', meta: { paymentTransactionId: txn } });
@@ -378,6 +416,19 @@ describe('Branch Core: serving the KDS with no internet, and support status', ()
 
 
 describe('Branch Core entity upload acknowledgements', () => {
+  it('checks local server revisions, retains identical retries and rejects future clocks', () => {
+    const store = new BranchStore(':memory:');
+    const core = new BranchCore(store, { restaurantId: 'r', branchId: 'b', branchCode: 'B' });
+    try {
+      const first = { externalId: 'category', baseSyncVersion: 0, payload: { id: 'category', name: 'First', updatedAt: '2026-01-01T00:00:00Z' } };
+      expect(core.pushEntities({ id: 'admin' }, 'MENU_CATEGORY', [first]).results[0]).toMatchObject({ status: 'ok', syncVersion: 1 });
+      expect(core.pushEntities({ id: 'admin' }, 'MENU_CATEGORY', [first]).results[0]).toMatchObject({ status: 'ok', syncVersion: 1 });
+      expect(core.pullEntities('MENU_CATEGORY').entities[0].syncVersion).toBe(1);
+      expect(core.pushEntities({ id: 'other' }, 'MENU_CATEGORY', [{ ...first, payload: { ...first.payload, name: 'Lost edit' } }]).results[0]).toMatchObject({ status: 'error', error: expect.stringContaining('ENTITY_VERSION_CONFLICT') });
+      expect(core.pushEntities({ id: 'admin' }, 'MENU_CATEGORY', [{ ...first, baseSyncVersion: 1, payload: { ...first.payload, name: 'Future', updatedAt: '2050-01-01T00:00:00Z' } }]).results[0]).toMatchObject({ status: 'error', error: expect.stringContaining('DEVICE_CLOCK_AHEAD') });
+      expect(core.pushEntities({ id: 'admin' }, 'MENU_CATEGORY', [{ ...first, baseSyncVersion: 1, payload: { ...first.payload, name: 'Reviewed', updatedAt: '2025-01-01T00:00:00Z' } }]).results[0]).toMatchObject({ status: 'ok', syncVersion: 2 });
+    } finally { store.close(); }
+  });
   it('keeps an edit made during an upload dirty until that new payload is acknowledged', () => {
     const store = new BranchStore(':memory:');
     const core = new BranchCore(store, { restaurantId: 'r', branchId: 'b', branchCode: 'B' });
@@ -386,9 +437,9 @@ describe('Branch Core entity upload acknowledgements', () => {
       const second = { ...first, name: 'Second', updatedAt: '2026-10-02T00:00:00Z' };
       core.pushEntities({ id: 'admin' }, 'MENU_ITEM', [{ externalId: 'dish', payload: first }]);
       core.pushEntities({ id: 'admin' }, 'MENU_ITEM', [{ externalId: 'dish', payload: second }]);
-      core.clearDirty('MENU_ITEM', 'dish', first);
+      core.clearDirty('MENU_ITEM', 'dish', first, 1);
       expect(core.dirtyEntities()).toHaveLength(1);
-      core.clearDirty('MENU_ITEM', 'dish', second);
+      core.clearDirty('MENU_ITEM', 'dish', second, 2);
       expect(core.dirtyEntities()).toEqual([]);
     } finally { store.close(); }
   });

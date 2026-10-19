@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore } from '../../store/captainStore';
 import { X, AlertTriangle } from 'lucide-react';
@@ -17,13 +17,15 @@ interface Props {
  * manager: the manager keys in their PIN here (a manager who is signed in does not need to).
  */
 export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCancelled }) => {
-  useEscapeToClose(!!dish, onClose);
   const cancelDish = useCaptainStore((s) => s.cancelDish);
   const [reason, setReason] = useState('');
   const [custom, setCustom] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const saving = useRef(false);
+  const close = () => { if (!saving.current) onClose(); };
+  useEscapeToClose(!!dish, close);
 
   useEffect(() => {
     if (dish) {
@@ -39,12 +41,17 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
   const finalReason = reason === 'Other' ? custom.trim() : reason;
 
   const submit = async () => {
+    if (saving.current) return;
+    saving.current = true;
     setError('');
     setBusy(true);
-    const result = await cancelDish(dish.orderItemId, finalReason, pin || undefined);
-    setBusy(false);
-    if (result.ok) onCancelled();
-    else setError(result.error);
+    try {
+      const result = await cancelDish(dish.orderItemId, finalReason, pin || undefined);
+      if (result.ok) onCancelled();
+      else setError(result.error);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Cancellation was not confirmed. Keep this bill and retry the same action.');
+    } finally { saving.current = false; setBusy(false); }
   };
 
   return (
@@ -59,7 +66,7 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
             <p className="text-sm font-bold text-slate-700 mt-1 break-words">{dish.quantity}× {dish.name}</p>
             <p className="text-xs text-slate-500 mt-0.5">It is taken off the bill and the kitchen is told to stop.</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close" className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 cursor-pointer shrink-0">
+          <button type="button" onClick={close} disabled={busy} aria-label="Close" className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 cursor-pointer shrink-0">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -71,6 +78,7 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
               <button
                 key={r}
                 type="button"
+                disabled={busy}
                 onClick={() => setReason(r)}
                 className={`px-3 py-2 rounded-xl text-xs font-bold border cursor-pointer min-h-[40px] ${reason === r ? 'bg-rose-600 text-white border-rose-600' : 'bg-jaman-cream text-slate-700 border-jaman-border'}`}
               >
@@ -81,6 +89,7 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
           {reason === 'Other' && (
             <input
               type="text"
+              disabled={busy}
               value={custom}
               onChange={(e) => setCustom(e.target.value)}
               placeholder="Type the reason"
@@ -94,6 +103,7 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
           <label htmlFor="cancel-pin" className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Manager PIN</label>
           <input
             id="cancel-pin"
+            disabled={busy}
             type="password"
             inputMode="numeric"
             autoComplete="off"
@@ -109,7 +119,7 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
         {error && <p role="alert" className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{error}</p>}
 
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={onClose} className="py-3 rounded-2xl bg-jaman-cream border border-jaman-border text-slate-700 font-bold text-sm cursor-pointer">
+          <button type="button" onClick={close} disabled={busy} className="py-3 rounded-2xl bg-jaman-cream border border-jaman-border text-slate-700 font-bold text-sm cursor-pointer">
             Keep dish
           </button>
           <button

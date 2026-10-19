@@ -606,7 +606,7 @@ export class QrPublicService {
       .catch(() => undefined);
   }
 
-  async guestEvent(token: string, type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED' | 'QR_ITEM_VIEWED', session?: string, itemId?:string) {
+  async guestEvent(token: string, type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED' | 'QR_ITEM_VIEWED' | 'QR_QUOTE_RETRY' | 'QR_PAYMENT_RETRY', session?: string, itemId?:string) {
     const ctx = await this.resolve(token);
     if (!session) throw new BadRequestException('A guest session is required');
     const menuItem=itemId?(await this.menus.build(ctx.restaurant.id,ctx.branch.id)).items.find(i=>i.id===itemId):undefined;

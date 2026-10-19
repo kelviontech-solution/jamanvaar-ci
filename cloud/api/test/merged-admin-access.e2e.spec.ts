@@ -100,9 +100,10 @@ describe('Merged Restaurant Admin access after kiosk-key activation', () => {
   it('counts a merged POS_ADMIN console against a kiosk-only admin quota and leaves a refused key unused', async () => {
     const f = await fixture(['KIOSK', 'KIOSK_ADMIN']);
     expect((await platform('patch', `/api/v1/subscriptions/${f.subscriptionId}/applications/KIOSK_ADMIN`).send({ deviceQuota: 1 })).status).toBe(200);
-    expect((await f.activate()).status).toBe(200);
     const nextKey = await platform('post', '/api/v1/activation-keys').send({ restaurantId: f.restaurantId, allowedDeviceType: 'KIOSK_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
     expect(nextKey.status).toBe(201);
+    expect((await f.activate()).status).toBe(200);
+    expect((await platform('post', '/api/v1/activation-keys').send({ restaurantId: f.restaurantId, allowedDeviceType: 'KIOSK_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() })).status).toBe(409);
     expect((await f.activate(nextKey.body.code)).status).toBe(409);
     const key = await prisma.runAsPlatform(tx => tx.activationKey.findUniqueOrThrow({ where: { id: nextKey.body.id } }));
     expect(key.status).toBe('ACTIVE');

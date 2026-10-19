@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-17",
+  "head": "ccf17d93288ede1a1bdf7bb2c150adf84ec88e72",
+  "markdownFiles": 13,
+  "documentedFindingsAndRisks": 16,
+  "uniqueIds": 16,
+  "brokenLinks": [],
+  "backendHarnessErrors": 0,
+  "browserEntries": 8,
+  "browserPageErrors": 0,
+  "browserHarnessErrors": 0,
+  "observedHorizontalOverflow": 0,
+  "suiteResults": [
+    {
+      "name": "root-tests-rerun",
+      "files": 321,
+      "tests": 2249,
+      "passed": 2241,
+      "failed": 8,
+      "skipped": 0
+    },
+    {
+      "name": "api-tests",
+      "files": 165,
+      "tests": 1542,
+      "passed": 1522,
+      "failed": 20,
+      "skipped": 0
+    },
+    {
+      "name": "probes",
+      "files": 1,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "cleanup": {
+    "at": "2026-10-17T15:19:20.162Z",
+    "ownedDisposableDatabaseRemoved": true,
+    "historicalPerformanceArtifactRestored": true,
+    "applicationFilesChangedByAudit": false,
+    "concurrentApplicationEditsPreserved": true
+  },
+  "applicationFixesPerformed": false
+}

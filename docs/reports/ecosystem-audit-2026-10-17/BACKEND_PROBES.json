@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-17T15:06:43.578Z",
+  "scope": "Actual service/database-loop probes in one uncommitted disposable transaction. Not HTTP authorization or physical disaster-recovery acceptance.",
+  "observations": [
+    {
+      "name": "Tenant-table RLS metadata",
+      "tenantTables": 45,
+      "withoutForcedRls": [
+        {
+          "table_name": "AuditLog",
+          "relrowsecurity": false,
+          "relforcerowsecurity": false
+        },
+        {
+          "table_name": "PlatformNotification",
+          "relrowsecurity": false,
+          "relforcerowsecurity": false
+        }
+      ]
+    },
+    {
+      "name": "Future-clock edit suppresses a later real-time correction",
+      "first": {
+        "externalId": "audit-a6288cbe-a14d-4ec0-8f14-81376805b1f4",
+        "status": "ok",
+        "syncVersion": 1
+      },
+      "second": {
+        "externalId": "audit-a6288cbe-a14d-4ec0-8f14-81376805b1f4",
+        "status": "ok",
+        "syncVersion": 1
+      },
+      "persistedName": "Future-clock edit"
+    },
+    {
+      "name": "Partial-refund sales classification",
+      "originalPaise": 10000,
+      "refundPaise": 2000,
+      "netCollectedPaise": 8000,
+      "reported": {
+        "orders": 0,
+        "sales": 0,
+        "averageOrder": 0,
+        "openOrders": 1,
+        "cancelledOrders": 0
+      }
+    },
+    {
+      "name": "Sales day uses database date rather than restaurant local date",
+      "restaurantTimezone": "Asia/Kolkata",
+      "independentLocalDate": "2026-10-02",
+      "reportedDays": [
+        "2026-10-01"
+      ]
+    },
+    {
+      "name": "Restaurant snapshot financial scope",
+      "includesSyncedOrders": 2,
+      "includesOrderPaymentEntries": false,
+      "includesGatewayPayments": false,
+      "includesInventoryMovements": false
+    },
+    {
+      "name": "Restore of a missing QR operational order",
+      "originalSource": "QR",
+      "restoredSource": "POS",
+      "publicOrderIdPreserved": false,
+      "createdAtPreserved": false,
+      "restoredPaymentEntries": 0
+    },
+    {
+      "name": "Entity restore cursor hypothesis rejected",
+      "before": 2,
+      "after": 4,
+      "cursorAdvancedByDatabaseTrigger": true
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import { createServer } from '../packages/branch-core/src/server';
 import { CloudUplink } from '../packages/branch-core/src/uplink';
 
 const roster = (enabledApps = ['KIOSK', 'KIOSK_ADMIN']) => ({
-  restaurant: { id: 'rest-A', name: 'Test', status: 'ACTIVE' }, branches: [],
+  restaurant: { id: 'rest-A', name: 'Test', status: 'ACTIVE' }, branches: [{ id: 'br-A', name: 'A', code: 'A', timezone: 'Asia/Kolkata', status: 'ACTIVE' }],
   subscription: { active: true, expiresAt: null, enabledApps },
   devices: [['admin', 'POS_ADMIN'], ['kiosk', 'KIOSK'], ['pos', 'POS']].map(([id, type]) => ({
     id, type, name: id, branchId: 'br-A', status: 'ACTIVE', isLocked: false,

@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ts } from '../../common/sql';
 import { toCsv } from '../../common/csv';
-import { deviceHealth } from '../../common/device-health';
+import { deviceHealth, healthWhere } from '../../common/device-health';
 
 type DateRange = { from?: string; to?: string };
 
@@ -29,49 +29,87 @@ export class ReportsService {
   async getRestaurantSales(restaurantId: string, range: { from?: string; to?: string } = {}) {
     const to = range.to ? new Date(range.to) : new Date();
     const from = range.from ? new Date(range.from) : new Date(to.getTime() - 30 * 86400_000);
+    if (!Number.isFinite(from.getTime()) || !Number.isFinite(to.getTime()) || from > to) throw new BadRequestException('Invalid sales date range');
     const inRange = Prisma.sql`o."restaurantId" = ${restaurantId} AND o."createdAt" >= ${ts(from)} AND o."createdAt" <= ${ts(to)}`;
-    const isSale = Prisma.sql`o."paymentStatus" = 'SUCCESS' AND o.status NOT IN ('CANCELLED', 'VOID')`;
+    const isSale = Prisma.sql`o.collected >= o."totalAmount" AND (o."ledgerEntries" > 0 OR o."paymentStatus" IN ('SUCCESS', 'PAID', 'PARTIALLY_REFUNDED', 'REFUND_PENDING', 'REFUNDED')) AND o.status NOT IN ('DRAFT', 'CANCELLED', 'VOID')`;
     const rupees = (n: unknown) => Math.round(Number(n ?? 0)) / 100;
 
     return this.prisma.runAsPlatform(async (tx) => {
-      const restaurant = await tx.restaurant.findFirst({ where: { id: restaurantId, deletedAt: null }, select: { id: true, name: true } });
+      const restaurant = await tx.restaurant.findFirst({ where: { id: restaurantId, deletedAt: null }, select: { id: true, name: true, timezone: true } });
       if (!restaurant) throw new NotFoundException('Restaurant not found');
 
+      // Read-only report: never synthesize ledger entries while opening a dashboard. Prefer the
+      // append-only ledger; legacy status/meta fallback is explicit and counted for reconciliation.
+      // This is an order-created cohort, with collections/refunds known by the requested end time.
+      const cohort = Prisma.sql`WITH scoped AS (
+        SELECT o.*, COALESCE(b.timezone, ${restaurant.timezone}) AS "reportTimezone",
+          COALESCE(l.entries, 0) AS "ledgerEntries",
+          CASE WHEN l.entries > 0 THEN COALESCE(l.collected, 0)
+            WHEN o."paymentStatus" IN ('SUCCESS', 'PAID', 'PARTIALLY_REFUNDED', 'REFUND_PENDING', 'REFUNDED') THEN o."totalAmount"
+            ELSE 0 END::bigint AS collected,
+          CASE WHEN l.entries > 0 THEN COALESCE(l.refunded, 0)
+            WHEN jsonb_typeof(o.meta->'refundAmountPaise') = 'number' THEN LEAST(o."totalAmount", GREATEST(0, (o.meta->>'refundAmountPaise')::numeric))
+            WHEN o."paymentStatus" = 'REFUNDED' OR o.status = 'REFUNDED' THEN o."totalAmount"
+            ELSE 0 END::bigint AS refunded
+        FROM "SyncedOrder" o
+        LEFT JOIN "Branch" b ON b.id = o."branchId" AND b."restaurantId" = o."restaurantId"
+        LEFT JOIN LATERAL (
+          SELECT COUNT(*) AS entries,
+            SUM(e.amount) FILTER (WHERE e.kind = 'COLLECTION' AND e."createdAt" <= ${ts(to)}) AS collected,
+            SUM(e.amount) FILTER (WHERE e.kind = 'REFUND' AND e."createdAt" <= ${ts(to)}) AS refunded
+          FROM "OrderPaymentEntry" e WHERE e."orderId" = o.id AND e."restaurantId" = o."restaurantId"
+        ) l ON true WHERE ${inRange}
+      )`;
+
       const [totals, byDay, byMethod, byBranch, topItems, anyOrder] = await Promise.all([
-        tx.$queryRaw<Array<{ orders: number; sales: number; open: number; cancelled: number }>>(Prisma.sql`
+        tx.$queryRaw<Array<{ orders: number; sales: number; gross: number; refunds: number; collected: number; outstanding: number; legacy: number; open: number; cancelled: number }>>(Prisma.sql`${cohort}
           SELECT COUNT(*) FILTER (WHERE ${isSale})::int AS orders,
-                 COALESCE(SUM(o."totalAmount") FILTER (WHERE ${isSale}), 0)::float8 AS sales,
-                 COUNT(*) FILTER (WHERE o."paymentStatus" IS DISTINCT FROM 'SUCCESS' AND o.status NOT IN ('CANCELLED', 'VOID'))::int AS open,
+                 COALESCE(SUM(o."totalAmount" - o.refunded) FILTER (WHERE ${isSale}), 0)::float8 AS sales,
+                 COALESCE(SUM(o."totalAmount") FILTER (WHERE ${isSale}), 0)::float8 AS gross,
+                 COALESCE(SUM(o.refunded), 0)::float8 AS refunds,
+                 COALESCE(SUM(o.collected), 0)::float8 AS collected,
+                 COALESCE(SUM(GREATEST(0, o."totalAmount" - o.collected)) FILTER (WHERE o.status NOT IN ('CANCELLED', 'VOID', 'REFUNDED')), 0)::float8 AS outstanding,
+                 COUNT(*) FILTER (WHERE o."ledgerEntries" = 0 AND o.collected > 0)::int AS legacy,
+                 COUNT(*) FILTER (WHERE o.collected < o."totalAmount" AND o.status NOT IN ('CANCELLED', 'VOID', 'REFUNDED'))::int AS open,
                  COUNT(*) FILTER (WHERE o.status IN ('CANCELLED', 'VOID'))::int AS cancelled
-          FROM "SyncedOrder" o WHERE ${inRange}`),
+          FROM scoped o`),
         tx.$queryRaw<Array<{ date: Date; orders: number; sales: number }>>(Prisma.sql`
-          SELECT (o."createdAt")::date AS date, COUNT(*)::int AS orders, SUM(o."totalAmount")::float8 AS sales
-          FROM "SyncedOrder" o WHERE ${inRange} AND ${isSale} GROUP BY 1 ORDER BY 1 ASC`),
+          ${cohort} SELECT ((o."createdAt" AT TIME ZONE 'UTC') AT TIME ZONE o."reportTimezone")::date AS date,
+            COUNT(*)::int AS orders, SUM(o."totalAmount" - o.refunded)::float8 AS sales
+          FROM scoped o WHERE ${isSale} GROUP BY 1 ORDER BY 1 ASC`),
         tx.$queryRaw<Array<{ method: string; orders: number; sales: number }>>(Prisma.sql`
-          SELECT COALESCE(o."paymentMethod", 'UNKNOWN') AS method, COUNT(*)::int AS orders, SUM(o."totalAmount")::float8 AS sales
-          FROM "SyncedOrder" o WHERE ${inRange} AND ${isSale} GROUP BY 1 ORDER BY sales DESC`),
+          ${cohort} SELECT COALESCE(o."paymentMethod", 'UNKNOWN') AS method, COUNT(*)::int AS orders, SUM(o."totalAmount" - o.refunded)::float8 AS sales
+          FROM scoped o WHERE ${isSale} GROUP BY 1 ORDER BY sales DESC`),
         tx.$queryRaw<Array<{ branchId: string | null; branchName: string; orders: number; sales: number }>>(Prisma.sql`
-          SELECT o."branchId" AS "branchId", COALESCE(b.name, 'Unassigned') AS "branchName", COUNT(*)::int AS orders, SUM(o."totalAmount")::float8 AS sales
-          FROM "SyncedOrder" o LEFT JOIN "Branch" b ON b.id = o."branchId"
-          WHERE ${inRange} AND ${isSale} GROUP BY o."branchId", b.name ORDER BY sales DESC`),
+          ${cohort} SELECT o."branchId" AS "branchId", COALESCE(b.name, 'Unassigned') AS "branchName", COUNT(*)::int AS orders, SUM(o."totalAmount" - o.refunded)::float8 AS sales
+          FROM scoped o LEFT JOIN "Branch" b ON b.id = o."branchId" AND b."restaurantId" = o."restaurantId"
+          WHERE ${isSale} GROUP BY o."branchId", b.name ORDER BY sales DESC`),
         tx.$queryRaw<Array<{ name: string; quantity: number; revenue: number }>>(Prisma.sql`
-          SELECT it->>'name' AS name, SUM((it->>'quantity')::numeric)::float8 AS quantity, SUM(COALESCE((it->>'lineTotal')::numeric, 0))::float8 AS revenue
-          FROM "SyncedOrder" o, jsonb_array_elements(o.items) it
-          WHERE ${inRange} AND ${isSale} AND it->>'name' IS NOT NULL GROUP BY 1 ORDER BY revenue DESC, quantity DESC LIMIT 10`),
+          ${cohort} SELECT it->>'name' AS name, SUM((it->>'quantity')::numeric)::float8 AS quantity, SUM(COALESCE((it->>'lineTotal')::numeric, 0))::float8 AS revenue
+          FROM scoped o, jsonb_array_elements(o.items) it
+          WHERE ${isSale} AND it->>'name' IS NOT NULL GROUP BY 1 ORDER BY revenue DESC, quantity DESC LIMIT 10`),
         tx.syncedOrder.count({ where: { restaurantId } })
       ]);
 
-      const t = totals[0] ?? { orders: 0, sales: 0, open: 0, cancelled: 0 };
+      const t = totals[0] ?? { orders: 0, sales: 0, gross: 0, refunds: 0, collected: 0, outstanding: 0, legacy: 0, open: 0, cancelled: 0 };
       const sales = rupees(t.sales);
       return {
         source: 'RESTAURANT_SYNCED_ORDERS',
-        note: "These are the restaurant's own sales, from orders its terminals synced. They are not the platform's invoices to the restaurant.",
+        note: "Restaurant orders created in this period, not the platform's invoices. Gross sales are settled bill totals after discounts and including billed tax; sales subtract confirmed refunds known by period end. Payment-method groups use the order's primary method; top-item revenue uses stored line totals before bill-level returns. Legacy orders without ledger entries use their recorded settlement state.",
+        metricBasis: 'ORDER_CREATED_COHORT',
+        dateBasis: 'BRANCH_LOCAL_CALENDAR_DATE',
         restaurant,
         period: { from: from.toISOString(), to: to.toISOString() },
         hasData: anyOrder > 0,
         totals: {
           orders: t.orders,
           sales,
+          grossSales: rupees(t.gross),
+          refunds: rupees(t.refunds),
+          collections: rupees(t.collected),
+          netCollections: rupees(t.collected - t.refunds),
+          outstanding: rupees(t.outstanding),
+          legacySettledOrders: t.legacy,
           averageOrder: t.orders > 0 ? Math.round((sales / t.orders) * 100) / 100 : 0,
           openOrders: t.open,
           cancelledOrders: t.cancelled
@@ -81,7 +119,7 @@ export class ReportsService {
         byBranch: byBranch.map((b) => ({ branchId: b.branchId, branchName: b.branchName, orders: b.orders, sales: rupees(b.sales) })),
         topItems: topItems.map((i) => ({ name: i.name, quantity: Number(i.quantity), revenue: rupees(i.revenue) }))
       };
-    });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
   }
 
   async getSummary() {
@@ -91,7 +129,12 @@ export class ReportsService {
       suspendedRestaurants,
       totalBranches,
       totalDevices,
-      activeDevices,
+      onlineDevices,
+      degradedDevices,
+      offlineDevices,
+      revokedDevices,
+      pendingDevices,
+      neverSeenDevices,
       totalSubscriptions,
       activeSubscriptions,
       invoiceTotals
@@ -101,7 +144,16 @@ export class ReportsService {
       this.prisma.platformDb.restaurant.count({ where: { status: 'SUSPENDED', deletedAt: null } }),
       this.prisma.platformDb.branch.count({ where: { status: 'ACTIVE' } }),
       this.prisma.platformDb.device.count(),
-      this.prisma.platformDb.device.count({ where: { status: 'ACTIVE' } }),
+      // EC-10: "active" used to mean registration status ACTIVE, and "offline" was just total minus
+      // that — a revoked device was never excluded from the offline count, and a long-silent-but-
+      // still-ACTIVE terminal was counted the same as one that heartbeat a second ago. Using the
+      // same deviceHealth/healthWhere thresholds every other device list already uses instead.
+      this.prisma.platformDb.device.count({ where: healthWhere('online') }),
+      this.prisma.platformDb.device.count({ where: healthWhere('degraded') }),
+      this.prisma.platformDb.device.count({ where: healthWhere('offline') }),
+      this.prisma.platformDb.device.count({ where: healthWhere('revoked') }),
+      this.prisma.platformDb.device.count({ where: healthWhere('pending') }),
+      this.prisma.platformDb.device.count({ where: healthWhere('never_seen') }),
       this.prisma.platformDb.subscription.count(),
       this.prisma.platformDb.subscription.count({ where: { status: 'ACTIVE' } }),
       this.prisma.platformDb.invoice.groupBy({ by: ['status'], _sum: { totalAmount: true } })
@@ -127,8 +179,15 @@ export class ReportsService {
       },
       devices: {
         total: totalDevices,
-        active: activeDevices,
-        offline: Math.max(0, totalDevices - activeDevices)
+        // "active" now means actually communicating (online or degraded-but-recent), not merely a
+        // registration status — matches what an operator diagnosing lost connectivity needs to see.
+        active: onlineDevices + degradedDevices,
+        online: onlineDevices,
+        degraded: degradedDevices,
+        offline: offlineDevices,
+        revoked: revokedDevices,
+        pending: pendingDevices,
+        neverSeen: neverSeenDevices
       },
       subscriptions: {
         total: totalSubscriptions,

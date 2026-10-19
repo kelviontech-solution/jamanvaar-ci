@@ -69,13 +69,19 @@ describe('Cash, table release and multi-register integrity', () => {
     const item=db.menuItems[0];
     const order=OrderRepository.createOrder({source_type:'KIOSK',orderType:'TAKEAWAY',items:[{id:'original-line',orderId:'',menuItemId:item.id,sku:item.sku,name:item.name,quantity:1,unitPrice:250,totalPrice:250,modifiers:[],kitchenStatus:'SERVED'}],totalAmount:250,paymentStatus:'PENDING',orderStatus:'COMPLETED',paymentMethod:'CASH_AT_COUNTER'});
     const pos=usePosStore.getState();pos.clearCart();
-    expect(pos.loadOrderForSettlement(order.id)).toBe(true);
+    // Simultaneous-edit protection (W01/EC-11,EC-12): loadOrderForSettlement now returns a
+    // structured CartSwitchResult ({ok: true} | {ok: false, reason}), not a bare boolean, so a
+    // blocked/preserved-work outcome always carries a human-readable reason instead of a silent
+    // false. Object truthiness is not success: check `.ok` explicitly.
+    expect(pos.loadOrderForSettlement(order.id)).toMatchObject({ ok: true });
     expect(usePosStore.getState().runningOrderId).toBe(order.id);
     expect(usePosStore.getState().cart.totalPayable).toBe(250);
     expect(usePosStore.getState().completePayment('CASH',250,'counter-existing',[{method:'CASH',amount:250}])?.id).toBe(order.id);
     expect(db.orders).toHaveLength(1);
     expect(OrderRepository.getOrderById(order.id)?.paymentStatus).toBe('SUCCESS');
-    expect(usePosStore.getState().loadOrderForSettlement(order.id)).toBe(false);
+    const reloadResult = usePosStore.getState().loadOrderForSettlement(order.id);
+    expect(reloadResult.ok).toBe(false);
+    expect((reloadResult as { ok: false; reason: string }).reason).toBeTruthy();
   });
   it('legacy core health does not invent devices or use another restaurant identity', () => {
     db.devices=[];

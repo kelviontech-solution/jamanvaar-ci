@@ -35,6 +35,7 @@ import { QrAdvancedController, QrAdvancedPublicController } from './qr-advanced.
 import { QrGroupService } from './qr-group.service';
 import { QrGroupController } from './qr-group.controller';
 import { QrPromotionsService } from './qr-promotions.service';
+import { QrReservationsService } from './qr-reservations.service';
 import { PlatformNotificationsModule } from '../platform-notifications/platform-notifications.module';
 
 /**
@@ -44,7 +45,7 @@ import { PlatformNotificationsModule } from '../platform-notifications/platform-
 @Module({
   imports: [TenantAuthModule, PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule, PlatformNotificationsModule],
   controllers: [QrRestaurantPageController,QrWorkflowsController,QrCrmController,QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
-  providers: [QrRestaurantPageService,QrWorkflowsService,QrCrmService,QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
+  providers: [QrRestaurantPageService,QrWorkflowsService,QrCrmService,QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, QrReservationsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]
 })
 export class QrModule {}

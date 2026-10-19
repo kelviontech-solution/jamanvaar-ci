@@ -282,8 +282,9 @@ describe('Manual restaurant payouts (Route pending)', () => {
     await prisma.runAsTenant(a.rid, tx => tx.refund.create({ data: { restaurantId: a.rid, paymentId: refundable.id, amount: 5000, status: 'PENDING' } }));
     const summary = await authed('get', '/api/v1/payments/payout-summary', a.kioskAdmin);
     expect(summary.status).toBe(200);
-    expect(summary.body).toMatchObject({ grossCollection: 2510000, platformFee: 75300, netPayable: 2425000, pendingPayout: 2425000, paidPayout: 0, heldPayable: 9700 });
+    expect(summary.body).toMatchObject({ grossCollection: 2510000, platformFee: 75300, netPayable: 0, pendingPayout: 0, paidPayout: 0, heldPayable: 9700 });
     await verifyBank(a.rid);
+    expect((await authed('get', '/api/v1/payments/payout-summary', a.kioskAdmin)).body.pendingPayout).toBe(2425000);
     await authed('post', '/api/v1/payments/payouts/run-eod', platformToken).send({});
     expect((await authed('get', '/api/v1/payments/payout-summary', a.kioskAdmin)).body.pendingPayout).toBe(2425000);
   });

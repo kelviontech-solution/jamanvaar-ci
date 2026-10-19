@@ -79,6 +79,42 @@ import {
   generateSeedShifts
 } from './seed';
 import { MenuImportRecord } from './menu_templates';
+import type { DurableCommand, DurableCommandResult, DurableRecoverySnapshot, StoreOp } from './durable/sql_kv_engine';
+import { protectRecovery } from './durable/protected_recovery';
+
+// The complete set serialized by saveToStorage, including encrypted customers.
+const FINANCIAL_STATE_FIELDS = [
+  'restaurant', 'outlet', 'menuItems', 'categories', 'modifierGroups', 'combos', 'loyaltyTiers',
+  'loyaltyRewards', 'loyaltyProgramSettings', 'staffSchedules', 'attendanceRecords', 'staffPayRates',
+  'marketingCampaigns', 'deliveryRiders', 'receiptConfig', 'receiptRecords', 'paymentTransactions',
+  'receipts', 'printJobs', 'orders', 'tables', 'floorPlanStartedEmpty', 'coupons', 'kiosks',
+  'serviceRequests', 'auditLogs', 'shifts', 'cashMovements', 'kots', 'heldOrders', 'reservations',
+  'waitlist', 'inventoryItems', 'stockMovements', 'suppliers', 'goodsReceipts', 'inventoryBatches',
+  'stockCounts', 'recipes', 'customerAccounts', 'users', 'roles', 'configuredPrinters', 'license',
+  'taxGroups', 'businessDays', 'eodReports', 'notifications', 'syncEvents', 'kioskDisplaySettings',
+  'welcomeScreenSettings', 'tokenSequenceResets', 'qrSettings'
+] as const;
+
+interface FinancialIntent {
+  version: 1;
+  command: DurableCommand;
+}
+
+function parseRecoveryJson(text: string): unknown {
+  try { return JSON.parse(text); }
+  catch { throw new Error('The saved operation is damaged. Keep this device intact for support; do not collect payment again.'); }
+}
+
+export interface FinancialMutationResult<T> {
+  operationId: string;
+  outcome: 'COMMITTED' | 'REPLAYED';
+  result: T;
+}
+
+export interface PendingFinancialRecovery {
+  operationId: string;
+  orderId: string;
+}
 
 /**
  * Universal Database Client for JAMANVAAR
@@ -92,7 +128,10 @@ export interface DbStorage {
   removeItem(key: string): void;
   /** True when writes made in the same tick are committed as one atomic transaction. */
   readonly atomicBatches?: boolean;
-  health?(): { ok: boolean; error: string | null };
+  commitCommand?(command: DurableCommand): Promise<DurableCommandResult>;
+  flush?(): Promise<void>;
+  exportRecovery?(scope: string): Promise<DurableRecoverySnapshot>;
+  health?(): { ok: boolean; error: string | null; commitState?: 'CLOSED' | 'FAILED' | 'PENDING' | 'COMMITTED'; pendingWrites?: number };
   onRemoteChange?: ((ops: Array<{ op: 'set'; key: string; value: string } | { op: 'remove'; key: string }>) => void) | null;
   subscribeRemote?: (listener: NonNullable<DbStorage['onRemoteChange']>) => () => void;
 }
@@ -1002,6 +1041,7 @@ export class JamanvaarDatabase {
   }
 
   public attachDurableStorage(store: DbStorage): void {
+    if (this.financialBusy) throw new Error('Finish or recover the pending checkout before switching local storage.');
     this.store = store;
     this.lastWritten.clear();
     this.persistenceError = null;
@@ -1010,6 +1050,9 @@ export class JamanvaarDatabase {
     this.unsubscribeStore?.();
     const onRemoteChange: NonNullable<DbStorage['onRemoteChange']> = (ops) => {
       if (!ops.some((op) => op.key.startsWith(this.storagePrefix))) return;
+      // The command compares these changes inside SQLite. Do not replace the
+      // isolated preparation or expose an unacknowledged result to subscribers.
+      if (this.financialBusy) return;
       for (const op of ops) {
         if (op.op === 'set') this.lastWritten.set(op.key, op.value);
         else this.lastWritten.delete(op.key);
@@ -1082,6 +1125,19 @@ export class JamanvaarDatabase {
     const background = this.store?.health?.();
     if (background && !background.ok) return { ok: false, error: background.error };
     return { ok: this.persistenceError === null, error: this.persistenceError };
+  }
+
+  /** Wait for already queued collections before acknowledging an external cursor.
+   * This is an ordering barrier, not a replacement for financial command replay.
+   * Legacy synchronous storage retains its existing behavior.
+   */
+  public async flushPersistence(): Promise<void> {
+    if (this.financialBusy) throw new Error('A financial operation is being saved; retry synchronization afterwards.');
+    const storage = this.store;
+    await storage?.flush?.();
+    if (storage !== this.store) throw new Error('Local storage changed during synchronization.');
+    const health = this.getPersistenceHealth();
+    if (!health.ok) throw new Error(health.error || 'Local changes have not been saved.');
   }
 
   private journalKey(): string {
@@ -1164,6 +1220,8 @@ export class JamanvaarDatabase {
       put('delivery_riders', this.deliveryRiders);
       put('receipt_config', this.receiptConfig);
       put('receipt_records', this.receiptRecords);
+      put('payment_transactions', this.paymentTransactions);
+      put('receipts', this.receipts);
       put('print_jobs', this.printJobs);
       put('orders', this.orders);
       put('tables', this.tables);
@@ -1343,6 +1401,11 @@ export class JamanvaarDatabase {
 
       const storedReceiptRecords = localStorage.getItem(`${p}receipt_records`);
       if (storedReceiptRecords) this.receiptRecords = JSON.parse(storedReceiptRecords);
+
+      const storedPaymentTransactions = localStorage.getItem(`${p}payment_transactions`);
+      if (storedPaymentTransactions) this.paymentTransactions = JSON.parse(storedPaymentTransactions);
+      const storedFinancialReceipts = localStorage.getItem(`${p}receipts`);
+      if (storedFinancialReceipts) this.receipts = JSON.parse(storedFinancialReceipts);
 
       const storedPrintJobs = localStorage.getItem(`${p}print_jobs`);
       if (storedPrintJobs) this.printJobs = JSON.parse(storedPrintJobs);
@@ -1576,6 +1639,236 @@ export class JamanvaarDatabase {
 
   private batchDepth = 0;
   private batchDirty = false;
+  private transactionEffects: Array<Array<() => void>> = [];
+  private financialBusy = false;
+  private financialPreparing = false;
+  private financialBaseline: Record<string, unknown> | null = null;
+
+  public supportsFinancialCommands(): boolean { return !!this.store?.commitCommand && !!this.store.flush; }
+
+  public hasPendingFinancialMutation(): boolean {
+    return this.financialBusy || !!this.store?.getItem(`${this.storagePrefix}financial_command_pending`);
+  }
+
+  /** Only references are exposed to recovery UI; never the stored command or customer payload. */
+  public getPendingFinancialRecovery(): PendingFinancialRecovery | null {
+    if (this.financialBusy) throw new Error('A local save is still running. Wait before reviewing recovery.');
+    const raw = this.store?.getItem(`${this.storagePrefix}financial_command_pending`);
+    if (!raw) return null;
+    const intent = parseRecoveryJson(raw) as FinancialIntent;
+    const command = intent?.command;
+    if (intent?.version !== 1 || !command || typeof command.operationId !== 'string' || !command.operationId.startsWith(`${this.storagePrefix}financial:`) ||
+        !/^[a-f0-9]{64}$/.test(command.requestFingerprint) || !Array.isArray(command.ops) || !Array.isArray(command.expected) || typeof command.result !== 'string' ||
+        command.ops.some(op => !op || typeof op.key !== 'string' || !op.key.startsWith(this.storagePrefix) || !['set', 'remove'].includes(op.op)) ||
+        command.expected.some(entry => !entry || typeof entry.key !== 'string' || !entry.key.startsWith(this.storagePrefix))) throw new Error('The saved operation needs support review. Do not collect payment again.');
+    const result = parseRecoveryJson(command.result) as { orderId?: unknown } | null;
+    if (!result || typeof result.orderId !== 'string' || !result.orderId) throw new Error('The saved operation has no bill reference. Keep this device intact for support review.');
+    const ordersOp = command.ops.find(op => op.op === 'set' && op.key === `${this.storagePrefix}orders`);
+    const preparedOrders = ordersOp?.op === 'set' ? parseRecoveryJson(ordersOp.value) : [];
+    if (!Array.isArray(preparedOrders)) throw new Error('The saved bill data needs support review.');
+    const order = preparedOrders.find(order => order.id === result.orderId);
+    // An unchanged result may already exist (for example an acknowledged no-op).
+    const target = order ?? this.orders.find(order => order.id === result.orderId);
+    if (!target || target.restaurantId !== this.restaurant.id || target.outletId !== this.outlet.id) throw new Error('The saved bill does not match this restaurant and branch. Open the original account for recovery.');
+    return { operationId: command.operationId, orderId: result.orderId };
+  }
+
+  /** Resume only the exact prepared command, without reconstructing the cart or repeating hardware effects.
+   * The caller must review/adopt its bill before acknowledging the operation.
+   */
+  public async recoverPendingFinancialMutation(expectedOperationId: string): Promise<FinancialMutationResult<{ orderId: string }>> {
+    const pending = this.getPendingFinancialRecovery();
+    if (!pending || pending.operationId !== expectedOperationId) throw new Error('The pending operation changed. Review its current bill before retrying.');
+    const intent = JSON.parse(this.store!.getItem(`${this.storagePrefix}financial_command_pending`)!) as FinancialIntent;
+    return this.commitFinancialMutation<{ orderId: string }>(intent.command.requestFingerprint, () => {
+      throw new Error('The original operation is no longer available. A replacement collection was not created.');
+    });
+  }
+
+  public getStorageStatus() {
+    const mode = this.supportsFinancialCommands() ? 'SQLITE' as const : this.ls() ? 'LEGACY' as const : 'MEMORY' as const;
+    const health = this.getPersistenceHealth();
+    const backend = this.store?.health?.();
+    return { mode, ok: mode !== 'MEMORY' && health.ok, error: health.error,
+      commitState: backend?.commitState, pendingWrites: backend?.pendingWrites ?? 0 };
+  }
+
+  /** Business-data snapshot, deliberately excluding storage internals and local encryption keys. */
+  public exportOperationalSnapshot(): Record<string, unknown> {
+    if (this.financialBusy) throw new Error('Finish or recover the pending checkout before exporting a snapshot.');
+    const record = this as unknown as Record<string, unknown>;
+    return structuredClone(Object.fromEntries(FINANCIAL_STATE_FIELDS.map(field => [field, record[field]])));
+  }
+
+  public localRecoveryScope(): string { return JSON.stringify([this.restaurant.id, this.outlet.id]); }
+
+  public async exportProtectedLocalRecovery(passphrase: string): Promise<string> {
+    if (this.financialBusy) throw new Error('Finish or recover the pending checkout before creating a recovery backup.');
+    if (!this.store?.exportRecovery) throw new Error('Complete device recovery requires SQLite storage. A JSON business snapshot is not a substitute.');
+    return protectRecovery(await this.store.exportRecovery(this.localRecoveryScope()), passphrase);
+  }
+
+  /** A business JSON import must never replace live financial/replay history or tenant ownership. */
+  public async assertOperationalRestoreSafe(snapshot: Record<string, unknown>): Promise<void> {
+    if (this.financialBusy) throw new Error('Finish or recover the pending checkout before restoring data.');
+    const restaurant = snapshot.restaurant as { id?: unknown } | undefined;
+    const branch = snapshot.outlet as { id?: unknown } | undefined;
+    if ((restaurant?.id && restaurant.id !== this.restaurant.id) || (branch?.id && branch.id !== this.outlet.id)) throw new Error('This snapshot belongs to a different restaurant or branch. Open the matching account; this import cannot change ownership.');
+    const financialFields = ['orders', 'paymentTransactions', 'receipts', 'receiptRecords', 'shifts', 'cashMovements', 'stockMovements', 'inventoryItems', 'inventoryBatches', 'customerAccounts', 'syncEvents'];
+    if (!financialFields.some(field => snapshot[field] !== undefined)) return;
+    if (this.orders.length || this.paymentTransactions.length || this.cashMovements.length) throw new Error('This device already has financial history. A JSON snapshot cannot overwrite it. Use reviewed menu import for menu changes or complete recovery into an empty target.');
+    if (this.supportsFinancialCommands()) {
+      // Even an apparently empty tab may share SQLite with another window.
+      // A check-then-overwrite would race its first checkout. Financial restore
+      // is exclusively the engine's atomic empty-target recovery operation.
+      throw new Error('SQLite operation history must be restored with its data. JSON snapshots omit replay protection; complete device recovery requires an empty target.');
+    }
+  }
+
+  /**
+   * Prepare real repository mutations in isolated collections, retain the exact
+   * command before attempting it, and publish only its SQLite acknowledgement.
+   * prepare MUST be synchronous and have no direct UI/hardware/network effects;
+   * repository afterTransaction deliveries are deferred automatically.
+   */
+  public async commitFinancialMutation<T>(requestFingerprint: string, prepare: () => T): Promise<FinancialMutationResult<T>> {
+    if (!/^[a-f0-9]{64}$/.test(requestFingerprint)) throw new Error('A SHA-256 financial request fingerprint is required');
+    const storage = this.store;
+    if (!storage?.commitCommand || !storage.flush) throw new Error('Safe checkout needs SQLite storage. Your draft is preserved; restore storage before collecting payment.');
+    if (this.financialBusy || this.batchDepth) throw new Error('Another local operation is being saved. Wait before trying again.');
+    this.financialBusy = true;
+    const record = this as unknown as Record<string, unknown>;
+    this.financialBaseline = Object.fromEntries(FINANCIAL_STATE_FIELDS.map(field => [field, structuredClone(record[field])]));
+    const intentKey = `${this.storagePrefix}financial_command_pending`;
+    let effects: Array<() => void> = [];
+    try {
+      let raw = storage.getItem(intentKey);
+      // A lost command acknowledgement may leave health failed with no pending
+      // writes. Retry its saved command directly; a flush cannot resolve it.
+      if (!raw) {
+        await storage.flush(); raw = storage.getItem(intentKey);
+        // A sibling window may have committed while the flush was pending.
+        // Prepare from its current acknowledged data, not our older cache.
+        this.loadFromStorage();
+        this.financialBaseline = Object.fromEntries(FINANCIAL_STATE_FIELDS.map(field => [field, structuredClone(record[field])]));
+      }
+      let intent: FinancialIntent;
+      if (raw) {
+        intent = JSON.parse(raw) as FinancialIntent;
+        if (intent.version !== 1 || intent.command?.requestFingerprint !== requestFingerprint) throw new Error('An earlier checkout needs recovery. Retry its original cart and payment choice, or ask a manager to open Settings → Local DB & Sync → Finish an interrupted save. Do not start another collection.');
+      } else {
+        const originalWritten = this.lastWritten;
+        const originalState = Object.fromEntries(FINANCIAL_STATE_FIELDS.map(field => [field, record[field]]));
+        const originalMeta = [this.piiKeyHex, this.lastCustomerAccountsPlaintext, this.lastCustomerAccountsCiphertext, this.persistenceError] as const;
+        const expected = new Map<string, string | null>();
+        const changes = new Map<string, StoreOp>();
+        const read = (key: string) => {
+          if (!expected.has(key)) expected.set(key, storage.getItem(key));
+          const change = changes.get(key);
+          return change ? change.op === 'set' ? change.value : null : expected.get(key)!;
+        };
+        const staging: DbStorage = {
+          atomicBatches: true,
+          getItem: read,
+          setItem: (key, value) => { read(key); changes.set(key, { op: 'set', key, value }); },
+          removeItem: key => { read(key); changes.set(key, { op: 'remove', key }); }
+        };
+        let result: T;
+        this.financialPreparing = true;
+        this.transactionEffects.push(effects);
+        try {
+          for (const field of FINANCIAL_STATE_FIELDS) record[field] = structuredClone(record[field]);
+          this.store = staging;
+          // Include every persisted collection as a dependency, even if this
+          // particular sale did not change it (prices, stock and roles included).
+          this.lastWritten = new Map();
+          result = prepare();
+          if (result && typeof (result as { then?: unknown }).then === 'function') throw new Error('Financial preparation must be synchronous');
+          this.saveToStorage();
+          if (this.persistenceError) throw new Error(this.persistenceError);
+          const encoded = JSON.stringify(result);
+          if (encoded === undefined) throw new Error('Financial preparation needs JSON result references');
+          intent = { version: 1, command: {
+            operationId: `${this.storagePrefix}financial:${generateDeviceKeyHex()}`,
+            requestFingerprint,
+            expected: [...expected].map(([key, value]) => ({ key, value })),
+            ops: [...changes.values()].filter(op => op.op === 'set' ? op.value !== expected.get(op.key) : expected.get(op.key) !== null),
+            result: encoded
+          } };
+        } finally {
+          Object.assign(this, originalState);
+          this.store = storage;
+          this.lastWritten = originalWritten;
+          [this.piiKeyHex, this.lastCustomerAccountsPlaintext, this.lastCustomerAccountsCiphertext, this.persistenceError] = originalMeta;
+          this.transactionEffects.pop();
+          this.financialPreparing = false;
+          this.batchDirty = false;
+        }
+        raw = JSON.stringify(intent!);
+        // An interrupted preparation can waste a leased number, but cannot
+        // expose a sale. The saved command carries its original order IDs.
+        await storage.commitCommand({
+          operationId: `${intent!.command.operationId}:prepare`, requestFingerprint,
+          expected: [{ key: intentKey, value: null }],
+          ops: [{ op: 'set', key: intentKey, value: raw }], result: '{}'
+        });
+      }
+      const command = intent!.command;
+      if (!command.operationId.startsWith(`${this.storagePrefix}financial:`) ||
+          command.ops.some(op => !op.key.startsWith(this.storagePrefix) || op.key === intentKey) ||
+          command.expected.some(entry => !entry.key.startsWith(this.storagePrefix) || entry.key === intentKey)) throw new Error('Invalid local financial recovery scope');
+      let outcome: DurableCommandResult;
+      try {
+        outcome = await storage.commitCommand({ ...command, expected: [...command.expected, { key: intentKey, value: raw }] });
+      } catch (error) {
+        if ((error as { code?: string })?.code === 'LOCAL_VERSION_CONFLICT') {
+          // SQLite proved this financial command did not apply. Release only
+          // this exact intent, so an explicit review can produce a new command.
+          // Unknown outcomes and ID reuse are deliberately never discarded.
+          await storage.commitCommand({ operationId: `${command.operationId}:discard-rejected`, requestFingerprint,
+            expected: [{ key: intentKey, value: raw }], ops: [{ op: 'remove', key: intentKey }], result: '{}' });
+          this.loadFromStorage(); this.financialBaseline = null;
+        }
+        throw error;
+      }
+      this.loadFromStorage();
+      this.financialBaseline = null;
+      this.financialBusy = false;
+      for (const listener of this.listeners) {
+        try { listener(); } catch { console.error('Local view refresh failed; the bill remains saved'); }
+      }
+      // Replay never automatically repeats a drawer pulse, printer dispatch or
+      // the original relay request. The persisted order remains uploadable.
+      if (outcome.outcome === 'COMMITTED') for (const effect of effects) {
+        try { effect(); } catch { console.error('Post-commit delivery failed; the bill remains saved'); }
+      }
+      try { this.pushToServer(); } catch { console.error('Order upload deferred; the bill remains saved'); }
+      return { operationId: command.operationId, outcome: outcome.outcome, result: JSON.parse(outcome.result) as T };
+    } finally {
+      if (this.financialBaseline) Object.assign(this, this.financialBaseline);
+      this.financialBaseline = null;
+      this.financialBusy = false;
+    }
+  }
+
+  /** Call only after the UI has adopted the recovered receipt and cleared its draft. */
+  public async acknowledgeFinancialMutation(operationId: string): Promise<void> {
+    const storage = this.store;
+    if (!storage?.commitCommand) throw new Error('Financial recovery storage is unavailable');
+    const key = `${this.storagePrefix}financial_command_pending`;
+    const raw = storage.getItem(key);
+    if (!raw) return;
+    const intent = JSON.parse(raw) as FinancialIntent;
+    if (intent.command.operationId !== operationId) throw new Error('A different financial operation needs recovery');
+    await storage.commitCommand({ operationId: `${operationId}:ack`, requestFingerprint: intent.command.requestFingerprint,
+      expected: [{ key, value: raw }], ops: [{ op: 'remove', key }], result: '{}' });
+  }
+
+  /** Defer external relay/hardware work until the enclosing synchronous mutation has succeeded. */
+  public afterTransaction(effect: () => void): void {
+    const current = this.transactionEffects[this.transactionEffects.length - 1];
+    if (current) current.push(effect); else effect();
+  }
 
   /**
    * Runs `fn` and announces its changes once at the end (BUG-033). Settling a bill notifies about
@@ -1584,6 +1877,7 @@ export class JamanvaarDatabase {
    * flushes, and it flushes even if `fn` throws.
    */
   public batch<T>(fn: () => T): T {
+    if (this.financialBusy && !this.financialPreparing) throw new Error('A checkout is being saved. Wait before changing local data.');
     this.batchDepth += 1;
     try {
       return fn();
@@ -1604,23 +1898,53 @@ export class JamanvaarDatabase {
   public transaction<T>(fn: () => T): T {
     const names = [
       'orders', 'kots', 'syncEvents', 'inventoryItems', 'stockMovements', 'cashMovements', 'shifts',
-      'receiptRecords', 'printJobs', 'auditLogs', 'businessDays', 'heldOrders', 'customerAccounts', 'tables'
+      'receiptRecords', 'printJobs', 'auditLogs', 'businessDays', 'heldOrders', 'customerAccounts', 'tables',
+      // Consuming stock also changes FIFO batches, counted dish stock, availability
+      // and low-stock alerts. These must roll back with the sale and movement rows.
+      'inventoryBatches', 'menuItems', 'notifications', 'paymentTransactions', 'receipts'
     ] as const;
     const self = this as unknown as Record<string, unknown[]>;
     const snapshot = names.map((n) => [n, structuredClone(self[n])] as const);
+    const effects: Array<() => void> = [];
+    this.transactionEffects.push(effects);
+    let result: T;
     try {
-      return this.batch(fn);
-    } catch (err) {
-      for (const [n, saved] of snapshot) {
-        const live = self[n];
-        if (Array.isArray(live)) live.splice(0, live.length, ...(saved as unknown[]));
-      }
-      this.notify();
-      throw err;
+      result = this.batch(() => {
+        try {
+          const value = fn();
+          if (value && typeof (value as { then?: unknown }).then === 'function') throw new Error('Database transactions require a synchronous mutation');
+          return value;
+        } catch (err) {
+          // Restore BEFORE batch() emits its one notification/save. Otherwise a
+          // failed mutation was briefly persisted and broadcast before rollback.
+          for (const [n, saved] of snapshot) {
+            const live = self[n];
+            if (Array.isArray(live)) live.splice(0, live.length, ...(saved as unknown[]));
+            else self[n] = saved as unknown[];
+          }
+          this.batchDirty = true;
+          throw err;
+        }
+      });
+    } finally { this.transactionEffects.pop(); }
+    const parent = this.transactionEffects[this.transactionEffects.length - 1];
+    if (parent) parent.push(...effects);
+    else for (const effect of effects) {
+      // A relay failure cannot turn a committed local mutation back into a failed
+      // collection and invite the cashier to collect it again.
+      try { effect(); } catch { console.error('Post-transaction delivery failed; the local mutation remains recorded'); }
     }
+    return result;
   }
 
   public notify(): void {
+    if (this.financialPreparing) { this.batchDirty = true; return; }
+    if (this.financialBusy) {
+      // Legacy repositories mutate before notify(). Restore that attempted
+      // mutation instead of allowing it to overwrite a pending command.
+      if (this.financialBaseline) Object.assign(this, structuredClone(this.financialBaseline));
+      throw new Error('A checkout is being saved. Your change was not applied; try it after saving finishes.');
+    }
     if (this.batchDepth > 0) {
       this.batchDirty = true;
       return;

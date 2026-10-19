@@ -1,0 +1,53 @@
+{
+  "revision": "Mobile landing page refinement",
+  "tests": {
+    "passed": 21,
+    "failed": 0
+  },
+  "mobileBrowser": {
+    "passedScenarios": 14,
+    "widths": [
+      320,
+      360,
+      390,
+      430,
+      667
+    ],
+    "landscape": "667x375",
+    "templates": [
+      "HERITAGE",
+      "CAFE",
+      "MODERN",
+      "INDIAN"
+    ],
+    "editorTransport": "isolated in-memory API/authentication; printing stubbed"
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "diagnostics": ""
+  },
+  "builds": [
+    {
+      "application": "guest",
+      "exitCode": 0
+    },
+    {
+      "application": "admin",
+      "exitCode": 0
+    }
+  ],
+  "orderNavigation": [
+    {
+      "source": "real local public page",
+      "navigation": "same tab",
+      "landingMenuHidden": true,
+      "onDemandMenu": true,
+      "orderDestinationHash": "menu",
+      "orderingDishes": 40,
+      "ordersCreated": 0,
+      "paymentsInitiated": 0,
+      "runtimeErrors": 0
+    }
+  ],
+  "deployment": "Local source only; no publication or production deployment"
+}

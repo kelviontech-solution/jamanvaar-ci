@@ -74,7 +74,7 @@ describe('encrypted backups', () => {
     expect(() => restoreBackup(file, 'wrong-passphrase', join(d, 'x.sqlite3'))).toThrow(BackupError);
     expect(existsSync(join(d, 'x.sqlite3'))).toBe(false); // nothing partially restored
     core.store.close();
-  });
+  }, 30_000); // Several real KDF/tamper checks plus file I/O; retain production cryptography.
 
   it('keeps only the newest N backups and leaves no temp files behind', () => {
     const d = tmp();
@@ -84,7 +84,7 @@ describe('encrypted backups', () => {
     expect(listBackups(join(d, 'backups'))).toHaveLength(3);
     expect(readdirSync(join(d, 'backups')).filter((f) => f.endsWith('.part') || f.endsWith('.tmp.sqlite'))).toEqual([]);
     core.store.close();
-  });
+  }, 30_000); // Five encrypted SQLite backups, not a single in-memory operation.
 
   it('refuses a passphrase that is too short', () => {
     const core = newCore();

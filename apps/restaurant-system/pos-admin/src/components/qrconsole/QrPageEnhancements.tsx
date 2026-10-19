@@ -28,8 +28,12 @@ export const pageFieldLabels: Record<string, string> = {
   reviewUrl: 'Google review link',
   address: 'Address',
   hours: 'Opening hours',
+  businessHours: 'Structured opening hours & holidays',
+  seo: 'Search & social sharing',
   notice: 'Notice',
   footer: 'Footer',
+  testimonials: 'Testimonials',
+  press: 'Press & awards',
   translations: 'Translations',
   defaultLanguage: 'Default language',
   noticeStart: 'Notice starts',
@@ -43,6 +47,14 @@ function readable(value: unknown): string {
   return typeof value === 'string' ? value : JSON.stringify(value);
 }
 function ComparedValue({ field, value }: { field: string; value: unknown }) {
+  if(field==='businessHours'&&value&&typeof value==='object'){
+    const hours=value as NonNullable<RestaurantPageContent['businessHours']>;
+    return <div><p><strong>Timezone:</strong> {hours.timezone}</p>{hours.weekly.map(row=><p key={row.day}>{['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][row.day]}: {row.intervals.map(shift=>`${shift.start} – ${shift.end}`).join(', ')||'Closed'}</p>)}{hours.exceptions.map(row=><p key={row.date}>{row.date}: {row.intervals.map(shift=>`${shift.start} – ${shift.end}`).join(', ')||'Closed all day'}</p>)}</div>;
+  }
+  if(field==='seo'&&value&&typeof value==='object'){
+    const seo=value as NonNullable<RestaurantPageContent['seo']>;
+    return <div><p><strong>Title:</strong> {seo.title||'Restaurant name & branch'}</p><p><strong>Description:</strong> {seo.description||'Welcome message'}</p>{seo.imageUrl?<img className="qpb-diff-photo" alt="Sharing photograph" src={resolveMenuImage(seo.imageUrl,{apiBase:import.meta.env.VITE_CLOUD_API_BASE_URL||'http://localhost:4000'})||''}/>:<p>Cover photograph used for sharing</p>}</div>;
+  }
   if ((field === 'heroUrl' || field === 'logoUrl') && typeof value === 'string' && value)
     return (
       <img
@@ -63,6 +75,24 @@ function ComparedValue({ field, value }: { field: string; value: unknown }) {
             />
             <figcaption>{item.caption}</figcaption>
           </figure>
+        ))}
+      </div>
+    );
+  if (field === 'testimonials' && Array.isArray(value) && value.length)
+    return (
+      <div>
+        {value.map((item, i) => (
+          <p key={i}>
+            “{item.quote}” — {item.author}
+          </p>
+        ))}
+      </div>
+    );
+  if (field === 'press' && Array.isArray(value) && value.length)
+    return (
+      <div>
+        {value.map((item, i) => (
+          <p key={i}>{item.url ? `${item.label} (${item.url})` : item.label}</p>
         ))}
       </div>
     );
@@ -454,7 +484,7 @@ export function PageBranchCopy({
           <legend>What to copy</legend>
           {Object.entries({
             DESIGN: 'Design, colours & sections',
-            STORY: 'Welcome, story, translations & notice',
+            STORY: 'Welcome, story, testimonials, press, translations & notice',
             PHOTOS: 'Logo, hero & gallery',
             CONTACT: 'Contact details, hours & review links — replaces target details',
             BEHAVIOUR: 'Enablement, scan destination, featured dishes & analytics'

@@ -1,0 +1,16 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { db, MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync } from '@jamanvaar/database';
+import { catalogRevisionScope, EntitySyncEngine } from '@jamanvaar/sync';
+import { MenuSyncReview } from '../../../apps/restaurant-system/pos-admin/src/components/menu/MenuSyncReview';
+import '../../../apps/restaurant-system/pos-admin/src/index.css';
+localStorage.clear();
+db.menuItems = []; MenuItemSync.reset(); CategorySync.reset(); ModifierGroupSync.reset(); TaxGroupSync.reset();
+const scope = catalogRevisionScope('MENU_ITEM');
+MenuItemSync.applyRemote({id:'review', name:'Gujarati Meal', price:70, updatedAt:'2026-10-01T00:00:00Z'}, {scope, syncVersion:1});
+MenuItemSync.stampChanges(); db.menuItems[0].price = 90; MenuItemSync.stampChanges();
+MenuItemSync.applyRemote({id:'review', name:'Gujarati Meal', price:80, updatedAt:'2026-10-01T00:00:00Z'}, {scope, syncVersion:2});
+EntitySyncEngine.configureTransport({pull:async()=>({entities:[],serverTime:new Date().toISOString()}),push:async(_type, events)=>({results:events.map(event=>({externalId:event.externalId,status:'ok',syncVersion:3})),serverTime:new Date().toISOString()})});
+(window as any).__reviewState = () => ({price:db.menuItems[0]?.price, conflicts:MenuItemSync.getConflicts(scope).length});
+document.body.style.cssText = 'margin:0;background:#faf7f2;padding:16px';
+createRoot(document.getElementById('root')!).render(<main style={{maxWidth:900,margin:'0 auto'}}><MenuSyncReview/></main>);

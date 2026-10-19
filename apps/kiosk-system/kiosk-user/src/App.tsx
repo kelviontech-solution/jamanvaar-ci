@@ -16,7 +16,8 @@ import { flushSync } from 'react-dom';
 import { KioskProductCard } from './KioskProductCard';
 import { KioskReceiptDeliveryDialog, type ReceiptDeliveryChannel, type ReceiptDeliveryResult } from './KioskReceiptDeliveryDialog';
 import { useKioskConfirmationReturn } from './useKioskConfirmationReturn';
-import { cancelAbandonedKioskDraft, confirmKioskCashOrder } from './kioskOrderLifecycle';
+import { cancelAbandonedKioskDraft } from './kioskOrderLifecycle';
+import { commitKioskDraft, commitKioskAdmission, commitKioskQuote } from './kioskAdmission';
 import { activateKioskDevice, resolveRestaurantByCode, syncRestaurantIdentity, RESTAURANT_CODE_RE, isKioskDeviceConnected, getKioskDeviceId, getKioskRestaurantId, createPaymentOrder, createPaymentQr, markPaymentFulfilled, claimKitchenTicket, savePendingPayment, loadPendingPayment, clearPendingPayment, getPaymentOrderStatus, emailReceipt, whatsappReceipt, pushOrderSync, pullOrderSync, reportHeartbeat, reportCustomerAiQuery, pushEntitySync, pullEntitySync, CloudApiError, type CartLinePayload, leaseNumberBlock, verifyManagerPin } from './cloud/cloudClient';
 import { AuditRepository, ComboRepository, CouponRepository, CustomerRepository, db, KeyValueStore, FeedbackRepository, KioskDisplaySettingsRepository, KioskRepository, KOTRepository, MenuRepository, OrderRepository, ReceiptRepository, ServiceMessages, ServiceRequestRepository, TableRepository, WelcomeScreenSettingsRepository, RestaurantIdentityRepository, KioskLocalPrinterRepository } from '@jamanvaar/database';
 import { KioskPrinterSettingsModal } from './KioskPrinterSettingsModal';
@@ -30,7 +31,8 @@ import {
   RecommendationEngine,
   validateModifiers,
   dishNeedsChoiceBeforeAdd,
-  clampItemQuantity
+  clampItemQuantity,
+  resolveModifierGroups
 } from '@jamanvaar/business';
 import { Button, EmptyState, JamanvaarLogo, BrandHeader, Modal, StatusBadge, ThermalReceiptView, JAMANVAARStartup, JamanvaarKioskAuthLayout, ActivationNoticeBanner, ActivationHelpNote, CachedImg, MenuCategoryIcon, LocalCorePairing, useAiAccess, JamanAiAccessNotice } from '@jamanvaar/ui';
 import { formatINR, formatSplitTax, splitTaxPaise, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache, menuDishImage, collectMenuImageUrls, isMenuPlaceholder } from '@jamanvaar/utils';
@@ -709,10 +711,10 @@ export default function KioskUserApp() {
       try {
         const result = await getPaymentOrderStatus(realPaymentId);
         if (result.status === 'SUCCESS') {
-          clearInterval(interval);
           if (localOrderIdForPayment) {
             await finalizePaidOrder(realPaymentId, localOrderIdForPayment);
           }
+          clearInterval(interval);
           return;
         }
         if (result.status === 'FAILED' || result.status === 'USER_DROPPED') {
@@ -838,6 +840,10 @@ export default function KioskUserApp() {
 
   // Full Session Memory Scrub (Sections 224-226: No customer data leaks)
   const handleFullSessionReset = () => {
+    if (db.hasPendingFinancialMutation()) {
+      showToast('This order needs saving recovery. Please call staff before starting a new session.');
+      return;
+    }
     receiptGeneration.current += 1;
     const currentDisplay = KioskDisplaySettingsRepository.getSettings();
     const nextSessionCopy = (key: string, fallback: string) => currentDisplay.texts?.[currentDisplay.defaultLanguage]?.[key] || fallback;
@@ -867,10 +873,20 @@ export default function KioskUserApp() {
     setLocalOrderIdForPayment(null);
     setRazorpayUnavailable(false);
     setOnlinePaymentConnectionIssue(false);
+    setUpiDiscountWarningArmed(false);
     setPlacedOrder(null);
     setShowIdleWarning(false);
     setIdleSeconds(0);
     setLoggedInAccount(null);
+    // Privacy: an abandoned or never-finished phone login left the typed number, the generated
+    // OTP and any error text sitting in state — invisible to this guest once they walked away,
+    // but still there (and visible) when the NEXT guest's session reused this same screen.
+    setPhoneInput('');
+    setOtpInput('');
+    setOtpGenerated('');
+    setOtpExpiresAt(0);
+    setOtpAttempts(0);
+    setAuthError(null);
     setSelectedReward(null);
     setStaffOverrideActive(false);
     setLoyaltyRedemptionApproved(false);
@@ -1254,6 +1270,7 @@ export default function KioskUserApp() {
   // The guest backs out of the QR screen. The order is cancelled on this terminal and the payment is no
   // longer watched; if they pay anyway the server lists it under "needs attention" for staff.
   const handleCancelQr = () => {
+    if (db.hasPendingFinancialMutation()) { showToast('This order needs saving recovery. Keep its payment reference and ask staff for help.'); return; }
     SoundService.playTap();
     const orderId = localOrderIdForPayment;
     clearPendingPayment();
@@ -1276,12 +1293,30 @@ export default function KioskUserApp() {
   };
 
   // Start Payment Process
+  const checkoutSavingRef = useRef(false);
   const handleProceedToPayment = async () => {
+    if (checkoutSavingRef.current) return;
+    checkoutSavingRef.current = true;
+    try {
     if (remoteLogoutInProgressRef.current) return;
     try {const service=await checkBranchService(networkState==='ONLINE');if(!service.available){showToast(service.message);return;}}catch(e){showToast(e instanceof Error?e.message:'Please check with a team member.');return;}
     SoundService.playTap();
     resetIdleTimer();
     if (cartItems.length === 0) return;
+    // A choice made earlier in this session (e.g. a bread or topping) can go out of stock before
+    // checkout — the cart only holds a copy of what was picked, so it never finds out on its own.
+    // Catch it here, before an order is created for a choice that no longer exists.
+    for (const ci of cartItems) {
+      const currentGroups = resolveModifierGroups(ci.item, db.modifierGroups);
+      for (const sel of ci.selectedModifiers) {
+        const group = currentGroups.find((g) => g.id === sel.groupId);
+        const stillAvailable = group?.options.some((o) => o.id === sel.optionId);
+        if (!stillAvailable) {
+          showToast(`"${sel.optionName}" for ${ci.item.name} is no longer available. Please reopen this dish to choose again.`);
+          return;
+        }
+      }
+    }
     setQrImageSrc(null);
     setQrExpiresAt(null);
     setQrSecondsLeft(0);
@@ -1305,10 +1340,8 @@ export default function KioskUserApp() {
     // and the real UPI success path below both act on. Never
     // paymentStatus: 'SUCCESS' here; that only ever happens once a real
     // payment is confirmed.
-    const pendingOrder = OrderRepository.createOrder({
-      idempotencyKey: generateIdempotencyKey('kiosk_ord'),
+    const draftCommit = await commitKioskDraft({
       // This kiosk numbers its own tokens, so they carry a prefix (K-101) that can never equal the counter's #101 (BUG-160).
-      tokenNumber: OrderRepository.nextTokenNumber('K'),
       kioskId,
       sessionId,
       orderType,
@@ -1361,7 +1394,10 @@ export default function KioskUserApp() {
       syncStatus: 'SAVED_LOCALLY',
       isSynced: false
     });
+    const pendingOrder = OrderRepository.getOrderById(draftCommit.result.orderId);
+    if (!pendingOrder) throw new Error('Your order needs local recovery. Ask the counter before starting another payment.');
     setLocalOrderIdForPayment(pendingOrder.id);
+    await db.acknowledgeFinancialMutation(draftCommit.operationId);
 
     if (effectiveMethod !== 'UPI') {
       // Cash-at-counter: the order is created, kitchen prep proceeds
@@ -1370,6 +1406,11 @@ export default function KioskUserApp() {
     }
 
     await requestUpiPayment(pendingOrder);
+    } catch (error) {
+      setIsProcessingPayment(false);
+      setStep('MENU'); setIsCartOpen(true);
+      showToast(error instanceof Error ? error.message : 'Your order was not confirmed. Keep this cart and retry; do not pay again.');
+    } finally { checkoutSavingRef.current = false; }
   };
 
   /**
@@ -1411,7 +1452,7 @@ export default function KioskUserApp() {
       const localAmountPaise = Math.round(order.totalAmount * 100);
       if (result.quote) {
         const { cgst: cgstPaise, sgst: sgstPaise } = splitTaxPaise(result.quote.taxAmount);
-        OrderRepository.updateOrder(order.id, {
+        const savedQuote = await commitKioskQuote(order.id, result.paymentId, {
           subtotal: result.quote.subtotal / 100, taxAmount: result.quote.taxAmount / 100,
           cgstAmount: cgstPaise / 100, sgstAmount: sgstPaise / 100,
           totalAmount: result.amount / 100, discountAmount: 0, couponCode: undefined, roundOffAmount: 0,
@@ -1422,6 +1463,7 @@ export default function KioskUserApp() {
           }),
           loyaltyRedemption: undefined
         });
+        await db.acknowledgeFinancialMutation(savedQuote.operationId);
       }
       // The online quote currently has no coupon/points discount contract. Never consume a benefit the gateway did not apply.
       if (appliedCoupon || selectedReward || staffDiscount > 0) {
@@ -1478,24 +1520,9 @@ export default function KioskUserApp() {
     if (finalizingRef.current) return;
     finalizingRef.current = true;
     try {
-      setPaymentStatus('SUCCESS');
-      let order = OrderRepository.getOrderById(localOrderId);
+      const order = OrderRepository.getOrderById(localOrderId);
       if (!order) {
-        // This terminal no longer has the order (storage cleared). The server still shows the paid
-        // order as needing attention, which is where staff will find it.
-        clearPendingPayment();
-        return;
-      }
-      if (order.paymentStatus !== 'SUCCESS') {
-        // Payment acceptance is not kitchen completion. Keep the order active until food is served.
-        OrderRepository.updateOrder(localOrderId, {
-          paymentMethod: 'UPI', paymentStatus: 'SUCCESS', paymentTransactionId: paymentId,
-          orderStatus: 'CONFIRMED'
-        });
-        order = OrderRepository.getOrderById(localOrderId) ?? order;
-      }
-      if (KOTRepository.getKOTsForOrder(localOrderId).length > 0) {
-        await acknowledgeFulfilled(paymentId);
+        showToast('Payment was verified, but the original order needs counter recovery. Do not pay again.');
         return;
       }
       await proceedToConfirmation(order, typeof navigator !== 'undefined' ? navigator.onLine : true, paymentId);
@@ -1509,94 +1536,22 @@ export default function KioskUserApp() {
   // payment is settled, whichever path settled it: cash at the counter
   // (handleGetToken) or a Razorpay-confirmed UPI payment (finalizePaidOrder).
   const proceedToConfirmation = async (order: Order, isCurrentlyOnline: boolean, paymentId?: string) => {
-    // Audio chime on successful order
-    SoundService.playSuccess();
-
-    // Generate station-routed Kitchen Order Tickets so this order appears
-    // on the KDS board grouped by kitchen station, exactly like a POS
-    // order — previously the kiosk only printed a customer receipt and
-    // never created KOT records, so kitchen staff never saw kiosk orders.
-    // Built from the saved order, not the on-screen cart, so it also works after a restart when the cart is gone.
-    const kotItems = order.items.map((it) => ({
-      id: `koti-${it.id}`,
-      orderItemId: it.id,
-      menuItemId: it.menuItemId,
-      name: it.name,
-      quantity: it.quantity,
-      modifiers: it.modifiers,
-      specialInstructions: it.specialInstructions,
-      kitchenStation: db.menuItems.find((m) => m.id === it.menuItemId)?.kitchenStation || 'Main Kitchen',
-      status: 'PREPARING' as const
-    }));
-    // One set of kitchen tickets per order, however many times this runs (double tap, a re-render, or a restart on the
-    // confirmation screen). A second run used to create a second set of tickets and print them again.
-    const existingKots = KOTRepository.getKOTsForOrder(order.id);
-    const orderLabel = String(order.orderNumber || order.tokenNumber || order.id).replace(/[^A-Za-z0-9-]/g, '');
-    const kots = existingKots.length > 0 ? [] : KOTRepository.generateKOT({
-      orderId: order.id,
-      orderNumber: order.orderNumber,
-      tokenNumber: order.tokenNumber,
-      tableNumber: order.tableNumber ?? selectedTable?.tableNumber,
-      orderType: order.orderType ?? orderType,
-      items: kotItems,
-      cashierName: 'Kiosk Self-Order',
-      // Deterministic ids: the same order always yields the same tickets, so a repeat can never add a second copy.
-      idBase: `kot-${order.id}-r1`,
-      numberBase: `KOT-${orderLabel}`
-    });
-    // Both cash and verified online orders must leave the outbox immediately.
-    // Receipt printing and speech must not hold up the kitchen delivery.
+    const admitted = await commitKioskAdmission(order.id, paymentId);
+    const saved = OrderRepository.getOrderById(admitted.result.orderId);
+    if (!saved) throw new Error('Order saved; its receipt needs recovery. Please ask the counter and do not pay again.');
+    order = saved;
+    // Only acknowledged admission may reach kitchen delivery, UI, print or audio.
     const confirmationSync = SyncOutboxEngine.processOutbox();
-    // A prepaid order's tickets print only once, across every terminal. Online, the server decides who may print.
-    // If the server cannot be reached, the tickets print anyway: a missed kitchen ticket is worse than a rare repeat.
-    // Tickets print only when they were made just now: an order whose tickets already exist was printed before.
+    const kots = admitted.outcome === 'COMMITTED' && admitted.result.firstAdmission
+      ? admitted.result.kotIds.map(id => db.kots.find(kot => kot.id === id)).filter((kot): kot is NonNullable<typeof kot> => !!kot) : [];
     let printTickets = kots.length > 0;
     if (printTickets && paymentId && isCurrentlyOnline) {
-      try {
-        printTickets = (await claimKitchenTicket(paymentId)).claimed;
-      } catch (err) {
-        console.error('Kitchen ticket claim unavailable; printing locally:', err);
-      }
+      try { printTickets = (await claimKitchenTicket(paymentId)).claimed; }
+      catch { printTickets = false; showToast('Your order is saved. Kitchen printing needs staff review.'); }
     }
-    if (printTickets) kots.forEach((kot) => PrinterService.printKOT(kot));
-
-    // The ticket now exists: tell the server, which stops flagging this paid order as needing attention.
-    if (paymentId) void confirmationSync.then(() => acknowledgeFulfilled(paymentId));
-
-    // If logged in, earn loyalty points on the same tiered program POS and Captain use (base rate ×
-    // tier multiplier, both set by the restaurant admin) — this used to be its own separate, disconnected
-    // flat 10% rule, so a kiosk guest's tier, multiplier and even the admin's own configured rate never
-    // applied to a kiosk purchase. Guarded by loyaltyPointsEarned the same way settleOrder is, so a kiosk
-    // order (which, unlike POS, can legitimately re-run this confirmation tail on a crash-recovery retry)
-    // can never be credited twice for one purchase.
-    //
-    // security-audit HIGH kiosk-loyalty-02: this used to run unconditionally, including for a
-    // cash-at-counter order that confirmKioskCashOrder leaves at paymentStatus 'PENDING' -- a
-    // guest got real loyalty points (and had real points deducted for a redemption) for an order
-    // nobody had paid for yet, with nothing reversing either if the order was later cancelled
-    // unpaid. This now only runs for an order that is ALREADY paid (the online/UPI path, which
-    // reaches here only after a server-confirmed success). A cash order earns and redeems points
-    // through the exact same mechanism POS does: settleOrder(), once a cashier actually collects
-    // the money -- see loyaltyPointsRedeemed being stamped onto the order above, and the matching
-    // deduction added to settleOrder() in repositories.ts.
-    if (loggedInAccount && order.loyaltyPointsEarned === undefined && order.paymentStatus === 'SUCCESS') {
-      order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(loggedInAccount.phone, order.totalAmount, order.id);
-      // Same validated commit POS's settleOrder() uses: re-checks the reward is still active,
-      // affordable and matches the order's own discount before deducting its points.
-      if (order.loyaltyRedemption) CustomerRepository.commitOrderRedemption(order);
-    }
-
-    // Update coupon usage
-    if (order.couponCode && order.discountAmount > 0) {
-      CouponRepository.incrementUsage(order.couponCode);
-    }
-
-    AuditRepository.log({
-      kioskId,
-      action: 'ORDER_PLACED',
-      category: 'ORDER',
-      details: `Customer placed Order ${order.orderNumber} (Token #${order.tokenNumber}, Total ₹${order.totalAmount}, Mode: ${isCurrentlyOnline ? 'ONLINE' : 'OFFLINE_SAVED'})`
-    });
+    if (printTickets) for (const kot of kots) void Promise.resolve().then(() => PrinterService.printKOT(kot)).catch(() => console.warn('Saved kitchen ticket needs reprint.'));
+    if (paymentId) void confirmationSync.then(() => acknowledgeFulfilled(paymentId)).catch(() => console.warn('Saved order delivery is waiting for reconnection.'));
+    SoundService.playSuccess();
 
     setPlacedOrder(order);
     setPaymentStatus('SUCCESS');
@@ -1604,10 +1559,15 @@ export default function KioskUserApp() {
     setStep('CONFIRMATION');
     setPrintSettled(false);
     setSpeechSettled(false);
+    try { await db.acknowledgeFinancialMutation(admitted.operationId); }
+    catch { showToast('Order saved. Local recovery acknowledgement needs a retry; do not pay again.'); }
 
     // 1. Automatically dispatch receipt to thermal printer (Zero user prompts required)
     try {
-      const printRes = await printKioskReceipt(order);
+      const printRes = admitted.outcome === 'COMMITTED' && admitted.result.firstAdmission
+        ? await printKioskReceipt(order)
+        : { success: false, message: 'Order recovered. Use Print Receipt if you need a copy.', printerName: 'No automatic repeat' };
+      if (admitted.outcome === 'COMMITTED' && admitted.result.firstAdmission) ReceiptRepository.updateRecordStatus(admitted.result.receiptId, printRes.success ? 'SENT' : 'FAILED', printRes.success ? undefined : printRes.message);
       setAutoPrintStatus({
         printed: printRes.success,
         message: printRes.message,
@@ -1648,12 +1608,16 @@ export default function KioskUserApp() {
       return;
     }
     // The order was created before the guest chose how to pay (default UPI): record the real choice (BUG-134).
-    const order = confirmKioskCashOrder(localOrderIdForPayment);
-    if (!order) {
-      setIsProcessingPayment(false);
-      return;
-    }
-    await proceedToConfirmation(order, networkState === 'ONLINE');
+    if (finalizingRef.current) { setIsProcessingPayment(false); return; }
+    finalizingRef.current = true;
+    try {
+      const order = OrderRepository.getOrderById(localOrderIdForPayment);
+      if (!order) throw new Error('The original order needs recovery. Please ask the counter.');
+      await proceedToConfirmation(order, networkState === 'ONLINE');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Order saving needs recovery. Keep this order and retry.');
+    } finally { finalizingRef.current = false; setIsProcessingPayment(false); }
+
   };
 
   // Entry and acknowledgement belong to the touch dialog; retain the existing
@@ -3236,6 +3200,24 @@ export default function KioskUserApp() {
             <h2 className="text-3xl font-black text-jaman-navy">{t('paymentTitle')}</h2>
             <p className="text-sm text-[#4A5568]">{kioskCopy("screen_total_payable__6577c8", "Total Payable:")}<span className="font-black text-jaman-saffron text-lg">{formatINR(netTotalPayable)}</span>
             </p>
+            {/* F: explain the final price — a guest reaching the payment tiles should not have to
+                navigate back to the cart to see what the total is actually made of, and must be
+                told plainly when it no longer matches what the cart screen showed a moment ago. */}
+            <details className="mx-auto max-w-sm text-left bg-jaman-ivory border border-jaman-border rounded-xl px-4 py-2">
+              <summary className="cursor-pointer text-xs font-bold text-jaman-navy">See how this total was calculated</summary>
+              <div className="mt-2 space-y-1 text-xs text-[#52677A]">
+                <div className="flex justify-between"><span>{t('subtotal')}</span><span className="tabular-nums">{formatINR(rawCalculated.subtotal)}</span></div>
+                {rawCalculated.discountAmount > 0 && <div className="flex justify-between text-emerald-700 font-semibold"><span>{t('discount')} {appliedCoupon ? `(${appliedCoupon.code})` : ''}</span><span className="tabular-nums">-{formatINR(rawCalculated.discountAmount)}</span></div>}
+                {loyaltyDiscountAmount > 0 && <div className="flex justify-between text-emerald-700 font-semibold"><span>{selectedReward?.name ?? 'Loyalty reward'}</span><span className="tabular-nums">-{formatINR(loyaltyDiscountAmount)}</span></div>}
+                {staffDiscount > 0 && <div className="flex justify-between text-indigo-700 font-semibold"><span>Staff manager discount</span><span className="tabular-nums">-{formatINR(staffDiscount)}</span></div>}
+                <div className="flex justify-between"><span>{t('cgst')}</span><span className="tabular-nums">{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).cgst}</span></div>
+                <div className="flex justify-between"><span>{t('sgst')}</span><span className="tabular-nums">{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).sgst}</span></div>
+                {quotedPayable !== null && (
+                  <p className="text-amber-700 pt-1 border-t border-jaman-border">Verified by the payment provider at checkout — this is the exact amount charged.</p>
+                )}
+                <div className="flex justify-between font-black text-jaman-navy pt-1 border-t border-jaman-border"><span>{t('totalPayable')}</span><span className="tabular-nums">{formatINR(netTotalPayable)}</span></div>
+              </div>
+            </details>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

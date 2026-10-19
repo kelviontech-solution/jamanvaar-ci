@@ -11,14 +11,14 @@ import { splitTax, splitTaxPaise } from '../packages/utils/src/currency';
  */
 describe('splitTax (BUG-039)', () => {
   it('always adds up to the total tax, in rupees to the paisa', () => {
+    const invalid: Array<{ paise: number; cgst: number; sgst: number }> = [];
     for (let paise = 0; paise <= 20_000; paise += 1) {
       const total = paise / 100;
       const { cgst, sgst } = splitTax(total);
-      expect(Math.round((cgst + sgst) * 100), `tax ${total}`).toBe(paise);
-      expect(cgst).toBeGreaterThanOrEqual(0);
-      expect(sgst).toBeGreaterThanOrEqual(0);
-      expect(Math.abs(cgst - sgst)).toBeLessThanOrEqual(0.01 + 1e-9);
+      if (Math.round((cgst + sgst) * 100) !== paise || !(cgst >= 0) || !(sgst >= 0) || !(Math.abs(cgst - sgst) <= 0.01 + 1e-9)) invalid.push({ paise, cgst, sgst });
     }
+    // Preserve every exhaustive invariant without 80,000 matcher allocations.
+    expect(invalid).toEqual([]);
   });
 
   it('adds up in whole rupees too, so 81 becomes 41 + 40, never 41 + 41', () => {

@@ -105,11 +105,11 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
           const after = url.searchParams.get('afterSeq');
           if (after === null) {
             // Legacy timestamp cursor: return everything (the core's history is small and branch-local).
-            return send(res, 200, core.pullOrders(0));
+            return send(res, 200, core.pullOrders(0, device));
           }
           const n = Number(after);
           if (!Number.isInteger(n) || n < 0) throw new CoreError(400, 'BAD_REQUEST', 'afterSeq must be a non-negative integer');
-          return send(res, 200, core.pullOrders(n));
+          return send(res, 200, core.pullOrders(n, device));
         }
       }
 

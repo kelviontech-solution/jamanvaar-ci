@@ -44,8 +44,12 @@
   accent-color: #bf540f;
 }
 .qr-admin-app button {
+  font-family: inherit;
   cursor: pointer;
 }
+.qr-admin-app .qr-btn {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--qr-orange);border-radius:10px;background:var(--qr-orange);color:#fff;font-size:13px;font-weight:700;text-decoration:none;}
+.qr-admin-app .qr-btn.secondary {background:white;border-color:var(--qr-line);color:var(--qr-ink);}
+.qr-admin-app .qr-admin-sidebar>.qr-sidebar-title+nav>.qr-btn {width:100%;}
 .qr-admin-app button:disabled {
   cursor: not-allowed;
 }
@@ -187,6 +191,7 @@
   padding: 8px 12px;
 }
 .qr-nav-group button {
+  background: transparent;
   display: flex;
   align-items: center;
   gap: 11px;
@@ -700,3 +705,6 @@
 .qr-navigation-confirm > * { pointer-events:auto; }
 .qr-console article button,.qr-console details button {padding:8px 12px;}
 .qr-admin-app input[type="color"] {min-height:44px;width:100%;padding:4px;}
+.qr-admin-app .qr-tool-search {display:grid;gap:6px;font-size:12px;font-weight:650;padding:10px 0;color:#435b66;}
+.qr-admin-app .qr-tool-search input {width:100%;min-width:0;min-height:44px;padding:10px;border:1px solid #d8e1dc;border-radius:10px;background:white;font:inherit;font-size:16px;}
+.qr-admin-app .qr-nav-hint {font-size:12px;line-height:1.5;color:#607270;padding:8px 4px;margin:0;}

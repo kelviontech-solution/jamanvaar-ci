@@ -8,6 +8,7 @@ import { nextAttemptState } from './sync_protocol';
 import { EndpointResolver } from './endpoint_resolver';
 import { jsonBatches } from './batches';
 import { requiresCloudOrderAuthorization } from './sync_authorization';
+import { sha256 } from '@noble/hashes/sha256';
 
 /** Money crosses the wire in paise (integers), matching cloud/api's schema. */
 const toPaise = (rupees: number | undefined | null): number => Math.round((Number(rupees) || 0) * 100);
@@ -191,25 +192,17 @@ function markFailedAttempt(order: Order, error: string): void {
   order.syncLastError = error.slice(0, 300);
 }
 
-/** A short, stable fingerprint of what a push says. Same content -> same fingerprint (a retry is recognised); any real change -> a different one. */
-function contentFingerprint(order: Order): string {
-  const text = JSON.stringify([
-    order.orderStatus, order.tableId, order.paymentStatus, order.totalAmount, order.customerNotes,
-    order.items.map((i) => [i.id, i.quantity, i.unitPrice, i.kitchenStatus, i.statusRev ?? 0, i.specialInstructions])
-  ]);
-  let h = 0x811c9dc5;
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i);
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h.toString(36);
+/** Canonicalize objects so insertion order cannot turn an identical retry into a new mutation. */
+function canonicalPayload(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalPayload);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value)
+    .filter(([, entry]) => entry !== undefined).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
+    .map(([key, entry]) => [key, canonicalPayload(entry)]));
+  return value;
 }
 
 function toPushEvent(order: Order): OrderSyncPushEvent {
-  return {
-    // Unique per distinct change: the order, when it changed, and what it said. Two different changes that share a millisecond
-    // no longer collide (the second used to be dropped as a "duplicate"); a retry of the same change still carries the same id.
-    eventId: `${order.id}@${order.updatedAt}#${contentFingerprint(order)}`,
+  const event: OrderSyncPushEvent = {
     ...(order.remoteSyncVersion !== undefined ? { baseSyncVersion: order.remoteSyncVersion } : {}),
     externalOrderId: order.id,
     orderType: order.orderType,
@@ -285,6 +278,20 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
     },
     updatedAt: order.updatedAt
   };
+  // Hash the actual wire mutation, not a hand-maintained subset of the local order. Session
+  // credentials and the last observed server revision may refresh between retries; they are
+  // authorization/concurrency context, not a new sale, refund or kitchen mutation.
+  // Freeze nested metadata too: editing a local refund/reward while the digest or HTTP
+  // request is pending must not change the payload underneath an already-created identity.
+  const snapshot = JSON.parse(JSON.stringify(event)) as OrderSyncPushEvent;
+  const { baseSyncVersion: _version, meta, ...payload } = snapshot;
+  const { staffSession: _staff, approvalSession: _approval, ...businessMeta } = meta ?? {};
+  const bytes = new TextEncoder().encode(JSON.stringify(canonicalPayload({ ...payload, meta: businessMeta })));
+  // A content digest is not an authentication operation. Keep the same identity on
+  // LAN HTTP clients too, where browsers do not expose WebCrypto's secure-context API.
+  const fingerprint = Array.from(sha256(bytes), byte => byte.toString(16).padStart(2, '0')).join('');
+  snapshot.eventId = `${snapshot.externalOrderId}@${snapshot.updatedAt}#v2:${fingerprint}`;
+  return snapshot;
 }
 
 function orderItemFromRemote(orderId: string, ri: OrderSyncPushItem): OrderItem {
@@ -704,7 +711,7 @@ export class SyncOutboxEngine {
           failed++;
         }
       } else {
-        const events = new Map(pendingOrders.map((order) => [order.id, toPushEvent(order)]));
+        const events = new Map(pendingOrders.map(order => [order.id, toPushEvent(order)] as const));
         // Never let an offline cancellation/refund hold ordinary branch sales in the same network request.
         const allEvents = [...events.values()];
         const batches = [allEvents.filter(e => !requiresCloudOrderAuthorization(e)), allEvents.filter(requiresCloudOrderAuthorization)]
@@ -721,26 +728,36 @@ export class SyncOutboxEngine {
           const { results } = await transport.push(payload);
           if (transport !== this.transport) break;
           const byId = new Map(results.map((r) => [r.externalOrderId, r]));
-          for (const ord of batch) {
+          for (const sentOrder of batch) {
+            const ord = db.orders.find(order => order.id === sentOrder.id);
+            if (!ord) continue;
             const res = byId.get(ord.id);
+            const stillCurrent = toPushEvent(ord).eventId === events.get(ord.id)?.eventId;
             if (res && res.status === 'ok') {
               // While this push was in flight the order shows SYNCING. If it shows SAVED_LOCALLY now, something changed it
               // after the push was built (a cook tapped another dish): that change is not in what the server just received,
               // so the order must stay queued rather than be marked as delivered.
-              if (ord.syncStatus !== 'SAVED_LOCALLY') markSynced(ord);
+              if (stillCurrent && ord.syncStatus !== 'SAVED_LOCALLY') markSynced(ord);
+              else { ord.syncStatus = 'SAVED_LOCALLY'; this.runAgain = true; }
               if (typeof res.syncVersion === 'number') ord.remoteSyncVersion = res.syncVersion;
               processed++;
             } else {
-              markFailedAttempt(ord, res?.error ?? 'Not acknowledged by the server');
-              if (/BRANCH_FORBIDDEN|Invalid order payload/.test(res?.error ?? '')) ord.syncStatus = 'DEAD_LETTER';
+              if (stillCurrent) {
+                markFailedAttempt(ord, res?.error ?? 'Not acknowledged by the server');
+                if (/BRANCH_FORBIDDEN|Invalid order payload/.test(res?.error ?? '')) ord.syncStatus = 'DEAD_LETTER';
+              } else { ord.syncStatus = 'SAVED_LOCALLY'; this.runAgain = true; }
               failed++;
             }
           }
           NetworkStatusService.setNetworkState('ONLINE', Date.now() - startedAt);
         } catch (err) {
-          for (const ord of batch) {
-            markFailedAttempt(ord, err instanceof Error ? err.message : 'Network error');
-            if ([400, 403, 404, 409, 413, 422].includes((err as { status?: number })?.status ?? 0)) ord.syncStatus = 'DEAD_LETTER';
+          for (const sentOrder of batch) {
+            const ord = db.orders.find(order => order.id === sentOrder.id);
+            if (!ord) continue;
+            if (toPushEvent(ord).eventId === events.get(ord.id)?.eventId) {
+              markFailedAttempt(ord, err instanceof Error ? err.message : 'Network error');
+              if ([400, 403, 404, 409, 413, 422].includes((err as { status?: number })?.status ?? 0)) ord.syncStatus = 'DEAD_LETTER';
+            } else { ord.syncStatus = 'SAVED_LOCALLY'; this.runAgain = true; }
             failed++;
           }
           if (err instanceof TypeError || (err as { code?: string })?.code === 'REQUEST_TIMEOUT') NetworkStatusService.setNetworkState('OFFLINE', 0);
@@ -816,7 +833,7 @@ export class SyncOutboxEngine {
   }
 
   private static async pullPages(): Promise<{ pulled: number; created: number }> {
-    if (!this.transport) return { pulled: 0, created: 0 };
+    if (!this.transport || db.hasPendingFinancialMutation()) return { pulled: 0, created: 0 };
 
     // A position on the Branch Core means nothing on the cloud (and vice versa), so each has its own cursor.
     const ORDERS_PATH = '/api/v1/orders/sync';
@@ -828,16 +845,20 @@ export class SyncOutboxEngine {
     let created = 0;
 
     try {
+      await db.flushPersistence();
       // Follow `hasMore` so a long outage catches up page by page, saving the cursor after each applied page.
       for (let page = 0; page < 50; page++) {
+      if (!this.transport || db.hasPendingFinancialMutation()) break;
       const transport: OrderSyncTransport = this.transport;
       const { orders, serverTime, latestSeq, hasMore, serverKey } = await transport.pull(cursor);
-      if (transport !== this.transport || cursorKey !== EndpointResolver.cursorKey(CATCH_UP_CURSOR_KEY, ORDERS_PATH)) break;
+      if (db.hasPendingFinancialMutation() || transport !== this.transport || cursorKey !== EndpointResolver.cursorKey(CATCH_UP_CURSOR_KEY, ORDERS_PATH)) break;
       let deferred = false;
+      let pagePulled = 0, pageCreated = 0;
       // If the other server answered (fallback), the orders are still applied (safe, idempotent) but the
       // position it returned belongs to a different server than the cursor that was sent: do not store it.
       const answeredByPredicted = (serverKey ?? EndpointResolver.lastResponder() ?? predicted) === predicted;
       const touchedDays = new Set<string>();
+      db.transaction(() => {
       for (const remote of orders) {
         const existing = db.orders.find((o) => o.id === remote.externalOrderId);
         if (existing) {
@@ -847,16 +868,16 @@ export class SyncOutboxEngine {
           // Which copy is newer is decided by the cloud's sequence, never by comparing the cloud's clock with this device's. A device
           // whose clock runs ahead used to ignore every server update. With unsent local changes the push goes first; the merged
           // result comes back on the next pull. Older cloud rows without a sequence still use the timestamp.
-          const localPending = existing.syncStatus === 'SAVED_LOCALLY' || existing.syncStatus === 'SYNCING' || existing.syncStatus === 'FAILED';
+          const localPending = existing.syncStatus === 'SAVED_LOCALLY' || existing.syncStatus === 'SYNCING' || existing.syncStatus === 'FAILED' || existing.syncStatus === 'DEAD_LETTER';
           if (localPending) deferred = true;
-          const remoteIsNewer =
+          const remoteIsNewer = !localPending && (
             typeof remote.seq === 'number'
-              ? remote.seq > (existing.remoteSeq ?? 0) && !localPending
-              : new Date(remote.updatedAt).getTime() >= new Date(existing.updatedAt).getTime();
+              ? remote.seq > (existing.remoteSeq ?? 0)
+              : new Date(remote.updatedAt).getTime() >= new Date(existing.updatedAt).getTime());
           if (remoteIsNewer) {
             if (typeof remote.seq === 'number') existing.remoteSeq = remote.seq;
             if (typeof remote.syncVersion === 'number') existing.remoteSyncVersion = remote.syncVersion;
-            const added = applyRemoteToLocalOrder(existing, remote);
+            applyRemoteToLocalOrder(existing, remote);
             // Admission can change without adding lines (online DRAFT -> paid CONFIRMED). Reconcile tickets on every accepted version.
             ensureKotsForOrder(existing);
             if (existing.businessDayId) touchedDays.add(existing.businessDayId);
@@ -875,7 +896,7 @@ export class SyncOutboxEngine {
             // (A synced-in REFUND is a known, smaller follow-up: restoreForOrder's exact
             // full-vs-partial-refund rule isn't replicated here yet, only the base deduction.)
             if (existing.orderStatus !== 'CANCELLED') {
-              try { InventoryRepository.reconcileOrder(existing); } catch { /* no recipe data on this device — nothing to deduct */ }
+              InventoryRepository.reconcileOrder(existing);
             }
           }
         } else {
@@ -885,12 +906,12 @@ export class SyncOutboxEngine {
           db.orders.push(localOrder);
           ensureKotsForOrder(localOrder);
           if (localOrder.businessDayId) touchedDays.add(localOrder.businessDayId);
-          created++;
+          pageCreated++;
           if (localOrder.orderStatus !== 'CANCELLED') {
-            try { InventoryRepository.reconcileOrder(localOrder); } catch { /* no recipe data on this device — nothing to deduct */ }
+            InventoryRepository.reconcileOrder(localOrder);
           }
         }
-        pulled++;
+        pagePulled++;
       }
       // Keep this device's own day totals in step with the orders it just received.
       touchedDays.forEach((dayId) => {
@@ -906,6 +927,13 @@ export class SyncOutboxEngine {
       // Table bill states and bill notifications follow the orders just received, so a bill that arrives before its
       // table (or the other way round) still shows up on this device.
       refreshBillState();
+      if (orders.length) db.notify();
+      });
+      // Data must be acknowledged before its cursor can move. A crash between
+      // these writes repeats an idempotent page instead of skipping lost orders.
+      await db.flushPersistence();
+      pulled += pagePulled; created += pageCreated;
+      if (transport !== this.transport || cursorKey !== EndpointResolver.cursorKey(CATCH_UP_CURSOR_KEY, ORDERS_PATH)) break;
       // Prefer the gapless sequence; use the server clock only while no sequenced row has been seen.
       if (deferred) break; // retry this page after the local push; do not acknowledge unapplied updates
       cursor = typeof latestSeq === 'number' ? `seq:${latestSeq}` : serverTime;
@@ -913,9 +941,9 @@ export class SyncOutboxEngine {
       safeSet(cursorKey, cursor);
       if (!hasMore) break;
       }
-      if (pulled > 0) db.notify();
     } catch {
-      // Leave the cursor untouched — the next attempt retries from the same point.
+      // The failed page's cursor stays unchanged. Earlier acknowledged pages
+      // remain valid and the next pull repeats only the unapplied window.
     }
 
     return { pulled, created };

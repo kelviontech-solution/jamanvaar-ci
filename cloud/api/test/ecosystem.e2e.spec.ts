@@ -102,13 +102,13 @@ describe('ecosystem: every app, every channel, several branches and restaurants 
         const each = (list: Terminal[], source: string, per = 3) => list.forEach((t) => { for (let k = 0; k < per; k++) {
           const id = `eco-${v.rid.slice(0, 4)}-${source}-${t.name}-${k}-${n++}`;
           expected.set(id, { rid: v.rid, branchId: b.id, source });
-          jobs.push(as('post', '/api/v1/orders/sync', t.token).send({ events: [orderFor(id, source, `T0${n % 3}`)] }));
+          jobs.push(as('post', '/api/v1/orders/sync', t.token).send({ events: [orderFor(id, source, `T0${v.branches.indexOf(b) + 1}`)] }));
         } });
         each(b.pos, 'POS');
         each(b.kiosk, 'KIOSK');
         each(b.captain, 'CAPTAIN', 2);
         // QR guests at the branch table, in the same instant
-        for (let k = 0; k < 6; k++) jobs.push(http().post(`/api/v1/public/qr/${b.qrToken}/orders`).send({ items: [{ itemId: 'burger', quantity: 1, optionIds: [] }], idempotencyKey: `qr-${b.id}-${k}-${stamp}` }).then((r) => { if (r.status === 201) expected.set(r.body.publicOrderId, { rid: v.rid, branchId: b.id, source: 'QR' }); return r; }));
+        for (let k = 0; k < 6; k++) jobs.push(http().post(`/api/v1/public/qr/${b.qrToken}/orders`).send({ items: [{ itemId: 'burger', quantity: 1, optionIds: [] }], paymentMethod: 'CASH_AT_COUNTER', idempotencyKey: `qr-${b.id}-${k}-${stamp}` }).then((r) => { if (r.status === 201) expected.set(r.body.publicOrderId, { rid: v.rid, branchId: b.id, source: 'QR' }); return r; }));
       }
     }
     const t1 = Date.now();

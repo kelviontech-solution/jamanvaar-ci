@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { Cart, CartItem, CustomerAccount, DiningTable, DraftCartSession, InstantBillConfig, KOTRecord, ManagerOverrideAction, MenuItem, Order, OrderType, PaymentMethod, SelectedModifier, User, PaymentSplit } from '@jamanvaar/types';
-import { CustomerRepository, AuditRepository, db, HeldOrderRepository, KOTRepository, OrderRepository, ReceiptRepository, StaffRepository, InventoryRepository, ShiftRepository } from '@jamanvaar/database';
+import { CustomerRepository, AuditRepository, db, HeldOrderRepository, KOTRepository, OrderRepository, ReceiptRepository, StaffRepository, InventoryRepository, ShiftRepository, TableRepository, financialRequestFingerprint } from '@jamanvaar/database';
 import { getTerminalId } from '@jamanvaar/database';
 import { PosPrinterService } from '../services/printerService';
 import { Platform } from '@jamanvaar/api';
 import { PosRecoveryService } from '../services/recoveryService';
 import { lanMeshSync, SyncOutboxEngine, StaffSession, verifyPinWithSync, type RefundApprovalScope } from '@jamanvaar/sync';
 import { deviceFetch as posDeviceFetch } from '../cloud/cloudClient';
-import { SessionPersistence, AuthStatus, calculateCart, resolveModifierGroups, dishNeedsChoiceBeforeAdd, clampItemQuantity } from '@jamanvaar/business';
+import { SessionPersistence, AuthStatus, calculateCart, resolveModifierGroups, dishNeedsChoiceBeforeAdd, clampItemQuantity, validateModifiers, priceSavedUnpaidOrder } from '@jamanvaar/business';
 import { generateUUID } from '@jamanvaar/utils';
 import { outstandingBillAmount } from '@jamanvaar/utils';
 
@@ -96,6 +96,12 @@ interface PosState {
   orderNotes: string;
   /** Id of the running (sent to kitchen, not yet paid) order this cart belongs to, for counter/takeaway orders. */
   runningOrderId: string | null;
+  /**
+   * The running order's own updatedAt the moment it was loaded into this cart — simultaneous-edit
+   * protection. If the live order's updatedAt has since moved on from a DIFFERENT terminal, this
+   * cashier is about to send KOT or collect payment against a bill someone else already changed.
+   */
+  cartOrderBaseline: { orderId: string; updatedAt: string } | null;
   recoverableDraft: DraftCartSession | null;
 
   // Active Modals & Dialogs
@@ -159,6 +165,13 @@ interface PosState {
   ) => void;
   updateItemSpecialInstructions: (cartItemId: string, instructions: string) => void;
   removeItemFromCart: (cartItemId: string) => void;
+  /**
+   * Cancelling a line that has already reached the kitchen (kotSentQty > 0) is a different action
+   * from removing an un-sent one: it needs a reason, it must tell the kitchen ticket to stop, and it
+   * must never silently vanish from the bill. Returns false for a missing/unsent line; rejects a
+   * closed, collected or changed bill. The cart adopts cancellation only after acknowledgement.
+   */
+  cancelSentItemDurably: (cartItemId: string, reason: string) => Promise<boolean>;
   applyBillDiscountPercent: (percent: number) => void;
   applyBillDiscountFlat: (amount: number) => void;
   applyDiscount: (params: {
@@ -189,12 +202,21 @@ interface PosState {
   repeatLastOrder: () => Cart | null;
 
   sendKOT: () => KOTRecord[] | null;
+  sendKOTDurably: () => Promise<KOTRecord[] | null>;
   completePayment: (
     method: PaymentMethod,
     tenderedAmount?: number,
     transactionId?: string,
     splits?: PaymentSplit[]
   ) => Order | null;
+  completePaymentDurably: (
+    method: PaymentMethod,
+    tenderedAmount?: number,
+    transactionId?: string,
+    splits?: PaymentSplit[],
+    confirmation?: Order['paymentConfirmation'],
+    options?: { autoPrint?: boolean; sendKotBeforeBill?: boolean; orderType?: OrderType; instant?: boolean }
+  ) => Promise<Order | null>;
 
   setCustomizingItem: (item: MenuItem | null) => void;
   setIsPaymentOpen: (open: boolean) => void;
@@ -228,6 +250,13 @@ interface PosState {
    * bill from Live Orders or a bill-request notification, where a table may not even apply
    * (takeaway/delivery orders can also sit in Live Orders awaiting settlement). */
   loadOrderForSettlement: (orderId: string) => CartSwitchResult;
+  /**
+   * Simultaneous-edit protection: call right before sending KOT or opening payment on a cart bound
+   * to a running order. Compares the live order's updatedAt against this cart's own baseline (taken
+   * when the order was loaded) — if it moved on and the change came from a DIFFERENT terminal, this
+   * cart is stale and must not send/bill against it until refreshed.
+   */
+  checkConcurrentEdit: () => CartSwitchResult;
   openCashDrawer: () => void;
   recoverDraftSession: () => void;
   discardDraftSession: () => void;
@@ -301,6 +330,35 @@ function recomputeCart(
     discountReason,
     discountCode
   });
+}
+
+function preserveAcceptedCartLines(cart: Cart, order: Order): Cart {
+  return { ...cart, items: cart.items.map(line => {
+    const saved = order.items.find(saved => saved.id === line.orderItemId && saved.kitchenStatus !== 'CANCELLED');
+    if (!saved || saved.quantity !== line.quantity || (line.kotSentQty ?? 0) < line.quantity) return line;
+    return { ...line, unitPrice: saved.unitPrice, itemTotal: saved.totalPrice, taxSnapshot: saved.snapshot,
+      itemDiscountPercent: saved.itemDiscountPercent, itemDiscountAmount: saved.itemDiscountAmount, discountReason: saved.discountReason,
+      item: { ...line.item, price: saved.unitPrice - (saved.modifiers ?? []).reduce((sum, modifier) => sum + (modifier.priceDelta ?? 0), 0) } };
+  }) };
+}
+
+function restoreSavedCart(cart: Cart, order: Order): Cart {
+  return { ...preserveAcceptedCartLines(cart, order), subtotal: order.subtotal, discountAmount: order.discountAmount,
+    discountType: order.discountType || (order.discountAmount ? 'FIXED' : 'NONE'), discountValue: order.discountValue ?? order.discountAmount ?? 0,
+    discountScope: order.discountScope ?? 'BILL', discountReason: order.discountReason, discountCode: order.discountCode,
+    cgstAmount: order.cgstAmount, sgstAmount: order.sgstAmount, taxAmount: order.taxAmount, totalPayable: order.totalAmount,
+    roundOffAmount: order.roundOffAmount, serviceChargeAmount: order.serviceChargeAmount, tipAmount: order.tipAmount,
+    loyaltyRedemption: order.loyaltyRedemption };
+}
+
+function savedDiscountState(order: Order) {
+  // The editor supports manual discounts. Keep an accepted coupon's amount
+  // here; reopening a bill must not run today's coupon rules again.
+  const type = order.discountType === 'COUPON' ? 'FIXED' : order.discountType || (order.discountAmount ? 'FIXED' : 'NONE');
+  const value = order.discountType === 'COUPON' ? order.discountAmount : order.discountValue ?? order.discountAmount ?? 0;
+  return { discountType: type, discountValue: value, discountScope: order.discountScope ?? 'BILL',
+    discountReason: order.discountReason ?? '', discountCode: order.discountCode ?? '',
+    billDiscountPercent: type === 'PERCENTAGE' ? value : 0, billDiscountFlat: type === 'FIXED' ? value : 0 };
 }
 
 
@@ -387,11 +445,13 @@ function protectActiveCartBeforeSwitch(state: PosState): { ok: true } | { ok: fa
 }
 
 /** Brings an open order's lines and totals in line with the cart, and flags it for cloud sync. */
-function syncOrderToCart(order: Order, cart: Cart): void {
+function syncOrderToCart(order: Order, cart: Cart, actorName?: string, terminalId?: string): void {
   if (order.orderStatus === 'COMPLETED' || order.tableReleasedAt) return;
   // A partially collected QR bill keeps its canonical prices and reward reservation.
   if (order.paymentAllocationSummary?.collectedPaise || (order.source_type === "QR_TABLE" && order.discountAmount > 0)) return;
-  order.items = cartLinesToOrderItems(cart.items, order.items).map((it) => ({ ...it, orderId: order.id }));
+  const cancelled = order.items.filter(line => line.kitchenStatus === 'CANCELLED');
+  if (cart.items.some(line => cancelled.some(old => old.id === line.orderItemId))) throw new Error('A cancelled dish cannot be restored to this bill. Add it as a new line after review.');
+  order.items = [...cancelled, ...cartLinesToOrderItems(cart.items, order.items).map((it) => ({ ...it, orderId: order.id }))];
   order.subtotal = cart.subtotal;
   order.discountAmount = cart.discountAmount;
   order.loyaltyRedemption = cart.loyaltyRedemption;
@@ -411,6 +471,10 @@ function syncOrderToCart(order: Order, cart: Cart): void {
   order.roundOffAmount = cart.roundOffAmount;
   order.totalAmount = cart.totalPayable;
   order.updatedAt = new Date().toISOString();
+  // Simultaneous-edit protection: whoever/whichever terminal last wrote the live order, so a
+  // second device that loaded it earlier can tell its own baseline is now stale before it bills.
+  if (actorName) order.lastEditedBy = actorName;
+  if (terminalId) order.lastEditedByTerminalId = terminalId;
   order.syncStatus = 'SAVED_LOCALLY';
   order.isSynced = false;
   // BUG-044: items added to a running order after the first KOT were never deducted from
@@ -426,6 +490,108 @@ function saveDiscountDraft(state: PosState): void {
     billDiscountPercent: state.billDiscountPercent, billDiscountFlat: state.billDiscountFlat,
     notes: state.orderNotes
   });
+}
+
+function preparePosTickets(state: PosState) {
+      if (state.cart.items.length === 0) return null;
+
+      const boundId = state.runningOrderId ?? state.selectedTable?.currentOrderId;
+      const boundOrder = boundId ? OrderRepository.getOrderById(boundId) : undefined;
+      if (boundId && !boundOrder) throw new Error('The original table bill is unavailable. Refresh before sending more dishes.');
+      if (boundOrder && (boundOrder.paymentStatus === 'SUCCESS' || ['CANCELLED','REFUNDED'].includes(boundOrder.orderStatus))) throw new Error('This bill is already paid or closed. Refresh the order and open its receipt; do not collect payment again.');
+
+      // Only what has not been sent yet goes to the kitchen. Once everything is
+      // sent there is nothing to do - this used to create a duplicate order and
+      // a duplicate kitchen ticket on every press.
+      const linkedItems = linkCartItems(state.cart.items);
+      const unsent = linkedItems
+        .map((ci) => ({ ci, qty: ci.quantity - (ci.kotSentQty || 0) }))
+        .filter((x) => x.qty > 0);
+      if (unsent.length === 0) return null;
+
+      // A choice the guest/cashier picked earlier (e.g. a bread or topping) can go out of stock
+      // before the dish is actually sent — the cart only holds a copy of what was selected, so it
+      // never finds out on its own. Catch that here, before the kitchen gets a ticket for a choice
+      // that no longer exists, and name the exact dish/choice so it's obvious what to reopen.
+      for (const { ci } of unsent) {
+        const currentDish = db.menuItems.find(item => item.id === ci.menuItemId);
+        if (!currentDish || !currentDish.isAvailable || !Number.isInteger(ci.quantity) || clampItemQuantity(currentDish, ci.quantity) !== ci.quantity) throw new Error(`Review availability and quantity for ${ci.item.name}.`);
+        const choices = validateModifiers(resolveModifierGroups(currentDish, db.modifierGroups), ci.selectedModifiers);
+        if (!choices.isValid) throw new Error(`${ci.item.name}: ${choices.errors.join(' ')}`);
+      }
+
+      const linkedCart: Cart = { ...state.cart, items: linkedItems };
+
+      // 1. Create the running order, or add the new items to the existing one
+      let order = findRunningOrder(state);
+
+      if (!order) {
+        order = OrderRepository.createOrder({
+          orderType: state.orderType,
+          cashierName: state.currentUser?.fullName || 'Cashier',
+          tableId: state.selectedTable?.id,
+          tableNumber: state.selectedTable?.tableNumber,
+          guestCount: state.guestCount,
+          customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
+          customerName: state.selectedCustomer?.name || state.deliveryDetails.name,
+          loyaltyRedemption: state.cart.loyaltyRedemption,
+          items: cartLinesToOrderItems(linkedItems),
+          subtotal: state.cart.subtotal,
+          discountAmount: state.cart.discountAmount,
+          discountType: state.cart.discountType, discountValue: state.cart.discountValue, discountScope: state.cart.discountScope,
+          discountReason: state.cart.discountReason, discountCode: state.cart.discountCode,
+          cgstAmount: state.cart.cgstAmount,
+          sgstAmount: state.cart.sgstAmount,
+          taxAmount: state.cart.taxAmount,
+          totalAmount: state.cart.totalPayable,
+          // B2-019: this order-creation call (like the other two in this file, and
+          // syncOrderToCart above) copied every other cart total but not roundOffAmount, so the
+          // stored order kept totalAmount correctly rounded (e.g. 409.50 -> 410) while
+          // roundOffAmount silently stayed 0 — the receipt's own "Round Off" line is gated on
+          // `roundOffAmount !== 0`, so it never printed, and subtotal+CGST+SGST visibly didn't
+          // add up to the total with nothing on the document explaining the ₹0.50 gap.
+          roundOffAmount: state.cart.roundOffAmount,
+          paymentMethod: 'CASH',
+          paymentStatus: 'PENDING',
+          orderStatus: 'PREPARING',
+          source_type: 'POS',
+          syncStatus: 'SAVED_LOCALLY'
+        });
+
+        if (state.selectedTable) {
+          const liveTable = db.tables.find(table => table.id === state.selectedTable!.id);
+          if (liveTable) { liveTable.currentOrderId = order.id; liveTable.status = 'OCCUPIED'; }
+        }
+      } else {
+        syncOrderToCart(order, linkedCart, state.currentUser?.fullName, state.posTerminalId);
+        db.notify();
+      }
+
+      // 2. Generate KOT record(s) for the NEW items only, routed by kitchen station
+      const kotItems = unsent.map(({ ci, qty }, idx) => ({
+        id: `koti-${generateUUID()}`,
+        orderItemId: ci.orderItemId,
+        menuItemId: ci.menuItemId,
+        name: ci.item.name,
+        quantity: qty,
+        modifiers: ci.selectedModifiers,
+        specialInstructions: ci.specialInstructions,
+        kitchenStation: ci.item.kitchenStation || 'Main Kitchen',
+        status: 'PREPARING' as const
+      }));
+
+      const kots = KOTRepository.generateKOT({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        tokenNumber: order.tokenNumber,
+        tableNumber: state.selectedTable?.tableNumber,
+        orderType: state.orderType,
+        items: kotItems,
+        cashierName: state.currentUser?.fullName || 'Cashier',
+        orderNotes: state.orderNotes || undefined
+      });
+
+      return { order, kots, linkedCart, linkedItems };
 }
 
 export const usePosStore = create<PosState>((set, get) => {
@@ -488,6 +654,7 @@ export const usePosStore = create<PosState>((set, get) => {
     discountCode: '',
     orderNotes: '',
     runningOrderId: null,
+    cartOrderBaseline: null,
     recoverableDraft: initialDraft,
 
     customizingItem: null,
@@ -969,6 +1136,55 @@ export const usePosStore = create<PosState>((set, get) => {
       });
     },
 
+    cancelSentItemDurably: async (cartItemId, reason) => {
+      const current = get();
+      const target = current.cart.items.find(line => line.cartItemId === cartItemId);
+      if (!target?.orderItemId || !(target.kotSentQty || 0)) return false;
+      const state = { ...current, cart: structuredClone(current.cart), selectedTable: current.selectedTable ? { ...current.selectedTable } : null };
+      const orderId = current.runningOrderId ?? current.selectedTable?.currentOrderId;
+      const cleanReason = reason.trim();
+      if (!orderId || cleanReason.length < 3) throw new Error('Keep this bill open and enter a cancellation reason.');
+      const saved = await db.commitFinancialMutation(await financialRequestFingerprint(JSON.stringify({ operation: 'POS_CANCEL_SENT_LINE_V1',
+        restaurant: db.restaurant.id, branch: db.outlet.id, orderId, lineId: target.orderItemId, reason: cleanReason,
+        actor: current.currentUser?.id, terminal: current.posTerminalId })), () => {
+        const conflict = get().checkConcurrentEdit();
+        if (!conflict.ok) throw new Error(conflict.reason);
+        const original = OrderRepository.getOrderById(orderId);
+        if (!original || original.tableReleasedAt || ['COMPLETED', 'CANCELLED', 'REFUNDED'].includes(original.orderStatus)) throw new Error('This bill is closed. Ask the cashier to review its original reference.');
+        if (original.source_type === 'QR_TABLE') throw new Error('Review this QR order in the order desk before cancelling a submitted line.');
+        // Check collection before changing a ticket or its line price.
+        priceSavedUnpaidOrder(original, db.menuItems, db.taxGroups);
+        const updated = KOTRepository.cancelOrderLine(orderId, target.orderItemId!, cleanReason, current.currentUser?.fullName || 'Cashier');
+        if (!updated) throw new Error('This dish can no longer be cancelled. Review its kitchen status.');
+        Object.assign(updated, priceSavedUnpaidOrder(updated, db.menuItems, db.taxGroups));
+        if (updated.orderStatus === 'CANCELLED') {
+          const table = db.tables.find(table => table.currentOrderId === updated.id);
+          if (table) TableRepository.updateTableStatus(table.id, 'AVAILABLE');
+        }
+        db.notify();
+        return { orderId };
+      });
+      const updated = OrderRepository.getOrderById(saved.result.orderId)!;
+      const view = get();
+      if ((view.runningOrderId ?? view.cartOrderBaseline?.orderId ?? view.selectedTable?.currentOrderId) === updated.id) {
+        const remaining = view.cart.items.filter(line => line.cartItemId !== cartItemId);
+        const cart = preserveAcceptedCartLines(recomputeCart(remaining, view.discountType, view.discountValue, view.discountScope, view.discountReason, view.discountCode), updated);
+        const allSent = remaining.every(line => line.quantity <= (line.kotSentQty ?? 0)) && view.discountType === state.discountType && view.discountValue === state.discountValue;
+        const closed = updated.orderStatus === 'CANCELLED';
+        set({ runningOrderId: closed ? null : updated.id, cartOrderBaseline: closed ? null : { orderId: updated.id, updatedAt: updated.updatedAt },
+          selectedTable: closed && view.selectedTable ? { ...view.selectedTable, currentOrderId: undefined, status: 'AVAILABLE' } : view.selectedTable,
+          cart: { ...cart,
+          ...(allSent ? { subtotal: updated.subtotal, discountAmount: updated.discountAmount, cgstAmount: updated.cgstAmount,
+            sgstAmount: updated.sgstAmount, taxAmount: updated.taxAmount, roundOffAmount: updated.roundOffAmount,
+            serviceChargeAmount: updated.serviceChargeAmount, tipAmount: updated.tipAmount, totalPayable: updated.totalAmount } : {}),
+          loyaltyRedemption: view.cart.loyaltyRedemption ? { ...view.cart.loyaltyRedemption, discountAmount: cart.discountAmount } : undefined } });
+        saveDiscountDraft(get());
+      }
+      await db.acknowledgeFinancialMutation(saved.operationId);
+      void SyncOutboxEngine.flush();
+      return true;
+    },
+
     applyBillDiscountPercent: (percent: number) => {
       get().applyDiscount({ scope: 'BILL', type: 'PERCENTAGE', value: percent, reason: 'Bill Discount' });
     },
@@ -1113,7 +1329,8 @@ export const usePosStore = create<PosState>((set, get) => {
         discountReason: '',
         discountCode: '',
         orderNotes: '',
-        runningOrderId: null
+        runningOrderId: null,
+        cartOrderBaseline: null
       });
       PosRecoveryService.clearDraft();
     },
@@ -1169,6 +1386,7 @@ export const usePosStore = create<PosState>((set, get) => {
         // refuses to hold one that is) — any running-order binding from the cart just replaced
         // must not leak onto this one, or its next KOT/payment would attach to the wrong order.
         runningOrderId: null,
+        cartOrderBaseline: null,
         activeTab: 'MENU'
       });
 
@@ -1187,91 +1405,64 @@ export const usePosStore = create<PosState>((set, get) => {
       return { ok: true };
     },
 
+    checkConcurrentEdit: () => {
+      const state = get();
+      const baseline = state.cartOrderBaseline;
+      if (!baseline) return { ok: true };
+      const live = OrderRepository.getOrderById(baseline.orderId);
+      if (!live) return { ok: true };
+      // Same timestamp: nothing has written to this order since the baseline was taken, by anyone.
+      if (live.updatedAt === baseline.updatedAt) return { ok: true };
+      // The order moved on, but the last write was THIS terminal's own (e.g. a previous sendKOT in
+      // this same editing session already advanced it) — not a conflict with someone else.
+      if (live.lastEditedByTerminalId && live.lastEditedByTerminalId === state.posTerminalId) return { ok: true };
+      const who = live.lastEditedBy || 'another device';
+      const when = new Date(live.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return { ok: false, reason: `This bill was changed by ${who} at ${when}, after you opened it here. Refresh to load the latest before sending to the kitchen or collecting payment.` };
+    },
+
+    sendKOTDurably: async () => {
+      const current = get();
+      if (!current.cart.items.some(line => line.quantity > (line.kotSentQty || 0))) return null;
+      const state = { ...current, cart: structuredClone(current.cart), selectedTable: current.selectedTable ? { ...current.selectedTable } : null };
+      const fingerprint = await financialRequestFingerprint(JSON.stringify({ operation: 'POS_KOT_V1', restaurant: db.restaurant.id,
+        branch: db.outlet.id, terminal: state.posTerminalId, table: state.selectedTable?.id, running: state.runningOrderId,
+        cart: state.cart, actor: state.currentUser?.id, notes: state.orderNotes }));
+      const committed = await db.commitFinancialMutation(fingerprint, () => {
+        const conflict = get().checkConcurrentEdit();
+        if (!conflict.ok) throw new Error(conflict.reason);
+        const prepared = preparePosTickets(state);
+        if (!prepared) throw new Error('No new dishes are ready for kitchen submission.');
+        return { orderId: prepared.order.id, kotIds: prepared.kots.map(kot => kot.id),
+          linkedItems: prepared.linkedItems.map(line => ({ cartItemId: line.cartItemId, orderItemId: line.orderItemId, quantity: line.quantity })) };
+      });
+      const order = db.orders.find(order => order.id === committed.result.orderId);
+      if (!order) throw new Error('Kitchen submission saved; the order needs recovery. Do not send it again.');
+      const kots = committed.result.kotIds.map(id => db.kots.find(kot => kot.id === id)).filter((kot): kot is NonNullable<typeof kot> => !!kot);
+      if (JSON.stringify(get().cart) === JSON.stringify(state.cart)) {
+        const links = new Map(committed.result.linkedItems.map(line => [line.cartItemId, line]));
+        set({ runningOrderId: order.id, cartOrderBaseline: { orderId: order.id, updatedAt: order.updatedAt },
+          cart: { ...get().cart, items: get().cart.items.map(line => links.has(line.cartItemId)
+            ? { ...line, orderItemId: links.get(line.cartItemId)!.orderItemId, kotSentQty: links.get(line.cartItemId)!.quantity } : line) } });
+        PosRecoveryService.clearDraft();
+      }
+      try { await db.acknowledgeFinancialMutation(committed.operationId); }
+      catch { console.warn('Kitchen submission saved; local acknowledgement needs recovery.'); }
+      if (committed.outcome === 'COMMITTED') {
+        for (const kot of kots) void Promise.resolve().then(() => PosPrinterService.printKOT(kot)).catch(() => console.warn('Saved ticket needs a print retry.'));
+        try { lanMeshSync.broadcast('ORDER_CREATED', order); lanMeshSync.broadcast('KOT_CREATED', kots); }
+        catch { console.warn('Saved ticket is waiting for live notification.'); }
+      }
+      void SyncOutboxEngine.flush();
+      return kots;
+    },
+
     sendKOT: () => {
       const state = get();
-      if (state.cart.items.length === 0) return null;
-
-      const boundId = state.runningOrderId ?? state.selectedTable?.currentOrderId;
-      const boundOrder = boundId ? OrderRepository.getOrderById(boundId) : undefined;
-      if (boundOrder && (boundOrder.paymentStatus === 'SUCCESS' || ['CANCELLED','REFUNDED'].includes(boundOrder.orderStatus))) throw new Error('This bill is already paid or closed. Refresh the order and open its receipt; do not collect payment again.');
-
-      // Only what has not been sent yet goes to the kitchen. Once everything is
-      // sent there is nothing to do - this used to create a duplicate order and
-      // a duplicate kitchen ticket on every press.
-      const linkedItems = linkCartItems(state.cart.items);
-      const unsent = linkedItems
-        .map((ci) => ({ ci, qty: ci.quantity - (ci.kotSentQty || 0) }))
-        .filter((x) => x.qty > 0);
-      if (unsent.length === 0) return null;
-
-      const linkedCart: Cart = { ...state.cart, items: linkedItems };
-
-      // 1. Create the running order, or add the new items to the existing one
-      let order = findRunningOrder(state);
-
-      if (!order) {
-        order = OrderRepository.createOrder({
-          orderType: state.orderType,
-          cashierName: state.currentUser?.fullName || 'Cashier',
-          tableId: state.selectedTable?.id,
-          tableNumber: state.selectedTable?.tableNumber,
-          guestCount: state.guestCount,
-          customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
-          customerName: state.selectedCustomer?.name || state.deliveryDetails.name,
-          loyaltyRedemption: state.cart.loyaltyRedemption,
-          items: cartLinesToOrderItems(linkedItems),
-          subtotal: state.cart.subtotal,
-          discountAmount: state.cart.discountAmount,
-          cgstAmount: state.cart.cgstAmount,
-          sgstAmount: state.cart.sgstAmount,
-          taxAmount: state.cart.taxAmount,
-          totalAmount: state.cart.totalPayable,
-          // B2-019: this order-creation call (like the other two in this file, and
-          // syncOrderToCart above) copied every other cart total but not roundOffAmount, so the
-          // stored order kept totalAmount correctly rounded (e.g. 409.50 -> 410) while
-          // roundOffAmount silently stayed 0 — the receipt's own "Round Off" line is gated on
-          // `roundOffAmount !== 0`, so it never printed, and subtotal+CGST+SGST visibly didn't
-          // add up to the total with nothing on the document explaining the ₹0.50 gap.
-          roundOffAmount: state.cart.roundOffAmount,
-          paymentMethod: 'CASH',
-          paymentStatus: 'PENDING',
-          orderStatus: 'PREPARING',
-          source_type: 'POS',
-          syncStatus: 'SAVED_LOCALLY'
-        });
-
-        if (state.selectedTable) {
-          state.selectedTable.currentOrderId = order.id;
-          state.selectedTable.status = 'OCCUPIED';
-        }
-      } else {
-        syncOrderToCart(order, linkedCart);
-        db.notify();
-      }
-
-      // 2. Generate KOT record(s) for the NEW items only, routed by kitchen station
-      const kotItems = unsent.map(({ ci, qty }, idx) => ({
-        id: `koti-${Date.now()}-${idx}`,
-        menuItemId: ci.menuItemId,
-        name: ci.item.name,
-        quantity: qty,
-        modifiers: ci.selectedModifiers,
-        specialInstructions: ci.specialInstructions,
-        kitchenStation: ci.item.kitchenStation || 'Main Kitchen',
-        status: 'PREPARING' as const
-      }));
-
-      const kots = KOTRepository.generateKOT({
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-        tokenNumber: order.tokenNumber,
-        tableNumber: state.selectedTable?.tableNumber,
-        orderType: state.orderType,
-        items: kotItems,
-        cashierName: state.currentUser?.fullName || 'Cashier',
-        orderNotes: state.orderNotes || undefined
-      });
-
+      if (db.supportsFinancialCommands()) throw new Error('Use acknowledged kitchen submission before marking dishes as sent.');
+      const prepared = preparePosTickets(state);
+      if (!prepared) return null;
+      const { order, kots, linkedCart, linkedItems } = prepared;
       // 3. Dispatch Print Jobs to Print Queue for each KOT Station
       kots.forEach((kot) => {
         PosPrinterService.printKOT(kot);
@@ -1289,6 +1480,7 @@ export const usePosStore = create<PosState>((set, get) => {
       // 4. The cart is now a running order: everything in it counts as sent
       set({
         runningOrderId: order.id,
+        cartOrderBaseline: { orderId: order.id, updatedAt: order.updatedAt },
         cart: { ...linkedCart, items: linkedItems.map((ci) => ({ ...ci, kotSentQty: ci.quantity })) }
       });
       // The earlier auto-saved draft still holds these dishes as unsent; the order is saved now, so a reload must not
@@ -1301,7 +1493,121 @@ export const usePosStore = create<PosState>((set, get) => {
       return kots;
     },
 
+    completePaymentDurably: async (method, tenderedAmount, transactionId, splits, confirmation, options) => {
+      const current = get();
+      if (!current.cart.items.length) return null;
+      const state = { ...current, cart: structuredClone(current.cart), selectedTable: current.selectedTable ? { ...current.selectedTable } : null };
+      const cartText = JSON.stringify(state.cart);
+      // Generated attempt references change on a UI retry. They are saved in the
+      // command, but are not the identity of the original customer request.
+      const request = JSON.stringify({
+        restaurant: db.restaurant.id, branch: db.outlet.id, terminal: state.posTerminalId,
+        user: state.currentUser?.id, runningOrderId: state.runningOrderId, table: state.selectedTable?.id,
+        cart: state.cart, phone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
+        name: state.selectedCustomer?.name || state.deliveryDetails.name,
+        method, tenderedAmount, splits, options,
+        confirmation: confirmation ? { kind: confirmation.kind, reference: confirmation.reference === transactionId ? null : confirmation.reference } : null
+      });
+      if (!globalThis.crypto?.subtle) throw new Error('Secure checkout storage is unavailable. Your cart is preserved.');
+      const hash = await globalThis.crypto.subtle.digest('SHA-256', new TextEncoder().encode(request));
+      const fingerprint = [...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+      const committed = await db.commitFinancialMutation(fingerprint, () => {
+        if (state.cart.totalPayable > 0 && (method === 'CASH' || method === 'CASH_AT_COUNTER' || splits?.some(split => split.method === 'CASH' && split.amount > 0)) && !ShiftRepository.getActiveShift()) throw new Error('Open a cash shift before collecting cash. Your cart is preserved.');
+        const boundId = state.runningOrderId ?? state.selectedTable?.currentOrderId;
+        const boundOrder = boundId ? OrderRepository.getOrderById(boundId) : undefined;
+        if (boundId && !boundOrder) throw new Error('This saved bill is no longer available. Refresh before collecting payment.');
+        if (boundOrder && (boundOrder.paymentStatus === 'SUCCESS' || ['CANCELLED', 'REFUNDED'].includes(boundOrder.orderStatus))) throw new Error('This bill is already paid or closed. Open its receipt; do not collect again.');
+        const conflict = get().checkConcurrentEdit();
+        if (!conflict.ok) throw new Error(conflict.reason);
+        CustomerRepository.validateOrderRedemption({ loyaltyRedemption: state.cart.loyaltyRedemption, customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone, discountAmount: state.cart.discountAmount });
+        const linked = linkCartItems(state.cart.items);
+        const unsent = linked.filter(line => line.quantity > (line.kotSentQty ?? 0));
+        for (const line of unsent) {
+          const dish = db.menuItems.find(item => item.id === line.menuItemId);
+          if (!dish || !dish.isAvailable) throw new Error(`${line.item.name} is unavailable. Review this dish before collecting payment.`);
+          if (!Number.isInteger(line.quantity) || line.quantity !== clampItemQuantity(dish, line.quantity)) throw new Error(`Review the quantity for ${dish.name}.`);
+          const choices = validateModifiers(resolveModifierGroups(dish, db.modifierGroups), line.selectedModifiers);
+          if (!choices.isValid) throw new Error(`${dish.name}: ${choices.errors.join(' ')}`);
+        }
+        let order = boundOrder;
+        if (order) {
+          syncOrderToCart(order, { ...state.cart, items: linked }, state.currentUser?.fullName, state.posTerminalId);
+          order.customerPhone = state.selectedCustomer?.phone || state.deliveryDetails.phone;
+          order.customerName = state.selectedCustomer?.name || state.deliveryDetails.name;
+        } else {
+          order = OrderRepository.createOrder({
+            source_type: 'POS', kioskId: state.posTerminalId, orderType: options?.orderType ?? state.orderType,
+            cashierName: state.currentUser?.fullName || 'Cashier', tableId: state.selectedTable?.id,
+            tableNumber: state.selectedTable?.tableNumber, guestCount: state.guestCount,
+            customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
+            customerName: state.selectedCustomer?.name || state.deliveryDetails.name,
+            loyaltyRedemption: state.cart.loyaltyRedemption, items: cartLinesToOrderItems(linked),
+            subtotal: state.cart.subtotal, discountAmount: state.cart.discountAmount,
+            discountType: state.discountType, discountValue: state.discountValue, discountScope: state.discountScope,
+            discountReason: state.discountReason, discountCode: state.discountCode,
+            discountAppliedBy: state.currentUser?.fullName || 'Cashier',
+            discountAppliedAt: state.cart.discountAmount > 0 ? new Date().toISOString() : undefined,
+            cgstAmount: state.cart.cgstAmount, sgstAmount: state.cart.sgstAmount, taxAmount: state.cart.taxAmount,
+            totalAmount: state.cart.totalPayable, roundOffAmount: state.cart.roundOffAmount,
+            paymentMethod: method, paymentStatus: 'PENDING', orderStatus: 'CONFIRMED'
+          });
+        }
+        // A running bill may have additions which have not reached the kitchen.
+        // Save their ticket intent together with settlement; dispatch follows ACK.
+        const kots = (boundOrder || options?.sendKotBeforeBill) && unsent.length ? KOTRepository.generateKOT({
+          orderId: order.id, orderNumber: order.orderNumber, tokenNumber: order.tokenNumber,
+          tableNumber: order.tableNumber, orderType: order.orderType,
+          cashierName: state.currentUser?.fullName || 'Cashier', orderNotes: state.orderNotes || undefined,
+          items: unsent.map(line => ({
+            id: `koti-${generateUUID()}`, orderItemId: line.orderItemId,
+            menuItemId: line.menuItemId, name: line.item.name, quantity: line.quantity - (line.kotSentQty ?? 0),
+            modifiers: line.selectedModifiers, specialInstructions: line.specialInstructions,
+            kitchenStation: line.item.kitchenStation || 'Main Kitchen', status: 'PREPARING' as const
+          }))
+        }) : [];
+        const settled = OrderRepository.settleOrder(order.id, method, tenderedAmount, transactionId, state.currentUser?.fullName || 'Cashier', splits);
+        if (!settled) throw new Error('The saved bill could not be settled. Your cart is preserved.');
+        if (confirmation) {
+          settled.paymentConfirmation = confirmation;
+          AuditRepository.log({ action: 'MANUAL_PAYMENT_CONFIRMED', category: 'PAYMENT', username: confirmation.actor, details: `${settled.orderNumber}: cashier acknowledged collection; reference ${confirmation.reference || transactionId || 'not supplied'}.` });
+        }
+        if (options?.instant) AuditRepository.log({ action: 'INSTANT_BILL_CREATED', category: 'FINANCIAL',
+          username: state.currentUser?.fullName || 'Cashier', details: `Instant Bill #${settled.orderNumber} settled via ${method} for ${settled.totalAmount}` });
+        const receiptRecordId = `rec-${generateUUID()}`;
+        ReceiptRepository.addRecord({ id: receiptRecordId, orderId: settled.id, orderNumber: settled.orderNumber,
+          tokenNumber: settled.tokenNumber, deliveryMethod: 'PRINT', deliveryStatus: 'QUEUED',
+          recipient: settled.customerPhone || 'Counter Guest', paperSize: '80mm',
+          content: PosPrinterService.generateReceiptText(settled, '80mm'), createdAt: new Date().toISOString() });
+        db.notify();
+        return { orderId: settled.id, receiptRecordId, kotIds: kots.map(kot => kot.id) };
+      });
+      const saved = OrderRepository.getOrderById(committed.result.orderId);
+      if (!saved) throw new Error('Checkout was saved but its receipt needs recovery. Do not collect payment again.');
+      if (committed.outcome === 'COMMITTED') {
+        for (const id of committed.result.kotIds) {
+          const kot = db.kots.find(ticket => ticket.id === id);
+          if (kot) void Promise.resolve().then(() => PosPrinterService.printKOT(kot)).catch(() => console.warn('Kitchen ticket saved; print dispatch needs a retry.'));
+        }
+        if (options?.autoPrint !== false) void Promise.resolve().then(() => PosPrinterService.printOrderReceipt(saved, '80mm')).then(job => {
+          ReceiptRepository.updateRecordStatus(committed.result.receiptRecordId, job.status === 'PRINTED' ? 'SENT' : 'FAILED', job.status !== 'PRINTED' ? job.lastError : undefined);
+        }).catch(() => ReceiptRepository.updateRecordStatus(committed.result.receiptRecordId, 'FAILED', 'Print dispatch failed; reprint from the saved receipt.'));
+        try {
+          if (method === 'CASH' || method === 'CASH_AT_COUNTER' || splits?.some(split => split.method === 'CASH' && split.amount > 0)) get().openCashDrawer();
+          lanMeshSync.broadcast('ORDER_CREATED', saved);
+          lanMeshSync.broadcast('BILL_SETTLED', { orderId: saved.id, tableNumber: saved.tableNumber, paymentMethod: saved.paymentMethod, totalAmount: saved.totalAmount });
+        } catch { console.warn('Bill saved; a hardware or live notification needs recovery.'); }
+      }
+      // Preserve any new work entered while awaiting the worker response.
+      if (JSON.stringify(get().cart) === cartText) get().clearCart();
+      set({ lastCompletedOrder: saved, isPaymentOpen: false, isReceiptOpen: true });
+      try { await db.acknowledgeFinancialMutation(committed.operationId); }
+      catch { console.warn('Receipt recovered; checkout acknowledgement will be retried before another collection.'); }
+      void SyncOutboxEngine.flush();
+      return saved;
+    },
+
     completePayment: (method: PaymentMethod, tenderedAmount?: number, transactionId?: string, splits?: PaymentSplit[]) => {
+      if (db.supportsFinancialCommands()) throw new Error('Use the acknowledged checkout flow before collecting payment.');
       const state = get();
       if (state.cart.items.length === 0) return null;
       if (state.cart.totalPayable > 0 && (method === 'CASH' || method === 'CASH_AT_COUNTER' || splits?.some(split => split.method === 'CASH' && split.amount > 0)) && !ShiftRepository.getActiveShift()) throw new Error('Open a cash shift in Shift & Cash before collecting cash. Your order is preserved.');
@@ -1320,7 +1626,7 @@ export const usePosStore = create<PosState>((set, get) => {
       const afterSend = get();
       let order = findRunningOrder(afterSend);
       if (order) {
-        syncOrderToCart(order, afterSend.cart);
+        syncOrderToCart(order, afterSend.cart, afterSend.currentUser?.fullName, afterSend.posTerminalId);
         order.customerPhone = afterSend.selectedCustomer?.phone || afterSend.deliveryDetails.phone;
         order.customerName = afterSend.selectedCustomer?.name || afterSend.deliveryDetails.name;
       }
@@ -1479,7 +1785,7 @@ export const usePosStore = create<PosState>((set, get) => {
         return { ok: false, reason: "This table's order has not fully synced to this terminal yet. Try again in a moment." };
       }
 
-      const cartItems: CartItem[] = order.items.map((oi) => {
+      const cartItems: CartItem[] = order.items.filter(line => line.kitchenStatus !== 'CANCELLED').map((oi) => {
         const itemObj = db.menuItems.find((m) => m.id === oi.menuItemId) || {
           id: oi.menuItemId,
           categoryId: 'cat-starters',
@@ -1502,9 +1808,10 @@ export const usePosStore = create<PosState>((set, get) => {
         return {
           cartItemId: `ci-loaded-${oi.id}`,
           menuItemId: oi.menuItemId,
-          item: itemObj as MenuItem,
+          item: { ...itemObj, price: oi.unitPrice - (oi.modifiers ?? []).reduce((sum, modifier) => sum + (modifier.priceDelta ?? 0), 0) } as MenuItem,
           quantity: oi.quantity,
           unitPrice: oi.unitPrice,
+          taxSnapshot: oi.snapshot,
           selectedModifiers: oi.modifiers || [],
           specialInstructions: oi.specialInstructions,
           itemTotal: oi.totalPrice,
@@ -1526,7 +1833,10 @@ export const usePosStore = create<PosState>((set, get) => {
       set({
         selectedTable: table,
         orderType: 'DINE_IN',
-        cart: { ...updatedCart, loyaltyRedemption: order.loyaltyRedemption },
+        runningOrderId: order.id,
+        ...savedDiscountState(order),
+        cartOrderBaseline: { orderId: order.id, updatedAt: order.updatedAt },
+        cart: restoreSavedCart(updatedCart, order),
         selectedCustomer: order.customerPhone ? CustomerRepository.getByPhone(order.customerPhone) ?? null : null,
         activeTab: 'MENU'
       });
@@ -1559,7 +1869,7 @@ export const usePosStore = create<PosState>((set, get) => {
 
       const table = db.tables.find((t) => t.currentOrderId === orderId) ?? null;
 
-      const cartItems: CartItem[] = order.items.map((oi) => {
+      const cartItems: CartItem[] = order.items.filter(line => line.kitchenStatus !== 'CANCELLED').map((oi) => {
         const itemObj = db.menuItems.find((m) => m.id === oi.menuItemId) || {
           id: oi.menuItemId,
           categoryId: 'cat-starters',
@@ -1582,9 +1892,10 @@ export const usePosStore = create<PosState>((set, get) => {
         return {
           cartItemId: `ci-loaded-${oi.id}`,
           menuItemId: oi.menuItemId,
-          item: itemObj as MenuItem,
+          item: { ...itemObj, price: oi.unitPrice - (oi.modifiers ?? []).reduce((sum, modifier) => sum + (modifier.priceDelta ?? 0), 0) } as MenuItem,
           quantity: oi.quantity,
           unitPrice: oi.unitPrice,
+          taxSnapshot: oi.snapshot,
           selectedModifiers: oi.modifiers || [],
           specialInstructions: oi.specialInstructions,
           itemTotal: oi.totalPrice,
@@ -1607,7 +1918,9 @@ export const usePosStore = create<PosState>((set, get) => {
         selectedTable: table,
         orderType: table ? 'DINE_IN' : order.orderType,
         runningOrderId: order.id,
-        cart: { ...updatedCart, subtotal:order.subtotal, discountAmount:order.discountAmount, cgstAmount:order.cgstAmount, sgstAmount:order.sgstAmount, taxAmount:order.taxAmount, totalPayable:order.totalAmount, roundOffAmount:order.roundOffAmount, loyaltyRedemption: order.loyaltyRedemption },
+        ...savedDiscountState(order),
+        cartOrderBaseline: { orderId: order.id, updatedAt: order.updatedAt },
+        cart: restoreSavedCart(updatedCart, order),
         selectedCustomer: order.customerPhone ? CustomerRepository.getByPhone(order.customerPhone) ?? null : null,
         activeTab: 'MENU'
       });
@@ -1673,7 +1986,7 @@ export const usePosStore = create<PosState>((set, get) => {
 
     repeatOrder: (order: Order) => {
       const state = get();
-      const newCartItems: CartItem[] = order.items.map((oi, idx) => {
+      const newCartItems: CartItem[] = order.items.filter(line => line.kitchenStatus !== 'CANCELLED').map((oi, idx) => {
         const menuItem = db.menuItems.find((mi) => mi.id === oi.menuItemId) || {
           id: oi.menuItemId,
           categoryId: 'cat-main',
@@ -1839,10 +2152,15 @@ export const usePosStore = create<PosState>((set, get) => {
       set({ isInstantBillProcessing: true });
 
       try {
+        if (db.supportsFinancialCommands()) {
+          const resolvedType = state.selectedTable ? 'DINE_IN' : state.orderType && state.orderType !== 'DINE_IN' ? state.orderType : cfg.defaultOrderType || 'TAKEAWAY';
+          return await get().completePaymentDurably(method, state.cart.totalPayable, `IB-${generateUUID()}`, undefined, undefined,
+            { autoPrint: cfg.autoPrint, sendKotBeforeBill: cfg.sendKotBeforeBill, orderType: resolvedType, instant: true });
+        }
         const running = findRunningOrder(state);
         const linked = linkCartItems(state.cart.items);
         const orderItems = cartLinesToOrderItems(linked, running?.items);
-        if (running) syncOrderToCart(running, { ...state.cart, items: linked });
+        if (running) syncOrderToCart(running, { ...state.cart, items: linked }, state.currentUser?.fullName, state.posTerminalId);
 
         // A quick counter sale with no table is takeaway (the setting's default), not a dine-in with no table
         // (BUG-153): the cart's order type is DINE_IN by default, so only a type the cashier deliberately

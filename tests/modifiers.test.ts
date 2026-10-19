@@ -54,6 +54,17 @@ describe('Modifier Selection Validation', () => {
     ]);
     expect(result.isValid).toBe(false);
   });
+  it('rejects unknown and unavailable options even if the group selection count matches', () => {
+    const choice = { groupId: 'grp-spice', groupName: 'Spice Level', optionId: 'missing', optionName: 'Missing', priceDelta: 0 };
+    expect(validateModifiers(groups, [choice]).isValid).toBe(false);
+    const soldOut = groups.map(group => ({ ...group, options: group.options.map(option => ({ ...option, isAvailable: false })) }));
+    expect(validateModifiers(soldOut, [{ ...choice, optionId: 'opt-mild' }]).isValid).toBe(false);
+  });
+  it('does not let duplicated options satisfy a minimum number of distinct choices', () => {
+    const group = { ...groups[1], minSelections: 2, maxSelections: 2, isRequired: true };
+    const option = { groupId: group.id, groupName: group.name, optionId: 'opt-cheese', optionName: 'Cheese', priceDelta: 30 };
+    expect(validateModifiers([group], [option, option]).isValid).toBe(false);
+  });
 });
 
 describe('hasRequiredModifierGroup — the "smart add" gate for kiosk/POS quick-add buttons', () => {

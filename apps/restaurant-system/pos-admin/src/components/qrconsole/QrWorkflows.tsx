@@ -4,6 +4,7 @@ import { formatINR, formatRestaurantDate } from '@jamanvaar/utils';
 import { qrApi } from '../../cloud/cloudClient';
 import { QrAdminApi } from '../../cloud/qrAdminClient';
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
+import { FeatureRequestButton } from './FeatureRequestButton';
 export const flowBase = '/api/v1/restaurant/qr/workflows';
 const button = 'min-h-11 rounded-xl border px-4 py-2 font-bold disabled:opacity-40',
   field = 'mt-1 w-full rounded-xl border p-3 min-h-11',
@@ -380,11 +381,20 @@ export function QrPickupCalendar() {
         Booked slots for the selected branch. Pending online payments hold capacity; cancelled/refunded orders release it. Mark handover only after food reaches
         the guest.
       </p>
-      <label>
-        Pickup date (restaurant time)
-        <input className={field} type="date" value={day} onChange={(e) => setDay(e.target.value)} />
-      </label>
-      {error && <p role="alert">{error}</p>}
+      {error && error.includes('not included in the current license') ? (
+        <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+          <p>{error}</p>
+          <FeatureRequestButton featureCode="QR_SCHEDULED_PICKUP" featureLabel="Pickup calendar" />
+        </div>
+      ) : (
+        <>
+          <label>
+            Pickup date (restaurant time)
+            <input className={field} type="date" value={day} onChange={(e) => setDay(e.target.value)} />
+          </label>
+          {error && <p role="alert">{error}</p>}
+        </>
+      )}
       {data && (
         <>
           <p>

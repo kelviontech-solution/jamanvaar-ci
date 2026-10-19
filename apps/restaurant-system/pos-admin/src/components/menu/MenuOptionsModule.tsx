@@ -3,6 +3,7 @@ import type { ModifierGroup, ModifierOption, TaxGroup } from '@jamanvaar/types';
 import { db, ModifierAuthoring, TaxAuthoring, newAuthoringId } from '@jamanvaar/database';
 import { Plus, Trash2, Pencil, ArrowUp, ArrowDown, Send, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { fetchMenuDraftStatus, publishMenuToGuests, MenuPublishRefused, qrApi, type MenuDraftStatus } from '../../cloud/cloudClient';
+import { MenuSyncReview } from './MenuSyncReview';
 
 interface Props {
   showToast: (message: string) => void;
@@ -62,6 +63,7 @@ export const MenuPublishPanel: React.FC<{ showToast: (m: string) => void; change
   const dirty = status?.hasUnpublishedChanges;
   return (
     <div className={`${card} space-y-3`}>
+      <MenuSyncReview />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-bold text-jaman-navy">Guest menu</h2>

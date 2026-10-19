@@ -1,0 +1,209 @@
+{
+  "date": "2026-10-19",
+  "rootTests": {
+    "files": 8,
+    "passed": 46
+  },
+  "apiTests": {
+    "files": 4,
+    "passed": 47
+  },
+  "focusedBrowser": [
+    {
+      "screen": "shared-qr-console",
+      "layout": "workspace",
+      "width": 1440,
+      "allToolsReachable": 24,
+      "search": true,
+      "overflow": false
+    },
+    {
+      "screen": "shared-qr-console",
+      "layout": "workspace",
+      "width": 390,
+      "allToolsReachable": 24,
+      "search": true,
+      "overflow": false
+    },
+    {
+      "screen": "shared-qr-console",
+      "layout": "integrated",
+      "width": 1440,
+      "allToolsReachable": 24,
+      "search": true,
+      "overflow": false
+    },
+    {
+      "screen": "shared-qr-console",
+      "layout": "integrated",
+      "width": 390,
+      "allToolsReachable": 24,
+      "search": true,
+      "overflow": false
+    },
+    {
+      "screen": "recommendations",
+      "width": 320,
+      "signatureVariety": true,
+      "categoriesAndSearch": true,
+      "translatedNavigationAndDishes": true,
+      "openingStatus": true,
+      "overflow": false
+    },
+    {
+      "screen": "recommendations",
+      "width": 390,
+      "signatureVariety": true,
+      "categoriesAndSearch": true,
+      "translatedNavigationAndDishes": true,
+      "openingStatus": true,
+      "overflow": false
+    },
+    {
+      "screen": "recommendations",
+      "width": 1440,
+      "signatureVariety": true,
+      "categoriesAndSearch": true,
+      "translatedNavigationAndDishes": true,
+      "openingStatus": true,
+      "overflow": false
+    },
+    {
+      "screen": "real-editor-with-isolated-transport",
+      "width": 1440,
+      "draftSave": true,
+      "publishAcknowledgement": true,
+      "overflow": false
+    },
+    {
+      "screen": "real-editor-with-isolated-transport",
+      "width": 390,
+      "draftSave": true,
+      "publishAcknowledgement": true,
+      "overflow": false
+    }
+  ],
+  "mobileBrowser": [
+    {
+      "screen": "real-public-page",
+      "width": 320,
+      "menuItemsAccessible": 40,
+      "menuOnDemand": true,
+      "mobileRefinement": true,
+      "overflow": false
+    },
+    {
+      "screen": "real-public-page",
+      "width": 360,
+      "menuItemsAccessible": 40,
+      "menuOnDemand": true,
+      "mobileRefinement": true,
+      "overflow": false
+    },
+    {
+      "screen": "real-public-page",
+      "width": 390,
+      "menuItemsAccessible": 40,
+      "menuOnDemand": true,
+      "mobileRefinement": true,
+      "overflow": false
+    },
+    {
+      "screen": "real-public-page",
+      "width": 430,
+      "menuItemsAccessible": 40,
+      "menuOnDemand": true,
+      "mobileRefinement": true,
+      "overflow": false
+    },
+    {
+      "screen": "real-public-page",
+      "width": 667,
+      "menuItemsAccessible": 40,
+      "menuOnDemand": true,
+      "mobileRefinement": true,
+      "overflow": false
+    },
+    {
+      "screen": "template-fixture",
+      "template": "HERITAGE",
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "screen": "template-fixture",
+      "template": "HERITAGE",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "screen": "template-fixture",
+      "template": "CAFE",
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "screen": "template-fixture",
+      "template": "CAFE",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "screen": "template-fixture",
+      "template": "MODERN",
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "screen": "template-fixture",
+      "template": "MODERN",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "screen": "template-fixture",
+      "template": "INDIAN",
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "screen": "template-fixture",
+      "template": "INDIAN",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "screen": "real-editor-with-isolated-transport",
+      "width": 390,
+      "draftSave": true,
+      "publishAcknowledgement": true,
+      "overflow": false
+    }
+  ],
+  "realOrderingNavigation": [
+    {
+      "source": "real local public page",
+      "navigation": "same tab",
+      "landingMenuHidden": true,
+      "onDemandMenu": true,
+      "orderDestinationHash": "menu",
+      "orderingDishes": 40,
+      "ordersCreated": 0,
+      "paymentsInitiated": 0,
+      "runtimeErrors": 0
+    }
+  ],
+  "initialHtmlMetadata": {
+    "url": "http://localhost:5190/q/site/jamanvaar-demo-restaurant-Ny2fFTbr",
+    "status": 200,
+    "title": "JAMANVAAR — Demo Restaurant · Demo Restaurant — Main Branch",
+    "canonical": true,
+    "openGraph": true,
+    "twitter": true,
+    "restaurantJsonLd": true,
+    "noJavascriptRequired": true,
+    "productionNginxRuntimeVerified": false
+  },
+  "productionDeployment": false,
+  "productionNginxRuntimeVerified": false
+}

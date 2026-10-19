@@ -1,0 +1,154 @@
+{
+  "generatedAt": "2026-10-19T01:18:23.771Z",
+  "baseCommit": "ccf17d93288ede1a1bdf7bb2c150adf84ec88e72",
+  "programmeComplete": false,
+  "pushed": false,
+  "deployed": false,
+  "provisionalScores": {
+    "security": 7,
+    "codeQuality": 7,
+    "saasReadiness": 6.5
+  },
+  "priorStage": {
+    "file": "CANCELLATION_BALANCES_VERIFICATION.json",
+    "sha256": "682f88d26e62b813be64a8b222990db8035ab723b73e468ce726e4fd79ff1a9b"
+  },
+  "tests": {
+    "file": ".jamanvaar/repair20-verified-sync-financial.private.json",
+    "sha256": "cddf6386b7ac40d6ad7810ad40649297344469cdc4e406e9711df67a3a6d0b7b",
+    "success": true,
+    "files": 17,
+    "passed": 197,
+    "failed": 0,
+    "skipped": 0,
+    "failures": []
+  },
+  "intermediate": [
+    {
+      "file": ".jamanvaar/repair20-inbound-before.private.json",
+      "sha256": "7864b6ae7a22b033cf829ec8fe0cfb2d8cbc22e9219057e7af63e064377d0e7b",
+      "success": false,
+      "files": 1,
+      "passed": 1,
+      "failed": 4,
+      "skipped": 0,
+      "failures": [
+        "inbound order persistence before cursor acknowledgement does not advance a cursor while the orders and kitchen tickets are waiting for SQLite",
+        "inbound order persistence before cursor acknowledgement retains the old cursor on disk failure and retries without duplicating the order or KOT",
+        "inbound order persistence before cursor acknowledgement rolls back page admission and retains the cursor if inventory preparation fails",
+        "inbound order persistence before cursor acknowledgement defers admission while an earlier financial operation needs recovery"
+      ]
+    },
+    {
+      "file": ".jamanvaar/repair20-legacy-quantity-before.private.json",
+      "sha256": "9761e3da94300873e7d3e7da2952360659ca2c4ce111b44e0bede37f47d8a973",
+      "success": false,
+      "files": 1,
+      "passed": 0,
+      "failed": 1,
+      "skipped": 4,
+      "failures": [
+        "inbound order persistence before cursor acknowledgement does not overwrite unsent local edits with an unsequenced legacy response"
+      ]
+    },
+    {
+      "file": ".jamanvaar/repair20-final-sync-financial.private.json",
+      "sha256": "9b3a8a07262742bdf4d44adf5aaa204f1575cf6005a9ba38671df7feef72310c",
+      "success": false,
+      "files": 17,
+      "passed": 196,
+      "failed": 1,
+      "skipped": 0,
+      "failures": [
+        "inbound order persistence before cursor acknowledgement does not overwrite SYNCING local edits with an unsequenced legacy response"
+      ]
+    }
+  ],
+  "intermediateExplanation": "Four initial admission failures and a separate future-clock quantity overwrite were reproduced before source repair. The first wider follow-up also expected a startup-normalized SYNCING status to remain unchanged; the fixture now models a live push after transport configuration without dropping data assertions.",
+  "types": [
+    {
+      "file": ".jamanvaar/repair20-header-root-types.log",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": ".jamanvaar/repair20-api-types.log",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "productionBundles": [
+    {
+      "app": "pos",
+      "exitCode": 0,
+      "logSha256": "c75ad4136cd1089b38219e1329b2605b8e596c803805c9cff0f5ceb948a39af9"
+    },
+    {
+      "app": "pos-admin",
+      "exitCode": 0,
+      "logSha256": "b81844ac5ef09d251465632cd34bf9217d46507dae06879d5dc48a71867274e6"
+    },
+    {
+      "app": "captain",
+      "exitCode": 0,
+      "logSha256": "c2e1f07fc7aadaea1f1f2d225762ac1dc6091030f515113c12c50cdce487e8ff"
+    },
+    {
+      "app": "kiosk-user",
+      "exitCode": 0,
+      "logSha256": "1d631bc737588f9237aa3f3dff6ffbd03ff4ba48f3e59afe0318dce2cb1b50a3"
+    },
+    {
+      "app": "kds",
+      "exitCode": 0,
+      "logSha256": "1c6c9c7c90f26fb0d68546263dac7e83dca97e396e59edf0b447a5c0bcc7e622"
+    },
+    {
+      "app": "qr-guest",
+      "exitCode": 0,
+      "logSha256": "bf6d29f81bc1708cda0c2a44c9e67d3b015e5914e2ba6f23412f1ba08f7a848e"
+    },
+    {
+      "app": "super-admin",
+      "exitCode": 0,
+      "logSha256": "c560bfbc398308c22e1d88d462f2b471d65fe6b181838f5f53d473216e9cf06f"
+    }
+  ],
+  "browser": {
+    "scenarios": 18,
+    "scope": "Regression of actual POS/Captain/Admin components, Kiosk admission service and payment/protected-recovery fixtures on Chrome/SQLite OPFS. New inbound fault cases use real Node SQLite; these browser checks do not directly exercise the inbound fault injector.",
+    "pageErrors": 0,
+    "mobileOverflowAssertions": "passed",
+    "kitchenSha256": "1678b1680de38f78500416b689e07e04e266a910c3624608d393097043f793d3",
+    "checkoutSha256": "073dfda5b13a70e875a219db816ef2b3f416d24e9c9a7f196c401d01ef7d239b"
+  },
+  "remaining": [
+    "The cursor barrier is not serializable cross-device command admission or complete replay recovery",
+    "Legacy memory/synchronous stores retain compatibility and are not certified as SQLite durable",
+    "Generic pending-operation recovery, operator-facing sync preparation diagnostics and original signing/provider/hardware acceptance remain",
+    "The previous full-root gate had 2378 passes and one timing failure; no clean new full-root or full API database gate is asserted",
+    "Ten work packages remain incomplete; source, deployment, installed recovery, load and pilot gates are distinct"
+  ],
+  "sources": [
+    {
+      "file": "packages/database/src/db.ts",
+      "sha256": "8a7faba41a9a0761aa2e7c0de746bdbed95fb06a5aad224a926927f5be1d0fbc"
+    },
+    {
+      "file": "packages/sync/src/outbox.ts",
+      "sha256": "a25d490a61e12be21eeeec0c8d6d855bbc4b423548d83007f06fadad787e3870"
+    },
+    {
+      "file": "tests/inbound_sync_durability.test.ts",
+      "sha256": "52a78a979e54a0955905c545868d1a5224da9c17fef08135274385bd5e22c9cf"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosCart.tsx",
+      "sha256": "a3bf180e3d4b1ab2e8bf81904102fa0c4ede6b370b0ca54d50cbb5a4b86d4e16"
+    },
+    {
+      "file": "docs/reports/ecosystem-audit-2026-10-17/kitchen-flow-browser.cjs",
+      "sha256": "9505978d5f448f82b816b3b6ef210e021f181f06204ad4798a0a55dc481be789"
+    }
+  ]
+}

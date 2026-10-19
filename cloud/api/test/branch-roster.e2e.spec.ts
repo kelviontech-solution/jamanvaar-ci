@@ -72,7 +72,19 @@ describe('Branch roster (for the Branch Core)', () => {
     expect(res.body.branches.some((b: { id: string; code: string }) => b.id === branchA && b.code === 'RSA')).toBe(true);
     expect(res.body.subscription).toMatchObject({ active: true, expiresAt: expect.any(String) });
     expect(res.body.restaurant).toMatchObject({ status: 'ACTIVE' });
+    expect(res.body.restaurantBranchCount).toBe(await prisma.runAsPlatform(tx => tx.branch.count({ where: { restaurantId: restaurantIds[0] } })));
     expect(typeof res.body.serverTime).toBe('string');
+  });
+
+  it('does not mistake a branch-scoped roster for a single-branch restaurant', async () => {
+    const original = await prisma.runAsPlatform(tx => tx.device.findUniqueOrThrow({ where: { deviceTokenHash: createHash('sha256').update(core).digest('hex') } }));
+    try {
+      await prisma.runAsPlatform(tx => tx.device.update({ where: { id: original.id }, data: { branchId: branchA } }));
+      const response = await as('get', '/api/v1/devices/me/roster', core);
+      expect(response.status).toBe(200); expect(response.body.branches.map((branch: { id: string }) => branch.id)).toEqual([branchA]);
+      const total = await prisma.runAsPlatform(tx => tx.branch.count({ where: { restaurantId: original.restaurantId } }));
+      expect(total).toBeGreaterThan(1); expect(response.body.restaurantBranchCount).toBe(total);
+    } finally { await prisma.runAsPlatform(tx => tx.device.update({ where: { id: original.id }, data: { branchId: original.branchId } })); }
   });
 
   it('never includes another restaurant\'s devices or any plain credential', async () => {

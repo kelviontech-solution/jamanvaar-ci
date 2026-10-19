@@ -1,0 +1,147 @@
+{
+  "generatedAt": "2026-10-18T17:23:07.331Z",
+  "programmeComplete": false,
+  "deployed": false,
+  "provisionalScores": {
+    "security": 7,
+    "codeQuality": 7,
+    "saasReadiness": 6.5
+  },
+  "tests": [
+    {
+      "scope": "Full root regression",
+      "source": ".jamanvaar/repair16-full-root.private.json",
+      "sha256": "907e26a025db32c185b29f3d99831db657d2b76dd4c66d2d43ca3b0b2eb16a7c",
+      "files": 331,
+      "passed": 2351,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "Earlier affected-file run; overlaps full root",
+      "source": ".jamanvaar/repair16-affected.private.json",
+      "sha256": "37230a0d671c3b56103a073626f9041a59fab3b4732f7270da81c1206ba76db4",
+      "files": 30,
+      "passed": 218,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "Earlier financial/offline run; overlaps full root",
+      "source": ".jamanvaar/repair16-financial.private.json",
+      "sha256": "c0dd8bff7fde86c864f07a5cd7428a9878d0f58dbfc2fdfb8cd571a54e6f007e",
+      "files": 8,
+      "passed": 78,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "typeGates": [
+    {
+      "command": "node node_modules/typescript/bin/tsc -b --pretty false",
+      "exitCode": 0
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit -p cloud/api/tsconfig.json --pretty false",
+      "exitCode": 0
+    }
+  ],
+  "viteBuilds": [
+    {
+      "app": "POS",
+      "processExitCode": 0,
+      "logSha256": "6b1f4a541c064d7c18f813b6c34c0934f68900987ba6921e67a3c795175842c7"
+    },
+    {
+      "app": "Restaurant Admin",
+      "processExitCode": 0,
+      "logSha256": "848b7dc530078030ab024b08480171dda53a5771a521de14689959a746b23600"
+    }
+  ],
+  "browser": {
+    "scope": "Actual POS payment component/store and real SQLite OPFS worker; isolated identities and simulated hardware. Not native power-loss or real printer acceptance.",
+    "sourceSha256": "b55fc79f00f4af7a73d28a6242bc1f6c496ae2d5b820c296bfe4e74721f988b1",
+    "scenarios": [
+      {
+        "name": "delayed-real-SQLite-acknowledgement",
+        "width": 390,
+        "pageErrors": 0
+      },
+      {
+        "name": "delayed-real-SQLite-acknowledgement",
+        "width": 1366,
+        "pageErrors": 0
+      },
+      {
+        "name": "lost-acknowledgement-close-reopen-real-OPFS",
+        "pageErrors": 0
+      },
+      {
+        "name": "actual-protected-recovery-download-wrong-password-then-verify",
+        "pageErrors": 0
+      }
+    ]
+  },
+  "limitations": [
+    "Other financial caller adoption remains",
+    "No provider payment sandbox acceptance",
+    "No physical printer/drawer acceptance",
+    "No signed installed-device update or native power-loss acceptance",
+    "No sustained production capacity or restaurant pilot",
+    "Encrypted-file verification does not install a restore or verify an off-device copy"
+  ],
+  "sources": [
+    {
+      "file": "packages/database/src/db.ts",
+      "sha256": "5668568e203d0031867bc6951aed437966f5f6f4bf8863c274aeb164b3d6e55e"
+    },
+    {
+      "file": "packages/database/src/repositories.ts",
+      "sha256": "e41b8d9fc9656d8e755bc0006d15f7809daf958870c1cd8fe5ff95b27ce03a0d"
+    },
+    {
+      "file": "packages/database/src/index.ts",
+      "sha256": "eeb0eb17c41b9015ed9281b03572a6fc8bd0e41a101082275b43aa4e0bb322d9"
+    },
+    {
+      "file": "packages/database/src/durable/protected_recovery.ts",
+      "sha256": "7b37ab900223b07034a608e8f1b5f4b5d717fde8e4704b070dd3e7f047202fb1"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/store/posStore.ts",
+      "sha256": "e0b247fdf8b6e62b06712c635fdd7c76ab477712b45ca2273b6694740a865b98"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/payment/PosPaymentModal.tsx",
+      "sha256": "b21d5aa752fed58ed4ae420c5e381f2cd739c5d65e469986a074c7c235b64532"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/DeviceRecoveryPanel.tsx",
+      "sha256": "8e63dcbf470638ae3aee7985fb46095194246bc0fa4c8043d140ed3171edf2e8"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/PosSettingsView.tsx",
+      "sha256": "23aa47544209150ce37135015ab1bf6c2465c761d28df668aab81bcd7dd4c611"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/backup/BackupRestoreModule.tsx",
+      "sha256": "1fb29460c66a7065c418362ca19ae5cfc64b83abedadde6e4e411e042f34c3fa"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/RestoreModal.tsx",
+      "sha256": "a416be3b101cfa74cdc146fb144499e576d5071e56f5e06df0d2dec58c1053a3"
+    },
+    {
+      "file": "tests/financial_repository_commit.test.ts",
+      "sha256": "059a15f12fe14e70b42984c6edde548fbf2a2a6465930ec6af0dbff57d0f0504"
+    },
+    {
+      "file": "docs/reports/ecosystem-audit-2026-10-17/financial-checkout-browser.cjs",
+      "sha256": "c5d29fcafcf6df52aac44aa82a09c3f1e8d00afc5ebee551c6aea21b4ed977f9"
+    },
+    {
+      "file": "docs/reports/ecosystem-audit-2026-10-17/financial-checkout-browser.tsx",
+      "sha256": "db44f7e68ca26966e4440ad80e270659daf56e69998df0a2379eb0631e329ada"
+    }
+  ]
+}

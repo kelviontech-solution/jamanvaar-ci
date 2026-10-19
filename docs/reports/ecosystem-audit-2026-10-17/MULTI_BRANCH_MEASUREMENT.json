@@ -1,0 +1,37 @@
+{
+  "environment": "isolated local database",
+  "recordedAt": "2026-10-17T14:57:10.622Z",
+  "additionalOrders": 10000,
+  "additionalDevices": 1001,
+  "dashboardRequestMs": [
+    380,
+    345,
+    524
+  ],
+  "underFiveSecondLimit": true,
+  "canonicalNetSales": 10500,
+  "operationalBranchFanoutMs": [
+    223.04809999999998
+  ],
+  "fullFlowTimings": [
+    {
+      "source": "POS",
+      "commitMs": 44
+    },
+    {
+      "source": "CAPTAIN",
+      "commitMs": 47
+    },
+    {
+      "source": "KIOSK",
+      "commitMs": 59
+    },
+    {
+      "source": "QR",
+      "commitMs": 175
+    }
+  ],
+  "devicesResponseCappedAt": 1000,
+  "aggregateTotalsIncludeAllDevices": true,
+  "productionAwsMeasured": false
+}

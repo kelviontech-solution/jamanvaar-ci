@@ -22,6 +22,8 @@ describe('Captain: courses, held dishes and cancelling a sent dish', () => {
     KeyValueStore.set('jamanvaar_tenant_id', 'captain-test-restaurant');
     KeyValueStore.set('jamanvaar_bound_branch_id', 'captain-test-branch');
     db.resetToDefaultSeed();
+    // Course/cancellation fixtures are plain dishes; required-choice validation is tested separately.
+    db.menuItems = db.menuItems.map(item => ({ ...item, modifierGroupIds: [] }));
     // This scenario explicitly exercises tax-exclusive listed prices; inclusive pricing has separate regressions.
     db.taxGroups.forEach(group => { group.isInclusive = false; });
     db.users = [];

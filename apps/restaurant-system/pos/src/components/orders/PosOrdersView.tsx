@@ -3,6 +3,7 @@ import {deviceFetch} from '../../cloud/cloudClient';
 const qrRequestsApi=async<T,>(path:string,method='GET',body?:unknown):Promise<T>=>{const r=await deviceFetch('/api/v1/restaurant/qr/operations'+path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok)throw new Error(d.message||'Request unavailable');return d;};
 import React, { useState, useMemo } from 'react';
 import { usePosStore } from '../../store/posStore';
+import { commitOrderReturn, commitVerifiedOnlineCollection } from '../../services/financialActions';
 import { db, OrderRepository, BusinessDayRepository, summarizeStations, RiderRepository } from '@jamanvaar/database';
 import { SyncOutboxEngine } from '@jamanvaar/sync';
 import { Order, OrderStatus } from '@jamanvaar/types';
@@ -107,23 +108,32 @@ export const PosOrdersView: React.FC = () => {
     // of one that already went through.
     if (isUnconfirmedKioskUpi && order.paymentTransactionId) {
       setCheckingOrderId(order.id);
+      let serverConfirmed = false;
       try {
         const result = await getPaymentStatus(order.paymentTransactionId);
         setCheckingOrderId(null);
         if (result.status === 'SUCCESS') {
-          OrderRepository.settleOrder(order.id, 'UPI', undefined, order.paymentTransactionId, 'Razorpay UPI (reconciled at counter)');
+          serverConfirmed = true;
+          const saved = await commitVerifiedOnlineCollection(order.id, order.paymentTransactionId);
           void SyncOutboxEngine.flush();
-          const updated = OrderRepository.getOrderById(order.id);
-          if (updated) {
-            setLastCompletedOrder(updated);
-            setIsReceiptOpen(true);
-          }
+          setLastCompletedOrder(saved.order);
+          setIsReceiptOpen(true);
+          await db.acknowledgeFinancialMutation(saved.operationId);
           await notify({ title: 'Already paid via UPI', message: 'Do not collect payment again. The receipt reflects the online payment.', confirmLabel: 'Got it' });
+          return;
+        }
+        if (!['FAILED', 'USER_DROPPED', 'CANCELLED', 'EXPIRED'].includes(result.status)) {
+          await notify({ title: 'Online payment is still pending', message: 'Keep the original reference and check again. Do not collect cash or start another payment while this attempt is unresolved.' });
           return;
         }
         // result.status is a definite, server-verified answer (e.g. FAILED) — not an exception —
         // so it is safe to fall through to manual settlement below.
       } catch {
+        if (serverConfirmed) {
+          setCheckingOrderId(null);
+          await notify({ title: 'Online payment verified; local save needs recovery', message: 'The server confirmed the original payment. Do not collect again. Retry this same bill to recover its local receipt.' });
+          return;
+        }
         // F25: "could not verify" (network/device-auth failure) is NOT the same thing as "verified
         // unpaid", and must not silently fall through to the same manual settlement screen as a
         // genuine failure — that risks charging the guest twice for a payment that actually went
@@ -182,19 +192,21 @@ export const PosOrdersView: React.FC = () => {
     const mode = refundVoidMode;
     const reason = refundVoidReason.trim();
     const amount = Number(refundAmountInput);
+    if (mode === 'REFUND' && selectedOrder.paymentMethod === 'UPI' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(selectedOrder.paymentTransactionId ?? '')) {
+      void notify({ title: 'Record the online-payment return in Bills & Invoices', message: 'Return the money to the guest by cash or your own UPI, then record it in Bills & Invoices. This system records the return; it does not send money through Razorpay.' }); return;
+    }
 
     requestManagerOverride(
       mode === 'REFUND' ? 'REFUND' : 'VOID_ORDER',
       mode === 'REFUND' ? `Refund Order #${selectedOrder.orderNumber}` : `Void Order #${selectedOrder.orderNumber}`,
       `${currentUser?.fullName || 'Cashier'} requested a ${mode === 'REFUND' ? `₹${amount} refund` : 'void'} — ${reason}`,
-      (managerName: string) => {
+      async (managerName: string) => {
         try {
-          const updated =
-            mode === 'REFUND'
-              ? OrderRepository.refundOrder(orderId, amount, reason, managerName)
-              : OrderRepository.voidOrder(orderId, reason, managerName);
-          if (updated) setSelectedOrder(updated);
+          const savedReturn = await commitOrderReturn({ kind: mode, orderId, amount: mode === 'REFUND' ? amount : undefined, reason, actor: managerName });
+          setSelectedOrder(savedReturn.order);
           setRefundVoidMode(null);
+          try { await db.acknowledgeFinancialMutation(savedReturn.operationId); }
+          catch { await notify({ title: 'Return saved', message: 'Local acknowledgement needs recovery. Do not issue another return for this operation.' }); }
         } catch (err: any) {
           setRefundVoidError(err?.message || 'Action failed.');
         }

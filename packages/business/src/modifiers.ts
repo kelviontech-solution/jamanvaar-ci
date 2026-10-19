@@ -26,10 +26,19 @@ export function validateModifiers(
   selectedModifiers: SelectedModifier[]
 ): ModifierValidationResult {
   const errors: string[] = [];
+  const seen = new Set<string>();
+  for (const selected of selectedModifiers) {
+    const group = groups.find(group => group.id === selected.groupId);
+    const option = group?.options.find(option => option.id === selected.optionId);
+    const key = JSON.stringify([selected.groupId, selected.optionId]);
+    if (!option || option.isAvailable === false) errors.push('A selected option is no longer available. Please review your choices.');
+    if (seen.has(key)) errors.push('Select each option only once.');
+    seen.add(key);
+  }
 
   for (const group of groups) {
     const selectedInGroup = selectedModifiers.filter((m) => m.groupId === group.id);
-    const count = selectedInGroup.length;
+    const count = new Set(selectedInGroup.map(option => option.optionId)).size;
 
     if (group.isRequired && count === 0) {
       errors.push(`Please select at least one option for '${group.name}'.`);

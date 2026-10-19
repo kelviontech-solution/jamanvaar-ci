@@ -11,7 +11,7 @@ const groups: TaxGroup[] = [
   { id: 'gst5inclusive', name: 'GST5 inclusive', cgstPercent: 2.5, sgstPercent: 2.5, igstPercent: 5, isInclusive: true, isActive: true }
 ];
 function line(price: number, taxGroupId?: string, quantity = 1): CartItem {
-  const item = { ...db.menuItems[0], id: `qa-${taxGroupId ?? 'none'}`, price, taxGroupId } as MenuItem;
+  const item = { ...db.menuItems[0], id: `qa-${taxGroupId ?? 'none'}`, price, taxGroupId, modifierGroupIds: [] } as MenuItem;
   return { cartItemId: item.id, menuItemId: item.id, item, quantity, unitPrice: price, itemTotal: price * quantity, selectedModifiers: [] };
 }
 beforeEach(() => {

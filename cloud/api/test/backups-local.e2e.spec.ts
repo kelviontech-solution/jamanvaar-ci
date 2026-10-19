@@ -23,6 +23,8 @@ import { createTestApp, createTestPlatformUser, platformLogin } from './helpers'
 import { PrismaService } from '../src/prisma/prisma.service';
 import { BackupStorageService } from '../src/modules/backups/backup-storage.service';
 import { BackupsService } from '../src/modules/backups/backups.service';
+import { QrPublicService } from '../src/modules/qr/qr-public.service';
+import { newPublicOrderId } from '../src/modules/qr/qr.support';
 
 /**
  * BUG-071/072/073/074: backups could not be created without S3, were never encrypted, never expired,
@@ -37,6 +39,10 @@ describe('Backups: local storage, encryption, failures, retention, schedule, res
   let token: string;
   let restaurantId: string;
   let otherRestaurantId: string;
+  let originalOrderId: string;
+  let originalBranchId: string;
+  let originalDeviceId: string;
+  const originalPublicId = newPublicOrderId();
 
   const auth = (r: request.Test) => r.set('Authorization', `Bearer ${token}`);
   const api = (method: 'get' | 'post', url: string) => auth(request(app.getHttpServer())[method](url));
@@ -63,11 +69,15 @@ describe('Backups: local storage, encryption, failures, retention, schedule, res
         ]
       })
     );
-    await prisma.runAsPlatform((tx) =>
-      tx.syncedOrder.create({
-        data: { restaurantId, externalOrderId: `bk-ord-${stamp}`, orderType: 'DINE_IN', status: 'COMPLETED', items: [{ name: 'Tea', quantity: 1, lineTotal: 5000 }], subtotal: 5000, taxAmount: 250, totalAmount: 5250, paymentStatus: 'SUCCESS' } as never
-      })
-    );
+    await prisma.runAsPlatform(async tx => {
+      originalBranchId = (await tx.branch.findFirstOrThrow({ where: { restaurantId } })).id;
+      originalDeviceId = (await tx.device.create({ data: { restaurantId, branchId: originalBranchId, type: 'KIOSK', name: 'Original backup device' } })).id;
+      const order = await tx.syncedOrder.create({
+        data: { restaurantId, branchId: originalBranchId, deviceId: originalDeviceId, externalOrderId: `bk-ord-${stamp}`, source: 'QR', publicOrderId: originalPublicId, meta: { qrBrowserSession: 'original-backup-guest' }, createdAt: new Date('2026-10-01T12:00:00Z'), orderType: 'DINE_IN', status: 'COMPLETED', items: [{ name: 'Tea', quantity: 1, lineTotal: 5000 }], subtotal: 5000, taxAmount: 250, totalAmount: 5250, paymentStatus: 'SUCCESS' }
+      });
+      originalOrderId = order.id;
+      await tx.orderPaymentEntry.create({ data: { restaurantId, orderId: order.id, kind: 'COLLECTION', amount: 5250, method: 'CASH', reference: `backup-collection-${stamp}` } });
+    });
   }, 60_000);
 
   afterAll(async () => {
@@ -179,9 +189,71 @@ describe('Backups: local storage, encryption, failures, retention, schedule, res
 
     expect(await prisma.runAsPlatform((tx) => tx.syncedEntity.count({ where: { restaurantId } }))).toBe(2);
     expect(await prisma.runAsPlatform((tx) => tx.syncedOrder.count({ where: { restaurantId } }))).toBe(1);
+    const recovered = await prisma.runAsPlatform(tx => tx.syncedOrder.findUniqueOrThrow({ where: { id: originalOrderId }, include: { paymentEntries: true } }));
+    expect(recovered).toMatchObject({ source: 'QR', branchId: originalBranchId, deviceId: originalDeviceId, publicOrderId: originalPublicId, createdAt: new Date('2026-10-01T12:00:00Z') });
+    expect(recovered.paymentEntries).toHaveLength(1);
+    expect(recovered.paymentEntries[0]).toMatchObject({ kind: 'COLLECTION', amount: 5250, reference: `backup-collection-${stamp}` });
+    const guestStatus = app.get(QrPublicService);
+    expect((await guestStatus.orderStatus(originalPublicId, undefined, 'original-backup-guest')).balance).toMatchObject({ collectedPaise: 5250, outstandingPaise: 0 });
+    await expect(guestStatus.orderStatus(originalPublicId, undefined, 'another-guest')).rejects.toThrow('Order not found');
     // A safety snapshot was really taken before anything was overwritten.
     expect(await prisma.runAsPlatform((tx) => tx.backup.count({ where: { restaurantId } }))).toBe(before + 1);
     expect((await api('post', `/api/v1/platform/backups/restore-jobs/${preview.body.id}/confirm`).send({ confirmed: true })).status).toBe(409);
+  });
+
+  it('preserves a newer live refund instead of overwriting it with an older snapshot', async () => {
+    const snapshot = await api('post', `/api/v1/platform/backups/${restaurantId}/trigger`);
+    await prisma.runAsPlatform(async tx => {
+      await tx.orderPaymentEntry.create({ data: { restaurantId, orderId: originalOrderId, kind: 'REFUND', amount: 1000, method: 'CASH', reference: `backup-live-refund-${stamp}` } });
+      await tx.syncedOrder.update({ where: { id: originalOrderId }, data: { paymentStatus: 'PARTIALLY_REFUNDED', meta: { refundAmountPaise: 1000 } } });
+    });
+    const preview = await api('post', `/api/v1/platform/backups/${snapshot.body.id}/preview-restore`).send({ targetType: 'PRODUCTION_RESTORE' });
+    const done = await api('post', `/api/v1/platform/backups/restore-jobs/${preview.body.id}/confirm`).send({ confirmed: true });
+    expect(done.status).toBe(201);
+    expect(done.body.restored.protectedOrders).toBe(1);
+    const saved = await prisma.runAsPlatform(tx => tx.syncedOrder.findUniqueOrThrow({ where: { id: originalOrderId }, include: { paymentEntries: true } }));
+    expect(saved.paymentStatus).toBe('PARTIALLY_REFUNDED');
+    expect(saved.paymentEntries).toHaveLength(2);
+  });
+
+  it('refuses to recreate settled financial history from a legacy snapshot with no ledger evidence', async () => {
+    const svc = app.get(BackupsService);
+    const backup = await svc.createBackup(restaurantId, { version: 1, syncedOrders: [{ id: `unsupported-${stamp}`, externalOrderId: `unsupported-${stamp}`, orderType: 'TAKEAWAY', status: 'COMPLETED', paymentStatus: 'SUCCESS', subtotal: 100, taxAmount: 0, totalAmount: 100, items: [] }] }, { method: 'MANUAL' });
+    const preview = await api('post', `/api/v1/platform/backups/${backup.id}/preview-restore`).send({ targetType: 'PRODUCTION_RESTORE' });
+    const result = await api('post', `/api/v1/platform/backups/restore-jobs/${preview.body.id}/confirm`).send({ confirmed: true });
+    expect(result.status).toBe(409);
+    expect(result.body.message).toMatch(/collection evidence/);
+    expect(await prisma.runAsPlatform(tx => tx.syncedOrder.count({ where: { restaurantId, externalOrderId: `unsupported-${stamp}` } }))).toBe(0);
+  });
+
+  it('does not roll back customer, cash, staff or stock balances through operational entity restore', async () => {
+    const svc = app.get(BackupsService);
+    const kinds = ['CUSTOMER', 'STAFF_USER', 'SHIFT', 'CASH_MOVEMENT', 'PAYMENT_TRANSACTION', 'INVENTORY_ITEM'];
+    const entities = kinds.map(entityType => ({ entityType, externalId: `protected-${entityType}-${stamp}`, payload: { balance: 0 } }));
+    await prisma.runAsPlatform(tx => tx.syncedEntity.createMany({ data: entities.map(entity => ({ ...entity, restaurantId, payload: { balance: 100 } })) }));
+    const backup = await svc.createBackup(restaurantId, { version: 2, syncedEntities: entities }, { method: 'MANUAL' });
+    const preview = await api('post', `/api/v1/platform/backups/${backup.id}/preview-restore`).send({ targetType: 'PRODUCTION_RESTORE' });
+    expect(preview.body.previewSummary).toMatchObject({ willRestore: { syncedEntities: 0 }, protectedEntities: kinds.length });
+    const result = await api('post', `/api/v1/platform/backups/restore-jobs/${preview.body.id}/confirm`).send({ confirmed: true });
+    expect(result.status).toBe(201);
+    expect(result.body.restored.protectedEntities).toBe(kinds.length);
+    const saved = await prisma.runAsPlatform(tx => tx.syncedEntity.findMany({ where: { restaurantId, externalId: { in: entities.map(entity => entity.externalId) } } }));
+    expect(saved).toHaveLength(kinds.length);
+    expect(saved.every(entity => (entity.payload as { balance: number }).balance === 100)).toBe(true);
+  });
+
+  it('does not trust invented financial entries in uploaded JSON even when storage encrypted the upload', async () => {
+    const id = `forged-upload-${stamp}`;
+    const forged = { version: 2, restaurant: { id: restaurantId }, serverRecoverySignature: 'a'.repeat(64),
+      syncedOrders: [{ id, externalOrderId: id, orderType: 'TAKEAWAY', status: 'COMPLETED', paymentStatus: 'SUCCESS', items: [], subtotal: 10000, taxAmount: 0, totalAmount: 10000 }],
+      orderPaymentEntries: [{ restaurantId, orderId: id, kind: 'COLLECTION', amount: 10000, method: 'CASH', reference: id }]
+    };
+    const backup = await app.get(BackupsService).createBackup(restaurantId, forged, { method: 'MANUAL' });
+    const preview = await api('post', `/api/v1/platform/backups/${backup.id}/preview-restore`).send({ targetType: 'PRODUCTION_RESTORE' });
+    const result = await api('post', `/api/v1/platform/backups/restore-jobs/${preview.body.id}/confirm`).send({ confirmed: true });
+    expect(result.status).toBe(409);
+    expect(result.body.message).toMatch(/authenticated server snapshot/);
+    expect(await prisma.runAsPlatform(tx => tx.syncedOrder.count({ where: { restaurantId, externalOrderId: id } }))).toBe(0);
   });
 
   it('refuses to restore a backup that fails verification', async () => {

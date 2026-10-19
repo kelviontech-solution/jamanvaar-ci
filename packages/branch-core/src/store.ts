@@ -53,6 +53,12 @@ const MIGRATIONS: string[][] = [
     `UPDATE entities SET seq = rowid`,
     `INSERT INTO seq_counter (name, value) SELECT 'entities', COALESCE(MAX(seq), 0) FROM entities`,
     `CREATE INDEX entities_by_seq ON entities (entity_type, seq)`
+  ],
+  [
+    // Preserve branch provenance for stock imported using an owner credential.
+    // Historical cloud rows remain unknown until the authoritative row is read.
+    `ALTER TABLE movements ADD COLUMN branch_id TEXT`,
+    `CREATE INDEX movements_by_branch_seq ON movements (branch_id, seq)`
   ]
 ];
 

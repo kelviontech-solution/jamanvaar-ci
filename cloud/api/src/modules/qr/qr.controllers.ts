@@ -1,5 +1,7 @@
 import {QrRestaurantPageService} from './qr-restaurant-page.service';
 import { pageEventSchema } from './qr-restaurant-page.schema';
+import { QrReservationsService } from './qr-reservations.service';
+import { createReservationSchema, CreateReservation, reservationActionSchema, ReservationAction } from './qr-reservations.schema';
 import { Body, Controller, Get, HttpCode, NotFoundException, StreamableFile, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { Device } from '@prisma/client';
@@ -30,7 +32,7 @@ const orderActionSchema = z.object({ action: z.enum(['PREPARING', 'READY', 'COMP
 @UseInterceptors(QrRateLimitInterceptor)
 @Controller('api/v1/public/qr')
 export class QrPublicController {
-  constructor(private readonly qr: QrPublicService, private readonly sessions: QrSessions, private readonly publications: MenuPublicationsService, private readonly pages: QrRestaurantPageService) {}
+  constructor(private readonly qr: QrPublicService, private readonly sessions: QrSessions, private readonly publications: MenuPublicationsService, private readonly pages: QrRestaurantPageService, private readonly reservations: QrReservationsService) {}
 
   /** A published menu picture. Its address is the hash of its bytes, so the browser may keep it for a year. */
   @Get('images/:hash')
@@ -77,12 +79,22 @@ export class QrPublicController {
 
   @Get('sites/:slug')
   site(@Param('slug') slug:string){return this.pages.site(slug);}
+  @Get('sites/:slug/head')
+  async siteHead(@Param('slug') slug:string,@Res({passthrough:true})res:Response){
+    res.setHeader('Content-Type','text/html; charset=utf-8');res.setHeader('Cache-Control','no-store');
+    return this.pages.publicHead(slug);
+  }
   @Post('sites/:slug/events')
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(pageEventSchema))
   pageEvent(@Param('slug') slug:string,@Body() body:z.infer<typeof pageEventSchema>,@Req() req:Request){
     if (req.headers.dnt === '1' || req.headers['sec-gpc'] === '1') return {recorded:false};
     return this.pages.track(slug,body.type);
+  }
+  @Post('sites/:slug/reservations')
+  @UsePipes(new ZodValidationPipe(createReservationSchema))
+  createReservation(@Param('slug') slug:string,@Body() body:CreateReservation){
+    return this.reservations.create(slug,body);
   }
 
   @Get(':token')
@@ -111,8 +123,8 @@ export class QrPublicController {
 
   @Post(':token/events')
   @HttpCode(200)
-  @UsePipes(new ZodValidationPipe(z.object({ type: z.enum(['QR_CART_CREATED', 'QR_CHECKOUT_STARTED', 'QR_ITEM_ADDED', 'QR_ITEM_VIEWED']),itemId:z.string().max(100).optional() }).strict()))
-  event(@Param('token') token: string, @Body() body: { type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED' | 'QR_ITEM_VIEWED';itemId?:string }, @Req() req: Request & { qrSession?: string }) {
+  @UsePipes(new ZodValidationPipe(z.object({ type: z.enum(['QR_CART_CREATED', 'QR_CHECKOUT_STARTED', 'QR_ITEM_ADDED', 'QR_ITEM_VIEWED', 'QR_QUOTE_RETRY', 'QR_PAYMENT_RETRY']),itemId:z.string().max(100).optional() }).strict()))
+  event(@Param('token') token: string, @Body() body: { type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED' | 'QR_ITEM_VIEWED' | 'QR_QUOTE_RETRY' | 'QR_PAYMENT_RETRY';itemId?:string }, @Req() req: Request & { qrSession?: string }) {
     return this.qr.guestEvent(token, body.type, req.qrSession,body.itemId);
   }
 
@@ -132,7 +144,20 @@ export class QrPublicController {
 @Controller('api/v1/restaurant/qr')
 @UseGuards(DeviceAuthGuard)
 export class QrRestaurantController {
-  constructor(private readonly qr: QrAdminService) {}
+  constructor(private readonly qr: QrAdminService, private readonly reservations: QrReservationsService) {}
+
+  @Get('reservations')
+  reservationsList(@CurrentDevice() device: Device) {
+    this.qr.assertConsole(device);
+    return this.reservations.list(device);
+  }
+
+  @Post('reservations/:id/action')
+  @UsePipes(new ZodValidationPipe(reservationActionSchema))
+  reservationAction(@CurrentDevice() device: Device, @Param('id') id: string, @Body() body: ReservationAction) {
+    this.qr.assertConsole(device);
+    return this.reservations.action(device, id, body);
+  }
 
   @Get('entitlement')
   entitlement(@CurrentDevice() device: Device) {

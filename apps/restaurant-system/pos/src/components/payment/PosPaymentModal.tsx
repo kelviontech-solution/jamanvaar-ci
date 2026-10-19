@@ -5,7 +5,7 @@ import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
 import { AuditRepository, OrderRepository, ShiftRepository } from '@jamanvaar/database';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
-import { sound, useDialogFocus } from '@jamanvaar/ui';
+import { sound, useDialogFocus, useConfirm } from '@jamanvaar/ui';
 import { useStaffLanguage } from '@jamanvaar/ui';
 import { PosSplitByGuestModal, type GuestSplitPlan } from './PosSplitByGuestModal';
 import { X, Banknote, QrCode, CreditCard, Wallet, Building2, CheckCircle2, AlertCircle, Trash2, Edit2, Check, Sparkles, Split, Tag } from 'lucide-react';
@@ -67,8 +67,10 @@ export const PosPaymentModal: React.FC = () => {
     cart,
     selectedTable,
     runningOrderId,
+    cartOrderBaseline,
+    checkConcurrentEdit,
+    loadOrderForSettlement,
     selectedCustomer,
-    completePayment,
     isDiscountModalOpen,
     setIsDiscountModalOpen,
     removeDiscount,
@@ -76,6 +78,7 @@ export const PosPaymentModal: React.FC = () => {
     requestManagerOverride,
     setActiveTab
   } = usePosStore();
+  const { notify, confirmDialog: concurrencyDialog } = useConfirm();
 
   const runningPaymentOrder = runningOrderId ? OrderRepository.getOrderById(runningOrderId) : null;
   const collectedPaise = runningPaymentOrder?.paymentAllocationSummary?.collectedPaise ?? 0;
@@ -390,9 +393,22 @@ export const PosPaymentModal: React.FC = () => {
   }, [isPaymentOpen, isReadyToSettle, isDiscountModalOpen]);
 
   // Settle and Confirm Payment
-  const handleSettle = () => {
+  const handleSettle = async () => {
     if (settlingRef.current) return;
     setErrorMessage('');
+
+    // Simultaneous-edit protection: a second device may have changed this exact bill since it was
+    // opened here (another cashier, Captain adding items, a QR guest's own edit). Catching that
+    // right before money is collected is the whole point of this check.
+    const conflict = checkConcurrentEdit();
+    if (!conflict.ok) {
+      await notify({ title: 'Bill changed elsewhere', message: conflict.reason, confirmLabel: 'Refresh now' });
+      if (cartOrderBaseline) {
+        const result = loadOrderForSettlement(cartOrderBaseline.orderId);
+        if (!result.ok) await notify({ title: 'Could not refresh', message: result.reason });
+      }
+      return;
+    }
 
     if (totalAllocated !== totalPayable) {
       if (isUnderAllocated) {
@@ -458,7 +474,7 @@ export const PosPaymentModal: React.FC = () => {
     performSettle(activeEntries, finalMethod);
   };
 
-  const performSettle = (activeEntries: [PaymentChannel, number][], finalMethod: PaymentMethod) => {
+  const performSettle = async (activeEntries: [PaymentChannel, number][], finalMethod: PaymentMethod) => {
     settlingRef.current = true;
     setIsProcessing(true);
 
@@ -478,11 +494,13 @@ export const PosPaymentModal: React.FC = () => {
         method: channelToSplit[channel],
         amount: Number(amt)
       }));
-      const res = completePayment(
+      const actor = usePosStore.getState().currentUser?.fullName ?? 'Cashier';
+      const res = await usePosStore.getState().completePaymentDurably(
         finalMethod,
         cashPortion > 0 ? cashReceived : undefined,
         txnRef,
-        splits
+        splits,
+        upiPortion > 0 || cardPortion > 0 ? { kind: 'CASHIER_CONFIRMED', actor, at: new Date().toISOString(), reference: manualReference.trim() || txnRef } : undefined
       );
 
       if (!res) {
@@ -491,18 +509,15 @@ export const PosPaymentModal: React.FC = () => {
         setIsProcessing(false);
         setErrorMessage('Failed to finalize settlement. Please try again.');
       } else {
-        if (upiPortion > 0 || cardPortion > 0) {
-          const actor=usePosStore.getState().currentUser?.fullName ?? 'Cashier';
-          OrderRepository.updateOrder(res.id, { paymentConfirmation: { kind: 'CASHIER_CONFIRMED', actor, at: new Date().toISOString(), reference: manualReference.trim() || txnRef } });
-          AuditRepository.log({action:'MANUAL_PAYMENT_CONFIRMED',category:'PAYMENT',username:actor,details:`${res.orderNumber}: cashier acknowledged UPI/card collection ${formatINR(upiPortion+cardPortion)}; reference ${manualReference.trim() || txnRef}.`});
-        }
         sound.play('payment');
       }
     } catch (err: any) {
       sound.play('error');
       settlingRef.current = false;
       setIsProcessing(false);
-      setErrorMessage(err?.message || 'An error occurred during payment settlement.');
+      setErrorMessage(err?.outcome === 'RECOVERY_REQUIRED'
+        ? 'Saving could not be confirmed. Do not collect payment again. Keep this cart and payment choice, then retry to recover the original bill.'
+        : err?.message || 'An error occurred during payment settlement.');
     }
   };
 
@@ -537,7 +552,7 @@ export const PosPaymentModal: React.FC = () => {
               {collectedPaise > 0 && <span className="text-xs text-emerald-700">Already collected: {formatINR(collectedPaise / 100)}</span>}
               <button
                 type="button"
-                disabled={collectedPaise > 0}
+                disabled={isProcessing || collectedPaise > 0}
                 onClick={() => setIsDiscountModalOpen(true)}
                 className={`px-2.5 py-1 rounded-xl border text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
                   cart.discountAmount > 0
@@ -622,7 +637,7 @@ export const PosPaymentModal: React.FC = () => {
         )}
 
         {/* WORKSPACE BODY (2 Columns) */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <fieldset disabled={isProcessing} aria-busy={isProcessing} className="min-w-0 border-0 m-0 flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
           
           {/* LEFT COLUMN (7 Cols): Cashier Payment Cards & Active Channel Controls */}
           <div className="lg:col-span-7 space-y-4">
@@ -1239,10 +1254,11 @@ export const PosPaymentModal: React.FC = () => {
               </span>
             </div>
           </div>
-        </div>
+        </fieldset>
 
       </div>
     </div>
+    {concurrencyDialog}
     </>
   );
 };

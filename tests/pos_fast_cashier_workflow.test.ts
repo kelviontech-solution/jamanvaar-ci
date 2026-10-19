@@ -4,6 +4,8 @@ import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 
 describe('JAMANVAAR POS — Ultra-Fast Cashier Billing Workflow & Productivity Engine', () => {
   beforeEach(() => {
+    // These cases exercise cashier speed and routing using dishes without required customization.
+    db.menuItems = db.menuItems.map(item => ({ ...item, modifierGroupIds: [] }));
     usePosStore.getState().clearCart();
   });
 

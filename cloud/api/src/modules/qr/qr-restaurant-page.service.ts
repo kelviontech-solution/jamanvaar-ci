@@ -8,14 +8,18 @@ import { AuditService } from '../audit/audit.service';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { parseInlineImage, publicImageUrl } from '../menu-publications/menu-snapshot';
 import { QrMenuService } from './qr-menu.service';
+import { QrSettingsService } from './qr-settings.service';
 import { restaurantPageSchema, RestaurantPageInput, PageCopyInput } from './qr-restaurant-page.schema';
 import { ConfigService } from '@nestjs/config';
+import { restaurantPageHead } from './qr-page-metadata';
 const DRAFT = 'QR_RESTAURANT_PAGE',
   PUBLIC = 'QR_PAGE_PUBLIC',
   HISTORY = 'QR_PAGE_HISTORY',
   LINK = 'QR_PAGE_LINK';
 type Scope = { restaurantId: string; key: string; branchId: string | null; actorId: string };
 const empty: RestaurantPageInput = {
+  businessHours:null,
+  seo:{title:'',description:'',imageUrl:''},
   translations: {},
   defaultLanguage: 'en',
   noticeStart: '',
@@ -44,7 +48,9 @@ const empty: RestaurantPageInput = {
   address: '',
   hours: '',
   notice: '',
-  footer: ''
+  footer: '',
+  testimonials: [],
+  press: []
 };
 @Injectable()
 export class QrRestaurantPageService {
@@ -55,10 +61,28 @@ export class QrRestaurantPageService {
     private readonly bus: RealtimeBus,
     private readonly menus: QrMenuService,
     private readonly config: ConfigService,
-    private readonly operations: QrOperationsService
+    private readonly operations: QrOperationsService,
+    private readonly settings: QrSettingsService
   ) {}
   private where(rid: string, type: string, key: string) {
     return { restaurantId_entityType_externalId: { restaurantId: rid, entityType: type, externalId: key } };
+  }
+  /**
+   * `jamanvaar-demo-restaurant-aB3xY9kq` instead of a bare random token: a guest or owner reading
+   * the URL (on a printed card, in a WhatsApp share, in browser history) can tell what it is before
+   * opening it. The random suffix is still the actual uniqueness guarantee -- two restaurants with
+   * the same name collide on the readable prefix constantly, never on the suffix -- so a name with
+   * no safe characters at all (emoji-only, etc.) degrades to the suffix alone rather than failing.
+   */
+  private publicSlug(name: string) {
+    const base = name
+      .normalize('NFKD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 40);
+    return (base ? base + '-' : '') + randomBytes(6).toString('base64url');
   }
   private async scope(user: User, key: string) {
     if (!['OWNER', 'MANAGER'].includes(user.role)) throw new ForbiddenException('Owner or branch manager access is required');
@@ -133,7 +157,9 @@ export class QrRestaurantPageService {
         affectedBranches,
         sharePath: link ? '/q/site/' + (link.payload as any).slug : null,
         shareUrl: link ? this.shareUrl((link.payload as any).slug) : null,
+        orderOnlineUrl: await this.orderOnlineUrl(tx, s.restaurantId, s.branchId),
         items: menu.items,
+        categories: menu.categories,
         menuReady: menu.ready,
         history: history.map((r) => ({
           id: r.externalId,
@@ -144,7 +170,7 @@ export class QrRestaurantPageService {
       };
     });
   }
-  private shareUrl(slug: string) {
+  private publicBase(): string | null {
     const base =
       this.config.get<string>('QR_ORDER_BASE_URL')?.trim().replace(/\/+$/, '') || (this.config.get('NODE_ENV') === 'production' ? '' : 'http://localhost:5190');
     try {
@@ -156,10 +182,63 @@ export class QrRestaurantPageService {
         (this.config.get('NODE_ENV') === 'production' && url.protocol !== 'https:')
       )
         return null;
-      return base + '/q/site/' + slug;
+      return base;
     } catch {
       return null;
     }
+  }
+  private shareUrl(slug: string) {
+    const base = this.publicBase();
+    return base ? base + '/q/site/' + slug : null;
+  }
+  /**
+   * The business page's "Order online" button needs somewhere real to send a guest -- this
+   * finds the branch's own menu-only code (no table, guest picks dine-in/takeaway themselves)
+   * rather than inventing a second ordering surface. Restaurant-wide scope (branchId null) has
+   * no single branch to point at, same reasoning as the page itself having none of its own.
+   */
+  private async orderOnlineUrl(tx: Prisma.TransactionClient, restaurantId: string, branchId: string | null) {
+    const base = branchId && this.publicBase();
+    if (!base) return null;
+    const code = await tx.qrCode.findFirst({
+      where: { restaurantId, branchId, mode: 'MENU_ONLY', status: 'ACTIVE' },
+      orderBy: { createdAt: 'asc' },
+      select: { publicToken: true }
+    });
+    return code ? base + '/q/' + code.publicToken : null;
+  }
+  /**
+   * A printable poster for the restaurant's own public page -- a distinct QR destination from any table
+   * code, so it is generated from the page's own stable share link, not a `QrCode` row. Only a published,
+   * enabled branch page has a real address to print; a restaurant-wide scope has no page of its own (see
+   * `editor` above), so the caller must pick the actual branch, the same choice the editor's own branch
+   * picker already makes them take before sharing a link.
+   */
+  async printData(user: User, key: string) {
+    if (key === 'restaurant') throw new BadRequestException('Choose a specific branch to generate its website QR poster.');
+    const s = await this.scope(user, key);
+    return this.prisma.runAsTenant(s.restaurantId, async (tx) => {
+      const capability = await this.access.resolveQrCapability(tx, s.restaurantId, 'QR_RESTAURANT_PAGE', s.branchId);
+      if (!capability.enabled) throw new ConflictException('Business page is not included for this branch.');
+      const published = await this.content(tx, s.restaurantId, key);
+      if (!published.content?.enabled) throw new ConflictException('Publish and enable the business page before generating its QR poster.');
+      const link = await tx.syncedEntity.findUnique({ where: this.where(s.restaurantId, LINK, key) });
+      const url = link ? this.shareUrl((link.payload as any).slug) : null;
+      if (!url) throw new ConflictException('The public website address is not configured yet. Ask your platform administrator.');
+      const restaurant = await tx.restaurant.findUniqueOrThrow({ where: { id: s.restaurantId }, select: { name: true } });
+      const branch = await tx.branch.findFirst({ where: { id: s.branchId!, restaurantId: s.restaurantId }, select: { name: true } });
+      const branding = await this.settings.branding(s.restaurantId);
+      const accent = /^#[0-9a-f]{6}$/i.test(published.content.accent) ? published.content.accent : '#0B253A';
+      return {
+        restaurantName: restaurant.name,
+        branchName: branch?.name ?? null,
+        tableLabel: 'VISIT OUR WEBSITE',
+        url,
+        tagline: published.content.tagline || 'Menu · Story · Contact',
+        logoUrl: branding.logoUrl,
+        design: { template: 'website' as const, accent, instruction: 'Scan to visit our website', footer: 'Served with JAMANVAAR', showLogo: true, layout: 'CARD' as const }
+      };
+    });
   }
   async save(user: User, key: string, version: number, input: RestaurantPageInput) {
     const s = await this.scope(user, key),
@@ -170,7 +249,7 @@ export class QrRestaurantPageService {
       await this.access.assertQrCapability(tx, s.restaurantId, 'QR_RESTAURANT_PAGE', s.branchId);
       const current = await tx.syncedEntity.findUnique({ where: this.where(s.restaurantId, DRAFT, key) });
       if ((current?.syncVersion ?? 0) !== version) throw new ConflictException('This draft changed. Reload before saving.');
-      const hashes = [parsed.data.logoUrl, parsed.data.heroUrl, ...parsed.data.gallery.map((i) => i.url)].filter(Boolean).map((v) => v.slice(4));
+      const hashes = [parsed.data.logoUrl, parsed.data.heroUrl, parsed.data.seo.imageUrl, ...parsed.data.gallery.map((i) => i.url)].filter(Boolean).map((v) => v.slice(4));
       if (hashes.length) {
         const owned = await tx.menuImage.count({ where: { restaurantId: s.restaurantId, hash: { in: [...new Set(hashes)] } } });
         if (owned !== new Set(hashes).size) throw new BadRequestException('Upload images to this restaurant before using them');
@@ -194,7 +273,7 @@ export class QrRestaurantPageService {
       if (!draft || draft.syncVersion !== version) throw new ConflictException('Save and review the current draft before publishing');
       const content = restaurantPageSchema.parse((draft.payload as any).content);
       if (content.enabled && (!content.title || !content.welcome))
-        throw new BadRequestException('Add a restaurant heading and welcome message before publishing');
+        throw new BadRequestException('Add a page heading and welcome message before publishing');
       const old = await tx.syncedEntity.findUnique({ where: this.where(s.restaurantId, PUBLIC, key) });
       if (old)
         await tx.syncedEntity.create({
@@ -214,12 +293,15 @@ export class QrRestaurantPageService {
       const targets = s.branchId
         ? [s.branchId]
         : (await tx.branch.findMany({ where: { restaurantId: s.restaurantId, status: 'ACTIVE' }, select: { id: true } })).map((b) => b.id);
+      let restaurantName: string | null = null;
       for (const branchId of targets) {
         const where = this.where(s.restaurantId, LINK, branchId);
-        if (!(await tx.syncedEntity.findUnique({ where })))
+        if (!(await tx.syncedEntity.findUnique({ where }))) {
+          restaurantName ??= (await tx.restaurant.findUniqueOrThrow({ where: { id: s.restaurantId }, select: { name: true } })).name;
           await tx.syncedEntity.create({
-            data: { restaurantId: s.restaurantId, entityType: LINK, externalId: branchId, payload: { slug: randomBytes(18).toString('base64url'), branchId } }
+            data: { restaurantId: s.restaurantId, entityType: LINK, externalId: branchId, payload: { slug: this.publicSlug(restaurantName), branchId } }
           });
+        }
       }
       // Bump the draft to prevent a stale preview or second editor publishing silently.
       await tx.syncedEntity.update({ where: { id: draft.id }, data: { syncVersion: { increment: 1 } } });
@@ -291,9 +373,9 @@ export class QrRestaurantPageService {
     const content = restaurantPageSchema.parse((source.payload as any).content);
     const groups: Record<PageCopyInput['groups'][number], (keyof RestaurantPageInput)[]> = {
       DESIGN: ['template', 'accent', 'sections'],
-      STORY: ['title', 'tagline', 'welcome', 'about', 'footer', 'translations', 'defaultLanguage', 'notice', 'noticeStart', 'noticeEnd'],
+      STORY: ['title', 'tagline', 'welcome', 'about', 'footer', 'translations', 'defaultLanguage', 'notice', 'noticeStart', 'noticeEnd', 'testimonials', 'press', 'seo'],
       PHOTOS: ['logoUrl', 'heroUrl', 'heroPosition', 'heroPositionX', 'gallery'],
-      CONTACT: ['address', 'hours', 'phone', 'whatsapp', 'instagram', 'mapsUrl', 'reviewUrl'],
+      CONTACT: ['address', 'hours', 'businessHours', 'phone', 'whatsapp', 'instagram', 'mapsUrl', 'reviewUrl'],
       BEHAVIOUR: ['enabled', 'entryMode', 'engagementEnabled', 'featuredItemIds']
     };
     const baseFields = input.groups.flatMap((g) => groups[g]);
@@ -454,11 +536,11 @@ export class QrRestaurantPageService {
     });
   }
   async track(slug: string, type: string) {
-    if (!/^[A-Za-z0-9_-]{24}$/.test(slug)) throw new NotFoundException('Restaurant page not found');
+    if (!/^[A-Za-z0-9_-]{6,80}$/.test(slug)) throw new NotFoundException('Business page not found');
     const row = await this.prisma.runAsPlatform((tx) =>
       tx.syncedEntity.findFirst({ where: { entityType: LINK, payload: { path: ['slug'], equals: slug } }, select: { restaurantId: true, payload: true } })
     );
-    if (!row) throw new NotFoundException('Restaurant page not found');
+    if (!row) throw new NotFoundException('Business page not found');
     const branchId = (row.payload as any).branchId as string;
     const active = await this.prisma.runAsPlatform((tx) =>
       tx.branch.findFirst({
@@ -466,7 +548,7 @@ export class QrRestaurantPageService {
         select: { id: true }
       })
     );
-    if (!active) throw new NotFoundException('Restaurant page unavailable');
+    if (!active) throw new NotFoundException('Business page unavailable');
     const page = await this.publicPage(row.restaurantId, branchId);
     if (!page?.content.engagementEnabled) return { recorded: false };
     await this.prisma.runAsTenant(row.restaurantId, async (tx) => {
@@ -495,6 +577,7 @@ export class QrRestaurantPageService {
       const noticeActive = (!c.noticeStart || Date.now() >= Date.parse(c.noticeStart)) && (!c.noticeEnd || Date.now() < Date.parse(c.noticeEnd));
       return {
         trackingSlug: c.engagementEnabled && link ? ((link.payload as any).slug as string) : null,
+        orderOnlineUrl: await this.orderOnlineUrl(tx, rid, branchId),
         content: {
           ...c,
           notice: noticeActive ? c.notice : '',
@@ -504,18 +587,24 @@ export class QrRestaurantPageService {
           address: c.address || branch?.address || '',
           logoUrl: publicImageUrl(c.logoUrl) || '',
           heroUrl: publicImageUrl(c.heroUrl) || '',
+          seo:{...c.seo,imageUrl:publicImageUrl(c.seo.imageUrl)||''},
           gallery: c.gallery.map((i) => ({ ...i, url: publicImageUrl(i.url) || '' }))
         },
         publishedAt: (result.row!.payload as any).publishedAt
       };
     });
   }
-  async site(slug: string) {
-    if (!/^[A-Za-z0-9_-]{24}$/.test(slug)) throw new NotFoundException('Restaurant page not found');
+  /**
+   * Shared by `site()` and anything else a business-page visitor reaches by slug (reservations,
+   * eventually others) -- one place resolving a public slug to the tenant it belongs to, rather
+   * than each caller re-deriving restaurantId/branchId from the LINK row itself.
+   */
+  async resolveSlug(slug: string) {
+    if (!/^[A-Za-z0-9_-]{6,80}$/.test(slug)) throw new NotFoundException('Business page not found');
     const link = await this.prisma.runAsPlatform((tx) =>
       tx.syncedEntity.findFirst({ where: { entityType: LINK, payload: { path: ['slug'], equals: slug } }, select: { restaurantId: true, payload: true } })
     );
-    if (!link) throw new NotFoundException('Restaurant page not found');
+    if (!link) throw new NotFoundException('Business page not found');
     const branchId = (link.payload as any).branchId as string;
     const [restaurant, branch] = await this.prisma.runAsPlatform((tx) =>
       Promise.all([
@@ -523,10 +612,62 @@ export class QrRestaurantPageService {
         tx.branch.findFirst({ where: { id: branchId, restaurantId: link.restaurantId, status: 'ACTIVE' }, select: { name: true } })
       ])
     );
-    if (!restaurant || !branch) throw new NotFoundException('Restaurant page is unavailable');
-    const page = await this.publicPage(link.restaurantId, branchId);
-    if (!page) throw new NotFoundException('Restaurant page is unavailable');
-    const menu = await this.menus.build(link.restaurantId, branchId);
-    return { ...page, restaurantName: restaurant.name, branchName: branch.name, currency: restaurant.currency, items: menu.items, menuReady: menu.ready };
+    if (!restaurant || !branch) throw new NotFoundException('Business page is unavailable');
+    return { restaurantId: link.restaurantId, branchId, restaurantName: restaurant.name, branchName: branch.name, currency: restaurant.currency };
+  }
+  /**
+   * Only worth showing once there is a second branch to choose between -- a single-branch
+   * restaurant already has its own address in the Visit section, so a one-item "locations" list
+   * would just repeat it. Each branch's own address/hours/phone come from its own published page
+   * when it has one (falling back to the bare branch address), the same source the Visit section
+   * itself reads from, so the two never disagree.
+   */
+  private async locationsFor(tx: Prisma.TransactionClient, restaurantId: string, currentBranchId: string) {
+    if (!(await this.access.resolveQrCapability(tx, restaurantId, 'QR_LOCATIONS', currentBranchId)).enabled) return null;
+    const branches = await tx.branch.findMany({ where: { restaurantId, status: 'ACTIVE' }, select: { id: true, name: true, address: true }, orderBy: { name: 'asc' } });
+    if (branches.length < 2) return null;
+    return Promise.all(
+      branches.map(async (b) => {
+        const own = await this.content(tx, restaurantId, b.id);
+        const c = own.content;
+        return {
+          branchId: b.id,
+          name: b.name,
+          isCurrent: b.id === currentBranchId,
+          address: c?.address || b.address || '',
+          hours: c?.hours || '',
+          phone: c?.phone || ''
+        };
+      })
+    );
+  }
+  async site(slug: string) {
+    const resolved = await this.resolveSlug(slug);
+    const page = await this.publicPage(resolved.restaurantId, resolved.branchId);
+    if (!page) throw new NotFoundException('Business page is unavailable');
+    const menu = await this.menus.build(resolved.restaurantId, resolved.branchId);
+    const [reservationsEnabled, locations] = await this.prisma.runAsTenant(resolved.restaurantId, (tx) =>
+      Promise.all([
+        this.access.resolveQrCapability(tx, resolved.restaurantId, 'QR_RESERVATIONS', resolved.branchId).then((c) => c.enabled),
+        this.locationsFor(tx, resolved.restaurantId, resolved.branchId)
+      ])
+    );
+    return {
+      ...page,
+      reservationsEnabled,
+      locations,
+      restaurantName: resolved.restaurantName,
+      branchName: resolved.branchName,
+      currency: resolved.currency,
+      items: menu.items,
+      categories: menu.categories,
+      menuReady: menu.ready
+    };
+  }
+  async publicHead(slug:string){
+    const page=await this.site(slug);
+    const canonical=this.shareUrl(slug);
+    if(!canonical)throw new NotFoundException('Public website address is not configured');
+    return restaurantPageHead(page,canonical);
   }
 }

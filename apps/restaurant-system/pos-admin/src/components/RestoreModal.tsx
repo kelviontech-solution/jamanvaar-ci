@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Modal, Button } from '@jamanvaar/ui';
 import {
   db,
@@ -136,16 +136,17 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
   const [backupMeta, setBackupMeta] = useState<BackupMeta | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [foreignRestaurantAck, setForeignRestaurantAck] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
+  const applyingRef = useRef(false);
 
   const resetSelection = () => {
     setParsedData(null);
     setBackupMeta(null);
     setErrorMsg(null);
-    setForeignRestaurantAck(false);
   };
 
   const handleClose = () => {
+    if (applyingRef.current) return;
     resetSelection();
     setFileName('');
     onClose();
@@ -181,20 +182,26 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
   };
 
   const isForeignRestaurant = !!(backupMeta?.restaurantId && db.restaurant?.id && backupMeta.restaurantId !== db.restaurant.id);
-  const canApply = !!parsedData && (!isForeignRestaurant || foreignRestaurantAck);
+  const canApply = !!parsedData && !isForeignRestaurant && !isApplying;
 
   const menuDiff = parsedData ? diffCounts(db.menuItems, parsedData.menuItems) : null;
   const categoryDiff = parsedData ? diffCounts(db.categories, parsedData.categories) : null;
   const tableDiff = parsedData ? diffCounts(db.tables, parsedData.tables) : null;
 
-  const handleApplyRestore = () => {
-    if (!canApply || !parsedData) return;
+  const handleApplyRestore = async () => {
+    if (!canApply || !parsedData || applyingRef.current) return;
+    applyingRef.current = true; setIsApplying(true);
+    try { await db.assertOperationalRestoreSafe(parsedData); }
+    catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : 'Restore safety checks failed; no data was changed.');
+      applyingRef.current = false; setIsApplying(false); return;
+    }
 
     // A best-effort local safety net (not a server backup): the state right before this restore,
     // so a mistaken restore can at least be inspected/recovered from this device's storage. Never
     // blocks the restore itself if storage is full or unavailable.
     try {
-      const snapshot = JSON.stringify({ _backupSchema: BACKUP_SCHEMA_VERSION, _exportedAt: new Date().toISOString(), _preRestoreSafetySnapshot: true, data: db });
+      const snapshot = JSON.stringify({ _backupSchema: BACKUP_SCHEMA_VERSION, _exportedAt: new Date().toISOString(), _preRestoreSafetySnapshot: true, data: db.exportOperationalSnapshot() });
       localStorage.setItem(`jamanvaar_pre_restore_snapshot:${db.restaurant?.id ?? 'unknown'}`, snapshot);
     } catch {
       // Quota or storage unavailable — proceed anyway; this is a best-effort safety net, not the only copy.
@@ -250,10 +257,9 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
       if (Array.isArray(parsedData.stockMovements)) db.stockMovements = parsedData.stockMovements as typeof db.stockMovements;
       if (Array.isArray(parsedData.recipes)) db.recipes = parsedData.recipes as typeof db.recipes;
       if (Array.isArray(parsedData.customerAccounts)) db.customerAccounts = parsedData.customerAccounts as typeof db.customerAccounts;
-      if (Array.isArray(parsedData.users)) db.users = parsedData.users as typeof db.users;
-      if (Array.isArray(parsedData.roles)) db.roles = parsedData.roles as typeof db.roles;
+      // Staff permissions and license authorization are not portable business
+      // data. Keep the account's current authenticated configuration.
       if (Array.isArray(parsedData.configuredPrinters)) db.configuredPrinters = parsedData.configuredPrinters as typeof db.configuredPrinters;
-      if (parsedData.license) db.license = parsedData.license as typeof db.license;
       if (Array.isArray(parsedData.shifts)) db.shifts = parsedData.shifts as typeof db.shifts;
       if (Array.isArray(parsedData.cashMovements)) db.cashMovements = parsedData.cashMovements as typeof db.cashMovements;
       if (Array.isArray(parsedData.kots)) db.kots = parsedData.kots as typeof db.kots;
@@ -267,10 +273,11 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
 
       db.notify();
       onRestored();
+      applyingRef.current = false;
       handleClose();
     } catch (err: any) {
-      setErrorMsg(`Restore failed during state commit: ${err.message}. A pre-restore snapshot was saved locally before this attempt.`);
-    }
+      setErrorMsg(`Restore failed during state commit: ${err.message}. Review the current state before retrying; the local safety snapshot is best-effort.`);
+    } finally { applyingRef.current = false; setIsApplying(false); }
   };
 
   return (
@@ -280,7 +287,7 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
         <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
           <p className="text-xs text-amber-900 leading-relaxed font-semibold">
-            <strong>Warning:</strong> Restoring a backup snapshot will replace your active menu, orders, inventory, and table layout with the contents of the file. The menu, categories, and tables sync to JAMANVAAR Cloud and every other connected device (POS, Kiosk, KDS, Captain) within moments — this is not local to this screen. Please ensure you have a current export before proceeding.
+            <strong>Review before importing:</strong> Menu and table changes can reach other connected devices. This JSON importer cannot replace live financial history or SQLite replay history, change restaurant/branch ownership, or replace staff permissions and licensing. Complete device recovery uses an encrypted recovery file and an empty compatible target.
           </p>
         </div>
 
@@ -317,10 +324,7 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
               currently open here (<strong>{db.restaurant?.name}</strong>). Restoring it will overwrite this restaurant's menu, orders and
               settings with that other restaurant's data.
             </p>
-            <label className="flex items-center gap-2 text-xs font-bold text-rose-800">
-              <input type="checkbox" checked={foreignRestaurantAck} onChange={(e) => setForeignRestaurantAck(e.target.checked)} />
-              I understand this backup is from a different restaurant and want to restore it anyway.
-            </label>
+            <p className="text-xs font-bold text-rose-800">Choose a snapshot from this restaurant and branch. Changing ownership through a backup import is not supported.</p>
           </div>
         )}
 

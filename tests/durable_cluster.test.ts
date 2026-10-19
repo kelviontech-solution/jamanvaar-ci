@@ -9,6 +9,7 @@ import { ClusterBackend, type Locks, type Channel } from '../packages/database/s
 
 /** A shared in-memory stand-in for the browser's Web Locks and BroadcastChannel, so windows can be started and killed. */
 class FakeBrowser {
+  dropNextAck = false;
   private held = false;
   private waiters: Array<() => void> = [];
   private channels = new Set<FakeChannel>();
@@ -50,6 +51,7 @@ class FakeBrowser {
   }
 
   deliver(from: FakeChannel, data: unknown) {
+    if (this.dropNextAck && (data as { t?: string })?.t === 'ack') { this.dropNextAck = false; return; }
     for (const c of this.channels) if (c !== from && !c.closed) queueMicrotask(() => c.onmessage?.({ data: structuredClone(data) }));
   }
 }
@@ -66,8 +68,8 @@ let dir: string;
 const file = () => join(dir, 'cluster.sqlite3');
 const tick = (ms = 15) => new Promise((r) => setTimeout(r, ms));
 
-function openWindow(browser: FakeBrowser, id: string, opts: { requestTimeoutMs?: number } = {}) {
-  const leaderBackend = () => new EngineBackend(new SqlKvEngine(new NodeSqliteDriver(file())));
+function openWindow(browser: FakeBrowser, id: string, opts: { requestTimeoutMs?: number; file?: string } = {}) {
+  const leaderBackend = () => new EngineBackend(new SqlKvEngine(new NodeSqliteDriver(opts.file ?? file())));
   const cluster = new ClusterBackend({ name: 'jv', windowId: id, locks: browser.locks(), makeChannel: () => browser.channel(), makeLeaderBackend: leaderBackend, requestTimeoutMs: opts.requestTimeoutMs ?? 300, snapshotTimeoutMs: 200 });
   return DurableStorage.open(cluster, { retryMs: 20 }).then((storage) => ({ storage, cluster }));
 }
@@ -75,6 +77,19 @@ function openWindow(browser: FakeBrowser, id: string, opts: { requestTimeoutMs?:
 describe('ClusterBackend', () => {
   beforeEach(() => { dir = mkdtempSync(join(tmpdir(), 'jv-cluster-')); });
   afterEach(() => { try { rmSync(dir, { recursive: true, force: true }); } catch { /* still closing */ } });
+  it('exports and restores complete operation history through the follower protocol', async () => {
+    const source = await openWindow(new FakeBrowser(), 'source');
+    const command = { operationId: 'rest:branch:receipt', requestFingerprint: 'c'.repeat(64), expected: [{ key: 'collections', value: null }], ops: [{ op: 'set' as const, key: 'collections', value: '[{"id":"collected-once"}]' }], result: '{"id":"collected-once"}' };
+    await source.storage.commitCommand(command);
+    const snapshot = await source.storage.exportRecovery('restaurant:branch:pos'); source.storage.close();
+    const bus = new FakeBrowser(), target = join(dir, 'recovered.sqlite3');
+    const leader = await openWindow(bus, 'leader', { file: target }), follower = await openWindow(bus, 'follower', { file: target });
+    await follower.storage.restoreRecovery(snapshot, 'restaurant:branch:pos');
+    expect((await follower.storage.commitCommand(command)).outcome).toBe('REPLAYED');
+    expect((await follower.storage.exportRecovery('restaurant:branch:pos')).commands).toHaveLength(1);
+    expect(leader.storage.getItem('collections')).toBe('[{"id":"collected-once"}]');
+    follower.storage.close(); leader.storage.close();
+  });
 
   it('the first window becomes leader and persists; a later window is a follower that receives the current data', async () => {
     const browser = new FakeBrowser();
@@ -86,6 +101,30 @@ describe('ClusterBackend', () => {
     const b = await openWindow(browser, 'B');
     expect(b.cluster.isLeader).toBe(false);
     expect(JSON.parse(b.storage.getItem('orders')!)).toEqual([{ id: 'o1' }]);
+  });
+
+  it('a follower recovers a lost command acknowledgement after leader takeover without replaying its effects', async () => {
+    const browser = new FakeBrowser();
+    const a = await openWindow(browser, 'A');
+    const b = await openWindow(browser, 'B', { requestTimeoutMs: 40 });
+    const command = {
+      operationId: 'tenant:branch:terminal:collection-1', requestFingerprint: 'a'.repeat(64),
+      expected: [{ key: 'collections', value: null }],
+      ops: [{ op: 'set' as const, key: 'collections', value: '[{"id":"collect-once"}]' }], result: '{"collectionId":"collect-once"}'
+    };
+    browser.dropNextAck = true;
+    await expect(b.storage.commitCommand(command)).rejects.toThrow('did not respond');
+    expect(b.storage.getItem('collections')).toBeNull();
+    expect(a.storage.getItem('collections')).toBe('[{"id":"collect-once"}]');
+    a.storage.close(); browser.releaseLeader(); await tick(60);
+    expect(b.cluster.isLeader).toBe(true);
+    expect((await b.storage.commitCommand(command)).outcome).toBe('REPLAYED');
+    expect(JSON.parse(b.storage.getItem('collections')!)).toEqual([{ id: 'collect-once' }]);
+    const c = await openWindow(browser, 'C');
+    await expect(c.storage.commitCommand({ ...command, operationId: 'new-stale-operation' })).rejects.toMatchObject({ outcome: 'REJECTED', code: 'LOCAL_VERSION_CONFLICT' });
+    expect(c.storage.health().ok).toBe(true);
+    c.storage.close();
+    b.storage.close();
   });
 
   it('a follower\'s write is persisted by the leader and appears in every window', async () => {

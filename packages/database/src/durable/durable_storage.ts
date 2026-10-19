@@ -1,4 +1,16 @@
-import { SqlKvEngine, type StoreOp } from './sql_kv_engine';
+import { SqlKvEngine, isDurableCommandRejection, type StoreOp, type DurableCommand, type DurableCommandResult, type DurableRecoverySnapshot } from './sql_kv_engine';
+
+export class DurableCommandFailure extends Error {
+  override name = 'DurableCommandFailure';
+  readonly outcome: 'REJECTED' | 'RECOVERY_REQUIRED';
+  readonly code?: string;
+  constructor(error: unknown) {
+    super(error instanceof Error ? error.message : String(error), { cause: error });
+    this.outcome = isDurableCommandRejection(error) ? 'REJECTED' : 'RECOVERY_REQUIRED';
+    const code = (error as { code?: unknown })?.code;
+    if (typeof code === 'string') this.code = code;
+  }
+}
 
 /**
  * A localStorage-shaped store that the app can read synchronously and that is durable in SQLite.
@@ -22,6 +34,9 @@ export interface StorageBackend {
   attach?(hooks: StorageHooks): void;
   load(): Promise<Record<string, string>>;
   write(ops: StoreOp[]): Promise<void>;
+  command?(command: DurableCommand): Promise<DurableCommandResult>;
+  exportRecovery?(scope: string): Promise<DurableRecoverySnapshot>;
+  restoreRecovery?(snapshot: DurableRecoverySnapshot, expectedScope: string): Promise<void>;
   close(): void;
 }
 
@@ -49,6 +64,14 @@ export class EngineBackend implements StorageBackend {
     this.batches.push(ops);
   }
 
+  async command(command: DurableCommand): Promise<DurableCommandResult> {
+    if (this.failNext > 0) { this.failNext--; throw new Error('simulated write failure'); }
+    return this.engine.applyCommand(command);
+  }
+
+  async exportRecovery(scope: string): Promise<DurableRecoverySnapshot> { return this.engine.exportRecovery(scope); }
+  async restoreRecovery(snapshot: DurableRecoverySnapshot, expectedScope: string): Promise<void> { this.engine.restoreRecovery(snapshot, expectedScope); }
+
   close() {
     this.engine.close();
   }
@@ -69,6 +92,9 @@ export class DurableStorage {
   private error: string | null = null;
   private closed = false;
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
+  private inFlight = 0;
+  private localRevision = new Map<string, number>();
+  private recovering = false;
 
   private constructor(
     private readonly backend: StorageBackend,
@@ -112,12 +138,18 @@ export class DurableStorage {
   }
 
   setItem(key: string, value: string): void {
+    if (this.recovering) throw new Error('Recovery is in progress');
+    if (this.closed) throw new Error('Durable storage is closed');
+    this.localRevision.set(key, (this.localRevision.get(key) ?? 0) + 1);
     const text = String(value);
     this.cache.set(key, text);
     this.enqueue({ op: 'set', key, value: text });
   }
 
   removeItem(key: string): void {
+    if (this.recovering) throw new Error('Recovery is in progress');
+    if (this.closed) throw new Error('Durable storage is closed');
+    this.localRevision.set(key, (this.localRevision.get(key) ?? 0) + 1);
     this.cache.delete(key);
     this.enqueue({ op: 'remove', key });
   }
@@ -134,19 +166,105 @@ export class DurableStorage {
     return this.keys()[index] ?? null;
   }
 
-  health(): { ok: boolean; error: string | null } {
-    return { ok: this.error === null, error: this.error };
+  health(): { ok: boolean; error: string | null; commitState: 'CLOSED' | 'FAILED' | 'PENDING' | 'COMMITTED'; pendingWrites: number } {
+    return { ok: !this.closed && this.error === null, error: this.error,
+      commitState: this.closed ? 'CLOSED' : this.error ? 'FAILED' : this.pending.size || this.inFlight ? 'PENDING' : 'COMMITTED',
+      pendingWrites: this.pending.size + this.inFlight };
+  }
+
+  /**
+   * An explicit atomic batch, acknowledged only after the backend transaction commits. Unlike
+   * setItem, this does not publish its values to synchronous readers before acknowledgement.
+   * Callers still need a persistent business operation ID and must defer external side effects;
+   * this storage primitive alone is not an idempotent financial command engine.
+   */
+  async commitBatch(ops: StoreOp[]): Promise<void> {
+    await this.commitPrepared(ops);
+  }
+
+  async exportRecovery(scope: string): Promise<DurableRecoverySnapshot> {
+    if (!this.backend.exportRecovery) throw new Error('This backend does not support complete local recovery');
+    await this.flush();
+    return this.backend.exportRecovery(scope);
+  }
+
+  async restoreRecovery(snapshot: DurableRecoverySnapshot, expectedScope: string): Promise<void> {
+    if (this.closed || this.recovering || this.cache.size || this.pending.size || this.inFlight) throw new Error('Recovery requires an open, empty and idle target');
+    if (!this.backend.restoreRecovery) throw new Error('This backend does not support complete local recovery');
+    this.recovering = true;
+    this.inFlight++;
+    try {
+      const frozen = structuredClone(snapshot);
+      await this.backend.restoreRecovery(frozen, expectedScope);
+      if (this.closed) throw new Error('Storage closed during recovery; reopen and verify before retrying');
+      for (const [key, value] of Object.entries(frozen.values)) this.cache.set(key, value);
+      this.error = null;
+    } catch (error) { this.error = error instanceof Error ? error.message : String(error); throw error; }
+    finally { this.recovering = false; this.inFlight--; }
+  }
+
+  /** No fallback to ordinary writes: a backend must implement transactional operation replay. */
+  async commitCommand(command: DurableCommand): Promise<DurableCommandResult> {
+    if (!this.backend.command) throw new Error('This storage backend does not support durable operation replay');
+    const frozen = structuredClone(command);
+    let outcome!: DurableCommandResult;
+    try {
+      await this.commitPrepared(frozen.ops, async () => {
+        outcome = await this.backend.command!(frozen);
+        return Object.entries(outcome.values).map(([key, value]): StoreOp => value === null ? { op: 'remove', key } : { op: 'set', key, value });
+      }, frozen.expected.map(entry => entry.key));
+    } catch (error) { throw new DurableCommandFailure(error); }
+    return outcome;
+  }
+
+  private async commitPrepared(ops: StoreOp[], command?: () => Promise<StoreOp[]>, observedKeys: string[] = []): Promise<void> {
+    if (this.recovering) throw new Error('Recovery is in progress');
+    if (this.closed) throw new Error('Durable storage is closed');
+    const batch = ops.map(op => ({ ...op }));
+    const revisions = new Map([...batch.map(op => op.key), ...observedKeys].map(key => [key, this.localRevision.get(key) ?? 0]));
+    // Establish the boundary now, before yielding. Draining the live pending map
+    // inside the queued task would put a later same-tick edit BEFORE this batch,
+    // then overwrite that newer value on disk while the cache still showed it.
+    const preceding = [...this.pending.values()];
+    this.pending = new Map();
+    this.scheduled = false;
+    this.inFlight++;
+    const committed = this.writing.then(async () => {
+      if (this.closed) throw new Error('Durable storage is closed');
+      if (this.error && this.pending.size) {
+        for (const op of preceding) if (!this.pending.has(op.key)) this.pending.set(op.key, op);
+        throw new Error(this.error);
+      }
+      if (preceding.length) await this.writePendingBatch(preceding);
+      if (this.error && this.pending.size) throw new Error(this.error);
+      const applied = command ? await command() : (await this.backend.write(batch), batch);
+      if (this.closed) throw new Error('Storage closed before commit acknowledgement; recover before retrying');
+      for (const op of applied) {
+        // Do not overwrite a later ordinary write which is still queued behind this transaction.
+        if ((this.localRevision.get(op.key) ?? 0) !== revisions.get(op.key)) continue;
+        if (op.op === 'set') this.cache.set(op.key, op.value);
+        else this.cache.delete(op.key);
+      }
+      this.error = null;
+    });
+    this.writing = committed.catch(() => undefined);
+    try { await committed; }
+    catch (error) { if (!isDurableCommandRejection(error)) this.error = error instanceof Error ? error.message : String(error); throw error; }
+    finally { this.inFlight--; }
   }
 
   /** Resolves once everything written so far is durable in SQLite (rejects if that could not be achieved). */
   async flush(): Promise<void> {
+    if (this.closed) throw new Error('Durable storage is closed');
     this.scheduled = false;
     this.writing = this.writing.then(() => this.drain());
     await this.writing;
+    if (this.closed) throw new Error('Storage closed before commit acknowledgement; recover before retrying');
     if (this.error) throw new Error(this.error);
   }
 
   close(): void {
+    if (this.closed) return;
     this.closed = true;
     if (this.retryTimer) clearTimeout(this.retryTimer);
     this.backend.close();
@@ -167,6 +285,11 @@ export class DurableStorage {
     if (this.pending.size === 0 || this.closed) return;
     const batch = [...this.pending.values()];
     this.pending = new Map();
+    await this.writePendingBatch(batch);
+  }
+
+  private async writePendingBatch(batch: StoreOp[]): Promise<void> {
+    this.inFlight++;
     try {
       await this.backend.write(batch);
       this.error = null;
@@ -175,6 +298,8 @@ export class DurableStorage {
       for (const op of batch) if (!this.pending.has(op.key)) this.pending.set(op.key, op);
       this.error = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
       this.scheduleRetry();
+    } finally {
+      this.inFlight--;
     }
   }
 

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StaffPracticePanel } from '@jamanvaar/ui';
-import { usePosStore } from '../../store/posStore';
+import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { db, PrintQueueRepository, LicenseRepository } from '@jamanvaar/database';
 import { applyLicenseCertificate } from '@jamanvaar/business';
 import { PlanTier, PrinterRole } from '@jamanvaar/types';
@@ -9,6 +9,8 @@ import { formatINR, slipHeader } from '@jamanvaar/utils';
 import { sound, ConnectionPanel, type SoundVolume, SettingsPageHeader, SettingsTabs, SettingsFeedback } from '@jamanvaar/ui';
 import { DisplaySizeCard } from './DisplaySizeCard';
 import { DetectedPrintersPanel } from './DetectedPrintersPanel';
+import { DeviceRecoveryPanel } from './DeviceRecoveryPanel';
+import { InterruptedOperationRecoveryPanel } from './InterruptedOperationRecoveryPanel';
 import { Settings, Printer, Server, Wifi, WifiOff, Database, RefreshCw, CheckCircle2, Sliders, FileText, HardDrive, ChefHat, Award, KeyRound, Building, Check, Sparkles, Smartphone, Zap, Banknote, QrCode, ChevronDown, ChevronUp, Bot, BarChart3, Network, UtensilsCrossed, LayoutGrid, Package, Users, Volume2, VolumeX } from 'lucide-react';
 
 export const PosSettingsView: React.FC = () => {
@@ -22,6 +24,13 @@ export const PosSettingsView: React.FC = () => {
   } = usePosStore();
 
   const [activeSettingsTab, setActiveSettingsTab] = useState<'HARDWARE' | 'REPORTS' | 'INSTANT_BILL' | 'DATABASE' | 'LICENSE'>('HARDWARE');
+  const [storageStatus, setStorageStatus] = useState(() => db.getStorageStatus());
+  useEffect(() => {
+    if (activeSettingsTab !== 'DATABASE') return;
+    setStorageStatus(db.getStorageStatus());
+    const timer = setInterval(() => setStorageStatus(db.getStorageStatus()), 1000);
+    return () => clearInterval(timer);
+  }, [activeSettingsTab]);
   const [instantBillFeedback, setInstantBillFeedback] = useState('');
 
   const instantBillCfg = db.restaurant?.instantBillConfig || {
@@ -850,14 +859,15 @@ ESC/POS Command Engine Verified OK
       {/* TAB 2: LOCAL DB & SYNC */}
       {activeSettingsTab === 'DATABASE' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {isManagerOrAboveRole(currentUser) && <div className="lg:col-span-2 space-y-4"><InterruptedOperationRecoveryPanel/><DeviceRecoveryPanel/></div>}
           <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Database className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-bold text-sm text-jaman-navy">Local Storage Health</h3>
               </div>
-              <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                HEALTHY
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${storageStatus.ok && storageStatus.mode === 'SQLITE' && storageStatus.commitState === 'COMMITTED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>
+                {!storageStatus.ok ? 'NEEDS ATTENTION' : storageStatus.commitState === 'PENDING' ? 'SAVING' : storageStatus.mode === 'SQLITE' ? 'SQLITE READY' : 'LEGACY STORAGE'}
               </span>
             </div>
 
@@ -865,7 +875,7 @@ ESC/POS Command Engine Verified OK
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Database Engine:</span>
-                  <strong className="font-mono text-jaman-navy">Browser LocalStorage (device-local)</strong>
+                  <strong className="font-mono text-jaman-navy">{storageStatus.mode === 'SQLITE' ? 'SQLite (device-local)' : storageStatus.mode === 'LEGACY' ? 'Browser localStorage (legacy mode)' : 'Memory only — not saved'}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Total Menu Dishes:</span>

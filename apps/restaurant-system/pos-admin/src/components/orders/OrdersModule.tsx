@@ -6,6 +6,7 @@ import { DayOrdersService, DateFilterPreset } from '@jamanvaar/business';
 import { OrderRepository, ReceiptRepository, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { Search, ChevronLeft, ChevronRight, FileSpreadsheet, Printer, ShoppingBag, Users, UserCheck, Flame, Sparkles, X } from 'lucide-react';
 import { OrderDetailModal } from '../OrderDetailModal';
+import { voidBillingOrder } from '../billing/billingCommands';
 import { ThermalReceiptView, printThermalReceipt, EmptyState, printElement, useConfirm, ModalBackdrop } from '@jamanvaar/ui';
 
 interface OrdersModuleProps {
@@ -883,7 +884,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                                 });
                                 if (!reason) return;
                                 try {
-                                  OrderRepository.voidOrder(ord.id, reason, 'Restaurant Admin');
+                                  await voidBillingOrder(ord, reason);
+                                  onOrderUpdated();
                                   showToast(`Voided ${ord.orderNumber}`);
                                 } catch (err) {
                                   showToast(err instanceof Error ? err.message : 'Could not void this bill');

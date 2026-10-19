@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { secureRandomIndex, generateSecurePassword, generateSecureCode } from '@jamanvaar/utils';
+import { describe, it, expect, vi } from 'vitest';
+import { secureRandomIndex, secureRandomBytes, generateSecurePassword, generateSecureCode } from '@jamanvaar/utils';
 
 /**
  * Found while chasing an unrelated PIN-hashing fix (B2-014): `secureRandomIndex` did single-byte
@@ -11,6 +11,15 @@ import { secureRandomIndex, generateSecurePassword, generateSecureCode } from '@
  * before it was caught (a test run for an unrelated fix that simply never completed).
  */
 describe('secureRandomIndex', () => {
+  it('refuses to create credentials or key bytes when secure entropy is unavailable', () => {
+    vi.stubGlobal('crypto', undefined);
+    try {
+      expect(() => secureRandomBytes(16)).toThrow('Secure randomness is unavailable');
+      expect(() => generateSecureCode(12)).toThrow('Secure randomness is unavailable');
+      expect(() => generateSecurePassword(16)).toThrow('Secure randomness is unavailable');
+      expect(() => secureRandomIndex(10000)).toThrow('Secure randomness is unavailable');
+    } finally { vi.unstubAllGlobals(); }
+  });
   it('does not hang for a large exclusiveMax (previously an infinite loop above 256)', () => {
     const t0 = Date.now();
     for (let i = 0; i < 1000; i++) {
@@ -37,6 +46,9 @@ describe('secureRandomIndex', () => {
     expect(() => secureRandomIndex(0)).toThrow();
     expect(() => secureRandomIndex(-5)).toThrow();
     expect(() => secureRandomIndex(2.5)).toThrow();
+    expect(() => secureRandomIndex(Number.MAX_VALUE)).toThrow();
+    expect(() => secureRandomIndex(Number.MAX_SAFE_INTEGER)).toThrow();
+    expect(() => secureRandomIndex(Infinity)).toThrow();
   });
 
   it('produces a roughly uniform distribution across a range that needs 2 bytes internally', () => {
@@ -46,7 +58,7 @@ describe('secureRandomIndex', () => {
     // would show up as buckets pinned at 0 or wildly over-represented, not just noise.
     expect(Math.min(...counts)).toBeGreaterThan(100);
     expect(Math.max(...counts)).toBeLessThan(320);
-  });
+  }, 30_000); // 200,000 actual secure entropy requests; keep all samples on slower hosts.
 });
 
 describe('other secure-random generators still work (sanity, unaffected by the secureRandomIndex fix)', () => {

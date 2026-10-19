@@ -50,6 +50,7 @@ const CATCH_UP_MAX_ROWS = 500;
  * the newer edit or bring the deleted record back.
  */
 const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['LOYALTY_TIER', 'LOYALTY_REWARD', 'LOYALTY_PROGRAM_SETTINGS', 'STAFF_USER', 'TAX_GROUP', 'DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION', 'INVENTORY_ITEM', 'RECIPE', 'SUPPLIER', 'KIOSK_CONFIGURATION']);
+const MAX_FUTURE_CLOCK_SKEW_MS = 5 * 60 * 1000;
 
 function changedAt(payload: unknown): number {
   const value = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).updatedAt : undefined;
@@ -197,6 +198,13 @@ export class EntitySyncService {
             continue;
           }
 
+          if (evt.baseSyncVersion !== undefined && evt.baseSyncVersion !== (existing?.syncVersion ?? 0)) {
+            throw new Error('ENTITY_VERSION_CONFLICT: This record changed on another device. Refresh and review your edit before retrying');
+          }
+          if (LAST_CHANGE_WINS_TYPES.has(entityType) && changedAt(evt.payload) > Date.now() + MAX_FUTURE_CLOCK_SKEW_MS) {
+            throw new Error('DEVICE_CLOCK_AHEAD: Correct the device clock before synchronizing this edit');
+          }
+
           if (existing && LAST_CHANGE_WINS_TYPES.has(entityType)) {
             const existingDeleted = isDeleted(existing.payload);
             const incomingDeleted = isDeleted(evt.payload);
@@ -211,12 +219,18 @@ export class EntitySyncService {
             // back is a new create (a new externalId) through the normal Add Dish flow, never an
             // implicit resurrection of an old one.
             if (existingDeleted && !incomingDeleted) {
+              if (evt.baseSyncVersion !== undefined) throw new Error('ENTITY_DELETED: This record was removed. Refresh and review your local edit');
               results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });
               continue;
             }
-            if (changedAt(evt.payload) < changedAt(existing.payload)) {
-              results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });
-              continue;
+            // A version-aware client resolves the precise server revision. Legacy clients retain
+            // timestamp ordering, but a previously poisoned future timestamp cannot block edits
+            // indefinitely. Report unapplied writes explicitly instead of acknowledging success.
+            const existingTime = changedAt(existing.payload);
+            const storedTime = existingTime > existing.updatedAt.getTime() + MAX_FUTURE_CLOCK_SKEW_MS
+              ? existing.updatedAt.getTime() : existingTime;
+            if (evt.baseSyncVersion === undefined && changedAt(evt.payload) < storedTime) {
+              throw new Error('STALE_ENTITY: This record has a newer edit. Refresh and review your changes');
             }
           }
 

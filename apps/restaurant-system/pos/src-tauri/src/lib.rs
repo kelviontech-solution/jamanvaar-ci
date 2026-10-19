@@ -3,6 +3,16 @@
 use std::net::UdpSocket;
 use std::thread;
 use std::time::Duration;
+mod core_health;
+
+fn local_core_health(port: u16) -> Result<serde_json::Value, String> {
+    let body = core_health::probe(port)?;
+    let health: serde_json::Value = serde_json::from_str(&body).map_err(|_| "Invalid Local Core health data")?;
+    if health["service"] != "local-relay" || health["core_status"] != "HEALTHY" {
+        return Err("The local port does not report a healthy JAMANVAAR Core".to_string());
+    }
+    Ok(health)
+}
 
 /// Broadcast JAMANVAAR_CORE beacon on LAN so Kiosk machines can auto-discover
 fn start_lan_beacon(local_core_port: u16) {
@@ -22,7 +32,9 @@ fn start_lan_beacon(local_core_port: u16) {
         );
 
         loop {
-            let _ = socket.send_to(beacon_msg.as_bytes(), "255.255.255.255:45678");
+            if local_core_health(local_core_port).is_ok() {
+                let _ = socket.send_to(beacon_msg.as_bytes(), "255.255.255.255:45678");
+            }
             thread::sleep(Duration::from_secs(3));
         }
     });
@@ -41,12 +53,10 @@ fn get_local_ip() -> Option<String> {
 #[tauri::command]
 fn get_local_core_info() -> serde_json::Value {
     let local_ip = get_local_ip().unwrap_or_else(|| "127.0.0.1".to_string());
-    serde_json::json!({
-        "status": "RUNNING",
-        "ip": local_ip,
-        "port": 5178,
-        "version": "1.0.0"
-    })
+    match local_core_health(5178) {
+        Ok(health) => serde_json::json!({ "status": "RUNNING", "ip": local_ip, "port": 5178, "version": health["version"] }),
+        Err(error) => serde_json::json!({ "status": "UNAVAILABLE", "ip": local_ip, "port": 5178, "version": null, "error": error }),
+    }
 }
 
 /// Tauri command: get this machine's LAN IP for display in settings
@@ -140,9 +150,12 @@ pub fn run() {
         // mobile targets at all, see tauri.android.conf.json).
         use tauri_plugin_shell::ShellExt;
         let shell = app.shell();
-        let _ = shell
+        let launched = shell
             .sidecar("JamanvaarLocalCore")
             .and_then(|cmd| cmd.spawn().map_err(Into::into));
+        if let Err(error) = launched {
+            eprintln!("JAMANVAAR Local Core could not be launched: {error}");
+        }
         Ok(())
     });
 

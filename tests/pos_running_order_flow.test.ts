@@ -15,6 +15,9 @@ import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 describe('POS running order — Send KOT then Pay (BUG-032)', () => {
   beforeEach(() => {
     db.resetToDefaultSeed();
+    // Running-bill fixtures use plain dishes; required-choice acceptance is
+    // covered by the modifier and durable kitchen-submission regressions.
+    db.menuItems = db.menuItems.map(item => ({ ...item, modifierGroupIds: [] }));
     db.shifts = []; ShiftRepository.openShift("qa-cashier", "QA Cashier", 0);
     usePosStore.getState().clearCart();
     usePosStore.setState({ selectedTable: null, orderType: 'TAKEAWAY' });

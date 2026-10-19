@@ -104,7 +104,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
     setCloudBackupError(null);
     setCloudUploading(true);
     try {
-      const summary = await uploadCloudBackup(db);
+      const summary = await uploadCloudBackup(db.exportOperationalSnapshot());
       setCloudBackups((prev) => [summary, ...(prev ?? [])]);
       markCloudBackedUp();
       showToast(`Backed up to JAMANVAAR Cloud (${(summary.sizeBytes / 1024).toFixed(0)} KB, compressed)`);
@@ -122,6 +122,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
   };
 
   const handleExportJson = () => {
+    try {
     // Wrapped with an identity/version marker so RestoreModal can actually validate a snapshot
     // (A01) and warn before restoring a different restaurant's backup (A03) — a raw `db` dump had
     // neither, so any JSON object that merely looked like it (or didn't look like it at all)
@@ -133,7 +134,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
       _restaurantName: db.restaurant?.name ?? null,
       _outletId: db.outlet?.id ?? null,
       _outletName: db.outlet?.name ?? null,
-      data: db
+      data: db.exportOperationalSnapshot()
     };
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payload, null, 2));
     const downloadAnchor = document.createElement('a');
@@ -144,7 +145,10 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
     downloadAnchor.remove();
 
     markLocalExported();
-    showToast('Database Backup JSON downloaded successfully!');
+    showToast('Business data snapshot downloaded successfully. Keep this unencrypted file private.');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Could not export this snapshot. No backup was recorded.');
+    }
   };
 
   const hoursSinceLastLocalExport = lastLocalExportAt ? (Date.now() - lastLocalExportAt.getTime()) / (1000 * 60 * 60) : null;
@@ -304,13 +308,13 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="font-bold text-base text-jaman-navy">Export Complete Database JSON</h4>
+                <h4 className="font-bold text-base text-jaman-navy">Export Business Data JSON</h4>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold">
-                  Recommended
+                  Unencrypted snapshot
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Download a complete portable JSON snapshot containing all orders, menu items, BOM recipes, tables, customers, shifts, and settings.
+                Download this app's business data, including orders, menu, customers and settings. This unencrypted file contains personal information. It does not include the SQLite operation ledger, device credentials or a complete device recovery backup.
               </p>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import type { StoreOp } from './sql_kv_engine';
+import type { StoreOp, DurableCommand, DurableCommandResult, DurableRecoverySnapshot } from './sql_kv_engine';
 import type { StorageBackend } from './durable_storage';
 
 export interface WorkerLike {
@@ -57,6 +57,13 @@ export class WorkerBackend implements StorageBackend {
   async write(ops: StoreOp[]): Promise<void> {
     await this.call({ type: 'write', ops });
   }
+
+  async command(command: DurableCommand): Promise<DurableCommandResult> {
+    return (await this.call({ type: 'command', command })).result;
+  }
+
+  async exportRecovery(scope: string): Promise<DurableRecoverySnapshot> { return (await this.call({ type: 'recovery-export', scope })).snapshot; }
+  async restoreRecovery(snapshot: DurableRecoverySnapshot, expectedScope: string): Promise<void> { await this.call({ type: 'recovery-restore', snapshot, expectedScope }); }
 
   close(): void {
     if (this.closed) return;

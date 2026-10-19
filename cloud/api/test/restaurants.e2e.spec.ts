@@ -80,7 +80,7 @@ describe('Restaurant management (Phase 1a)', () => {
     createdRestaurantIds.push(res.body.restaurant.id);
   });
 
-  it('allows restaurant creation with no mobile number, leaving restaurantCode null', async () => {
+  it('allows restaurant creation with no mobile number and generates a usable Restaurant ID', async () => {
     const res = await request(app.getHttpServer())
       .post('/api/v1/restaurants')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -90,7 +90,7 @@ describe('Restaurant management (Phase 1a)', () => {
         ownerEmail: `owner-nomobile-${Date.now()}@test.example.com`
       });
     expect(res.status).toBe(201);
-    expect(res.body.restaurant.restaurantCode).toBeNull();
+    expect(res.body.restaurant.restaurantCode).toMatch(/^JM\d{10}$/);
     expect(res.body.restaurant.mobile).toBeNull();
     createdRestaurantIds.push(res.body.restaurant.id);
   });

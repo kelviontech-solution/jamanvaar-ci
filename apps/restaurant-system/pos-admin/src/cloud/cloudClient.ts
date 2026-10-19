@@ -1,6 +1,6 @@
 import { KioskConfigurationRepository, KeyValueStore } from '@jamanvaar/database';
 import { activeAdminBranch } from '../adminBranchScope';
-import { stopRealtime } from '@jamanvaar/sync';
+import { stopRealtime, catalogSyncConflicts } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, PushedMovement, RemoteMovement } from '@jamanvaar/sync';
 import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
@@ -206,10 +206,25 @@ export function isCloudConnected(): boolean {
  */
 type RefreshOutcome = 'ok' | 'invalid' | 'transient';
 
+/**
+ * Set only when the refresh call itself returned 403 (restaurant suspended/archived, not a bad
+ * token) — the one case where the server already explains exactly what happened
+ * ("Restaurant account is suspended or archived..."). `request()` throws this verbatim instead
+ * of falling through to the original call's generic "Missing bearer token" body, which told a
+ * suspended owner nothing about why they were locked out.
+ *
+ * Reset at the start of each refresh attempt, not consumed (nulled) by whichever caller reads it
+ * first: dev StrictMode (and ordinary concurrent requests) can have two `request()` calls share
+ * one `refreshInFlight` promise, so a read-then-clear here let the second resumer find it already
+ * gone and fall back to the generic message — a real race, not a hypothetical one.
+ */
+let deniedMessage: string | null = null;
+
 function refreshAccessToken(): Promise<RefreshOutcome> { return withSessionLock('tenant-cookie', refreshAccessTokenLocked); }
 
 async function refreshAccessTokenLocked(): Promise<RefreshOutcome> {
   const epoch = sessionEpoch;
+  deniedMessage = null;
   const restaurantId = getRestaurantId();
   if (!restaurantId) return 'invalid';
   try {
@@ -221,6 +236,18 @@ async function refreshAccessTokenLocked(): Promise<RefreshOutcome> {
     if (!res.ok) {
       if (res.status === 401) {
         accessToken = null;
+        return 'invalid';
+      }
+      if (res.status === 403) {
+        // A real, final denial (e.g. suspension) -- not a bad token, so the session still ends,
+        // but it is never "transient": retrying will not fix it.
+        accessToken = null;
+        try {
+          const body = await res.json();
+          deniedMessage = typeof body?.message === 'string' ? body.message : null;
+        } catch {
+          deniedMessage = null;
+        }
         return 'invalid';
       }
       return 'transient';
@@ -266,6 +293,9 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     if (outcome === 'transient') {
       // Not a real session problem — the original 401 must not be reported as one.
       throw new CloudApiError('Could not reach JAMANVAAR Cloud to restore your session. Check your connection and try again.', 0);
+    }
+    if (outcome === 'invalid' && deniedMessage) {
+      throw new CloudApiError(deniedMessage, 403);
     }
     // outcome === 'invalid': fall through — the original 401 below is the real, final answer.
   }
@@ -1488,6 +1518,7 @@ export class MenuPublishRefused extends Error {
  */
 export async function publishMenuToGuests(note?: string): Promise<{ version: number; warnings: string[] }> {
   const sent = await publishCatalogNow();
+  if (catalogSyncConflicts().length) throw new MenuPublishRefused('Review the conflicting menu changes before publishing.', ['Open Menu and compare your edits with the published versions.']);
   if (!sent.delivered) throw new CloudApiError(`${sent.pending} menu change(s) have not reached the cloud yet. Check your connection and try again.`, 0);
   const res = await deviceFetch('/api/v1/menu/publish', { method: 'POST', body: JSON.stringify({ note }) });
   const data = await parseJsonResponse(res);

@@ -16,6 +16,9 @@ describe('Captain service workflow', () => {
 
   beforeEach(async () => {
     db.resetToDefaultSeed();
+    // These service scenarios use plain dishes. Required-choice acceptance has its own fixture;
+    // silently adding the seeded customizable thali without choices is no longer a valid order.
+    db.menuItems = db.menuItems.map(item => ({ ...item, modifierGroupIds: [] }));
     // This scenario explicitly exercises tax-exclusive listed prices; inclusive pricing has separate regressions.
     db.taxGroups.forEach(group => { group.isInclusive = false; });
     db.users = [];

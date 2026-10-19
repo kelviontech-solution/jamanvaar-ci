@@ -55,11 +55,14 @@ function walk(dir: string, out: string[] = []): string[] {
 
 describe('no invented business identity in reports and bills (BUG-042)', () => {
   const files = SOURCE_DIRS.flatMap((d) => walk(join(__dirname, d)));
+  // One source snapshot for the whole audit. Re-reading thousands of files for
+  // every forbidden string makes this an I/O benchmark on Windows/OneDrive.
+  const contents = files.map(file => ({ file, lines: readFileSync(file, 'utf8').split('\n') }));
 
   it.each(FORBIDDEN)('"%s" is not used as a fallback anywhere outside the demo seed', (literal) => {
     const hits: string[] = [];
-    for (const file of files) {
-      readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    for (const { file, lines } of contents) {
+      lines.forEach((line, i) => {
         if (line.includes(literal) && !ALLOWED_LINE.test(line)) hits.push(`${file.replace(join(__dirname, '..'), '')}:${i + 1}: ${line.trim().slice(0, 110)}`);
       });
     }

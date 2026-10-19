@@ -1,0 +1,75 @@
+[
+  {
+    "screen": "shared-qr-console",
+    "layout": "workspace",
+    "width": 1440,
+    "allToolsReachable": 24,
+    "search": true,
+    "overflow": false
+  },
+  {
+    "screen": "shared-qr-console",
+    "layout": "workspace",
+    "width": 390,
+    "allToolsReachable": 24,
+    "search": true,
+    "overflow": false
+  },
+  {
+    "screen": "shared-qr-console",
+    "layout": "integrated",
+    "width": 1440,
+    "allToolsReachable": 24,
+    "search": true,
+    "overflow": false
+  },
+  {
+    "screen": "shared-qr-console",
+    "layout": "integrated",
+    "width": 390,
+    "allToolsReachable": 24,
+    "search": true,
+    "overflow": false
+  },
+  {
+    "screen": "recommendations",
+    "width": 320,
+    "signatureVariety": true,
+    "categoriesAndSearch": true,
+    "translatedNavigationAndDishes": true,
+    "openingStatus": true,
+    "overflow": false
+  },
+  {
+    "screen": "recommendations",
+    "width": 390,
+    "signatureVariety": true,
+    "categoriesAndSearch": true,
+    "translatedNavigationAndDishes": true,
+    "openingStatus": true,
+    "overflow": false
+  },
+  {
+    "screen": "recommendations",
+    "width": 1440,
+    "signatureVariety": true,
+    "categoriesAndSearch": true,
+    "translatedNavigationAndDishes": true,
+    "openingStatus": true,
+    "overflow": false
+  },
+  {
+    "screen": "real-editor-with-isolated-transport",
+    "width": 1440,
+    "draftSave": true,
+    "publishAcknowledgement": true,
+    "overflow": false
+  },
+  {
+    "screen": "real-editor-with-isolated-transport",
+    "width": 390,
+    "draftSave": true,
+    "publishAcknowledgement": true,
+    "overflow": false
+  }
+]

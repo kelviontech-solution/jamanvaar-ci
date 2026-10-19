@@ -216,12 +216,13 @@ it('POS, Captain, Kiosk and a real QR checkout converge in one branch and KDS co
   expect(qr.status,JSON.stringify(qr.body)).toBe(201);
   const record=await prisma.runAsTenant(rid,tx=>tx.syncedOrder.findFirstOrThrow({where:{restaurantId:rid,publicOrderId:qr.body.publicOrderId,source:'QR',branchId:branches[4].id}}));created.push(record.externalOrderId);
   fullFlowTimings.push({source:'QR',commitMs:Math.round(performance.now()-start)});
-  for(const d of members){const pull=await as('get','/api/v1/orders/sync?afterSeq=0',d.token);for(const id of created)expect(pull.body.orders.some((o:any)=>o.externalOrderId===id)).toBe(true);}
+  const visibleIds=(d:{type:string;token:string})=>d.type==='KIOSK'?(d.token===members.find(member=>member.type==='KIOSK').token?[`four-source-KIOSK-${stamp}`]:[]):created;
+  for(const d of members){const pull=await as('get','/api/v1/orders/sync?afterSeq=0',d.token);for(const id of created)expect(pull.body.orders.some((o:any)=>o.externalOrderId===id)).toBe(visibleIds(d).includes(id));}
   const foreign=await as('get','/api/v1/orders/sync?afterSeq=0',devices[0][0].token);for(const id of created)expect(foreign.body.orders.some((o:any)=>o.externalOrderId===id)).toBe(false);
   const kds=members.find(d=>d.type==='KDS'),before=await as('get','/api/v1/orders/sync?afterSeq=0',kds.token),readyAt=performance.now();
   for(const id of created){const o=before.body.orders.find((o:any)=>o.externalOrderId===id);const wire=Object.fromEntries(Object.entries(o).filter(([,v])=>v!==null));const ready={...wire,status:'READY',updatedAt:new Date().toISOString(),items:o.items.map((i:any)=>({...i,kitchenStatus:'READY'}))};const readyPush=await as('post','/api/v1/orders/sync',kds.token).send({events:[ready]});expect(readyPush.body.results[0].status,JSON.stringify(readyPush.body)).toBe('ok');
     const served={...ready,status:'COMPLETED',updatedAt:new Date().toISOString(),items:ready.items.map((i:any)=>({...i,kitchenStatus:'SERVED'}))};expect((await as('post','/api/v1/orders/sync',kds.token).send({events:[served]})).body.results[0].status).toBe('ok');}
-  for(const d of members.filter(d=>d.type!=='KDS')){const pull=await as('get','/api/v1/orders/sync?afterSeq=0',d.token);for(const id of created)expect(pull.body.orders.find((o:any)=>o.externalOrderId===id).status).toBe('COMPLETED');}
+  for(const d of members.filter(d=>d.type!=='KDS')){const pull=await as('get','/api/v1/orders/sync?afterSeq=0',d.token);for(const id of visibleIds(d))expect(pull.body.orders.find((o:any)=>o.externalOrderId===id).status).toBe('COMPLETED');}
   const status=await http().get(`/api/v1/public/qr/orders/${record.publicOrderId}`);expect(status.body.status).toBe('COMPLETED');
   fullFlowTimings.push({phase:'KDS ready and served to POS/Captain/Kiosk/QR',roundTripMs:Math.round(performance.now()-readyAt)});
 });

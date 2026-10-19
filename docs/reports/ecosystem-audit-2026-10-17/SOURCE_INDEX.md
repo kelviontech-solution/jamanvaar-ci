@@ -1,0 +1,44 @@
+# Source evidence
+
+HEAD `ccf17d93288ede1a1bdf7bb2c150adf84ec88e72`; current file hashes and concurrent changes are recorded in [SOURCE_SNAPSHOT.json](SOURCE_SNAPSHOT.json). The route inventory does not assert exhaustive manual review.
+
+- [cloud/api/src/modules/order-sync/order-sync.service.ts](../../../cloud/api/src/modules/order-sync/order-sync.service.ts) — 959 lines
+- [cloud/api/src/modules/order-sync/order-rules.ts](../../../cloud/api/src/modules/order-sync/order-rules.ts) — 109 lines
+- [cloud/api/src/modules/order-sync/order-merge.ts](../../../cloud/api/src/modules/order-sync/order-merge.ts) — 105 lines
+- [cloud/api/src/modules/order-sync/order-sync-admission.ts](../../../cloud/api/src/modules/order-sync/order-sync-admission.ts) — 83 lines
+- [cloud/api/src/modules/payments/payments.service.ts](../../../cloud/api/src/modules/payments/payments.service.ts) — 1230 lines
+- [cloud/api/src/modules/payments/order-payment-ledger.ts](../../../cloud/api/src/modules/payments/order-payment-ledger.ts) — 214 lines
+- [cloud/api/src/modules/payments/razorpay-gateway.service.ts](../../../cloud/api/src/modules/payments/razorpay-gateway.service.ts) — 187 lines
+- [cloud/api/src/modules/entity-sync/entity-sync.service.ts](../../../cloud/api/src/modules/entity-sync/entity-sync.service.ts) — 360 lines
+- [cloud/api/src/modules/backups/backups.service.ts](../../../cloud/api/src/modules/backups/backups.service.ts) — 606 lines
+- [cloud/api/src/modules/backups/backup-storage.service.ts](../../../cloud/api/src/modules/backups/backup-storage.service.ts) — 212 lines
+- [cloud/api/src/modules/reports/reports.service.ts](../../../cloud/api/src/modules/reports/reports.service.ts) — 500 lines
+- [cloud/api/src/common/guards/device-auth.guard.ts](../../../cloud/api/src/common/guards/device-auth.guard.ts) — 269 lines
+- [cloud/api/src/common/guards/platform-auth.guard.ts](../../../cloud/api/src/common/guards/platform-auth.guard.ts) — 89 lines
+- [cloud/api/src/common/security/branch-license.ts](../../../cloud/api/src/common/security/branch-license.ts) — 50 lines
+- [cloud/api/src/prisma/prisma.service.ts](../../../cloud/api/src/prisma/prisma.service.ts) — 149 lines
+- [cloud/api/src/common/realtime/realtime-bus.ts](../../../cloud/api/src/common/realtime/realtime-bus.ts) — 143 lines
+- [cloud/api/src/common/realtime/realtime.controller.ts](../../../cloud/api/src/common/realtime/realtime.controller.ts) — 52 lines
+- [cloud/api/prisma/schema.prisma](../../../cloud/api/prisma/schema.prisma) — 1982 lines
+- [cloud/api/prisma/migrations/20261006040000_entity_recovery_sequence/migration.sql](../../../cloud/api/prisma/migrations/20261006040000_entity_recovery_sequence/migration.sql) — 31 lines
+- [packages/database/src/durable/durable_storage.ts](../../../packages/database/src/durable/durable_storage.ts) — 221 lines
+- [packages/database/src/durable/browser_boot.ts](../../../packages/database/src/durable/browser_boot.ts) — 125 lines
+- [packages/database/src/db.ts](../../../packages/database/src/db.ts) — 1665 lines
+- [packages/database/src/key_value_store.ts](../../../packages/database/src/key_value_store.ts) — 90 lines
+- [packages/database/src/tenant_isolation.ts](../../../packages/database/src/tenant_isolation.ts) — 122 lines
+- [packages/sync/src/outbox.ts](../../../packages/sync/src/outbox.ts) — 955 lines
+- [packages/sync/src/device_gate.ts](../../../packages/sync/src/device_gate.ts) — 451 lines
+- [packages/api/src/printer.ts](../../../packages/api/src/printer.ts) — 738 lines
+- [apps/restaurant-system/captain/src/store/captainStore.ts](../../../apps/restaurant-system/captain/src/store/captainStore.ts) — 1500 lines
+- [apps/restaurant-system/captain/src/components/tables/CaptainTableWorkspaceModal.tsx](../../../apps/restaurant-system/captain/src/components/tables/CaptainTableWorkspaceModal.tsx) — 762 lines
+- [apps/restaurant-system/pos/src/store/posStore.ts](../../../apps/restaurant-system/pos/src/store/posStore.ts) — 2098 lines
+- [apps/restaurant-system/pos/src/components/cart/PosCart.tsx](../../../apps/restaurant-system/pos/src/components/cart/PosCart.tsx) — 681 lines
+- [apps/kiosk-system/kiosk-user/src/App.tsx](../../../apps/kiosk-system/kiosk-user/src/App.tsx) — 4496 lines
+- [apps/qr-guest/src/App.tsx](../../../apps/qr-guest/src/App.tsx) — 705 lines
+- [apps/restaurant-system/kds/src/App.tsx](../../../apps/restaurant-system/kds/src/App.tsx) — 700 lines
+- [apps/restaurant-system/pos/src-tauri/src/lib.rs](../../../apps/restaurant-system/pos/src-tauri/src/lib.rs) — 153 lines
+- [.github/workflows/quality-security.yml](../../../.github/workflows/quality-security.yml) — 96 lines
+- [docker-compose.yml](../../../docker-compose.yml) — 374 lines
+- [cloud/api/test/sync-chaos.e2e.spec.ts](../../../cloud/api/test/sync-chaos.e2e.spec.ts) — 190 lines
+- [apps/restaurant-system/pos/src/components/payment/PosPaymentModal.tsx](../../../apps/restaurant-system/pos/src/components/payment/PosPaymentModal.tsx) — 1267 lines
+- [packages/types/src/domain.ts](../../../packages/types/src/domain.ts) — 1876 lines

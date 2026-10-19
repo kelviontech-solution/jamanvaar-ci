@@ -28,7 +28,7 @@ describe('Plan device limit enforcement (BUG-061)', () => {
   const api = (method: 'get' | 'post' | 'patch', url: string) => request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
   async function redeem(deviceType: string) {
     const key = await api('post', '/api/v1/activation-keys').send({ restaurantId, allowedDeviceType: deviceType, expiresAt: new Date(Date.now() + 86400000).toISOString() });
-    if (key.status !== 201) return { keyStatus: key.status, keyBody: key.body };
+    if (key.status !== 201) return { keyStatus: key.status, status: key.status, body: key.body };
     const res = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType });
     return { keyStatus: key.status, status: res.status, body: res.body };
   }
@@ -57,6 +57,8 @@ describe('Plan device limit enforcement (BUG-061)', () => {
   });
 
   it('redeems up to the plan limit for one app, then refuses the next one of that same app with a clear reason', async () => {
+    const spare = await api('post', '/api/v1/activation-keys').send({ restaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    expect(spare.status).toBe(201);
     const first = await redeem('POS');
     expect(first.status).toBe(201);
     const second = await redeem('POS');
@@ -65,6 +67,8 @@ describe('Plan device limit enforcement (BUG-061)', () => {
     const third = await redeem('POS');
     expect(third.status).toBe(409);
     expect(third.body.message).toMatch(/device|maxDevices|2 device/i);
+    const lateRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: spare.body.code, deviceType: 'POS' });
+    expect(lateRedeem.status).toBe(409);
   });
 
   it('a different app (KDS) has its own independent cap, unaffected by POS being full', async () => {

@@ -160,6 +160,13 @@ export function generateUniquePin(restaurantId: string, existingFingerprints: It
   const taken = new Set(existingFingerprints);
   const extraWeak = new Set(['1212', '0001']); // not caught by isObviousPattern but still common guesses
   const weak = (pin: string) => isObviousPattern(pin) || extraWeak.has(pin);
+  // Most restaurants occupy only a tiny fraction of the PIN space. Sampling
+  // directly avoids 10,000 random draws and a full sort for every staff member.
+  // Keep the exhaustive fallback for nearly-full spaces and unlucky draws.
+  for (let attempt = 0; attempt < 32; attempt++) {
+    const pin = String(secureRandomIndex(10000)).padStart(4, '0');
+    if (!weak(pin) && !taken.has(pinFingerprint(pin, restaurantId))) return pin;
+  }
   const candidates: string[] = [];
   for (let n = 0; n < 10000; n++) candidates.push(String(n).padStart(4, '0'));
   // B2-003: Fisher-Yates so we don't hand out PINs in ascending order — was Math.random(),

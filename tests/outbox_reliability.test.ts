@@ -1,4 +1,5 @@
-import { describe, expect, it, afterEach, beforeEach } from 'vitest';
+import { describe, expect, it, afterEach, beforeEach, vi } from 'vitest';
+import { createHash } from 'node:crypto';
 import { SyncOutboxEngine, OrderSyncTransport, OrderSyncPushEvent } from '../packages/sync/src/outbox';
 import { MAX_ATTEMPTS_BEFORE_DEAD_LETTER } from '../packages/sync/src/sync_protocol';
 import { db } from '../packages/database/src/db';
@@ -40,6 +41,27 @@ describe('SyncOutboxEngine reliability', () => {
   });
   afterEach(() => SyncOutboxEngine.configureTransport(null));
 
+  it('uses the same complete SHA-256 mutation identity without secure-context WebCrypto', async () => {
+    const order = makeOrder('lan-digest');
+    db.orders.push(order);
+    const t = transport(() => 'throw');
+    SyncOutboxEngine.configureTransport(t);
+    await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+    const expected = t.calls[0][0].eventId;
+    vi.stubGlobal('crypto', undefined);
+    try {
+      await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+      const event = t.calls[1][0];
+      expect(event.eventId).toBe(expected);
+      const canonical = (value: unknown): unknown => Array.isArray(value) ? value.map(canonical)
+        : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([k, v]) => [k, canonical(v)])) : value;
+      const { eventId: _eventId, baseSyncVersion: _version, meta, ...payload } = event;
+      const { staffSession: _staff, approvalSession: _approval, ...businessMeta } = meta ?? {};
+      const digest = createHash('sha256').update(JSON.stringify(canonical({ ...payload, meta: businessMeta }))).digest('hex');
+      expect(event.eventId).toBe(`${event.externalOrderId}@${event.updatedAt}#v2:${digest}`);
+    } finally { vi.unstubAllGlobals(); }
+  });
+
   it('sends the exact partial refund in paise instead of reversing the whole sale', async () => {
     const order = makeOrder('partial-sync');
     order.orderStatus = 'REFUNDED';order.refundAmount = 30.25;
@@ -48,6 +70,30 @@ describe('SyncOutboxEngine reliability', () => {
     await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
     expect(t.calls[0][0].meta?.refundAmountPaise).toBe(3025);
     expect(t.calls[0][0].totalAmount).toBe(10500);
+  });
+  it.each(['ok', 'rejected', 'throw'] as const)('does not apply an old %s acknowledgement to a newer same-time mutation', async outcome => {
+    const order = makeOrder(`changed-during-${outcome}`);
+    db.orders.push(order);
+    const calls: OrderSyncPushEvent[][] = [];
+    SyncOutboxEngine.configureTransport({
+      async push(events) {
+        calls.push(events);
+        if (calls.length === 1) {
+          // A caller forgot to mark dirty, and a refresh replaced the array record.
+          // Neither condition may let the old response acknowledge the new data.
+          db.orders[0] = { ...order, customerName: 'Corrected guest' };
+          if (outcome === 'throw') throw Object.assign(Error('Old payload rejected'), { status: 422 });
+          if (outcome === 'rejected') return { results: [{ externalOrderId: order.id, status: 'error', error: 'Invalid order payload' }], serverTime: new Date().toISOString() };
+        }
+        return { results: events.map(event => ({ externalOrderId: event.externalOrderId, status: 'ok', syncVersion: calls.length })), serverTime: new Date().toISOString() };
+      }, async pull() { return { orders: [], serverTime: new Date().toISOString() }; }
+    });
+    await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+    await vi.waitFor(() => expect(db.orders[0].syncStatus).toBe('SYNCED'));
+    expect(calls).toHaveLength(2);
+    expect(calls[0][0].eventId).not.toBe(calls[1][0].eventId);
+    expect(calls[1][0].meta?.customerName).toBe('Corrected guest');
+    expect(db.orders[0].remoteSyncVersion).toBe(2);
   });
   it('a cancellation awaiting cloud authorization cannot block ordinary offline sales', async () => {
     const sale = makeOrder('ordinary-sale'), cancellation = { ...makeOrder('cancelled-sale'), orderStatus: 'CANCELLED' as const };
@@ -75,6 +121,24 @@ describe('SyncOutboxEngine reliability', () => {
     order.updatedAt = new Date(Date.now() + 5000).toISOString();
     await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
     expect(t.calls[2][0].eventId).not.toBe(first.eventId);
+  });
+
+  it.each(['modifier', 'split', 'seat', 'refund', 'discount'] as const)('does not deduplicate a same-millisecond %s mutation', async (change) => {
+    const order = makeOrder(`same-time-${change}`);
+    order.items = [{ id: 'line', orderId: order.id, sku: 'MEAL', menuItemId: 'dish', name: 'Meal', quantity: 1, unitPrice: 100, totalPrice: 100, kitchenStatus: 'PENDING', modifiers: [] }];
+    db.orders.push(order);
+    const t = transport(() => 'throw');
+    SyncOutboxEngine.configureTransport(t);
+    await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+    if (change === 'modifier') order.items[0].modifiers = [{ groupId: 'bread', groupName: 'Bread', optionId: 'roti', optionName: 'Roti', priceDelta: 0 }];
+    if (change === 'split') order.paymentSplits = [{ method: 'CASH', amount: 50 }, { method: 'UPI', amount: 55 }];
+    if (change === 'seat') order.items[0].seat = 2;
+    if (change === 'refund') order.refundAmount = 5;
+    if (change === 'discount') order.discountAmount = 5;
+    await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+    expect(t.calls[1][0].eventId).not.toBe(t.calls[0][0].eventId);
+    await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+    expect(t.calls[2][0].eventId).toBe(t.calls[1][0].eventId);
   });
 
   it('a failed order is not retried again until its backoff has elapsed', async () => {

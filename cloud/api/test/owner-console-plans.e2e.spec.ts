@@ -5,6 +5,7 @@ import {PrismaService} from '../src/prisma/prisma.service';
 import {ApplicationEntitlementsService} from '../src/modules/application-entitlements/application-entitlements.service';
 import {AiAssistantService} from '../src/modules/ai-assistant/ai-assistant.service';
 import {QrSettingsService} from '../src/modules/qr/qr-settings.service';
+import {QR_CAPABILITIES} from '../src/modules/application-entitlements/qr-capabilities';
 
 describe('generic owner entry, QR grants and AI under mixed subscriptions',()=>{
  let app:any,prisma:PrismaService,ent:ApplicationEntitlementsService,ai:AiAssistantService,platform:string;
@@ -61,7 +62,7 @@ describe('generic owner entry, QR grants and AI under mixed subscriptions',()=>{
    const path=`/api/v1/qr-ordering/restaurants/${restaurantId}/entitlement`;
    expect((await p('patch',path).send({capabilities:{QR_LOYALTY:false}})).status).toBe(200);expect((await resolve()).limits.qrLoyalty).toBe(false);
    expect((await p('patch',path).send({capabilities:{QR_LOYALTY:true},maxOrdersPerDay:50})).status).toBe(200);expect((await resolve()).limits.qrLoyalty).toBe(true);expect((await resolve()).limits.qrMaxOrdersPerDay).toBe(50);
-   const detail=(await p('get',`/api/v1/qr-ordering/restaurants/${restaurantId}`)).body;expect(detail.entitlement.capabilityStatus).toHaveLength(17);
+   const detail=(await p('get',`/api/v1/qr-ordering/restaurants/${restaurantId}`)).body;expect(detail.entitlement.capabilityStatus).toHaveLength(Object.keys(QR_CAPABILITIES).length);
    expect((await p('patch',path).send({qrEntitled:false})).status).toBe(200);expect((await resolve()).enabled).toBe(false);
   }finally{await prisma.runAsPlatform(async tx=>{await tx.subscription.delete({where:{id:secondary.id}});await tx.applicationEntitlement.update({where:{id:original.id},data:{enabled:original.enabled,config:original.config as any}});});}
  });

@@ -216,6 +216,15 @@ describe('Remaining financial and usability gaps', () => {
     expect(document.body.textContent).toContain('Payment Status: PENDING');
     expect(document.body.textContent).not.toContain('FULLY SETTLED');
   });
+  it('Admin order details show actual partial collection and outstanding balance', () => {
+    const order = paid({ paymentStatus: 'PARTIALLY_PAID', orderStatus: 'PREPARING' });
+    order.paymentAllocationSummary = { collectedPaise: 10000, outstandingPaise: 15000 };
+    container = document.createElement('div'); document.body.appendChild(container); root = createRoot(container);
+    act(() => root!.render(<OrderDetailModal order={order} isOpen onClose={() => {}} onOrderUpdated={() => {}} />));
+    const settlement = [...document.querySelectorAll('span')].find(node => node.textContent === 'PAYMENT SETTLEMENT')!.parentElement!;
+    expect(settlement.textContent).toContain('₹100'); expect(settlement.textContent).toContain('₹150');
+    expect(settlement.textContent).not.toContain('FULLY PAID');
+  });
   it('partial local returns record the amount entered instead of silently defaulting zero to the bill total', async () => {
     const shift = ShiftRepository.openShift('a', 'Asha', 0, 'counter-a'); const order = paid({ shiftId: shift.id });
     await expect(refundBillingOrder(order, 'Return', true, 'CASH', 0)).rejects.toThrow(/amount/);

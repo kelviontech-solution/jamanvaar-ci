@@ -82,8 +82,13 @@ describe('restaurant niche templates and one real menu', () => {
     const pizza = PREBUILT_MENU_TEMPLATES.find(t => t.id === 'tpl-pizza')!;
     expect(pizza.categories.flatMap(c => c.items).find(i => i.name === 'Margherita Pizza')?.imageUrl).toMatch(/^\/assets\/menu\/template-photos-v1\/dish-[a-f0-9]+\.webp$/);
     expect(pizza.categories.flatMap(c => c.items).find(i => i.name === 'Garlic Bread')?.imageUrl).toMatch(/^\/assets\/menu\/template-photos-v1\/dish-[a-f0-9]+\.webp$/);
-    for (const item of PREBUILT_MENU_TEMPLATES.flatMap(t => t.categories.flatMap(c => c.items))) for (const app of ['apps/restaurant-system/pos-admin','apps/kiosk-system/kiosk-user']) expect(existsSync(resolve(app, 'public' + item.imageUrl)), item.name).toBe(true);
-  });
+    const checked = new Map<string, boolean>();
+    for (const item of PREBUILT_MENU_TEMPLATES.flatMap(t => t.categories.flatMap(c => c.items))) for (const app of ['apps/restaurant-system/pos-admin','apps/kiosk-system/kiosk-user']) {
+      const file = resolve(app, 'public' + item.imageUrl);
+      if (!checked.has(file)) checked.set(file, existsSync(file));
+      expect(checked.get(file), item.name).toBe(true);
+    }
+  }, 30_000); // Verify the complete packaged image set, including slower filesystem delivery.
   it('keeps the owner category order, food types and branch/channel restrictions on Kiosk', () => {
     load(); MenuRepository.moveCategory(db.categories.find(c => c.name === 'Beverages')!.id, -1);
     const pizza = db.menuItems.find(i => i.name === 'Margherita Pizza')!; pizza.branchIds = ['B'];

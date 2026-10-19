@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { hashPin, verifyPinHash, isPlaintextPin, generateUniquePin, pinFingerprint } from '@jamanvaar/database';
 
 /**
@@ -9,6 +9,14 @@ import { hashPin, verifyPinHash, isPlaintextPin, generateUniquePin, pinFingerpri
  * behind StaffRepository's PIN issuance.
  */
 describe('staff PIN hashing', () => {
+  it('issues an unused strong PIN without shuffling the entire PIN space', () => {
+    const random = vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation((array: any) => { array.fill(2); return array; });
+    try {
+      const pin = generateUniquePin('sparse-restaurant', []);
+      expect(pin).toMatch(/^\d{4}$/);
+      expect(random.mock.calls.length).toBeLessThanOrEqual(32);
+    } finally { random.mockRestore(); }
+  });
   it('hashes a PIN and a matching PIN verifies', async () => {
     const hash = await hashPin('4821', 'rest-1');
     expect(hash).not.toContain('4821');

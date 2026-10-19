@@ -43,5 +43,13 @@
   // metadata, commonjs modules) and its own independent typecheck script —
   // it must not be swept into this project's default include, which has no
   // "include" of its own and would otherwise pick up every .ts file in the repo.
-  "exclude": ["cloud/**", "docs/**", "node_modules"]
+  //
+  // tooling/qa fixtures are browser-injected probe scripts loaded directly by
+  // a target app's own Vite dev server, which resolves their "/src/..." import
+  // specifiers relative to that app's root — a Vite-only convention, not a
+  // real module path. This project's Node/bundler resolution can never resolve
+  // a leading-slash specifier, so these files are excluded the same way
+  // cloud/** and docs/** are: a different, independently-validated file tree,
+  // not a real gap in this project's own type coverage (EC-11).
+  "exclude": ["cloud/**", "docs/**", "tooling/qa/**", "node_modules"]
 }

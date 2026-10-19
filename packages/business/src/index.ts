@@ -28,3 +28,4 @@ export * from './split_bill';
 export * from './reservation_hold';
 
 export * from './shift_report';
+export * from './saved_order_pricing';

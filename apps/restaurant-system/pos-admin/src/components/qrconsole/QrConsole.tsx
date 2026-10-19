@@ -10,6 +10,7 @@ import {
   QrSetupHealth,
   QrServiceOperations,
   QrPickupOperations,
+  QrReservationsInbox,
   QrMenuPerformance,
   QrBrandStudio,
 } from "./QrOperations";
@@ -103,6 +104,7 @@ export function QrConsole({
   const [tab, setTab] = useState<Tab>(currentQrTab);
   const [menuOpen, setMenuOpen] = useState(false);
   const [advancedNavigation, setAdvancedNavigation] = useState(false);
+  const [toolSearch, setToolSearch] = useState('');
   const [feature, setFeature] = useState(currentQrFeature);
   const menuTrigger = useRef<HTMLButtonElement>(null);
   const sidebar = useRef<HTMLElement>(null);
@@ -148,7 +150,7 @@ export function QrConsole({
       if (event.key !== "Tab") return;
       const buttons = Array.from(
         sidebar.current?.querySelectorAll<HTMLButtonElement>(
-          "button, a[href]",
+          "button, a[href], input",
         ) ?? [],
       );
       const first = buttons[0],
@@ -201,8 +203,9 @@ export function QrConsole({
     );
 
   const page = QR_PAGES.find((p) => p.id === tab)!;
-  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','TABLES','PAYMENTS','BRAND','RESTAURANT_PAGE','CRM','ONBOARDING','ACCEPTANCE','RECONCILIATION','CALENDAR','PRINTPACK','RULES','ADVANCED','ANALYTICS']);
-  const visiblePages = QR_NAVIGATION.filter(page => advancedNavigation || basicPages.has(page.id) || page.id === tab);
+  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','CRM','RESTAURANT_PAGE','TABLES','ADVANCED','ANALYTICS']);
+  const search = toolSearch.trim().toLowerCase();
+  const visiblePages = QR_NAVIGATION.filter(page => (advancedNavigation || search || basicPages.has(page.id) || page.id === tab) && (!search || `${page.label} ${page.description} ${page.group}`.toLowerCase().includes(search)));
   const tabs: Array<[Tab, string]> = visiblePages.map((p) => [p.id, p.label]);
   return (
     <div
@@ -253,7 +256,10 @@ export function QrConsole({
             </div>
             <nav aria-label="QR administration">
               {onBack && <button type="button" className="qr-btn secondary" onClick={onBack}>← Back to management</button>}
-              <button type="button" aria-expanded={advancedNavigation} onClick={() => setAdvancedNavigation(value => !value)} className="qr-btn secondary">{advancedNavigation ? 'Show daily tools' : 'Show advanced tools'}</button>
+              <label className="qr-tool-search">Find a tool<input type="search" value={toolSearch} onChange={event=>setToolSearch(event.target.value)} placeholder="Payments, hours, reports…" /></label>
+              <button type="button" aria-expanded={advancedNavigation} onClick={() => {setAdvancedNavigation(value => !value);setToolSearch('');}} className="qr-btn secondary">{advancedNavigation ? 'Show daily tools' : 'All tools & setup'}</button>
+              {!advancedNavigation&&!search&&<p className="qr-nav-hint">Daily tasks first. Payments, design and configuration are in All tools & setup.</p>}
+              {!visiblePages.length&&<p className="qr-nav-hint" role="status">No tools match. Try menu, payments or hours.</p>}
               {[...new Set(visiblePages.map(page => page.group))].map((group) => (
                 <div className="qr-nav-group" key={group}>
                   <span>{group}</span>
@@ -307,6 +313,9 @@ export function QrConsole({
         </>
       )}
       <div className={workspace ? "qr-workspace-page" : ""}>
+        {!workspace && (
+          <button type="button" className="qr-btn secondary" aria-expanded={advancedNavigation} onClick={()=>setAdvancedNavigation(value=>!value)}>{advancedNavigation?'Show daily tools':'All tools & setup'}</button>
+        )}
         {!workspace && (
           <p className="text-xs text-slate-600">
             QR Ordering license active
@@ -371,7 +380,7 @@ export function QrConsole({
         {tab === "OVERVIEW" && (
           <div className="space-y-5">
             <Overview navigate={navigate} />
-            <section className="rounded-2xl border border-jaman-border bg-white p-5 space-y-3"><h2 className="font-bold text-lg">Set up guest ordering</h2><p className="text-sm text-slate-600">Work through the setup checks below, then open your live table QR to verify the guest experience.</p><div className="flex flex-wrap gap-3">{([['MENU','1. Publish menu'],['TABLES','2. Set up table QR'],['PAYMENTS','3. Check payments'],['BRAND','4. Preview appearance']] as const).map(([id,label]) => <button key={id} type="button" className="min-h-11 rounded-xl border px-4 text-sm font-bold" onClick={() => void navigate(id)}>{label}</button>)}<button type="button" className="min-h-11 rounded-xl border px-4 text-sm font-bold" onClick={() => setAdvancedNavigation(value => !value)}>{advancedNavigation ? 'Show daily tools' : 'Show advanced tools'}</button></div></section>
+            <section className="rounded-2xl border border-jaman-border bg-white p-5 space-y-3"><h2 className="font-bold text-lg">Set up guest ordering</h2><p className="text-sm text-slate-600">Work through the setup checks below, then open your live table QR to verify the guest experience.</p><div className="flex flex-wrap gap-3">{([['MENU','1. Publish menu'],['TABLES','2. Set up table QR'],['PAYMENTS','3. Check payments'],['BRAND','4. Preview appearance']] as const).map(([id,label]) => <button key={id} type="button" className="min-h-11 rounded-xl border px-4 text-sm font-bold" onClick={() => void navigate(id)}>{label}</button>)}<button type="button" className="min-h-11 rounded-xl border px-4 text-sm font-bold" onClick={() => setAdvancedNavigation(value => !value)}>{advancedNavigation ? 'Show daily tools' : 'All tools & setup'}</button></div></section>
             <QrSetupHealth navigate={(t) => navigate(t as Tab)} />
           </div>
         )}
@@ -396,6 +405,7 @@ export function QrConsole({
         {tab === 'ACCEPTANCE' && <QrPaymentWizard/>}
         {tab === 'RECONCILIATION' && <QrReconciliation/>}
         {tab === 'CALENDAR' && <QrPickupCalendar/>}
+        {tab === 'RESERVATIONS' && <QrReservationsInbox/>}
         {tab === 'PRINTPACK' && <QrPrintPack/>}
         {tab === "DESIGN" && <QrDesignStudio showToast={showToast} />}
         {tab === "ORDERS" && <QrOperationalOrders showToast={showToast} />}

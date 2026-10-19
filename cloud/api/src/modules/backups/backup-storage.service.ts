@@ -2,7 +2,7 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypt
 import { promises as fs } from 'fs';
 import { dirname, join, resolve, sep } from 'path';
 import { gzipSync, gunzipSync } from 'zlib';
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -33,8 +33,6 @@ const TAG_BYTES = 16;
  */
 @Injectable()
 export class BackupStorageService {
-  private readonly logger = new Logger(BackupStorageService.name);
-
   constructor(private readonly config: ConfigService) {}
 
   // ---- configuration -----------------------------------------------------------------------
@@ -55,9 +53,8 @@ export class BackupStorageService {
     const b64 = this.config.get<string>('BACKUP_ENCRYPTION_KEY_B64');
     if (!b64) return null;
     const key = Buffer.from(b64, 'base64');
-    if (key.length !== 32) {
-      this.logger.warn('BACKUP_ENCRYPTION_KEY_B64 must be 32 bytes (base64); backups will NOT be encrypted until it is fixed.');
-      return null;
+    if (key.length !== 32 || key.toString('base64') !== b64.trim()) {
+      throw new ServiceUnavailableException('BACKUP_ENCRYPTION_KEY_B64 must contain exactly 32 bytes encoded as base64');
     }
     return key;
   }
@@ -65,11 +62,18 @@ export class BackupStorageService {
   /** Where backups go and how well they are protected, for the health card. Never returns key material. */
   describe() {
     const s3 = this.s3Configured();
-    const encrypted = this.encryptionKey() !== null;
+    const encryptionRequired = this.config.get<string>('NODE_ENV') === 'production' || this.config.get<string>('BACKUP_REQUIRE_ENCRYPTION') === 'true';
+    let encrypted = false;
+    let configurationError: string | undefined;
+    try { encrypted = this.encryptionKey() !== null; } catch { configurationError = 'Backup encryption key is invalid'; }
+    if (encryptionRequired && !encrypted && !configurationError) configurationError = 'Backup encryption is required but no key is configured';
     return {
       storageMode: (s3 ? 's3' : 'local') as 's3' | 'local',
       offsite: s3,
       encryptionEnabled: encrypted,
+      encryptionRequired,
+      configurationReady: !configurationError,
+      configurationError,
       storageNote: s3
         ? `Stored in the S3-compatible bucket "${this.config.get<string>('BACKUP_S3_BUCKET')}".${encrypted ? '' : ' Not encrypted by the API: set BACKUP_ENCRYPTION_KEY_B64.'}`
         : `Stored on this server's own disk. Set the BACKUP_S3_* variables for off-site copies.${encrypted ? '' : ' Not encrypted: set BACKUP_ENCRYPTION_KEY_B64.'}`
@@ -81,6 +85,7 @@ export class BackupStorageService {
     const info = this.describe();
     const key = `health/probe-${Date.now()}.txt`;
     try {
+      if (!info.configurationReady) throw new ServiceUnavailableException(info.configurationError);
       await this.put(key, Buffer.from('ok'), 'text/plain', false);
       await this.delete(key);
       return { ok: true, ...info };
@@ -158,7 +163,7 @@ export class BackupStorageService {
     const compressed = gzipSync(Buffer.from(jsonPayload, 'utf8'));
     const key = this.encryptionKey();
     // Backups hold customers and PIN hashes. In production an unencrypted backup is refused rather than stored.
-    if (!key && this.config.get<string>('NODE_ENV') === 'production') {
+    if (!key && (this.config.get<string>('NODE_ENV') === 'production' || this.config.get<string>('BACKUP_REQUIRE_ENCRYPTION') === 'true')) {
       throw new ServiceUnavailableException('Backups are disabled until BACKUP_ENCRYPTION_KEY_B64 is configured on this server');
     }
     const stored = key ? this.encrypt(compressed, key) : compressed;

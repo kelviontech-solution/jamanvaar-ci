@@ -1,4 +1,5 @@
 import { BranchAvailabilityNotice } from './BranchAvailabilityNotice';
+import { MenuSyncReview } from './MenuSyncReview';
 import { CachedImg, MenuCategoryIcon } from '@jamanvaar/ui';
 import { isMenuPlaceholder, menuDishImage, menuCategoryImage } from '@jamanvaar/utils';
 import React, { useEffect, useRef, useState } from 'react';
@@ -247,6 +248,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      <MenuSyncReview />
       <BranchAvailabilityNotice itemId={initialItemId}/>
       {csvError && <p role="alert" className="text-rose-700">{csvError}</p>}
       {publicationMessage && <p role="status" className="rounded-xl bg-orange-50 border border-orange-200 p-3 text-sm text-jaman-navy">{publicationMessage}</p>}

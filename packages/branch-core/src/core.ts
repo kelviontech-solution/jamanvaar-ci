@@ -75,6 +75,7 @@ const itemSchema = z.object({
   lineTotal: z.number().int().min(0)
 });
 const orderEventSchema = z.object({
+  branchId: z.string().min(1).max(128).optional(),
   eventId: z.string().min(1).max(128).optional(),
   traceId: z.string().min(1).max(128).optional(),
   externalOrderId: z.string().min(1).max(64),
@@ -144,6 +145,13 @@ export class BranchCore {
     this.now = cfg.now ?? Date.now;
   }
 
+  private allowsLegacyBranchRows(): boolean {
+    try {
+      const branches = JSON.parse(this.store.getConfig('branches') ?? '[]');
+      return this.store.getConfig('restaurant_branch_count') === '1' && Array.isArray(branches) && branches.length === 1 && branches[0]?.id === this.cfg.branchId;
+    } catch { return false; }
+  }
+
   publish(event: RealtimeEvent): void {
     this.listeners.forEach((l) => l(event));
   }
@@ -153,10 +161,12 @@ export class BranchCore {
   /** Replaces the local view of who may connect with the cloud's latest roster. */
   applyRoster(roster: {
     restaurant: { id: string; name: string; status: string };
+    restaurantBranchCount?: number;
     branches: Array<{ id: string; name: string; code: string; timezone: string; status: string }>;
     subscription: { active: boolean; expiresAt: string | null; enabledApps: string[] };
     devices: Array<{ id: string; type: string; name: string | null; branchId: string | null; status: string; isLocked: boolean; tokenHash: string | null; appEnabled: boolean }>;
   }): void {
+    if (roster.restaurant.id !== this.cfg.restaurantId) throw new CoreError(403, 'WRONG_RESTAURANT', 'The cloud credential belongs to another restaurant; reconnect the correct Branch Core account');
     const now = this.now();
     this.store.transaction(() => {
       const seen = new Set<string>();
@@ -176,6 +186,7 @@ export class BranchCore {
       }
       this.store.setConfig('restaurant', JSON.stringify(roster.restaurant));
       this.store.setConfig('branches', JSON.stringify(roster.branches));
+      this.store.setConfig('restaurant_branch_count', Number.isSafeInteger(roster.restaurantBranchCount) && roster.restaurantBranchCount! >= 1 ? String(roster.restaurantBranchCount) : 'unknown');
       this.store.setConfig('subscription', JSON.stringify(roster.subscription));
       this.store.setConfig('last_cloud_contact', String(now));
     });
@@ -219,6 +230,8 @@ export class BranchCore {
     }
     if (!row.app_enabled) throw new CoreError(403, 'APP_DISABLED', `${row.type} is not enabled for this restaurant.`);
     if (row.branch_id && row.branch_id !== this.cfg.branchId) throw new CoreError(403, 'WRONG_BRANCH', 'This device belongs to another branch.');
+    const branch = (JSON.parse(this.store.getConfig('branches') ?? '[]') as Array<{ id: string; status: string }>).find(candidate => candidate.id === this.cfg.branchId);
+    if ((!branch || branch.status !== 'ACTIVE') && !opts.allowLocked) throw new CoreError(403, 'BRANCH_INACTIVE', 'This branch is inactive or missing from the current cloud roster. Reconnect the correct branch before continuing.');
     if (row.is_locked && !opts.allowLocked) throw new CoreError(403, 'DEVICE_LOCKED', row.lock_reason ?? 'This device is locked.');
 
     return { id: row.id, type: row.type, branchId: row.branch_id, restaurantId: this.cfg.restaurantId, name: row.name, isLocked: !!row.is_locked, lockReason: row.lock_reason };
@@ -255,6 +268,10 @@ export class BranchCore {
           continue;
         }
         const evt: OrderEvent = parsed.data;
+        if ((evt.branchId && evt.branchId !== this.cfg.branchId) || (typeof evt.meta?.branchId === 'string' && evt.meta.branchId !== this.cfg.branchId)) {
+          results.push({ externalOrderId: evt.externalOrderId, status: 'error', error: 'WRONG_BRANCH: Order belongs to another branch' });
+          continue;
+        }
         const attempt = this.store.attempt(() => this.applyOrderEvent(device, evt, origin, now));
         if (attempt.ok) {
           const r = attempt.value;
@@ -278,6 +295,9 @@ export class BranchCore {
 
   private applyOrderEvent(device: { id: string; type: string }, evt: OrderEvent, origin: 'device' | 'cloud', now: number) {
     if (origin === 'device' && requiresCloudOrderAuthorization(evt)) throw new CoreError(403, 'CLOUD_AUTHORIZATION_REQUIRED', 'Cancellation, refunds and corrections require current manager authorization on the cloud');
+    const existingRow = this.store.get<Record<string, any>>('SELECT * FROM orders WHERE external_order_id = ?', evt.externalOrderId);
+    const existing = existingRow ? this.orderFromRow(existingRow) : undefined;
+    if (origin === 'device' && device.type === 'KIOSK' && existing && existing.meta?.originDeviceId !== device.id) throw new CoreError(403, 'ORDER_NOT_AVAILABLE', 'This order is not available to this kiosk');
     if (evt.eventId) {
       const prior = this.store.get<{ result: string }>('SELECT result FROM processed_events WHERE event_id = ?', evt.eventId);
       if (prior) {
@@ -286,8 +306,6 @@ export class BranchCore {
       }
     }
 
-    const existingRow = this.store.get<Record<string, any>>('SELECT * FROM orders WHERE external_order_id = ?', evt.externalOrderId);
-    const existing = existingRow ? this.orderFromRow(existingRow) : undefined;
     const decision = origin === 'cloud' ? { apply: true as const, status: evt.status } : decideStatus(existing?.status, evt.status, device.type, evt.meta);
     if (!decision.apply) throw new CoreError(409, decision.reason, decision.message);
 
@@ -306,7 +324,13 @@ export class BranchCore {
     const merge = mergeOrderItems((existing?.items as never[] | undefined) ?? undefined, evt.items as never[], device.id);
     const prior = existing?.meta ?? {};
     const incoming = evt.meta ?? {};
-    const meta = existing || evt.meta || merge.foreignItemsKept ? { ...prior, ...incoming, ...(merge.foreignItemsKept ? { needsTotalsReview: true } : {}) } : null;
+    const meta: Record<string, unknown> = { ...prior, ...incoming, ...(merge.foreignItemsKept ? { needsTotalsReview: true } : {}) };
+    meta.branchId = this.cfg.branchId;
+    // Creator identity is server-owned, not the most recent editor. Unknown
+    // historical creators remain unclaimed rather than exposed to a kiosk.
+    if (typeof prior.originDeviceId === 'string') meta.originDeviceId = prior.originDeviceId;
+    else if (!existing && origin === 'device') meta.originDeviceId = device.id;
+    else if (origin === 'device') delete meta.originDeviceId;
     // Accepting an order is a claim: the first device to record it owns it.
     if (meta && typeof (prior as { acceptedBy?: unknown }).acceptedBy === 'string') (meta as Record<string, unknown>).acceptedBy = (prior as { acceptedBy: string }).acceptedBy;
 
@@ -351,8 +375,11 @@ export class BranchCore {
   }
 
   /** Orders changed after the cursor, in sequence order. This is the cursor KDS and every device recovers from. */
-  pullOrders(afterSeq: number) {
-    const rows = this.store.all<Record<string, any>>('SELECT * FROM orders WHERE seq > ? ORDER BY seq ASC LIMIT 501', afterSeq);
+  pullOrders(afterSeq: number, device?: { id: string; type: string }) {
+    // Quarantine historical cloud rows whose branch cannot be proven. Do not
+    // delete them or guess their ownership from an owner's credential.
+    const scope = "(json_extract(meta, '$.branchId') = ? OR (json_extract(meta, '$.branchId') IS NULL AND (device_id <> 'cloud' OR ? = 1)))";
+    const rows = this.store.all<Record<string, any>>(`SELECT * FROM orders WHERE seq > ? AND ${scope}${device?.type === 'KIOSK' ? " AND json_extract(meta, '$.originDeviceId') = ?" : ''} ORDER BY seq ASC LIMIT 501`, afterSeq, this.cfg.branchId, this.allowsLegacyBranchRows() ? 1 : 0, ...(device?.type === 'KIOSK' ? [device.id] : []));
     const hasMore = rows.length > 500;
     const orders = (hasMore ? rows.slice(0, 500) : rows).map((r) => this.orderFromRow(r));
     return { orders, latestSeq: orders.length ? orders[orders.length - 1].seq : afterSeq, hasMore, serverTime: new Date(this.now()).toISOString() };
@@ -377,14 +404,23 @@ export class BranchCore {
           results.push({movementId:m.movementId,status:'error',error:'WRONG_BRANCH: Inventory belongs to another branch'});
           continue;
         }
-        if (this.store.get('SELECT 1 FROM movements WHERE movement_id = ?', m.movementId)) {
+        const priorMovement = this.store.get<Record<string, any>>('SELECT * FROM movements WHERE movement_id = ?', m.movementId);
+        if (priorMovement) {
+          if (priorMovement.branch_id && priorMovement.branch_id !== this.cfg.branchId) {
+            results.push({ movementId: m.movementId, status: 'error', error: 'WRONG_BRANCH: Inventory belongs to another branch' }); continue;
+          }
+          if (!priorMovement.branch_id && origin === 'cloud' && m.branchId === this.cfg.branchId) {
+            const same = priorMovement.item_id === m.itemId && priorMovement.item_name === m.itemName && priorMovement.type === m.type && priorMovement.quantity_delta === m.quantityDelta && priorMovement.unit === m.unit && (priorMovement.order_id ?? null) === (m.orderId ?? null) && priorMovement.reason === m.reason && Date.parse(priorMovement.occurred_at) === Date.parse(m.occurredAt);
+            if (!same) { results.push({ movementId: m.movementId, status: 'error', error: 'RECOVERY_REVIEW_REQUIRED: Historical stock evidence differs from the authoritative movement' }); continue; }
+            this.store.run('UPDATE movements SET branch_id = ? WHERE movement_id = ?', this.cfg.branchId, m.movementId);
+          }
           results.push({ movementId: m.movementId, status: 'ok', duplicate: true });
           continue;
         }
         const seq = this.store.nextSeq();
         this.store.run(
-          'INSERT INTO movements (movement_id, device_id, item_id, item_name, type, quantity_delta, unit, order_id, reason, occurred_at, seq) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-          m.movementId, device.id, m.itemId, m.itemName, m.type, m.quantityDelta, m.unit, m.orderId ?? null, m.reason, m.occurredAt, seq
+          'INSERT INTO movements (movement_id, device_id, item_id, item_name, type, quantity_delta, unit, order_id, reason, occurred_at, seq, branch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          m.movementId, device.id, m.itemId, m.itemName, m.type, m.quantityDelta, m.unit, m.orderId ?? null, m.reason, m.occurredAt, seq, this.cfg.branchId
         );
         if (origin === 'device') this.store.run("INSERT OR IGNORE INTO cloud_outbox (kind, dedupe_key, payload, created_at) VALUES ('movement', ?, ?, ?)", `mv:${m.movementId}`, JSON.stringify(m), now);
         results.push({ movementId: m.movementId, status: 'ok', seq });
@@ -396,11 +432,11 @@ export class BranchCore {
   }
 
   pullMovements(afterSeq: number) {
-    const rows = this.store.all<Record<string, any>>('SELECT * FROM movements WHERE seq > ? ORDER BY seq ASC LIMIT 501', afterSeq);
+    const rows = this.store.all<Record<string, any>>("SELECT * FROM movements WHERE seq > ? AND (branch_id = ? OR (branch_id IS NULL AND (device_id <> 'cloud' OR ? = 1))) ORDER BY seq ASC LIMIT 501", afterSeq, this.cfg.branchId, this.allowsLegacyBranchRows() ? 1 : 0);
     const hasMore = rows.length > 500;
     const list = hasMore ? rows.slice(0, 500) : rows;
     return {
-      movements: list.map((r) => ({ movementId: r.movement_id, deviceId: r.device_id, itemId: r.item_id, itemName: r.item_name, type: r.type, quantityDelta: r.quantity_delta, unit: r.unit, orderId: r.order_id, reason: r.reason, occurredAt: r.occurred_at, seq: r.seq })),
+      movements: list.map((r) => ({ movementId: r.movement_id, branchId: r.branch_id ?? this.cfg.branchId, deviceId: r.device_id, itemId: r.item_id, itemName: r.item_name, type: r.type, quantityDelta: r.quantity_delta, unit: r.unit, orderId: r.order_id, reason: r.reason, occurredAt: r.occurred_at, seq: r.seq })),
       latestSeq: list.length ? list[list.length - 1].seq : afterSeq,
       hasMore
     };
@@ -408,7 +444,7 @@ export class BranchCore {
 
   balances() {
     return this.store
-      .all<Record<string, any>>('SELECT item_id, item_name, unit, SUM(quantity_delta) AS net, COUNT(*) AS n FROM movements GROUP BY item_id, item_name, unit')
+      .all<Record<string, any>>("SELECT item_id, item_name, unit, SUM(quantity_delta) AS net, COUNT(*) AS n FROM movements WHERE branch_id = ? OR (branch_id IS NULL AND (device_id <> 'cloud' OR ? = 1)) GROUP BY item_id, item_name, unit", this.cfg.branchId, this.allowsLegacyBranchRows() ? 1 : 0)
       .map((r) => ({ branchId: this.cfg.branchId, itemId: r.item_id, itemName: r.item_name, unit: r.unit, netQuantity: Math.round(Number(r.net) * 1000) / 1000, movementCount: Number(r.n) }));
   }
 
@@ -433,7 +469,7 @@ export class BranchCore {
 
   // ------------------------------------------------------------------ generic entities (menu, staff, tables ...)
 
-  pushEntities(device: { id: string; type?: string }, type: string, events: Array<{ externalId: string; payload: Record<string, any> }>, origin: 'device' | 'cloud' = 'device') {
+  pushEntities(device: { id: string; type?: string }, type: string, events: Array<{ externalId: string; payload: Record<string, any>; baseSyncVersion?: number }>, origin: 'device' | 'cloud' = 'device') {
     if (type === 'STAFF_USER' && origin === 'device') throw new CoreError(403, 'STAFF_ADMINISTRATION_REQUIRED', 'Staff changes require an authorized cloud manager session');
     if (origin === 'device' && device.type && !mayWrite(type as never,device.type as never)) throw new CoreError(403,'FORBIDDEN',`This device may not write ${type}`);
     if (type === 'KIOSK_CONFIGURATION') {
@@ -469,14 +505,25 @@ export class BranchCore {
         }
         if (BRANCH_ENTITY_TYPES.has(type) && !e.payload.branchId) e.payload={...e.payload,branchId:this.cfg.branchId};
         if (type === 'STAFF_USER' && !e.payload.branchId && (existingPayload?.branchId || (!existing && origin === 'device'))) e.payload={...e.payload,branchId:existingPayload?.branchId ?? this.cfg.branchId};
+        if (existing && JSON.stringify(existingPayload) === JSON.stringify(e.payload)) {
+          results.push({ externalId: e.externalId, status: 'ok', syncVersion: existing.sync_version }); continue;
+        }
+        if (origin === 'device' && e.baseSyncVersion !== undefined && (!Number.isSafeInteger(e.baseSyncVersion) || e.baseSyncVersion < 0 || e.baseSyncVersion !== (existing?.sync_version ?? 0))) {
+          results.push({ externalId: e.externalId, status: 'error', error: 'ENTITY_VERSION_CONFLICT: This record changed. Refresh and review your edit' }); continue;
+        }
         // A deletion is sticky: a device holding an old copy can never bring the record back.
         if (existingPayload?.deleted === true && e.payload.deleted !== true) {
+          if (origin === 'device' && e.baseSyncVersion !== undefined) { results.push({ externalId: e.externalId, status: 'error', error: 'ENTITY_DELETED: This record was removed. Refresh and review your edit' }); continue; }
           results.push({ externalId: e.externalId, status: 'ok', syncVersion: existing!.sync_version });
           continue;
         }
         const inTime = Date.parse(e.payload.updatedAt ?? '') || 0;
-        const haveTime = Date.parse(existingPayload?.updatedAt ?? '') || 0;
-        if (existing && inTime && haveTime && inTime < haveTime && e.payload.deleted !== true) {
+        const storedTime = Date.parse(existingPayload?.updatedAt ?? '') || 0;
+        const haveTime = existing && storedTime > existing.updated_at + 300_000 ? existing.updated_at : storedTime;
+        if (origin === 'device' && inTime > now + 300_000) {
+          results.push({ externalId: e.externalId, status: 'error', error: 'DEVICE_CLOCK_AHEAD: Correct the device clock before synchronizing this edit' }); continue;
+        }
+        if (existing && e.baseSyncVersion === undefined && inTime && haveTime && inTime < haveTime && e.payload.deleted !== true) {
           results.push({ externalId: e.externalId, status: 'ok', syncVersion: existing.sync_version });
           continue;
         }
@@ -502,7 +549,11 @@ export class BranchCore {
       : this.store.all<Record<string, any>>('SELECT * FROM entities WHERE entity_type = ? AND updated_at > ? ORDER BY updated_at ASC, external_id ASC LIMIT 501', type, sinceMs);
     const page = rows.slice(0, 500);
     return {
-      entities: page.map((r) => ({ externalId: r.external_id, payload: JSON.parse(r.payload), updatedAt: new Date(r.updated_at).toISOString() })).filter(e=>!deviceType||type!=='STAFF_USER'||staffVisibleTo(deviceType as never,e.payload)),
+      entities: page.map((r) => ({ externalId: r.external_id, payload: JSON.parse(r.payload), syncVersion: r.sync_version, updatedAt: new Date(r.updated_at).toISOString() })).filter(e => {
+        if (e.payload.branchId != null && e.payload.branchId !== this.cfg.branchId) return false;
+        if (BRANCH_ENTITY_TYPES.has(type) && e.payload.branchId == null && !this.allowsLegacyBranchRows()) return false;
+        return !deviceType || type !== 'STAFF_USER' || staffVisibleTo(deviceType as never, e.payload);
+      }),
       latestSeq: page.length ? page[page.length - 1].seq : afterSeq ?? 0, hasMore: rows.length > 500,
       serverTime: new Date(this.now()).toISOString()
     };
@@ -617,16 +668,15 @@ export class BranchCore {
     );
   }
 
-  dirtyEntities(limit = 200): Array<{ type: string; externalId: string; payload: any }> {
+  dirtyEntities(limit = 200): Array<{ type: string; externalId: string; payload: any; syncVersion: number }> {
     return this.store
-      .all<Record<string, any>>('SELECT entity_type, external_id, payload FROM entities WHERE dirty = 1 ORDER BY updated_at LIMIT ?', limit)
-      .map((r) => ({ type: r.entity_type, externalId: r.external_id, payload: JSON.parse(r.payload) }));
+      .all<Record<string, any>>('SELECT entity_type, external_id, payload, sync_version FROM entities WHERE dirty = 1 ORDER BY updated_at LIMIT ?', limit)
+      .map((r) => ({ type: r.entity_type, externalId: r.external_id, payload: JSON.parse(r.payload), syncVersion: r.sync_version }));
   }
 
-  clearDirty(type: string, externalId: string, acknowledgedPayload?: unknown): void {
-    if (acknowledgedPayload !== undefined) {
-      this.store.run('UPDATE entities SET dirty = 0 WHERE entity_type = ? AND external_id = ? AND payload = ?', type, externalId, JSON.stringify(acknowledgedPayload));
-    } else this.store.run('UPDATE entities SET dirty = 0 WHERE entity_type = ? AND external_id = ?', type, externalId);
+  clearDirty(type: string, externalId: string, acknowledgedPayload: unknown, acknowledgedVersion: number): void {
+    if (!Number.isSafeInteger(acknowledgedVersion) || acknowledgedVersion < 1 || acknowledgedPayload === undefined) throw new Error('A catalog acknowledgement requires its submitted payload and local revision');
+    this.store.run('UPDATE entities SET dirty = 0 WHERE entity_type = ? AND external_id = ? AND payload = ? AND sync_version = ?', type, externalId, JSON.stringify(acknowledgedPayload), acknowledgedVersion);
   }
 
   /** What the cloud should know about each device this core serves. */
@@ -642,6 +692,8 @@ export class BranchCore {
     const q = (sql: string) => Number(this.store.get<{ n: number }>(sql)?.n ?? 0);
     const now = this.now();
     const contact = this.lastCloudContact();
+    const unscopedCloudOrders = this.allowsLegacyBranchRows() ? 0 : q("SELECT COUNT(*) AS n FROM orders WHERE device_id = 'cloud' AND json_extract(meta, '$.branchId') IS NULL");
+    const unscopedCloudMovements = this.allowsLegacyBranchRows() ? 0 : q("SELECT COUNT(*) AS n FROM movements WHERE device_id = 'cloud' AND branch_id IS NULL");
     return {
       service: 'jamanvaar-branch-core',
       restaurantId: this.cfg.restaurantId,
@@ -660,6 +712,11 @@ export class BranchCore {
       lastCloudContactAt: contact ? new Date(contact).toISOString() : null,
       cloud: contact !== null && now - contact < 120_000 ? 'CONNECTED' : contact !== null ? 'OFFLINE' : 'NEVER_CONNECTED',
       unresolvedConflicts: q('SELECT COUNT(*) AS n FROM conflicts WHERE resolved = 0'),
+      branchScopeReview: {
+        required: unscopedCloudOrders + unscopedCloudMovements > 0,
+        unscopedCloudOrders, unscopedCloudMovements,
+        ...(unscopedCloudOrders + unscopedCloudMovements > 0 ? { action: 'RECONCILE_BRANCH_MIRROR', message: 'Historical cloud records have unknown branch ownership and are hidden. Preserve pending local work, then reconcile against this branch on the cloud.' } : {})
+      },
       devices: q("SELECT COUNT(*) AS n FROM devices WHERE status = 'ACTIVE'"),
       serverTime: new Date(now).toISOString()
     };

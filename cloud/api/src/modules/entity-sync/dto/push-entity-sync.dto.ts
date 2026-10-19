@@ -27,6 +27,8 @@ export type SyncableEntityType = (typeof SYNCABLE_ENTITY_TYPES)[number];
 
 export const entitySyncEventSchema = z.object({
   externalId: z.string().min(1).max(128),
+  // Additive concurrency contract: legacy clients retain bounded timestamp handling.
+  baseSyncVersion: z.number().int().nonnegative().optional(),
   // The shape genuinely differs per entityType (loyalty fields vs. stock
   // levels vs. tender breakdown) — validated by each domain's own local
   // repository before it ever reaches this bridge, not re-validated here.

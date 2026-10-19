@@ -10,7 +10,11 @@ import { RestaurantSetupFlow } from '../cloud/super-admin-web/src/pages/Restaura
 import { BranchAccessWorkspace } from '../cloud/super-admin-web/src/pages/Branches/BranchAccessWorkspace';
 import { usePlatformSearch } from '../cloud/super-admin-web/src/hooks/usePlatformSearch';
 
-const state=vi.hoisted(()=>({role:'SUPER_ADMIN',get:vi.fn(),post:vi.fn(),can:vi.fn(()=>true)}));
+// can's mock needs the real AuthContext signature (area, level?) up front — an untyped `()=>true`
+// infers a zero-arg mock, so a later, more realistic `mockImplementation((area: string) => ...)`
+// call fails the same way a real extra-argument caller mismatch would (EC-11/EC-12: a type gate
+// catching a genuine mock/contract drift, not a wording assertion to relax).
+const state=vi.hoisted(()=>({role:'SUPER_ADMIN',get:vi.fn(),post:vi.fn(),can:vi.fn((_area?: string | null, _level?: string) => true)}));
 vi.mock('../cloud/super-admin-web/src/api/client',()=>({api:{get:state.get,post:state.post}}));
 vi.mock('../cloud/super-admin-web/src/auth/AuthContext',()=>({useAuth:()=>({user:{role:state.role},can:state.can})}));
 let host:HTMLDivElement,root:ReturnType<typeof createRoot>;
@@ -29,7 +33,7 @@ describe('Actionable setup routing',()=>{
   it('builds a real owner route with branch and handover preserved',()=>{const url=new URL(ownerConsoleTask('https://example.invalid/restaurant-admin/','branch-a','handover'));expect(url.pathname).toBe('/restaurant-admin/operations');expect(url.searchParams.get('opsTask')).toBe('handover');expect(url.searchParams.get('branchId')).toBe('branch-a');expect(new URL(ownerConsoleTask('https://example.invalid','b','tables')).pathname).toBe('/restaurant-admin/tables');});
   it('uses the destination ops permission for Products & access',async()=>{
     state.get.mockResolvedValue({branch:{name:'Main'},products:[],checks:[],delivery:[],handovers:[],publishedMenuVersion:0});
-    state.can.mockImplementation((area:string)=>area!=='ops');
+    state.can.mockImplementation((area?:string|null)=>area!=='ops');
     await render(<RestaurantSetupFlow restaurantId="r" branchId="b" onOpen={vi.fn()} onStatus={vi.fn()}/>);
     expect([...host.querySelectorAll('button')].find(b=>b.textContent==='2. Products & access')?.disabled).toBe(true);
   });

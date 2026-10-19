@@ -38,6 +38,8 @@ export * from './durable/durable_storage';
 export * from './durable/cluster_backend';
 export * from './durable/worker_backend';
 export * from './durable/browser_boot';
+export * from './durable/protected_recovery';
+export * from './durable/financial_request';
 export * from './payment_policy';
 export * from './key_value_store';
 export * from './tenant_isolation';

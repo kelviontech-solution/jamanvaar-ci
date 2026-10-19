@@ -351,7 +351,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
       // A device that was offline pushes what it last knew, which is older.
       const stale = await authed('post', '/api/v1/entity-sync/DINING_TABLE', captainToken).send({ events: [table({ status: 'OCCUPIED', updatedAt: '2026-09-20T10:10:00.000Z' })] });
       expect(stale.status).toBe(201);
-      expect(stale.body.results[0].status).toBe('ok');
+      expect(stale.body.results[0]).toMatchObject({ status: 'error', error: expect.stringContaining('STALE_ENTITY') });
 
       let pull = await authed('get', '/api/v1/entity-sync/DINING_TABLE', posToken);
       expect(pull.body.entities[0].payload).toMatchObject({ status: 'BILL_REQUESTED', updatedAt: '2026-09-20T10:30:00.000Z' });

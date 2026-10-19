@@ -6,6 +6,7 @@ import {
   KOTRepository,
   TableRepository,
   AuditRepository,
+  InventoryRepository,
   db,
   StaffRepository,
   ServiceMessages,
@@ -13,6 +14,7 @@ import {
   CustomerRepository,
   getTerminalId,
   KeyValueStore,
+  financialRequestFingerprint,
   type ServiceMessage
 } from '@jamanvaar/database';
 import type { User } from '@jamanvaar/types';
@@ -26,7 +28,7 @@ function pushNow(): void {
 }
 import { deviceFetch as captainDeviceFetch } from '../cloud/cloudClient';
 import { alertWaiter, isMyTable } from '../alerts';
-import { SessionPersistence, AuthStatus, priceOrderLines } from '@jamanvaar/business';
+import { SessionPersistence, AuthStatus, priceOrderLines, priceSavedUnpaidOrder, resolveModifierGroups, dishNeedsChoiceBeforeAdd, clampItemQuantity, validateModifiers } from '@jamanvaar/business';
 
 export type Course = 'COURSE_1' | 'COURSE_2' | 'COURSE_3';
 export const COURSES: ReadonlyArray<{ id: Course; label: string; short: string }> = [
@@ -290,6 +292,7 @@ interface CaptainState {
   repeatPreviousOrder: (tableNumber: string) => boolean;
   /** Sends the dishes not yet sent to the kitchen: all of them, or only those of the given courses (the rest stay held). */
   sendKOT: (courses?: Course[]) => KOT[] | null;
+  sendKOTDurably: (courses?: Course[]) => Promise<KOT[] | null>;
   /**
    * Cancels a dish that was already sent. Needs a manager: pass the manager's PIN unless the signed-in person is one.
    * The dish stays on the bill at no charge and the kitchen screen shows it cancelled.
@@ -331,6 +334,137 @@ interface CaptainState {
 
 /** The first refresh after opening the app only loads what is already ready, without announcing it. */
 let readyListPrimed = false;
+
+function prepareCaptainTickets(state: Pick<CaptainState, 'cartItems' | 'selectedTable' | 'selectedTableOrder' | 'currentCaptain' | 'guestCount' | 'attachedCustomer'>, courses?: Course[]) {
+    const heldBack = (ci: CartItemEntry) => !!courses && !courses.includes(ci.course ?? 'COURSE_1');
+    const unFiredItems = state.cartItems.filter((ci) => !ci.isFired && !heldBack(ci));
+    if (unFiredItems.length === 0) return null;
+    // Restored drafts and repeat-order callers must pass the same rules as the visible Add flow.
+    if (unFiredItems.some(line => {
+      const item = db.menuItems.find(item => item.id === line.menuItem.id);
+      if (!item || item.isAvailable === false || clampItemQuantity(item, line.quantity) !== line.quantity) return true;
+      const groups = resolveModifierGroups(item, db.modifierGroups);
+      return !validateModifiers(groups, line.selectedModifiers).isValid || line.selectedModifiers.some(modifier =>
+        !groups.some(group => group.id === modifier.groupId && group.options.some(option => option.id === modifier.optionId)));
+    })) return null;
+    // Each fired dish becomes exactly one order line; the ticket line and the cart entry keep that line's id.
+    const stamp = Date.now();
+    const lineIdOf = new Map(unFiredItems.map((ci, idx) => [ci.id, `oi-${stamp}-${idx}-${Math.random().toString(36).slice(2, 6)}`] as const));
+
+    // A ticket must say which table it is for: never guess one (used to default to table 1).
+    const table = state.selectedTable ? db.tables.find(table => table.id === state.selectedTable!.id) : undefined;
+    if (!table) return null;
+    const tableNumber = table.tableNumber;
+    const captain = state.currentCaptain;
+
+    // 1. Create or Update Order in Database
+    let order = table.currentOrderId ? db.orders.find(order => order.id === table.currentOrderId) : undefined;
+    if (table.currentOrderId && !order) throw new Error('This table order is unavailable. Refresh before sending dishes.');
+    if ((order?.id || null) !== (state.selectedTableOrder?.id || null) ||
+        (order && state.selectedTableOrder && order.updatedAt !== state.selectedTableOrder.updatedAt)) throw new Error('This table bill changed on another device. Refresh and review before sending dishes.');
+    if (order && (order.paymentStatus === 'SUCCESS' || ['CANCELLED', 'REFUNDED', 'COMPLETED'].includes(order.orderStatus))) throw new Error('This table bill is paid or closed. Open a new table session before sending dishes.');
+    if (!order) {
+      const orderItems = unFiredItems.map((ci) => ({
+        id: lineIdOf.get(ci.id)!,
+        orderId: '',
+        menuItemId: ci.menuItem.id,
+        name: ci.menuItem.name,
+        sku: ci.menuItem.sku,
+        quantity: ci.quantity,
+        unitPrice: ci.unitPrice,
+        modifiers: ci.selectedModifiers,
+        specialInstructions: ci.specialNotes,
+        course: ci.course ?? 'COURSE_1',
+        ...(ci.seat ? { seat: ci.seat } : {}),
+        totalPrice: ci.totalPrice,
+        kitchenStatus: 'PREPARING' as const
+      }));
+
+      // Same pricing rules as POS (CGST + SGST, round-off), so both show the same bill (BUG-102).
+      const priced = priceOrderLines(orderItems.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups });
+
+      order = OrderRepository.createOrder({
+        orderType: 'DINE_IN',
+        tableId: table.id,
+        tableNumber,
+        guestCount: state.guestCount,
+        captainName: captain?.name,
+        customerPhone: state.attachedCustomer?.phone,
+        customerName: state.attachedCustomer?.name,
+        items: orderItems,
+        ...priced,
+        paymentMethod: 'CASH',
+        paymentStatus: 'PENDING',
+        orderStatus: 'PREPARING',
+        source_type: 'CAPTAIN',
+        syncStatus: 'SAVED_LOCALLY'
+      });
+
+      table.currentOrderId = order.id;
+      table.status = 'OCCUPIED';
+      if (!table.openedById) {
+        table.openedById = captain?.id;
+        table.openedByName = captain?.name;
+      }
+    } else {
+      const newItems = unFiredItems.map((ci) => ({
+        id: lineIdOf.get(ci.id)!,
+        orderId: order!.id,
+        menuItemId: ci.menuItem.id,
+        name: ci.menuItem.name,
+        sku: ci.menuItem.sku,
+        quantity: ci.quantity,
+        unitPrice: ci.unitPrice,
+        modifiers: ci.selectedModifiers,
+        specialInstructions: ci.specialNotes,
+        course: ci.course ?? 'COURSE_1',
+        ...(ci.seat ? { seat: ci.seat } : {}),
+        totalPrice: ci.totalPrice,
+        kitchenStatus: 'PREPARING' as const
+      }));
+
+      order.items = [...(order.items || []), ...newItems];
+      // Cancelled dishes are at no charge, so they add nothing to the bill.
+      Object.assign(order, priceOrderLines(order.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups }));
+      order.captainName = order.captainName || captain?.name;
+      order.orderStatus = 'PREPARING';
+      order.updatedAt = new Date().toISOString();
+      // Without this, adding items to an already-existing table order from
+      // Captain would never reach the cloud sync bridge — only a brand-new
+      // order's creation would (BUG-009's Captain-specific gap).
+      order.syncStatus = 'SAVED_LOCALLY';
+    }
+
+    InventoryRepository.reconcileOrder(order);
+
+    // 2. Generate KOT strictly for newly fired items
+    const kotItems = unFiredItems.map((ci, idx) => ({
+      id: `koti-${stamp}-${idx}`,
+      menuItemId: ci.menuItem.id,
+      name: ci.menuItem.name,
+      quantity: ci.quantity,
+      modifiers: ci.selectedModifiers,
+      specialInstructions: ci.specialNotes,
+      kitchenStation: ci.menuItem.kitchenStation || 'Main Kitchen',
+      status: 'PREPARING' as const,
+      orderItemId: lineIdOf.get(ci.id)!,
+      course: ci.course ?? 'COURSE_1',
+      ...(ci.seat ? { seat: ci.seat } : {})
+    }));
+
+    const generatedKots = KOTRepository.generateKOT({
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      tokenNumber: order.tokenNumber,
+      tableNumber,
+      orderType: 'DINE_IN',
+      items: kotItems,
+      cashierName: captain?.name || '',
+      serverName: captain?.name
+    });
+
+    return { order, generatedKots, lineIdOf, tableNumber, unFiredItems };
+}
 
 export const useCaptainStore = create<CaptainState>((set, get) => {
   // Restore persisted captain session on store init
@@ -783,6 +917,11 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     }
 
     const state = get();
+    // EC-03: configured min/max quantity rules apply no matter which screen added the dish.
+    const groups = resolveModifierGroups(item, db.modifierGroups);
+    if (!validateModifiers(groups, modifiers).isValid || modifiers.some(modifier =>
+      !groups.some(group => group.id === modifier.groupId && group.options.some(option => option.id === modifier.optionId)))) return;
+    quantity = clampItemQuantity(item, quantity);
     const modDelta = modifiers.reduce((acc, m) => acc + (m.priceDelta || 0), 0);
     const unitPrice = item.price + modDelta;
 
@@ -799,7 +938,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
     if (existingIdx !== -1) {
       updatedCart = [...state.cartItems];
-      const newQty = updatedCart[existingIdx].quantity + quantity;
+      const newQty = clampItemQuantity(item, updatedCart[existingIdx].quantity + quantity);
       updatedCart[existingIdx].quantity = newQty;
       updatedCart[existingIdx].totalPrice = unitPrice * newQty;
     } else {
@@ -826,8 +965,11 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     const updated = state.cartItems
       .map((ci) => {
         if (ci.id === itemId && !ci.isFired) {
-          const nextQty = ci.quantity + delta;
-          if (nextQty <= 0) return null;
+          const rawQty = ci.quantity + delta;
+          // Below the dish's configured minimum (default 1) means "remove it", not an invalid
+          // partial quantity — same rule as POS/Kiosk (EC-03).
+          if (rawQty < (ci.menuItem.minQuantity ?? 1)) return null;
+          const nextQty = clampItemQuantity(ci.menuItem, rawQty);
           return {
             ...ci,
             quantity: nextQty,
@@ -877,121 +1019,56 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     return true;
   },
 
+  sendKOTDurably: async (courses) => {
+    const current = get();
+    if (!current.selectedTable || !current.cartItems.some(line => !line.isFired && (!courses || courses.includes(line.course ?? 'COURSE_1')))) return null;
+    const state = { cartItems: structuredClone(current.cartItems), selectedTable: { ...current.selectedTable },
+      selectedTableOrder: current.selectedTableOrder ? structuredClone(current.selectedTableOrder) : null,
+      currentCaptain: current.currentCaptain ? { ...current.currentCaptain } : null,
+      guestCount: current.guestCount, attachedCustomer: current.attachedCustomer ? { ...current.attachedCustomer } : null };
+    const fingerprint = await financialRequestFingerprint(JSON.stringify({ operation: 'CAPTAIN_KOT_V1',
+      restaurant: db.restaurant.id, branch: db.outlet.id, device: getTerminalId('CAPTAIN'),
+      tableId: state.selectedTable.id, captain: state.currentCaptain?.id, guestCount: state.guestCount,
+      customerPhone: state.attachedCustomer?.phone, courses: courses ? [...courses].sort() : null,
+      cart: state.cartItems.filter(line => !line.isFired).map(line => ({ id: line.id, menuItemId: line.menuItem.id,
+        quantity: line.quantity, unitPrice: line.unitPrice, totalPrice: line.totalPrice, selectedModifiers: line.selectedModifiers,
+        specialNotes: line.specialNotes, course: line.course, seat: line.seat })) }));
+    const result = await db.commitFinancialMutation(fingerprint, () => {
+      const prepared = prepareCaptainTickets(state, courses);
+      if (!prepared) throw new Error('Review the dish quantities and required choices before sending to the kitchen.');
+      AuditRepository.log({ action: 'KOT_FIRED', category: 'ORDER', username: state.currentCaptain?.name || 'Captain',
+        details: `KOT saved for Table #${prepared.tableNumber} (${prepared.unFiredItems.length} dishes)` });
+      return { orderId: prepared.order.id, kotIds: prepared.generatedKots.map(kot => kot.id),
+        lineIds: [...prepared.lineIdOf].map(([cartId, orderItemId]) => ({ cartId, orderItemId })) };
+    });
+    const order = db.orders.find(order => order.id === result.result.orderId);
+    if (!order) throw new Error('Kitchen submission saved; the order needs recovery. Do not send the same dishes again.');
+    const tickets = result.result.kotIds.map(id => db.kots.find(kot => kot.id === id)).filter((kot): kot is NonNullable<typeof kot> => !!kot);
+    if (get().selectedTable?.id === state.selectedTable.id) {
+      const links = new Map(result.result.lineIds.map(line => [line.cartId, line.orderItemId]));
+      set({ selectedTableOrder: order, cartItems: get().cartItems.map(line => links.has(line.id)
+        ? { ...line, isFired: true, orderItemId: links.get(line.id), status: 'PREPARING' as const } : line), kots: db.kots,
+        shiftStats: { ...get().shiftStats,
+          ordersTaken: get().shiftStats.ordersTaken + (result.outcome === 'COMMITTED' ? 1 : 0),
+          kotsSent: get().shiftStats.kotsSent + (result.outcome === 'COMMITTED' ? tickets.length : 0) } });
+      saveHeld(state.selectedTable.tableNumber, get().cartItems.filter(line => !line.isFired));
+    }
+    try { await db.acknowledgeFinancialMutation(result.operationId); }
+    catch { console.warn('Kitchen submission saved; local acknowledgement needs recovery.'); }
+    if (result.outcome === 'COMMITTED') {
+      try { lanMeshSync.broadcast('ORDER_CREATED', order); lanMeshSync.broadcast('KOT_CREATED', tickets); }
+      catch { console.warn('Saved kitchen submission is waiting for live notification.'); }
+    }
+    pushNow();
+    return tickets;
+  },
+
   sendKOT: (courses) => {
     const state = get();
-    const heldBack = (ci: CartItemEntry) => !!courses && !courses.includes(ci.course ?? 'COURSE_1');
-    const unFiredItems = state.cartItems.filter((ci) => !ci.isFired && !heldBack(ci));
-    if (unFiredItems.length === 0) return null;
-    // Each fired dish becomes exactly one order line; the ticket line and the cart entry keep that line's id.
-    const stamp = Date.now();
-    const lineIdOf = new Map(unFiredItems.map((ci, idx) => [ci.id, `oi-${stamp}-${idx}-${Math.random().toString(36).slice(2, 6)}`] as const));
-
-    // A ticket must say which table it is for: never guess one (used to default to table 1).
-    const table = state.selectedTable;
-    if (!table) return null;
-    const tableNumber = table.tableNumber;
-    const captain = state.currentCaptain;
-
-    // 1. Create or Update Order in Database
-    let order = state.selectedTableOrder;
-    if (!order) {
-      const orderItems = unFiredItems.map((ci) => ({
-        id: lineIdOf.get(ci.id)!,
-        orderId: '',
-        menuItemId: ci.menuItem.id,
-        name: ci.menuItem.name,
-        sku: ci.menuItem.sku,
-        quantity: ci.quantity,
-        unitPrice: ci.unitPrice,
-        modifiers: ci.selectedModifiers,
-        specialInstructions: ci.specialNotes,
-        course: ci.course ?? 'COURSE_1',
-        ...(ci.seat ? { seat: ci.seat } : {}),
-        totalPrice: ci.totalPrice,
-        kitchenStatus: 'PREPARING' as const
-      }));
-
-      // Same pricing rules as POS (CGST + SGST, round-off), so both show the same bill (BUG-102).
-      const priced = priceOrderLines(orderItems.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups });
-
-      order = OrderRepository.createOrder({
-        orderType: 'DINE_IN',
-        tableId: table.id,
-        tableNumber,
-        guestCount: state.guestCount,
-        captainName: captain?.name,
-        customerPhone: state.attachedCustomer?.phone,
-        customerName: state.attachedCustomer?.name,
-        items: orderItems,
-        ...priced,
-        paymentMethod: 'CASH',
-        paymentStatus: 'PENDING',
-        orderStatus: 'PREPARING',
-        source_type: 'CAPTAIN',
-        syncStatus: 'SAVED_LOCALLY'
-      });
-
-      table.currentOrderId = order.id;
-      table.status = 'OCCUPIED';
-      if (!table.openedById) {
-        table.openedById = captain?.id;
-        table.openedByName = captain?.name;
-      }
-    } else {
-      const newItems = unFiredItems.map((ci) => ({
-        id: lineIdOf.get(ci.id)!,
-        orderId: order!.id,
-        menuItemId: ci.menuItem.id,
-        name: ci.menuItem.name,
-        sku: ci.menuItem.sku,
-        quantity: ci.quantity,
-        unitPrice: ci.unitPrice,
-        modifiers: ci.selectedModifiers,
-        specialInstructions: ci.specialNotes,
-        course: ci.course ?? 'COURSE_1',
-        ...(ci.seat ? { seat: ci.seat } : {}),
-        totalPrice: ci.totalPrice,
-        kitchenStatus: 'PREPARING' as const
-      }));
-
-      order.items = [...(order.items || []), ...newItems];
-      // Cancelled dishes are at no charge, so they add nothing to the bill.
-      Object.assign(order, priceOrderLines(order.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups }));
-      order.captainName = order.captainName || captain?.name;
-      order.orderStatus = 'PREPARING';
-      order.updatedAt = new Date().toISOString();
-      // Without this, adding items to an already-existing table order from
-      // Captain would never reach the cloud sync bridge — only a brand-new
-      // order's creation would (BUG-009's Captain-specific gap).
-      order.syncStatus = 'SAVED_LOCALLY';
-    }
-
-    // 2. Generate KOT strictly for newly fired items
-    const kotItems = unFiredItems.map((ci, idx) => ({
-      id: `koti-${stamp}-${idx}`,
-      menuItemId: ci.menuItem.id,
-      name: ci.menuItem.name,
-      quantity: ci.quantity,
-      modifiers: ci.selectedModifiers,
-      specialInstructions: ci.specialNotes,
-      kitchenStation: ci.menuItem.kitchenStation || 'Main Kitchen',
-      status: 'PREPARING' as const,
-      orderItemId: lineIdOf.get(ci.id)!,
-      course: ci.course ?? 'COURSE_1',
-      ...(ci.seat ? { seat: ci.seat } : {})
-    }));
-
-    const generatedKots = KOTRepository.generateKOT({
-      orderId: order.id,
-      orderNumber: order.orderNumber,
-      tokenNumber: order.tokenNumber,
-      tableNumber,
-      orderType: 'DINE_IN',
-      items: kotItems,
-      cashierName: captain?.name || '',
-      serverName: captain?.name
-    });
-
+    if (db.supportsFinancialCommands()) throw new Error('Use acknowledged kitchen submission before marking dishes as sent.');
+    const prepared = prepareCaptainTickets(state, courses);
+    if (!prepared) return null;
+    const { order, generatedKots, lineIdOf, tableNumber, unFiredItems } = prepared;
     // 3. Mark cart items as fired
     const updatedCart = state.cartItems.map((ci) =>
       lineIdOf.has(ci.id) ? { ...ci, isFired: true, orderItemId: lineIdOf.get(ci.id), status: 'PREPARING' as const } : ci
@@ -1033,8 +1110,6 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     if (!order) return { ok: false, error: 'There is no running order on this table.' };
     const line = order.items.find((i) => i.id === orderItemId);
     if (!line) return { ok: false, error: 'That dish is not on this order.' };
-    if (line.kitchenStatus === 'SERVED') return { ok: false, error: 'This dish was already served and cannot be cancelled.' };
-    if (line.kitchenStatus === 'CANCELLED') return { ok: false, error: 'This dish is already cancelled.' };
     const cleanReason = reason.trim();
     if (cleanReason.length < 3) return { ok: false, error: 'Choose or type a reason.' };
 
@@ -1050,23 +1125,43 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       await StaffSession.approve(managerPin, captainDeviceFetch); // best effort: gives the server proof of who approved
     }
 
-    const updated = KOTRepository.cancelOrderLine(order.id, orderItemId, cleanReason, `${approver ?? 'Manager'} (for ${state.currentCaptain?.name ?? 'Captain'})`);
-    if (!updated) return { ok: false, error: 'This dish can no longer be cancelled.' };
-    Object.assign(updated, priceOrderLines(updated.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups }));
-
-    set({
+    const actor = `${approver ?? 'Manager'} (for ${state.currentCaptain?.name ?? 'Captain'})`;
+    const prepare = () => {
+      const current = OrderRepository.getOrderById(order.id);
+      if (!current || current.paymentStatus === 'SUCCESS' || current.paymentStatus === 'REFUNDED') throw new Error('This bill is paid or closed. Ask the cashier to review it.');
+      const updated = KOTRepository.cancelOrderLine(order.id, orderItemId, cleanReason, actor);
+      if (!updated) throw new Error('This dish can no longer be cancelled; it may already be served or cancelled.');
+      Object.assign(updated, priceSavedUnpaidOrder(updated, db.menuItems, db.taxGroups));
+      const table = db.tables.find(table => table.currentOrderId === updated.id);
+      if (updated.orderStatus === 'CANCELLED' && table) TableRepository.updateTableStatus(table.id, 'AVAILABLE');
+      db.notify();
+      return { orderId: updated.id, tableNumber: table?.tableNumber, closed: updated.orderStatus === 'CANCELLED' };
+    };
+    try {
+      const durable = db.supportsFinancialCommands();
+      const outcome = durable ? await db.commitFinancialMutation(await financialRequestFingerprint(JSON.stringify({
+        operation: 'CAPTAIN_CANCEL_LINE_V1', restaurant: db.restaurant.id, branch: db.outlet.id,
+        orderId: order.id, orderItemId, reason: cleanReason, actor
+      })), prepare) : undefined;
+      const result = outcome?.result ?? db.transaction(prepare);
+      const updated = OrderRepository.getOrderById(result.orderId)!;
+      // A network/save wait may outlive the selected table. Never replace another party's workspace.
+      if (get().selectedTableOrder?.id === result.orderId) set({
       selectedTableOrder: updated,
       cartItems: get().cartItems.map((ci) => (ci.orderItemId === orderItemId ? { ...ci, status: 'CANCELLED' as const, totalPrice: 0, cancelReason: cleanReason } : ci)),
       kots: captainDb.kots
-    });
-    if (updated.orderStatus === 'CANCELLED' && state.selectedTable) {
-      // Nothing is left to cook or bill: the table is free again.
-      get().closeTable(state.selectedTable.tableNumber);
-    } else {
+      });
+      if (result.closed && result.tableNumber) {
+        saveHeld(result.tableNumber, []);
+        if (get().selectedTable?.tableNumber === result.tableNumber) set({ selectedTable: null, selectedTableOrder: null, cartItems: [], isTableWorkspaceOpen: false });
+      }
+      if (outcome) await db.acknowledgeFinancialMutation(outcome.operationId);
       get().refreshState();
       pushNow();
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Cancellation was not confirmed. Keep this order and retry the same action.' };
     }
-    return { ok: true };
   },
 
   // Food Ready & Bill Actions

@@ -1,0 +1,2 @@
+/* The real admin shell owns its scrolling container. This standalone fixture uses the document. */
+html, body, #root { height: auto; min-height: 100%; overflow: visible; }

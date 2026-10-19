@@ -47,9 +47,10 @@ describe('JAMANVAAR POS — Cashier UX Polish & Workflows', () => {
     const lastHeld = allHeld[0];
     expect(lastHeld.totalAmount).toBe(payableBeforeHold);
 
-    // Recall order
+    // Recall order — recallHeldOrder returns a structured CartSwitchResult ({ok}|{ok,reason}),
+    // not a bare boolean (W01/EC-11,EC-12: simultaneous-edit/cart-switch protection).
     const recalled = usePosStore.getState().recallHeldOrder(lastHeld.id);
-    expect(recalled).toBe(true);
+    expect(recalled).toMatchObject({ ok: true });
     expect(usePosStore.getState().cart.items.length).toBe(1);
     expect(usePosStore.getState().cart.totalPayable).toBe(payableBeforeHold);
     expect(usePosStore.getState().orderNotes).toBe('Table anniversary');

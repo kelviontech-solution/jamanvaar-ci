@@ -6,15 +6,46 @@ export const QR_DESIGNS: Array<{id:QrPrintDesign['template'];name:string;color:s
  {id:'colorful',name:'Modern colorful',color:'#7353A6'},{id:'cafe',name:'Cafe',color:'#6F4E37'},
  {id:'fine-dining',name:'Fine dining',color:'#243D32'},{id:'family',name:'Family restaurant',color:'#B35316'},
  {id:'casual',name:'Casual dining',color:'#1E6FA8'},{id:'takeaway',name:'Takeaway',color:'#0E4D3C'},
- {id:'table',name:'Table number card',color:'#9A3324'}];
+ {id:'table',name:'Table number card',color:'#9A3324'},{id:'lounge',name:'Speakeasy bar',color:'#C9A227'},
+ {id:'rooftop',name:'Rooftop sunset',color:'#E0763D'},{id:'bakery',name:'Bakery & sweets',color:'#E7A6BD'},
+ {id:'festival',name:'Festival & fun',color:'#E0483E'}];
 export const DEFAULT_DESIGN:QrPrintDesign={template:'premium',accent:'#0B253A',instruction:'Scan to Order',footer:'Freshly prepared. Thoughtfully served.',showLogo:true,layout:'CARD'};
 export function cardSvg(data:QrPrintData,size=320){
  if(!data.url)throw Error('Only active QR codes with a public address can be printed.');
  return generateQrSvg(data.url,{size,margin:4,color:'#000000',backgroundColor:'#FFFFFF'});
 }
+/** The restaurant website QR gets its own full-bleed poster, not another band on the table-card layout:
+ * it is a different product (a destination to browse and come back to, not a per-table scan-and-order
+ * code), and a restaurant printing this next to its table cards needs it to read as obviously different
+ * at a glance. */
+function websitePosterSvg(data:QrPrintData,d:QrPrintDesign){
+ const color=/^#[0-9a-f]{6}$/i.test(d.accent)?d.accent:'#0B253A';
+ const name=esc(data.restaurantName),nameSize=Math.min(50,1080/Math.max(data.restaurantName.length,1));
+ const qr=cardSvg(data,400).replace('<svg ','<svg x="120" y="345" ');
+ const logo=d.showLogo&&data.logoUrl&&/^data:image\/(png|jpeg|webp);base64,/i.test(data.logoUrl)?'<image href="'+esc(data.logoUrl)+'" x="270" y="54" width="100" height="56" preserveAspectRatio="xMidYMid meet"/>':'';
+ return '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="860" viewBox="0 0 640 860">'
+  +'<defs><linearGradient id="rpGrad" x1="0" y1="0" x2="1" y2="1">'
+  +'<stop offset="0" stop-color="'+color+'"/><stop offset="1" stop-color="#05070a"/>'
+  +'</linearGradient></defs>'
+  +'<rect width="640" height="860" fill="url(#rpGrad)"/>'
+  +'<circle cx="-10" cy="-10" r="170" fill="#D6B56D" opacity=".16"/>'
+  +'<circle cx="650" cy="870" r="190" fill="#D6B56D" opacity=".16"/>'
+  +'<path d="M36 36H104M36 36V104" stroke="#D6B56D" stroke-width="4" fill="none"/>'
+  +'<path d="M604 824H536M604 824V756" stroke="#D6B56D" stroke-width="4" fill="none"/>'
+  +logo
+  +'<text x="320" y="'+(logo?195:150)+'" text-anchor="middle" font-family="Georgia,serif" font-size="'+nameSize+'" font-weight="700" fill="#FFFFFF">'+name+'</text>'
+  +(data.branchName?'<text x="320" y="'+(logo?225:182)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" letter-spacing="1" fill="#D6B56D">'+esc(data.branchName.toUpperCase())+'</text>':'')
+  +'<rect x="70" y="285" width="500" height="440" rx="30" fill="#FFFFFF"/>'
+  +qr
+  +'<text x="320" y="773" text-anchor="middle" font-family="Arial,sans-serif" font-size="29" font-weight="750" letter-spacing="1" fill="#FFFFFF">'+esc(data.tableLabel)+'</text>'
+  +'<text x="320" y="803" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#D6B56D">'+esc(data.tagline)+'</text>'
+  +'<text x="320" y="834" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#FFFFFF" opacity=".7">'+esc(d.footer)+'</text>'
+  +'</svg>';
+}
 /** Preview, PNG, SVG and printing all use this renderer. Artwork stays outside the QR quiet zone. */
 export function designSvg(data:QrPrintData,d:QrPrintDesign=data.design??DEFAULT_DESIGN){
- const color=/^#[0-9a-f]{6}$/i.test(d.accent)?d.accent:'#0B253A',dark=['premium','fine-dining'].includes(d.template),ink=dark?'#FFFFFF':'#0B253A';
+ if(d.template==='website')return websitePosterSvg(data,d);
+ const color=/^#[0-9a-f]{6}$/i.test(d.accent)?d.accent:'#0B253A',dark=['premium','fine-dining','lounge','rooftop'].includes(d.template),ink=dark?'#FFFFFF':'#0B253A';
  const qr=cardSvg(data,480).replace('<svg ','<svg x="80" y="250" ');
  const text=(s:string,y:number,size:number,fill=ink)=>'<text x="320" y="'+y+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="'+Math.min(size,1060/Math.max(s.length,1))+'" font-weight="600" fill="'+fill+'">'+esc(s)+'</text>';
  const bands:Record<string,string>={
@@ -26,7 +57,16 @@ export function designSvg(data:QrPrintData,d:QrPrintDesign=data.design??DEFAULT_
  family:'<path d="M0 0H640V70Q320 170 0 70Z" fill="'+color+'" opacity=".16"/><circle cx="44" cy="775" r="20" fill="'+color+'" opacity=".25"/><circle cx="596" cy="775" r="20" fill="'+color+'" opacity=".25"/>',
  casual:'<rect width="18" height="860" fill="'+color+'"/><rect x="622" width="18" height="860" fill="'+color+'"/>',
  takeaway:'<path d="M0 0H640V50H0ZM0 810H640V860H0Z" fill="'+color+'"/><path d="M570 115h30l-15-15m15 15-15 15" stroke="'+color+'" stroke-width="5" fill="none"/>',
- table:'<rect x="40" y="36" width="560" height="170" rx="18" fill="'+color+'"/>'};
+ table:'<rect x="40" y="36" width="560" height="170" rx="18" fill="'+color+'"/>',
+ lounge:'<rect width="640" height="860" fill="#111111"/><rect x="18" y="18" width="604" height="824" fill="none" stroke="'+color+'" stroke-width="1.5"/><rect x="30" y="30" width="580" height="800" fill="none" stroke="'+color+'" stroke-width="1"/>',
+ rooftop:'<rect width="640" height="860" fill="#1B1B2D"/><circle cx="320" cy="110" r="150" fill="'+color+'" opacity=".4"/><circle cx="320" cy="110" r="85" fill="#F2C14E" opacity=".5"/><polygon points="0,860 90,640 170,760 260,560 340,720 430,580 520,700 640,620 640,860" fill="#10101A" opacity=".9"/>',
+ bakery:'<rect width="640" height="860" fill="#FFF7F2"/><path d="M0 70 Q40 20 80 70 Q120 120 160 70 Q200 20 240 70 Q280 120 320 70 Q360 20 400 70 Q440 120 480 70 Q520 20 560 70 Q600 120 640 70 L640 0 L0 0 Z" fill="'+color+'" opacity=".55"/>',
+ festival:'<rect width="640" height="860" fill="#FFF9F0"/><path d="M10 36H630" stroke="'+color+'" stroke-width="3"/>'
+  +'<polygon points="20,36 70,36 45,110" fill="'+color+'"/><polygon points="90,36 140,36 115,110" fill="#F2C14E"/>'
+  +'<polygon points="160,36 210,36 185,110" fill="'+color+'"/><polygon points="230,36 280,36 255,110" fill="#F2C14E"/>'
+  +'<polygon points="300,36 350,36 325,110" fill="'+color+'"/><polygon points="370,36 420,36 395,110" fill="#F2C14E"/>'
+  +'<polygon points="440,36 490,36 465,110" fill="'+color+'"/><polygon points="510,36 560,36 535,110" fill="#F2C14E"/>'
+  +'<polygon points="580,36 630,36 605,110" fill="'+color+'"/>'};
  const logo=d.showLogo&&data.logoUrl&&/^data:image\/(png|jpeg|webp);base64,/i.test(data.logoUrl)?'<image href="'+esc(data.logoUrl)+'" x="265" y="50" width="110" height="60" preserveAspectRatio="xMidYMid meet"/>':'';
  return '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="860" viewBox="0 0 640 860"><rect width="640" height="860" rx="20" fill="#FFFFFF"/>'+bands[d.template]+logo+text(d.template==='table'?data.tableLabel:data.restaurantName,145,32,d.template==='table'?'#FFFFFF':ink)+text(d.template==='table'?data.restaurantName:data.branchName??'',190,20)+text(d.instruction,232,27)+qr+text(d.template==='table'?'Your table menu':data.tableLabel,772,32)+text(d.footer,810,18)+'</svg>';
 }

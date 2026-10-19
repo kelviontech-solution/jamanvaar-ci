@@ -132,6 +132,8 @@ describe('Multi-family subscriptions (Phase 2)', () => {
       return res.body.code as string;
     };
 
+    // Issue one spare before filling the quota, so activation is checked independently of issuance.
+    const thirdKioskKey = await genKey('KIOSK');
     // The KIOSK plan's cap is 2 — fill it.
     for (let i = 0; i < 2; i++) {
       const key = await genKey('KIOSK');
@@ -139,9 +141,9 @@ describe('Multi-family subscriptions (Phase 2)', () => {
       expect(res.status).toBe(201);
     }
     // A 3rd KIOSK device is rejected — the KIOSK plan's own cap (2) is reached.
-    const thirdKioskKey = await genKey('KIOSK');
     const thirdKiosk = await redeem(thirdKioskKey, 'KIOSK');
     expect(thirdKiosk.status).toBe(409);
+    expect((await auth(request(app.getHttpServer()).post('/api/v1/activation-keys')).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: inDays(1) })).status).toBe(409);
 
     // POS is governed by the separate RESTAURANT plan's cap of 3, and is unaffected by KIOSK
     // being full — proving quotas are per-app, not one shared pool across every subscription.

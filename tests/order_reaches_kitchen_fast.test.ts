@@ -18,6 +18,8 @@ describe('Captain pushes to the cloud immediately', () => {
 
   beforeEach(async () => {
     db.resetToDefaultSeed();
+    // Measure delivery of valid plain dishes, without bypassing the required-choice contract.
+    db.menuItems = db.menuItems.map(item => ({ ...item, modifierGroupIds: [] }));
     db.users = [];
     db.orders = [];
     db.kots = [];

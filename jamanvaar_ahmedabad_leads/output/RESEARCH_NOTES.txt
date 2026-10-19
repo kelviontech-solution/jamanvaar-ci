@@ -1,0 +1,56 @@
+Research snapshot: 2026-10-19
+
+GENERAL OUTLET FILES
+135 researched outlets; 92 in the selected premium focus areas. 134 public phones: 119 published on official pages and 15 in public listings. None were call-tested. Twelve venues have no official website found in limited public research; two have hosted menu/ordering pages only. Coverage is partial, not a census.
+
+META ADS RESEARCH
+{
+  "business_leads": 108,
+  "matched_active_ad_ids": 258,
+  "scanned_unique_ad_ids": 992,
+  "public_phone_available": 67,
+  "priority_area_leads": 63,
+  "locality_not_established": 21,
+  "existing_master_outlets_with_brand_ad_match": 7
+}
+
+The browser rendered public Meta ad cards despite initial HTTP 403 responses. The prior conclusion that this response prevented all access is superseded by visible ad cards and direct-ID spot checks. No login, private API or message sending was used.
+
+The verified CSV contains business/dining-concept leads, not 108 independently owned companies or 108 branches. Multiple ads and duplicate Caffix pages were consolidated; hospitality-group affiliations remain labeled. All 258 selected Library IDs had an active label in the rendered public UI. These are observed IDs, not Meta platform totals.
+
+Sixty-seven leads have public business phone numbers, including labeled shared property, other-branch and franchise contacts. Forty-one phones remain blank. No number was call-tested. Twenty-one localities remain unestablished; city mentions in ad copy or advertiser names are weaker location evidence and are labeled. Audience targeting, budgets, legal payer and actual order conversion are unknown.
+
+Website status is independent of ad status. Missing website information in an ad does not mean the business has no website. QR ordering and checkout were not transaction-tested.
+
+Priority-area definition: core eight requested localities plus Ambli, Mumatpura, Shilaj, South Bopal, Science City, Bopal, Ambawadi, Shela, Nehrunagar, Manekbaug, Gurukul, Drive In Road and Karnavati Club Road. This is a sales focus definition, not an independently measured affluence ranking. Nearby address/locality labels can vary by source.
+
+Out-of-city Sankalp Pune promotions and the unresolved Tatvarasa location were excluded. Standalone food-blogger ads, suppliers, property advertisers and unrelated businesses were not counted as restaurant advertisers. Hotel dining, QSRs and mixed-format cafe venues are explicitly categorized.
+
+The older 65-brand manual review CSV records the result for earlier candidates; unmatched candidates remain unverified, not inactive. Seven original outlet records have a positive brand ad match.
+
+CSV files are UTF-8 with BOM. Import Library ID columns as text in spreadsheet applications to preserve long identifiers; evidence URLs also preserve each full ID.
+
+SEPARATED DELIVERABLES
+{
+  "meta_business_leads": 108,
+  "meta_public_phones": 67,
+  "other_outlets": 125,
+  "other_brands": 56,
+  "other_premium_area_outlets": 85,
+  "other_public_phones": 125,
+  "other_no_website_found": 11,
+  "other_hosted_pages_only": 2
+}
+
+meta_ads_restaurants.html / .csv: 108 business/dining-concept leads with observed active Meta ad cards.
+other_restaurants_cafes.html / .csv: 125 other researched outlets across 56 brands; ad status remains unverified. These are not established non-advertisers.
+The two prior dashboard paths now open the corresponding separate lists. The 135-row master and original focused CSV files are retained as historical research archives, so their counts differ from the new other-leads set.
+
+Seven confirmed original rows removed from the other set: JAM-013 Ame Cafe & Patisserie, JAM-072 Dunoara Cafe, JAM-105 Virasat-E-Curry, JAM-106 Virasat-E-Curry, JAM-108 Patang Re-Evolve, JAM-130 Rungg Premium Dining, JAM-131 Bellasen Bistro.
+Three additional group/possible overlaps held out of the other set:
+JAM-079: Tinello shares the Hyatt Regency property with the advertised Sarvatt venue; group outreach may overlap.
+JAM-121: Possible Hive brand overlap; the SBR venue and advertised rooftop venue were not established as the same outlet.
+JAM-124: Paari is on the same Banjara hospitality website as Ame and belongs to a group already represented in the Meta list.
+Browser status storage preserves previous notes for excluded IDs. No new business or ad verification was performed during this separation.
+
+The other-leads set retains Wabi Sabi as a separate named cafe, but flags its public phone as shared with TimTim in the Meta list. This is a contact overlap, not an established business identity match. Confirm the venue before outreach.

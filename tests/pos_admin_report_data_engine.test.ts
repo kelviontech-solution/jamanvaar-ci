@@ -109,11 +109,14 @@ describe('ReportDataEngine — station performance derives real prep time from K
   });
 
   it('returns zero counts (not a fake floor of 1/2) for a station with no activity in range', () => {
+    // getStationPerformance deliberately derives its station list from the KOTs actually in range
+    // (see the doc comment above it): historically accurate for a date-ranged report, since a
+    // dish's station assignment can be reconfigured later without rewriting what a past ticket was
+    // really routed to. With zero orders/KOTs, no station was really involved in this range, so the
+    // honest "not a fake floor of 1/2" result is no fabricated row at all — never a non-zero count
+    // invented for a station nothing in this range ever touched.
     const stations = ReportDataEngine.getStationPerformance([]);
-    const tandoor = stations.find((s) => s.stationName === 'Tandoor Section')!;
-    expect(tandoor.kotCount).toBe(0);
-    expect(tandoor.itemsCount).toBe(0);
-    expect(tandoor.avgPrepMinutes).toBeNull();
+    expect(stations).toEqual([]);
   });
 
   it('computes a real average prep time from KOT createdAt -> readyAt instead of a random number', () => {

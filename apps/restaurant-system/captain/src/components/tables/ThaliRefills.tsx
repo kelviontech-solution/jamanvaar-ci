@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { StaffSession, SyncOutboxEngine } from '@jamanvaar/sync';
 import { deviceFetch } from '../../cloud/cloudClient';
 import { useCaptainStore } from '../../store/captainStore';
+import { captainDb } from '@jamanvaar/database';
+import { resolveModifierGroups, dishNeedsChoiceBeforeAdd } from '@jamanvaar/business';
 type Policy = { mealItemId: string; includedItemIds: string[]; maxRefillsPerOrder: number };
 export function ThaliRefills() {
   const { selectedTableOrder: order, menuItems, addItemToCart } = useCaptainStore(),
@@ -27,6 +29,12 @@ export function ThaliRefills() {
   async function request() {
     if (!chosen || !order || busy) return;
     if (!included) {
+      // EC-03: this simple dropdown has no customization sheet of its own — a dish needing a
+      // required choice or a configured minimum above one can't be added correctly from here.
+      if (dishNeedsChoiceBeforeAdd(chosen, resolveModifierGroups(chosen, captainDb.modifierGroups))) {
+        setNotice(`${chosen.name} needs a choice (or a minimum quantity) picked before it can be added — use the main menu's Customize option instead of this quick extra.`);
+        return;
+      }
       addItemToCart(chosen, [], 'CHARGEABLE EXTRA');
       setNotice('Chargeable extra added to the order. Review its price and send the KOT.');
       return;

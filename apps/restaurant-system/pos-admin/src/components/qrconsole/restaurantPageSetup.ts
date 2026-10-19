@@ -1,4 +1,5 @@
 import { DEFAULT_RESTAURANT_PAGE, type RestaurantPageContent } from '../../../../../../packages/ui/src/restaurant-page/types';
+import { restaurantOpeningStatus } from '../../../../../../packages/ui/src/restaurant-page/restaurant-hours';
 
 /** Compare content, independent of the property order returned by the API. */
 export function samePage(a: RestaurantPageContent, b: RestaurantPageContent) {
@@ -26,9 +27,10 @@ export function pagePublicationStatus(published: RestaurantPageContent | null, d
 
 /** Optional photos and contact links never block an information-only page. */
 export function pagePublishIssue(draft: RestaurantPageContent): string | null {
+  if(draft.businessHours&&!restaurantOpeningStatus(draft.businessHours))return 'Opening hours need valid opening and closing times and a restaurant timezone. Check Contact details → Opening status.';
   if (draft.noticeStart && draft.noticeEnd && Date.parse(draft.noticeEnd)<=Date.parse(draft.noticeStart)) return 'Notice end must be after its start. Check More options → Schedule your service notice.';
   if (!draft.enabled) return null;
-  if (!draft.title.trim()) return 'Add a restaurant page heading before reviewing.';
+  if (!draft.title.trim()) return 'Add a page heading before reviewing.';
   if (!draft.welcome.trim()) return 'Add a welcome message before reviewing.';
   return null;
 }

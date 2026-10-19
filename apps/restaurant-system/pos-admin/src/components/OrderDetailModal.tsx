@@ -5,7 +5,7 @@ import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { Modal, Button, printThermalReceipt, OrderActivityView, type CanonicalOrderActivity } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
-import { db, OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
+import { db, OrderRepository, AuditRepository, ReceiptRepository, orderPaymentPosition } from '@jamanvaar/database';
 import { getCurrentAdminName } from '../currentAdminIdentity';
 import { signedDeviceFetch } from '../cloud/cloudClient';
 const loadOrderActivity = async (id: string): Promise<CanonicalOrderActivity> => { const response = await signedDeviceFetch(`/api/v1/orders/sync/${encodeURIComponent(id)}/activity`); if (!response.ok) throw new Error('Order activity unavailable'); return response.json(); };
@@ -41,6 +41,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   const [refundError, setRefundError] = useState('');
 
   if (!order) return null;
+  const paymentPosition = orderPaymentPosition(order);
 
   const handlePrint = () => {
     printThermalReceipt(order, '80mm', ReceiptRepository.getConfig());
@@ -78,7 +79,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Order #${order.orderNumber}`} maxWidth="2xl">
+    <Modal isOpen={isOpen} onClose={() => { if (!operationLock.current) onClose(); }} title={`Order #${order.orderNumber}`} maxWidth="2xl">
       <div className="space-y-5 py-1">
         {/* Header Summary Banner */}
         <div className="p-4 bg-jaman-navy text-white rounded-2xl flex flex-wrap items-center justify-between gap-3">
@@ -204,11 +205,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </div>
               <div className="flex items-center justify-between font-mono">
                 <span className="text-slate-500">Total Settled:</span>
-                <strong className="text-emerald-700 font-bold">{formatINR(order.totalAmount)}</strong>
+                <strong className="text-emerald-700 font-bold">{formatINR(paymentPosition.collectedPaise / 100)}</strong>
               </div>
               <div className="flex items-center justify-between font-mono text-slate-500">
                 <span>Remaining:</span>
-                <span>₹0.00</span>
+                <span>{formatINR(paymentPosition.outstandingPaise / 100)}</span>
               </div>
               <div className="pt-1.5 border-t border-slate-200 flex items-center justify-between text-[11px] font-bold">
                 <span className="text-slate-600">Status:</span>
@@ -230,7 +231,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             {(['CONFIRMED', 'PREPARING', 'READY', 'COMPLETED'] as OrderStatus[]).map((st) => (
               <button
                 key={st}
-                disabled={order.orderStatus === st || order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED'}
+                disabled={operationBusy || order.orderStatus === st || order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED'}
                 onClick={() => handleAdvanceStatus(st)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   order.orderStatus === st
@@ -252,13 +253,14 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               type="text"
               required
               value={voidReason}
+              disabled={operationBusy}
               onChange={(e) => setVoidReason(e.target.value)}
               placeholder="e.g. Customer cancelled before cooking / duplicate bill"
               className="w-full bg-white border border-rose-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
             />
             {voidError && <p className="font-bold text-rose-700">{voidError}</p>}
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" type="button" onClick={() => setIsVoiding(false)}>
+              <Button variant="outline" size="sm" type="button" disabled={operationBusy} onClick={() => setIsVoiding(false)}>
                 Cancel
               </Button>
               <button
@@ -277,6 +279,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 type="number"
                 required
                 value={refundAmount}
+                disabled={operationBusy}
                 min="0.01" max={order.totalAmount} step="0.01"
                 onChange={(e) => { setRefundAmount(e.target.value); setMoneyReturned(false); }}
                 placeholder={`Amount (Max ₹${order.totalAmount})`}
@@ -286,6 +289,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 type="text"
                 required
                 value={refundReason}
+                disabled={operationBusy}
                 onChange={(e) => setRefundReason(e.target.value)}
                 placeholder="Reason (e.g. Food return)"
                 className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
@@ -297,7 +301,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             <label className="flex gap-2 items-center"><input type="checkbox" checked={moneyReturned} onChange={e => setMoneyReturned(e.target.checked)} />I confirm this amount has already been returned to the customer.</label>
             {refundError && <p className="font-bold text-amber-800">{refundError}</p>}
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" type="button" onClick={() => setIsRefunding(false)}>
+              <Button variant="outline" size="sm" type="button" disabled={operationBusy} onClick={() => setIsRefunding(false)}>
                 Cancel
               </Button>
               <button
