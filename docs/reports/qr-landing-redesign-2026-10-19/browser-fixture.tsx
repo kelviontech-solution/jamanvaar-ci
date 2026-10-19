@@ -36,6 +36,7 @@ const draft = {
   gallery: items.slice(0, 3).map((item) => ({ url: item.imageUrl, caption: item.name }))
 };
 if(params.has('enhanced'))Object.assign(draft,{businessHours:{timezone:'Asia/Kolkata',weekly:Array.from({length:7},(_,day)=>({day,intervals:[{start:'10:00',end:'22:00'}]})),exceptions:[]},translations:{gu:{title:'નદી કિનારે ભોજન',welcome:'આપનું સ્વાગત છે'}}});
+if(params.has('pageOff'))draft.enabled=false;
 const data = {
   scope: 'restaurant',
   canEditGlobal: true,

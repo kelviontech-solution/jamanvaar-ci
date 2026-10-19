@@ -4,10 +4,19 @@ import {
   fillPageDetails,
   pagePublicationStatus,
   pagePublishIssue,
+  pageReviewIssue,
   samePage
 } from '../apps/restaurant-system/pos-admin/src/components/qrconsole/restaurantPageSetup';
 
 describe('restaurant page setup and publication guidance', () => {
+  it('requires explicit activation before reviewing a new or already switched-off page',()=>{
+    expect(pageReviewIssue(defaults,null)).toContain('Enable page for publishing');
+    expect(pageReviewIssue(defaults,defaults)).toContain('switched off');
+    const enabled={...defaults,enabled:true,title:'Our restaurant',welcome:'Welcome'};
+    expect(pageReviewIssue(enabled,defaults)).toBeNull();
+    expect(pageReviewIssue(defaults,enabled)).toBeNull();
+    expect(pageReviewIssue({...defaults,enabled:true},defaults)).toContain('heading');
+  });
   it('fills only missing fields without changing existing design, scan destination or contact information', () => {
     const draft = { ...defaults, title: 'Our custom name', phone: '+919876543210', template: 'CAFE' as const };
     const result = fillPageDetails(draft, 'Restaurant One', 'Branch address');

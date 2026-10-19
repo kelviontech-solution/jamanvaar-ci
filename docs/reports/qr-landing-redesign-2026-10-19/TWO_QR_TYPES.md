@@ -43,3 +43,17 @@ The Business Page editor links directly to the new print workspace. Its old “W
 Evidence: `two-qr-types-results.json`, `two-qr-types-<layout>-<width>.png`, `ordering-navigation-results.json`; regression sources `tests/qr_two_code_types.test.ts`, `tests/qr_website_print_auth.test.ts` and `cloud/api/test/qr-restaurant-page.e2e.spec.ts`.
 
 No physical printer job, production deployment, real order/payment, Git commit or push was performed. Browser print tests inspect the generated document rather than send a job to a physical printer. Deploy the API, QR Guest and Restaurant Admin together; no Prisma migration is required.
+
+## Publication recovery fix — 19 October 2026
+
+The reported screen showed an already published page whose `enabled` setting was false. This was a confusing activation flow, not a visible server error: publishing the same disabled content again could never make its website QR available, but the action still said “Publish reviewed page” and the success message implied the website was live.
+
+The publication panel now includes a visible **Enable page for publishing** action when the draft is switched off. It changes only the draft. An already-off/new page cannot proceed through publication while still off. After enabling, the owner reviews the content and scope and explicitly publishes it. Required title/welcome validation and all existing access checks remain.
+
+Switching off an existing live page remains supported. Its final action says **Switch off published page**, warns that the website QR will stop working, and confirms the page was switched off rather than claiming a live publication. Errors also appear beside the publication controls.
+
+Current-screen workaround before deploying this frontend fix: **01 · Choose your design → Enable published business page → Save & review → acknowledge review → Publish reviewed page**. Use the intended branch or its inherited business defaults.
+
+Verification: **28 targeted tests pass**, root TypeScript check passes, and the Restaurant Admin production build passes with its existing bundle-size warning. Browser checks at **1440px and 390px** verify recovery from an off page, draft-only enabling, review acknowledgement, actual enabled fixture publication, intentional switch-off and accurate confirmation text. No horizontal overflow or runtime errors were recorded. Evidence: `publication-off-results.json` and `publication-off-recovery-<width>.png`. Browser transport is isolated; no production tenant was published or modified.
+
+This follow-up changes the shared frontend only. Rebuild/deploy Restaurant Admin (including its standalone QR entry) to expose the new controls; no API or database migration is required for this follow-up.

@@ -34,3 +34,9 @@ export function pagePublishIssue(draft: RestaurantPageContent): string | null {
   if (!draft.welcome.trim()) return 'Add a welcome message before reviewing.';
   return null;
 }
+
+/** Publishing an already-off page again cannot make its website QR available. */
+export function pageReviewIssue(draft: RestaurantPageContent, published: RestaurantPageContent|null): string|null {
+  if(!draft.enabled&&!published?.enabled)return 'Your restaurant page is switched off. Click Enable page for publishing, then review and publish it to make the website and its QR available.';
+  return pagePublishIssue(draft);
+}

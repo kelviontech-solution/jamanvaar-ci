@@ -40,10 +40,47 @@ async function main() {
   const fixturesOnly = process.argv.includes('--fixtures-only');
   const recommendations = process.argv.includes('--recommendations') || process.argv.includes('--recommendations-only');
   const twoCodes = process.argv.includes('--two-codes');
+  const publicationOff = process.argv.includes('--publication-off');
   const mobileOnly = process.argv.includes('--mobile');
   const results = fixturesOnly ? JSON.parse(fs.readFileSync(path.join(__dirname, 'browser-results.json'), 'utf8')).filter(row => row.screen === 'real-public-page') : [];
   const fixtureUrl = 'http://127.0.0.1:5542/docs/reports/qr-landing-redesign-2026-10-19/browser-fixture.html';
   try {
+    if(publicationOff){
+      for(const width of [1440,390]){
+        console.log('Checking switched-off publication recovery',width);
+        const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+        await page.goto(`${fixtureUrl}?screen=admin&pageOff=1`,{waitUntil:'domcontentloaded'});
+        await page.getByRole('button',{name:'Enable page for publishing',exact:true}).waitFor();
+        assert.equal(await page.getByRole('button',{name:'Enable page to continue',exact:true}).isDisabled(),true);
+        assert.equal(await page.evaluate(()=>window.__pageFixture.publishes),0);
+        await page.getByRole('button',{name:'Enable page for publishing',exact:true}).click();
+        assert.equal(await page.evaluate(()=>window.__pageFixture.data.published.enabled),false,'Enable action is draft-only');
+        await page.getByRole('button',{name:'Save & review',exact:true}).click();
+        await page.getByRole('button',{name:'Publish reviewed page',exact:true}).waitFor();
+        assert.equal(await page.getByRole('button',{name:'Publish reviewed page',exact:true}).isDisabled(),true);
+        await page.getByLabel('I reviewed the design, contact links and affected scope.').check();
+        await page.getByRole('button',{name:'Publish reviewed page',exact:true}).click();
+        await page.getByText('Business page published. New visitors receive this version.').waitFor();
+        assert.equal(await page.evaluate(()=>window.__pageFixture.data.published.enabled),true);
+        assert.equal(await page.evaluate(()=>window.__pageFixture.publishes),1);
+        if(width<1000)await page.getByRole('button',{name:'Edit page',exact:true}).click();
+        await page.locator('#qpb-design').evaluate(node=>node.open=true);
+        await page.getByLabel('Enable published business page',{exact:true}).uncheck();
+        await page.getByRole('button',{name:'Save & review',exact:true}).click();
+        await page.getByRole('button',{name:'Switch off published page',exact:true}).waitFor();
+        await page.getByLabel('I reviewed the design, contact links and affected scope.').check();
+        await page.getByRole('button',{name:'Switch off published page',exact:true}).click();
+        await page.getByText('Restaurant page switched off. Its website QR is unavailable until the page is enabled and published again.').waitFor();
+        assert.equal(await page.evaluate(()=>window.__pageFixture.data.published.enabled),false);
+        assert.equal(await page.getByText('Business page published. New visitors receive this version.').count(),0);
+        if(width<1000)await page.getByRole('button',{name:'Edit page',exact:true}).click();
+        await page.getByRole('button',{name:'Enable page for publishing',exact:true}).scrollIntoViewIfNeeded();
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+        await page.screenshot({path:path.join(__dirname,`publication-off-recovery-${width}.png`),fullPage:false});
+        assert.deepEqual(errors,[]);results.push({width,offPageCannotBePublishedAsLive:true,explicitEnableIsDraftOnly:true,reviewedPublicationEnabledPage:true,intentionalSwitchOffPreserved:true,accurateSuccessMessage:true,overflow:false});await page.close();
+      }
+      console.log(JSON.stringify(results,null,2));return;
+    }
     if(twoCodes){
       for(const layout of ['workspace','integrated'])for(const width of [1440,390]){
         console.log('Checking separate QR workflow',layout,width);
@@ -286,7 +323,7 @@ async function main() {
       assert.deepEqual(errors, []); results.push({ screen: 'real-editor-with-isolated-transport', width, draftSave: true, publishAcknowledgement: true, overflow: false }); await page.close();
     }
   } catch(error) { console.error('Browser check failed:', error); throw error; }
-  finally { fs.writeFileSync(path.join(__dirname, twoCodes?'two-qr-types-results.json':recommendations?'recommendations-results.json':mobileOnly?'mobile-results.json':'browser-results.json'), JSON.stringify(results, null, 2)); for (const context of browser.contexts()) await context.unrouteAll({ behavior: 'ignoreErrors' }); await browser.close(); await server.close(); }
+  finally { fs.writeFileSync(path.join(__dirname, publicationOff?'publication-off-results.json':twoCodes?'two-qr-types-results.json':recommendations?'recommendations-results.json':mobileOnly?'mobile-results.json':'browser-results.json'), JSON.stringify(results, null, 2)); for (const context of browser.contexts()) await context.unrouteAll({ behavior: 'ignoreErrors' }); await browser.close(); await server.close(); }
   console.log(JSON.stringify({ passedScenarios: results.length, results }, null, 2));
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

@@ -8,7 +8,7 @@ import { useQrUnsavedChanges, requestQrLeave } from './useQrUnsavedChanges';
 import { resolveMenuImage } from '../../../../../../packages/utils/src/menu_image';
 import { menuDishImage } from '../../../../../../packages/utils/src/dish_photos';
 import { FeatureRequestButton } from './FeatureRequestButton';
-import { fillPageDetails, pagePublicationStatus, pagePublishIssue } from './restaurantPageSetup';
+import { fillPageDetails, pagePublicationStatus, pageReviewIssue } from './restaurantPageSetup';
 import { optimizePageImage } from './optimizePageImage';
 import { PageComparison, PageContentOptions, PageBranchCopy, PageEngagement, PageLaunchChecklist } from './QrPageEnhancements';
 import { PAGE_LANGUAGES } from '../../../../../../packages/ui/src/restaurant-page/types';
@@ -240,9 +240,10 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
   };
   const saveAndReview = () =>
     void run(async () => {
-      const issue = pagePublishIssue(draft);
+      const issue = pageReviewIssue(draft,data!.published);
       if (issue) {
-        openStep(issue.startsWith('Opening hours') ? 'qpb-contact' : issue.startsWith('Notice') ? 'qpb-schedule' : 'qpb-first-impression');
+        if(!draft.enabled)requestAnimationFrame(()=>document.getElementById('qpb-enable-page')?.scrollIntoView({behavior:'smooth',block:'center'}));
+        else openStep(issue.startsWith('Opening hours') ? 'qpb-contact' : issue.startsWith('Notice') ? 'qpb-schedule' : 'qpb-first-impression');
         throw new Error(issue);
       }
       // Saving is still a draft-only action. Publication requires the separate review acknowledgement.
@@ -785,6 +786,12 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
             />
           )}
           <section className="qpb-publish">
+            {!draft.enabled&&<div id="qpb-enable-page" className="qpb-enable-page" role="status">
+              <strong>{data.published?.enabled?'This draft will switch your restaurant page off':'Your restaurant page is switched off'}</strong>
+              <p>{data.published?.enabled?'Publishing this draft will hide the website and stop its Restaurant Page QR from working. Keep it enabled if guests should see it.':'Publishing with the page switched off keeps it hidden. Enable the page, review it and publish it live before generating its Restaurant Page QR.'}</p>
+              <button type="button" disabled={busy||locked} onClick={()=>{update('enabled',true);setError('');setNotice('Page enabled in this draft. Review and publish to make the restaurant website and its QR available.');}}>Enable page for publishing</button>
+              <small>Existing table ordering continues independently. This changes the draft only.</small>
+            </div>}
             <p>
               <strong>{pagePublicationStatus(data.published, draft, !locked)}</strong>
               <small>
@@ -806,8 +813,8 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
               >
                 Save draft
               </button>
-              <button disabled={busy || locked} onClick={saveAndReview}>
-                {dirty ? 'Save & review' : 'Review & publish'}
+              <button disabled={busy || locked || (!draft.enabled&&!data.published?.enabled)} onClick={saveAndReview}>
+                {!draft.enabled&&!data.published?.enabled?'Enable page to continue':dirty ? 'Save & review' : 'Review & publish'}
               </button>
             </div>
             {review && (
@@ -838,18 +845,20 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} /> I reviewed the design, contact links and affected scope.
                 </label>
                 <button
-                  disabled={!ack || busy || locked}
+                  disabled={!ack || busy || locked || (!draft.enabled&&!data.published?.enabled)}
                   onClick={() =>
                     void run(async () => {
-                      install(await request<Editor>(endpoint(scope!, '/publish'), { method: 'POST', body: { version: data.version } }));
-                      setNotice('Business page published. New visitors receive this version.');
+                      const published=await request<Editor>(endpoint(scope!, '/publish'), { method: 'POST', body: { version: data.version } });
+                      install(published);
+                      setNotice(published.published?.enabled?'Business page published. New visitors receive this version.':'Restaurant page switched off. Its website QR is unavailable until the page is enabled and published again.');
                     })
                   }
                 >
-                  Publish reviewed page
+                  {draft.enabled?'Publish reviewed page':data.published?.enabled?'Switch off published page':'Enable page to publish it live'}
                 </button>
               </div>
             )}
+            {error&&<p className="qpb-error">{error}</p>}
             {scope !== 'restaurant' && !data.inherited && (
               <button
                 disabled={busy}

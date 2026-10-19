@@ -1,0 +1,20 @@
+[
+  {
+    "width": 1440,
+    "offPageCannotBePublishedAsLive": true,
+    "explicitEnableIsDraftOnly": true,
+    "reviewedPublicationEnabledPage": true,
+    "intentionalSwitchOffPreserved": true,
+    "accurateSuccessMessage": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "offPageCannotBePublishedAsLive": true,
+    "explicitEnableIsDraftOnly": true,
+    "reviewedPublicationEnabledPage": true,
+    "intentionalSwitchOffPreserved": true,
+    "accurateSuccessMessage": true,
+    "overflow": false
+  }
+]
