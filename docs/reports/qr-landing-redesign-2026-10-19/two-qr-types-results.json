@@ -1,0 +1,42 @@
+[
+  {
+    "layout": "workspace",
+    "width": 1440,
+    "savedBranchDesign": true,
+    "svgDownload": true,
+    "pngDecoded": true,
+    "twoSidedPrintPreview": true,
+    "unpublishedBranchBlocked": true,
+    "overflow": false
+  },
+  {
+    "layout": "workspace",
+    "width": 390,
+    "savedBranchDesign": true,
+    "svgDownload": true,
+    "pngDecoded": true,
+    "twoSidedPrintPreview": true,
+    "unpublishedBranchBlocked": true,
+    "overflow": false
+  },
+  {
+    "layout": "integrated",
+    "width": 1440,
+    "savedBranchDesign": true,
+    "svgDownload": true,
+    "pngDecoded": true,
+    "twoSidedPrintPreview": true,
+    "unpublishedBranchBlocked": true,
+    "overflow": false
+  },
+  {
+    "layout": "integrated",
+    "width": 390,
+    "savedBranchDesign": true,
+    "svgDownload": true,
+    "pngDecoded": true,
+    "twoSidedPrintPreview": true,
+    "unpublishedBranchBlocked": true,
+    "overflow": false
+  }
+]

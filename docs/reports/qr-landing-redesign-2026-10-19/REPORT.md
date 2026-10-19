@@ -82,6 +82,8 @@ The demo’s existing restaurant name, press entry and testimonial remain its sa
 
 ## Follow-up recommendations implemented
 
+**Latest:** Restaurant Page QRs now have their own design/print workspace, and fresh Table Ordering QR scans open ordering directly. See [TWO_QR_TYPES.md](./TWO_QR_TYPES.md) for setup, verification and deployment notes.
+
 The five requested follow-ups—varied signature dishes, category filters, structured opening status, server-rendered search/social metadata and translated customer controls—are now implemented. QR Admin navigation and editor cards were also simplified, and the shared Restaurant Admin/standalone QR console was checked for feature-access parity. See [RECOMMENDATIONS_IMPLEMENTED.md](./RECOMMENDATIONS_IMPLEMENTED.md) for the current implementation, verification evidence and deployment requirements.
 
 ## Earlier recommendations

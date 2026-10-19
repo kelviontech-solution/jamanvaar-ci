@@ -1,4 +1,5 @@
 import {QrRestaurantPage} from './QrRestaurantPage';
+import {QrRestaurantPageQr} from './QrRestaurantPageQr';
 import {OperationsConsole} from '../operations/OperationsConsole';
 import { QrOnboarding } from './QrOnboarding';
 import { QrAiAssistant } from './QrAiAssistant';
@@ -203,7 +204,7 @@ export function QrConsole({
     );
 
   const page = QR_PAGES.find((p) => p.id === tab)!;
-  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','CRM','RESTAURANT_PAGE','TABLES','ADVANCED','ANALYTICS']);
+  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','CRM','RESTAURANT_PAGE','WEBSITE_QR','TABLES','ADVANCED','ANALYTICS']);
   const search = toolSearch.trim().toLowerCase();
   const visiblePages = QR_NAVIGATION.filter(page => (advancedNavigation || search || basicPages.has(page.id) || page.id === tab) && (!search || `${page.label} ${page.description} ${page.group}`.toLowerCase().includes(search)));
   const tabs: Array<[Tab, string]> = visiblePages.map((p) => [p.id, p.label]);
@@ -392,7 +393,8 @@ export function QrConsole({
         {tab === "SUPPORT" && <SupportTicketsModule showToast={showToast} />}
         {tab === "BRAND" && <QrBrandStudio />}
         {tab === 'RESTAURANT_PAGE' && <QrRestaurantPage onNavigate={(next,scope)=>void navigate(next,'Settings',scope)} />}
-        {tab === "TABLES" && <TablesAndQr showToast={showToast} />}
+        {tab === 'WEBSITE_QR' && <QrRestaurantPageQr onNavigate={(next,scope)=>void navigate(next,'Settings',scope)}/>}
+        {tab === "TABLES" && <><div className="rounded-xl border border-blue-200 bg-blue-50 p-4 my-4 text-sm"><strong>Table Ordering QR → ordering menu for that table</strong><p className="mt-1">Place these cards on dining tables. A fresh scan opens the menu directly and keeps the table number. For a website QR on your entrance or visiting card, use Restaurant Page QR.</p><button type="button" className="qr-btn secondary mt-3" onClick={()=>void navigate('WEBSITE_QR')}>Design Restaurant Page QR</button></div><TablesAndQr showToast={showToast} /></>}
         {tab === "MENU" && <QrMenuWorkspace showToast={showToast} />}
         {tab === "ADVANCED" && (
           <QrCapabilities

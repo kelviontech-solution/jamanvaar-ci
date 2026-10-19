@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
 import { QrRestaurantPageService } from './qr-restaurant-page.service';
-import { restaurantPageSchema, pageCopySchema } from './qr-restaurant-page.schema';
+import { restaurantPageSchema, pageCopySchema, websiteQrPrintDesignSchema } from './qr-restaurant-page.schema';
 function parse<T extends z.ZodTypeAny>(schema: T, body: unknown): z.infer<T> {
   const p = schema.safeParse(body);
   if (!p.success) throw new BadRequestException(p.error.issues.map((i) => i.path.join('.') + ': ' + i.message).join('; '));
@@ -34,6 +34,13 @@ export class QrRestaurantPageController {
   }
   @Get('print-data') printData(@CurrentTenantUser() u: User, @Query('scope') scope = 'restaurant') {
     return this.pages.printData(u, scope);
+  }
+  @Get('print-design') printDesign(@CurrentTenantUser() u: User, @Query('scope') scope = 'restaurant') {
+    return this.pages.printDesign(u, scope);
+  }
+  @Put('print-design') savePrintDesign(@CurrentTenantUser() u: User, @Query('scope') scope = 'restaurant', @Body() body: unknown) {
+    const p = parse(revision.extend({ design: websiteQrPrintDesignSchema }).strict(), body);
+    return this.pages.savePrintDesign(u, scope, p.version, p.design);
   }
   @Post('launch') recordLaunch(@CurrentTenantUser() u: User, @Query('scope') scope = 'restaurant', @Body() body: unknown) {
     return this.pages.recordLaunch(

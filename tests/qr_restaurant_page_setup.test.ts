@@ -35,8 +35,8 @@ describe('restaurant page setup and publication guidance', () => {
     expect(pagePublicationStatus(null, live, true)).toBe('Not published');
     expect(pagePublicationStatus(live, { ...live, welcome: 'New draft' }, true)).toBe('Changes not published');
     expect(pagePublicationStatus(defaults, defaults, true)).toBe('Page switched off');
-    expect(pagePublicationStatus(live, live, true)).toBe('Live · page first');
-    expect(pagePublicationStatus({ ...live, entryMode: 'MENU' }, { ...live, entryMode: 'MENU' }, true)).toBe('Live · menu first');
+    expect(pagePublicationStatus(live, live, true)).toBe('Live · restaurant page');
+    expect(pagePublicationStatus({ ...live, entryMode: 'MENU' }, { ...live, entryMode: 'MENU' }, true)).toBe('Live · restaurant page');
   });
   it('ignores API object key order but detects gallery and featured dish order changes', () => {
     expect(samePage(defaults, Object.fromEntries(Object.entries(defaults).reverse()) as typeof defaults)).toBe(true);

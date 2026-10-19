@@ -46,7 +46,7 @@ export const qrBrandingSchema = z
   .partial()
   .strict();
 export type QrBrandingUpdate = z.infer<typeof qrBrandingSchema>;
-export const qrPrintDesignSchema = z.object({ template: z.enum(['minimal', 'premium', 'colorful', 'cafe', 'fine-dining', 'family', 'casual', 'takeaway', 'table']), accent: z.string().regex(/^#[0-9a-fA-F]{6}$/), instruction: z.string().trim().min(1).max(70), footer: z.string().trim().max(100), showLogo: z.boolean(), layout: z.enum(['CARD', 'TENT', 'LABEL']) }).strict();
+export const qrPrintDesignSchema = z.object({ template: z.enum(['minimal', 'premium', 'colorful', 'cafe', 'fine-dining', 'family', 'casual', 'takeaway', 'table','lounge','rooftop','bakery','festival']), accent: z.string().regex(/^#[0-9a-fA-F]{6}$/), instruction: z.string().trim().min(1).max(70), footer: z.string().trim().max(100), showLogo: z.boolean(), layout: z.enum(['CARD', 'TENT', 'LABEL']) }).strict();
 
 export interface QrSettingsView {
   orderingEnabled: boolean;

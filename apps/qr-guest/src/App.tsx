@@ -176,7 +176,8 @@ function Ordering({ token }: { token: string }) {
       const [d, menuResult] = await Promise.all([QrApi.describe(token, sessionId), QrApi.menu(token, sessionId).catch((error:ApiError)=>({error}))]);
       if('error' in menuResult && (!d.restaurantPage || menuResult.error.code!=='MENU_NOT_PUBLISHED'))throw menuResult.error;
       const m='error' in menuResult?{menu:{items:[],categories:[],modifierGroups:[],menuVersion:0,etag:''} as Menu,etag:null}:menuResult;
-      if(d.restaurantPage?.content.entryMode==='PAGE'&&!location.hash&&!new URLSearchParams(location.search).has('order')&&!restoredActive.current&&itemCount(parseCart(store.get(`jv_qr_cart:${token}`)))===0)setScreen('HOME');
+      // Table/menu codes open ordering directly. Restaurant Page QRs use /q/site/:slug.
+      // Explicit About links, saved carts, payment returns and active-order recovery retain their own screens.
       currencyCode = d.currency || 'INR';
       setInfo(d);
       seenMenuVersion = m.menu?.menuVersion ?? seenMenuVersion;

@@ -9,5 +9,13 @@
     "ordersCreated": 0,
     "paymentsInitiated": 0,
     "runtimeErrors": 0
+  },
+  {
+    "source": "real local ordering QR without hash",
+    "storedEntryMode": "MENU",
+    "mode": "MENU_ONLY",
+    "opensOrderingDirectly": true,
+    "aboutPageStillReachable": true,
+    "runtimeErrors": 0
   }
 ]

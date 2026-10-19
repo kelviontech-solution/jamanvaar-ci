@@ -12,6 +12,19 @@ async function main() {
     const fixture=window.__pageFixture; const data=fixture.data;
     if(path.endsWith('/entitlement'))return {enabled:true,source:'PLAN',limits:{},planName:'Fixture QR plan',validUntil:null};
     if(path.includes('/ai-config'))return {state:'OFF'};
+    if(path.includes('/qr-page/print-design?')){
+      const branch=new URL(path,location.origin).searchParams.get('scope');
+      fixture.qrDesigns ||= {};
+      const current=fixture.qrDesigns[branch]||{version:0,design:{template:'website',accent:'#0B253A',instruction:'Scan to visit our restaurant',footer:'Menu · Story · Contact',showLogo:true,layout:'CARD'}};
+      if(options.method==='PUT'){if(current.version!==options.body.version)throw Error('Stale design');fixture.qrDesigns[branch]={version:current.version+1,design:structuredClone(options.body.design)};fixture.websiteQrSaves=(fixture.websiteQrSaves||0)+1;}
+      return structuredClone(fixture.qrDesigns[branch]||current);
+    }
+    if(path.includes('/qr-page/print-data?')){
+      const branch=new URL(path,location.origin).searchParams.get('scope');
+      if(branch==='branch-b')throw Error('Publish and enable the business page before generating its QR poster.');
+      const design=fixture.qrDesigns?.[branch]?.design||{template:'website',accent:'#0B253A',instruction:'Scan to visit our restaurant',footer:'Menu · Story · Contact',showLogo:true,layout:'CARD'};
+      return {restaurantName:data.restaurantName,branchName:'Riverside',tableLabel:'VISIT OUR WEBSITE',tagline:'Menu · Story · Contact',url:'https://example.test/q/site/river-house-branch-a',logoUrl:null,design:structuredClone(design)};
+    }
     if(path.includes('/launch?'))return {pageEnabled:true,health:{checks:[],scope:'Fixture branch'},testCurrent:false,currentPublication:data.publishedAt,branchRequired:true,recentOrders:[]};
     if(path.includes('/engagement?'))return {counts:{},description:'Isolated fixture'};
     if(path.includes('/publish?')){fixture.publishes++;data.published=structuredClone(data.draft);data.publishedAt=new Date().toISOString();data.version++;}
@@ -26,10 +39,45 @@ async function main() {
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
   const fixturesOnly = process.argv.includes('--fixtures-only');
   const recommendations = process.argv.includes('--recommendations') || process.argv.includes('--recommendations-only');
+  const twoCodes = process.argv.includes('--two-codes');
   const mobileOnly = process.argv.includes('--mobile');
   const results = fixturesOnly ? JSON.parse(fs.readFileSync(path.join(__dirname, 'browser-results.json'), 'utf8')).filter(row => row.screen === 'real-public-page') : [];
   const fixtureUrl = 'http://127.0.0.1:5542/docs/reports/qr-landing-redesign-2026-10-19/browser-fixture.html';
   try {
+    if(twoCodes){
+      for(const layout of ['workspace','integrated'])for(const width of [1440,390]){
+        console.log('Checking separate QR workflow',layout,width);
+        const context=await browser.newContext({viewport:{width,height:1000},acceptDownloads:true});
+        const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+        await page.goto(`${fixtureUrl}?screen=console&layout=${layout}&tab=WEBSITE_QR&twoCodes=1`,{waitUntil:'domcontentloaded'});
+        await page.getByRole('img',{name:'Restaurant Page QR poster preview'}).waitFor();
+        await page.getByRole('button',{name:'Warm café',exact:true}).click();
+        await page.getByLabel('Message below the QR').fill('Discover River House');
+        await page.getByLabel('Print format').selectOption('TENT');
+        assert.equal(await page.getByRole('button',{name:'Download PNG',exact:true}).isDisabled(),true);
+        await page.getByRole('button',{name:'Save QR design',exact:true}).click();
+        await page.getByText('Restaurant page QR design saved for this branch. Table QR designs are unchanged.').waitFor();
+        assert.equal(await page.evaluate(()=>window.__pageFixture.websiteQrSaves),1);
+        const [svgDownload]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'Download SVG',exact:true}).click()]);
+        const svg=fs.readFileSync(await svgDownload.path(),'utf8');assert.ok(svg.includes('Discover River House'));
+        const [pngDownload]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'Download PNG',exact:true}).click()]);
+        const png=await require('sharp')(await pngDownload.path()).resize({width:640}).ensureAlpha().raw().toBuffer({resolveWithObject:true});
+        assert.equal(require('jsqr')(new Uint8ClampedArray(png.data),png.info.width,png.info.height)?.data,'https://example.test/q/site/river-house-branch-a');
+        const popupPromise=page.waitForEvent('popup');await page.getByRole('button',{name:'Print / Save PDF',exact:true}).click();const popup=await popupPromise;
+        await popup.evaluate(()=>window.print=()=>{});await popup.locator('svg').first().waitFor();assert.equal(await popup.locator('svg[viewBox="0 0 640 860"]').count(),2,'Tent layout prints two sides');await popup.close();
+        await page.getByLabel('Branch to print',{exact:true}).selectOption('branch-b');
+        await page.getByText('Get this branch page ready to print').waitFor();
+        assert.equal(await page.getByRole('button',{name:'Heritage evening',exact:true}).getAttribute('aria-pressed'),'true');
+        assert.equal(await page.getByRole('button',{name:'Download PNG',exact:true}).isDisabled(),true);
+        await page.getByLabel('Branch to print',{exact:true}).selectOption('branch-a');
+        await page.getByRole('img',{name:'Restaurant Page QR poster preview'}).waitFor();
+        assert.equal(await page.getByLabel('Message below the QR').inputValue(),'Discover River House');
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+        await page.screenshot({path:path.join(__dirname,`two-qr-types-${layout}-${width}.png`),fullPage:width===390});
+        assert.deepEqual(errors,[]);results.push({layout,width,savedBranchDesign:true,svgDownload:true,pngDecoded:true,twoSidedPrintPreview:true,unpublishedBranchBlocked:true,overflow:false});await context.close();
+      }
+      console.log(JSON.stringify(results,null,2));return;
+    }
     // Local API listens on IPv4; the existing Vite guest server listens on IPv6.
     // Forward only the local API transport. Responses remain from the real API.
     const context = await browser.newContext();
@@ -238,7 +286,7 @@ async function main() {
       assert.deepEqual(errors, []); results.push({ screen: 'real-editor-with-isolated-transport', width, draftSave: true, publishAcknowledgement: true, overflow: false }); await page.close();
     }
   } catch(error) { console.error('Browser check failed:', error); throw error; }
-  finally { fs.writeFileSync(path.join(__dirname, recommendations?'recommendations-results.json':mobileOnly?'mobile-results.json':'browser-results.json'), JSON.stringify(results, null, 2)); for (const context of browser.contexts()) await context.unrouteAll({ behavior: 'ignoreErrors' }); await browser.close(); await server.close(); }
+  finally { fs.writeFileSync(path.join(__dirname, twoCodes?'two-qr-types-results.json':recommendations?'recommendations-results.json':mobileOnly?'mobile-results.json':'browser-results.json'), JSON.stringify(results, null, 2)); for (const context of browser.contexts()) await context.unrouteAll({ behavior: 'ignoreErrors' }); await browser.close(); await server.close(); }
   console.log(JSON.stringify({ passedScenarios: results.length, results }, null, 2));
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

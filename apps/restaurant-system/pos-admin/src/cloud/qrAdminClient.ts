@@ -1,4 +1,4 @@
-import { qrApi } from './cloudClient';
+import { qrApi, request } from './cloudClient';
 
 /** Restaurant Admin's view of QR ordering. Every call is the console's own device credential; there is no restaurant id anywhere. */
 
@@ -108,7 +108,7 @@ export interface QrSettings {
 }
 export interface QrRules { hours: Array<{day:number;open:string;close:string}>; pausedUntil:string|null; minimumOrderPaise:number; preparationMinutes:number; maxPendingOrders:number; maxOrdersPerWindow:number; windowMinutes:number; customerInstructions:string; paymentInstructions:string; orderingModes:Array<'DINE_IN'|'TAKEAWAY'> }
 export interface QrAnalytics { timezone: string; from: string; to: string; byCode:Array<{codeId:string;table:string;branchId:string|null;version:number;status:string;scans:number;orders:number;sales:number}>; metrics: Record<string,number>; byBranch:Array<{branchId:string;orders:number;sales:number}>; trend:Array<{date:string;orders:number;sales:number}>; popular:Array<{name:string;quantity:number}>; payments:Array<{status:string;amount:number;createdAt:string;failureReason?:string;providerPaymentId?:string}> }
-export interface QrPrintDesign { template: 'minimal'|'premium'|'colorful'|'cafe'|'fine-dining'|'family'|'casual'|'takeaway'|'table'|'lounge'|'rooftop'|'bakery'|'festival'|'website'; accent:string; instruction:string; footer:string; showLogo:boolean; layout:'CARD'|'TENT'|'LABEL' }
+export interface QrPrintDesign { template: 'minimal'|'premium'|'colorful'|'cafe'|'fine-dining'|'family'|'casual'|'takeaway'|'table'|'lounge'|'rooftop'|'bakery'|'festival'|'website'|'website-minimal'|'website-cafe'; accent:string; instruction:string; footer:string; showLogo:boolean; layout:'CARD'|'TENT'|'LABEL' }
 
 export interface QrPrintData {
   logoUrl?: string | null;
@@ -160,5 +160,5 @@ export const QrAdminApi = {
   disable: (codeId: string) => qrApi<unknown>(`${base}/codes/${codeId}/disable`, json({})),
   enable: (codeId: string) => qrApi<unknown>(`${base}/codes/${codeId}/enable`, json({})),
   printData: (codeId: string) => qrApi<QrPrintData>(`${base}/codes/${codeId}/print-data`),
-  websitePrintData: (scope = 'restaurant') => qrApi<QrPrintData>(`/api/v1/tenant/qr-page/print-data?scope=${encodeURIComponent(scope)}`)
+  websitePrintData: (scope = 'restaurant') => request<QrPrintData>(`/api/v1/tenant/qr-page/print-data?scope=${encodeURIComponent(scope)}`)
 };

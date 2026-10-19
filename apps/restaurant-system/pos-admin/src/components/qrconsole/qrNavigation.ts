@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 export const QR_PAGES = [
+ {id:'WEBSITE_QR',label:'Restaurant Page QR',group:'Branding',icon:QrCode,description:'Design and print the QR that opens your restaurant website. Separate from table ordering codes.'},
  {id:'RESTAURANT_PAGE',label:'Business Page',group:'Branding',icon:Paintbrush,description:'Design your business website, branch contacts and mobile welcome page.'},
  {id:'OPERATIONS',label:'Operations Hub',group:'Live operations',icon:LayoutDashboard,description:'Branch service controls, guest follow-up, handovers and acceptance.'},
  {id:'ONBOARDING',label:'Guided Menu Setup',group:'Launch setup',icon:UtensilsCrossed,description:'Load cuisine templates, review pricing and publish your shared guest menu.'},
@@ -69,10 +70,10 @@ export const QR_PAGES = [
   },
   {
     id: "DESIGN",
-    label: "QR Design Studio",
+    label: "Table QR Design",
     group: "Branding",
     icon: Palette,
-    description: "Make table cards that feel at home in your restaurant.",
+    description: "Design cards that open table ordering directly. Restaurant Page QR posters have their own design workspace.",
   },
   {
     id: "BRAND",
@@ -160,7 +161,7 @@ export type QrTab = (typeof QR_PAGES)[number]["id"];
 // Service rules. "Restaurant default vs. branch override" is already called out per-page by the
 // scope banner in QrConsole.tsx (see the tab list there) — unaffected by this reshuffle.
 const GROUP_ORDER = ['Live operations', 'Launch setup', 'Guest experience', 'Menu & guests', 'Payments', 'Service rules', 'Branding', 'Insights', 'Help'];
-const TASK_ORDER: QrTab[] = ['OVERVIEW','OPERATIONS','ORDERS','SERVICE','CALENDAR','RESERVATIONS','MENU','CRM','ONBOARDING','TABLES','PAYMENTS','ACCEPTANCE','RULES','BRAND','RESTAURANT_PAGE','DESIGN','PRINTPACK','ANALYTICS','RECONCILIATION','PERFORMANCE','PICKUP','SETTINGS','ADVANCED','SUPPORT'];
+const TASK_ORDER: QrTab[] = ['OVERVIEW','OPERATIONS','ORDERS','SERVICE','CALENDAR','RESERVATIONS','MENU','CRM','ONBOARDING','TABLES','PAYMENTS','ACCEPTANCE','RULES','BRAND','RESTAURANT_PAGE','WEBSITE_QR','DESIGN','PRINTPACK','ANALYTICS','RECONCILIATION','PERFORMANCE','PICKUP','SETTINGS','ADVANCED','SUPPORT'];
 export const QR_NAVIGATION = [...QR_PAGES].sort((a,b) => {
   const rank = (group: string) => {const index = GROUP_ORDER.indexOf(group);return index < 0 ? GROUP_ORDER.length : index;};
   return rank(a.group) - rank(b.group) || TASK_ORDER.indexOf(a.id) - TASK_ORDER.indexOf(b.id);

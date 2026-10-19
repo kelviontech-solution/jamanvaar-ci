@@ -20,6 +20,7 @@ export function cardSvg(data:QrPrintData,size=320){
  * at a glance. */
 function websitePosterSvg(data:QrPrintData,d:QrPrintDesign){
  const color=/^#[0-9a-f]{6}$/i.test(d.accent)?d.accent:'#0B253A';
+ const light=d.template!=='website',ink=light?'#0B253A':'#FFFFFF',detail=light?color:'#D6B56D';
  const name=esc(data.restaurantName),nameSize=Math.min(50,1080/Math.max(data.restaurantName.length,1));
  const qr=cardSvg(data,400).replace('<svg ','<svg x="120" y="345" ');
  const logo=d.showLogo&&data.logoUrl&&/^data:image\/(png|jpeg|webp);base64,/i.test(data.logoUrl)?'<image href="'+esc(data.logoUrl)+'" x="270" y="54" width="100" height="56" preserveAspectRatio="xMidYMid meet"/>':'';
@@ -27,24 +28,24 @@ function websitePosterSvg(data:QrPrintData,d:QrPrintDesign){
   +'<defs><linearGradient id="rpGrad" x1="0" y1="0" x2="1" y2="1">'
   +'<stop offset="0" stop-color="'+color+'"/><stop offset="1" stop-color="#05070a"/>'
   +'</linearGradient></defs>'
-  +'<rect width="640" height="860" fill="url(#rpGrad)"/>'
+  +(d.template==='website-minimal'?'<rect width="640" height="860" fill="#FFFFFF"/><rect width="640" height="14" fill="'+color+'"/>':d.template==='website-cafe'?'<rect width="640" height="860" fill="#FFF4E7"/><path d="M0 0H640V180Q320 260 0 180Z" fill="'+color+'" opacity=".13"/>':'<rect width="640" height="860" fill="url(#rpGrad)"/>')
   +'<circle cx="-10" cy="-10" r="170" fill="#D6B56D" opacity=".16"/>'
   +'<circle cx="650" cy="870" r="190" fill="#D6B56D" opacity=".16"/>'
   +'<path d="M36 36H104M36 36V104" stroke="#D6B56D" stroke-width="4" fill="none"/>'
   +'<path d="M604 824H536M604 824V756" stroke="#D6B56D" stroke-width="4" fill="none"/>'
   +logo
-  +'<text x="320" y="'+(logo?195:150)+'" text-anchor="middle" font-family="Georgia,serif" font-size="'+nameSize+'" font-weight="700" fill="#FFFFFF">'+name+'</text>'
-  +(data.branchName?'<text x="320" y="'+(logo?225:182)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" letter-spacing="1" fill="#D6B56D">'+esc(data.branchName.toUpperCase())+'</text>':'')
-  +'<rect x="70" y="285" width="500" height="440" rx="30" fill="#FFFFFF"/>'
+  +'<text x="320" y="'+(logo?195:150)+'" text-anchor="middle" font-family="Georgia,serif" font-size="'+nameSize+'" font-weight="700" fill="'+ink+'">'+name+'</text>'
+  +(data.branchName?'<text x="320" y="'+(logo?225:182)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" letter-spacing="1" fill="'+detail+'">'+esc(data.branchName.toUpperCase())+'</text>':'')
+  +'<rect x="70" y="285" width="500" height="465" rx="30" fill="#FFFFFF"/>'
   +qr
-  +'<text x="320" y="773" text-anchor="middle" font-family="Arial,sans-serif" font-size="29" font-weight="750" letter-spacing="1" fill="#FFFFFF">'+esc(data.tableLabel)+'</text>'
-  +'<text x="320" y="803" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#D6B56D">'+esc(data.tagline)+'</text>'
-  +'<text x="320" y="834" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#FFFFFF" opacity=".7">'+esc(d.footer)+'</text>'
+  +'<text x="320" y="780" text-anchor="middle" font-family="Arial,sans-serif" font-size="'+Math.min(27,1040/Math.max(d.instruction.length,1))+'" font-weight="750" fill="'+ink+'">'+esc(d.instruction)+'</text>'
+  +'<text x="320" y="807" text-anchor="middle" font-family="Arial,sans-serif" font-size="'+Math.min(16,1000/Math.max(data.tagline.length,1))+'" fill="'+detail+'">'+esc(data.tagline)+'</text>'
+  +'<text x="320" y="834" text-anchor="middle" font-family="Arial,sans-serif" font-size="'+Math.min(12,1000/Math.max(d.footer.length,1))+'" fill="'+ink+'" opacity=".7">'+esc(d.footer)+'</text>'
   +'</svg>';
 }
 /** Preview, PNG, SVG and printing all use this renderer. Artwork stays outside the QR quiet zone. */
 export function designSvg(data:QrPrintData,d:QrPrintDesign=data.design??DEFAULT_DESIGN){
- if(d.template==='website')return websitePosterSvg(data,d);
+ if(d.template.startsWith('website'))return websitePosterSvg(data,d);
  const color=/^#[0-9a-f]{6}$/i.test(d.accent)?d.accent:'#0B253A',dark=['premium','fine-dining','lounge','rooftop'].includes(d.template),ink=dark?'#FFFFFF':'#0B253A';
  const qr=cardSvg(data,480).replace('<svg ','<svg x="80" y="250" ');
  const text=(s:string,y:number,size:number,fill=ink)=>'<text x="320" y="'+y+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="'+Math.min(size,1060/Math.max(s.length,1))+'" font-weight="600" fill="'+fill+'">'+esc(s)+'</text>';
@@ -85,8 +86,8 @@ function documentHtml(cards:QrPrintData[],design?:QrPrintDesign){
  const body=cards.map(data=>{const d=design??data.design??DEFAULT_DESIGN,svg=designSvg(data,d);return '<section class="'+d.layout.toLowerCase()+'">'+(d.layout==='TENT'?'<div class="back">'+svg+'</div><div class="fold">Fold here</div>':'')+svg+'</section>';}).join('');
  return '<!doctype html><html><head><meta charset="utf-8"><title>Restaurant QR materials</title><style>'+css+'</style></head><body>'+body+'</body></html>';
 }
-export function printCards(cards:QrPrintData[],design?:QrPrintDesign){
- const w=window.open('','_blank','width=720,height=900');if(!w)throw Error('Allow pop-ups to print QR cards.');
+export function printCards(cards:QrPrintData[],design?:QrPrintDesign,printWindow?:Window){
+ const w=printWindow??window.open('','_blank','width=720,height=900');if(!w)throw Error('Allow pop-ups to print QR cards.');
  w.document.write(documentHtml(cards,design));w.document.close();w.focus();setTimeout(()=>w.print(),300);
 }
 export async function downloadCardPng(data:QrPrintData,name:string,design?:QrPrintDesign){

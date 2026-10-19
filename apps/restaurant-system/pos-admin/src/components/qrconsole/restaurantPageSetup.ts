@@ -22,7 +22,7 @@ export function pagePublicationStatus(published: RestaurantPageContent | null, d
   if (!published) return 'Not published';
   if (!samePage(published, draft)) return 'Changes not published';
   if (!published.enabled) return 'Page switched off';
-  return published.entryMode === 'PAGE' ? 'Live · page first' : 'Live · menu first';
+  return 'Live · restaurant page';
 }
 
 /** Optional photos and contact links never block an information-only page. */

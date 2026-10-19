@@ -60,6 +60,7 @@ const data = {
   history: []
 };
 (window as any).__pageFixture = { data, saves: 0, publishes: 0 };
+if(params.has('twoCodes'))data.branches.push({id:'branch-b',name:'Uptown',address:'Another branch'});
 if(params.has('longName'))data.restaurantName='River House Kitchen, Family Dining & Riverside Celebrations';
 const admin = params.get('screen') === 'admin';
 createRoot(document.getElementById('root')!).render(

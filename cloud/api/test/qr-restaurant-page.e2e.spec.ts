@@ -6,6 +6,7 @@ import { createTestApp, createTestPlatformUser, platformLogin, ownerDeviceSessio
 import { PrismaService } from '../src/prisma/prisma.service';
 import { QrRestaurantPageService } from '../src/modules/qr/qr-restaurant-page.service';
 import { QrMenuService } from '../src/modules/qr/qr-menu.service';
+import { QrSettingsService,qrPrintDesignSchema } from '../src/modules/qr/qr-settings.service';
 import { MenuPublicationsService } from '../src/modules/menu-publications/menu-publications.service';
 import { TENANT_JWT_AUDIENCE, TENANT_JWT_ISSUER } from '../src/modules/tenant-auth/tenant-auth.service';
 let app: any,
@@ -350,6 +351,26 @@ it('publishes structured hours, categories and server-rendered sharing metadata 
   expect((await api('put',branch,'',{version:invalid.version,content:{...invalid.draft,seo:{title:'Bad image',description:'',imageUrl:'img:'+'a'.repeat(64)}}})).status).toBe(400);
   expect((await http().get('/api/v1/public/qr/sites/not-a-real-page/head')).status).toBe(404);
 });
+it('persists a separate branch website QR design with owner auth, version safety and a stable public destination',async()=>{
+  const path='/api/v1/tenant/qr-page/print-design?scope='+branch;
+  expect((await http().get(path)).status).toBe(401);
+  expect((await api('get','restaurant','/print-design')).status).toBe(400);
+  expect((await api('get',other,'/print-design')).status).toBe(403);
+  expect((await api('get',second,'/print-design',undefined,manager)).status).toBe(403);
+  const before=await api('get',branch,'/print-design');expect(before.status).toBe(200);
+  const tableBefore=await app.get(QrSettingsService).printDesign(rid);
+  const first=await api('get',branch,'/print-data');expect(first.status).toBe(200);expect(first.body.url).toContain('/q/site/');
+  const codesBefore=await prisma.runAsTenant(rid,tx=>tx.qrCode.count({where:{restaurantId:rid}}));
+  const design={...before.body.design,template:'website-minimal',instruction:'Explore our restaurant',accent:'#245B45'};
+  expect(qrPrintDesignSchema.safeParse(design).success).toBe(false);
+  const saved=await api('put',branch,'/print-design',{version:before.body.version,design});expect(saved.status).toBe(200);expect(saved.body.version).toBe(before.body.version+1);
+  expect((await api('put',branch,'/print-design',{version:before.body.version,design})).status).toBe(409);
+  expect((await api('put',branch,'/print-design',{version:saved.body.version,design:{...design,template:'table'}})).status).toBe(400);
+  const printed=await api('get',branch,'/print-data');expect(printed.body.design).toEqual(design);expect(printed.body.url).toBe(first.body.url);
+  const otherBranch=await api('get',second,'/print-design');expect(otherBranch.body.design.template).toBe('website');
+  expect(await app.get(QrSettingsService).printDesign(rid)).toEqual(tableBefore);
+  expect(await prisma.runAsTenant(rid,tx=>tx.qrCode.count({where:{restaurantId:rid}}))).toBe(codesBefore);
+});
 it('turns off the landing page independently of base ordering and respects per-branch licensing', async () => {
   await save({ enabled: false }, second);
   await publish(second);
@@ -370,6 +391,8 @@ it('turns off the landing page independently of base ordering and respects per-b
   );
   expect(await app.get(QrRestaurantPageService).publicPage(rid, branch)).toBeNull();
   expect((await editor(branch)).capability.enabled).toBe(false);
+  expect((await api('get',branch,'/print-design')).status).toBe(403);
+  expect((await api('get',branch,'/print-data')).status).toBe(409);
   const e=await editor(branch),slug=e.sharePath?.split('/').at(-1);
   if(slug)expect((await http().get('/api/v1/public/qr/sites/'+slug+'/head')).status).toBe(404);
 });

@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { request, cloudQrAccount } from '../../cloud/cloudClient';
-import { QrAdminApi } from '../../cloud/qrAdminClient';
-import { printCards, downloadCardPng, withLogo } from './qrPrint';
 import { RestaurantPage } from '../../../../../../packages/ui/src/restaurant-page/RestaurantPage';
 import { DEFAULT_RESTAURANT_PAGE, type RestaurantPageContent, type RestaurantPageDish, type RestaurantPageCategory } from '../../../../../../packages/ui/src/restaurant-page/types';
 import { diverseSignatureDishes } from '../../../../../../packages/ui/src/restaurant-page/restaurant-hours';
@@ -467,14 +465,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 <label>
                   <input type="checkbox" checked={draft.enabled} onChange={(e) => update('enabled', e.target.checked)} /> Enable published business page
                 </label>
-                <label>
-                  When customers scan
-                  <select aria-label="When customers scan" value={draft.entryMode} onChange={(e) => update('entryMode', e.target.value as 'PAGE' | 'MENU')}>
-                    <option value="MENU">Open menu directly</option>
-                    <option value="PAGE">Show business page first</option>
-                  </select>
-                </label>
-                <p className="qpb-help">Payment returns and existing order/cart tasks resume directly. Existing printed table QR codes keep working.</p>
+                <div className="qpb-image-note"><strong>Two QR types, two clear destinations</strong><p>Restaurant Page QRs open this website. Table Ordering QRs open the ordering menu directly and keep the table number. Guests can still open About & contact from the menu.</p>{onNavigate&&<button type="button" onClick={()=>onNavigate('WEBSITE_QR',scope!)}>Design & print Restaurant Page QR</button>}</div>
                 <label>
                   Accent colour
                   <input type="color" value={draft.accent} onChange={(e) => update('accent', e.target.value)} />
@@ -840,9 +831,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 )}
                 <p>
                   {draft.enabled
-                    ? draft.entryMode === 'PAGE'
-                      ? 'Fresh scans will open this page first.'
-                      : 'Scans open the menu directly; business information stays accessible.'
+                    ? 'Restaurant Page QRs open this website. Table Ordering QRs open the menu directly.'
                     : 'The business page is disabled. Existing menu ordering continues.'}
                 </p>
                 <label>
@@ -899,23 +888,11 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   disabled={busy}
                   onClick={() =>
                     void run(async () => {
-                      printCards([await QrAdminApi.websitePrintData(scope!).then(withLogo)]);
+                      onNavigate?.('WEBSITE_QR',scope!);
                     })
                   }
                 >
-                  Print website QR poster
-                </button>
-                <button
-                  disabled={busy}
-                  onClick={() =>
-                    void run(async () => {
-                      const card = await QrAdminApi.websitePrintData(scope!).then(withLogo);
-                      await downloadCardPng(card, data.restaurantName + '-' + (selectedBranch?.name ?? 'branch') + '-website-qr');
-                      setNotice('Website QR poster downloaded.');
-                    })
-                  }
-                >
-                  Download QR poster PNG
+                  Design & print Restaurant Page QR
                 </button>
                 <small>
                   A distinct poster QR for your door, counter or table tents — scanning it opens this business page, never the table-ordering menu codes.
@@ -923,6 +900,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
               </div>
             )}
             {scope === 'restaurant' && data.published?.enabled && !locked && <BranchPageLinks data={data} />}
+            {scope==='restaurant'&&!locked&&onNavigate&&<button type="button" onClick={()=>onNavigate('WEBSITE_QR',data.branches[0]?.id||'')}>Design & print Restaurant Page QR</button>}
             {data.sharePath && !data.shareUrl && (
               <p role="status">The public website address must be configured by your platform administrator before sharing this page.</p>
             )}

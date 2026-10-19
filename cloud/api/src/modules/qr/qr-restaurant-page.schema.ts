@@ -13,16 +13,52 @@ const https = (hosts?: string[]) =>
 // Image values stored here are server-created content hashes, never arbitrary remote fetch targets.
 const image = z.string().regex(/^(?:|img:[a-f0-9]{64})$/);
 const timestamp = z.union([z.literal(''), z.string().datetime({ offset: true })]);
-const clock=z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/);
-const intervals=z.array(z.object({start:clock,end:clock}).strict()).max(4).refine(rows=>rows.every(row=>row.start!==row.end),'Opening and closing times must differ').refine(rows=>{
-  const spans=rows.map(row=>{const start=Number(row.start.slice(0,2))*60+Number(row.start.slice(3));let end=Number(row.end.slice(0,2))*60+Number(row.end.slice(3));if(end<start)end+=1440;return {start,end};}).sort((a,b)=>a.start-b.start);
-  return spans.every((span,index)=>index===0||span.start>=spans[index-1].end);
-},'Hours must not overlap');
-export const restaurantBusinessHoursSchema=z.object({
-  timezone:text(80).refine(value=>{try{new Intl.DateTimeFormat('en',{timeZone:value}).format();return true;}catch{return false;}},'Choose a valid IANA timezone'),
-  weekly:z.array(z.object({day:z.number().int().min(0).max(6),intervals}).strict()).length(7).refine(rows=>new Set(rows.map(row=>row.day)).size===7,'Choose each weekday once'),
-  exceptions:z.array(z.object({date:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value=>!Number.isNaN(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value,'Use a valid calendar date'),intervals}).strict()).max(40).refine(rows=>new Set(rows.map(row=>row.date)).size===rows.length,'Choose each exception date once')
-}).strict();
+const clock = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/);
+const intervals = z
+  .array(z.object({ start: clock, end: clock }).strict())
+  .max(4)
+  .refine((rows) => rows.every((row) => row.start !== row.end), 'Opening and closing times must differ')
+  .refine((rows) => {
+    const spans = rows
+      .map((row) => {
+        const start = Number(row.start.slice(0, 2)) * 60 + Number(row.start.slice(3));
+        let end = Number(row.end.slice(0, 2)) * 60 + Number(row.end.slice(3));
+        if (end < start) end += 1440;
+        return { start, end };
+      })
+      .sort((a, b) => a.start - b.start);
+    return spans.every((span, index) => index === 0 || span.start >= spans[index - 1].end);
+  }, 'Hours must not overlap');
+export const restaurantBusinessHoursSchema = z
+  .object({
+    timezone: text(80).refine((value) => {
+      try {
+        new Intl.DateTimeFormat('en', { timeZone: value }).format();
+        return true;
+      } catch {
+        return false;
+      }
+    }, 'Choose a valid IANA timezone'),
+    weekly: z
+      .array(z.object({ day: z.number().int().min(0).max(6), intervals }).strict())
+      .length(7)
+      .refine((rows) => new Set(rows.map((row) => row.day)).size === 7, 'Choose each weekday once'),
+    exceptions: z
+      .array(
+        z
+          .object({
+            date: z
+              .string()
+              .regex(/^\d{4}-\d{2}-\d{2}$/)
+              .refine((value) => !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value, 'Use a valid calendar date'),
+            intervals
+          })
+          .strict()
+      )
+      .max(40)
+      .refine((rows) => new Set(rows.map((row) => row.date)).size === rows.length, 'Choose each exception date once')
+  })
+  .strict();
 const translation = z
   .object({
     title: text(100).optional(),
@@ -37,7 +73,10 @@ const translation = z
 export const restaurantPageSchema = z
   .object({
     businessHours: restaurantBusinessHoursSchema.nullable().default(null),
-    seo:z.object({title:text(80),description:text(180),imageUrl:image}).strict().default({title:'',description:'',imageUrl:''}),
+    seo: z
+      .object({ title: text(80), description: text(180), imageUrl: image })
+      .strict()
+      .default({ title: '', description: '', imageUrl: '' }),
     translations: z.record(z.enum(['en', 'hi', 'gu', 'mr', 'ta', 'te', 'kn', 'bn']), translation).default({}),
     defaultLanguage: z.enum(['en', 'hi', 'gu', 'mr', 'ta', 'te', 'kn', 'bn']).default('en'),
     noticeStart: timestamp.default(''),
@@ -81,6 +120,17 @@ export const restaurantPageSchema = z
   .refine((v) => new Set(v.sections).size === v.sections.length, 'Choose each section once')
   .refine((v) => new Set(v.featuredItemIds).size === v.featuredItemIds.length, 'Choose each featured dish once');
 export type RestaurantPageInput = z.infer<typeof restaurantPageSchema>;
+export const websiteQrPrintDesignSchema = z
+  .object({
+    template: z.enum(['website', 'website-minimal', 'website-cafe']),
+    accent: z.string().regex(/^#[0-9a-f]{6}$/i),
+    instruction: text(48).min(1),
+    footer: text(100),
+    showLogo: z.boolean(),
+    layout: z.enum(['CARD', 'TENT', 'LABEL'])
+  })
+  .strict();
+export type WebsiteQrPrintDesign = z.infer<typeof websiteQrPrintDesignSchema>;
 export const pageCopySchema = z
   .object({
     version: z.number().int().nonnegative(),

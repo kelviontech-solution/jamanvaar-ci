@@ -9,13 +9,13 @@ import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { parseInlineImage, publicImageUrl } from '../menu-publications/menu-snapshot';
 import { QrMenuService } from './qr-menu.service';
 import { QrSettingsService } from './qr-settings.service';
-import { restaurantPageSchema, RestaurantPageInput, PageCopyInput } from './qr-restaurant-page.schema';
+import { restaurantPageSchema, RestaurantPageInput, PageCopyInput, websiteQrPrintDesignSchema, WebsiteQrPrintDesign } from './qr-restaurant-page.schema';
 import { ConfigService } from '@nestjs/config';
 import { restaurantPageHead } from './qr-page-metadata';
 const DRAFT = 'QR_RESTAURANT_PAGE',
   PUBLIC = 'QR_PAGE_PUBLIC',
   HISTORY = 'QR_PAGE_HISTORY',
-  LINK = 'QR_PAGE_LINK';
+  LINK = 'QR_PAGE_LINK', PRINT_DESIGN = 'QR_PAGE_PRINT_DESIGN';
 type Scope = { restaurantId: string; key: string; branchId: string | null; actorId: string };
 const empty: RestaurantPageInput = {
   businessHours:null,
@@ -214,6 +214,33 @@ export class QrRestaurantPageService {
    * `editor` above), so the caller must pick the actual branch, the same choice the editor's own branch
    * picker already makes them take before sharing a link.
    */
+  private async websiteDesign(tx:Prisma.TransactionClient,rid:string,key:string,accent='#0B253A') {
+    const row=await tx.syncedEntity.findUnique({where:this.where(rid,PRINT_DESIGN,key)});
+    const design=websiteQrPrintDesignSchema.parse((row?.payload as any)?.design??{template:'website',accent,instruction:'Scan to visit our restaurant',footer:'Menu · Story · Contact',showLogo:true,layout:'CARD'});
+    return {version:row?.syncVersion??0,design};
+  }
+  async printDesign(user:User,key:string) {
+    if(key==='restaurant')throw new BadRequestException('Choose the branch whose restaurant page QR you want to design.');
+    const s=await this.scope(user,key);
+    return this.prisma.runAsTenant(s.restaurantId,async tx=>{
+      await this.access.assertQrCapability(tx,s.restaurantId,'QR_RESTAURANT_PAGE',s.branchId);
+      const page=await this.content(tx,s.restaurantId,key);
+      return this.websiteDesign(tx,s.restaurantId,key,page.content?.accent);
+    });
+  }
+  async savePrintDesign(user:User,key:string,version:number,input:WebsiteQrPrintDesign) {
+    if(key==='restaurant')throw new BadRequestException('Choose a branch before saving its restaurant page QR design.');
+    const s=await this.scope(user,key),design=websiteQrPrintDesignSchema.parse(input);
+    return this.prisma.runAsTenant(s.restaurantId,async tx=>{
+      await this.lock(tx,s.restaurantId);
+      await this.access.assertQrCapability(tx,s.restaurantId,'QR_RESTAURANT_PAGE',s.branchId);
+      const current=await tx.syncedEntity.findUnique({where:this.where(s.restaurantId,PRINT_DESIGN,key)});
+      if((current?.syncVersion??0)!==version)throw new ConflictException('This QR design changed. Reload before saving.');
+      const row=await tx.syncedEntity.upsert({where:this.where(s.restaurantId,PRINT_DESIGN,key),create:{restaurantId:s.restaurantId,entityType:PRINT_DESIGN,externalId:key,payload:{design}},update:{payload:{design},syncVersion:{increment:1}}});
+      await this.log(tx,s,'QR_PAGE_PRINT_DESIGN_UPDATED');
+      return {version:row.syncVersion,design};
+    });
+  }
   async printData(user: User, key: string) {
     if (key === 'restaurant') throw new BadRequestException('Choose a specific branch to generate its website QR poster.');
     const s = await this.scope(user, key);
@@ -229,14 +256,15 @@ export class QrRestaurantPageService {
       const branch = await tx.branch.findFirst({ where: { id: s.branchId!, restaurantId: s.restaurantId }, select: { name: true } });
       const branding = await this.settings.branding(s.restaurantId);
       const accent = /^#[0-9a-f]{6}$/i.test(published.content.accent) ? published.content.accent : '#0B253A';
+      const configured=await this.websiteDesign(tx,s.restaurantId,key,accent);
       return {
         restaurantName: restaurant.name,
         branchName: branch?.name ?? null,
         tableLabel: 'VISIT OUR WEBSITE',
         url,
         tagline: published.content.tagline || 'Menu · Story · Contact',
-        logoUrl: branding.logoUrl,
-        design: { template: 'website' as const, accent, instruction: 'Scan to visit our website', footer: 'Served with JAMANVAAR', showLogo: true, layout: 'CARD' as const }
+        logoUrl: publicImageUrl(published.content.logoUrl)||branding.logoUrl,
+        design: configured.design
       };
     });
   }
