@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import { Button } from '../../components/ui';
+import { CopyButton } from '../../components/CopyButton';
 
 interface IssuedCertificateResponse {
   payload: string;
@@ -18,12 +19,10 @@ export function LicenseCertificatePanel({ restaurantId }: { restaurantId: string
   const [certificate, setCertificate] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   async function handleGenerate() {
     setBusy(true);
     setError(null);
-    setCopied(false);
     try {
       const result = await api.get<IssuedCertificateResponse>(`/api/v1/restaurants/${restaurantId}/license-certificate`);
       setCertificate(`${result.payload}.${result.signature}`);
@@ -32,18 +31,6 @@ export function LicenseCertificatePanel({ restaurantId }: { restaurantId: string
       setCertificate(null);
     } finally {
       setBusy(false);
-    }
-  }
-
-  async function handleCopy() {
-    if (!certificate) return;
-    try {
-      await navigator.clipboard.writeText(certificate);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard API can be unavailable (permissions, non-secure context) — the
-      // certificate is still selectable/copyable manually from the textarea below.
     }
   }
 
@@ -76,9 +63,7 @@ export function LicenseCertificatePanel({ restaurantId }: { restaurantId: string
             onFocus={(e) => e.currentTarget.select()}
           />
           <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Button variant="ghost" onClick={handleCopy}>
-              {copied ? 'Copied ✓' : 'Copy Certificate'}
-            </Button>
+            <CopyButton text={certificate} label="Copy Certificate" />
             <span style={{ fontSize: 12, color: '#8b93a0' }}>
               Reflects this restaurant's plan at the moment it was generated — regenerate after any plan change.
             </span>

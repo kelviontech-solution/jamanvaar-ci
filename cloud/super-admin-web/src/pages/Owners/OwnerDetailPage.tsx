@@ -1,3 +1,4 @@
+import { CopyButton } from '../../components/CopyButton';
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
 import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,8 +23,6 @@ import {
   FileText,
   Activity,
   AlertTriangle,
-  Copy,
-  Check,
   ChevronRight,
   ArrowRight,
   MapPin,
@@ -53,7 +52,6 @@ export function OwnerDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('overview');
-  const [copiedId, setCopiedId] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   // Tab data
@@ -136,12 +134,6 @@ export function OwnerDetailPage() {
     }
   }
 
-  async function handleCopyId() {
-    if (!owner) return;
-    if (!(await copyText(owner.id))) return;
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
-  }
 
   if (loading) {
     return (
@@ -213,13 +205,7 @@ export function OwnerDetailPage() {
                     {owner.phone}
                   </span>
                 )}
-                <button
-                  type="button"
-                  onClick={handleCopyId}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontFamily: 'monospace', background: 'var(--jv-bg-muted)', border: '1px solid var(--jv-border)', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', color: 'var(--jv-text-secondary)' }}
-                >
-                  {copiedId ? <><Check className="w-3 h-3 text-emerald-500" /> Copied</> : <><Copy className="w-3 h-3" /> {owner.id.slice(0, 8)}…</>}
-                </button>
+                <CopyButton text={owner.id} label={owner.id.slice(0, 8) + '...'} title="Copy owner ID" />
               </div>
             </div>
           </div>

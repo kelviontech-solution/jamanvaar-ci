@@ -1,0 +1,31 @@
+[
+  {
+    "width": 1440,
+    "nativeClipboardReadback": true,
+    "restaurantIdCopied": true,
+    "summaryCopied": true,
+    "allSharedVariants": true,
+    "tickAndAnimation": true,
+    "noCopyServerRequest": true,
+    "noCardNavigation": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "nativeClipboardReadback": true,
+    "restaurantIdCopied": true,
+    "summaryCopied": true,
+    "allSharedVariants": true,
+    "tickAndAnimation": true,
+    "noCopyServerRequest": true,
+    "noCardNavigation": true,
+    "overflow": false
+  },
+  {
+    "missingClipboardApiFallback": true
+  },
+  {
+    "blockedClipboardManualFallback": true,
+    "noFalseSuccess": true
+  }
+]

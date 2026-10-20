@@ -42,7 +42,8 @@ describe('Actionable setup routing',()=>{
 describe('Plan transparency',()=>{
   it('lists actual default products and limits rather than promising everything for PRO',async()=>{
     await render(<PlanReview plan={{id:'p',name:'Only kiosk',tier:'PRO',defaultApps:['KIOSK'],maxBranches:2,maxDevices:3,maxUsers:4,entitlements:{selfOrderKiosk:true}} as any}/>);
-    expect(host.textContent).toContain('2 branches');expect(host.textContent).toContain('3 devices');expect(host.textContent).toContain('Kiosk');expect(host.textContent).not.toContain('immediately unlocked');
+    const limits=Object.fromEntries([...host.querySelectorAll('.plan-access-limits>div')].map(row=>[row.querySelector('dt')?.textContent,row.querySelector('dd')?.textContent]));
+    expect(limits).toEqual({Branches:'2',Devices:'3','Staff accounts':'4'});expect(host.textContent).toContain('Kiosk');expect(host.textContent).not.toContain('immediately unlocked');
   });
 });
 

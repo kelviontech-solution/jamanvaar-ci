@@ -1,10 +1,11 @@
+import {OrderReceipt} from './OrderReceipt';
 import {RestaurantPage,RestaurantContactFooter} from '../../../packages/ui/src/restaurant-page/RestaurantPage';
 import type {RestaurantPageView,RestaurantPageDish,PageEngagementAction} from '../../../packages/ui/src/restaurant-page/types';
 import { translatedPage } from '../../../packages/ui/src/restaurant-page/page-content';
 import type { ComponentProps } from 'react';
 import {ServiceRequests,PickupSelector} from './Operations';
 import { accentInk, accentText } from './brandContrast';
-import { printElement } from '../../../packages/ui/src/printElement';
+import {readGuestSession,saveGuestSession} from './guestSession';
 import { shouldRefreshGuestOrder } from './paymentProgress';
 import { LoyaltyPanel } from './LoyaltyPanel';
 import { GroupOrder } from './GroupOrder';
@@ -66,7 +67,7 @@ function tokenFromPath(): string | null {
   return m ? m[1] : null;
 }
 
-// The session is issued and signed by the server (once per browser tab); a made-up one would simply be ignored.
+// The session is issued and signed by the server (once per browser); a made-up one would simply be ignored.
 let sessionId = '';
 // The menu version this guest is looking at; sent with the order so a menu published meanwhile is never charged silently.
 let seenMenuVersion: number | undefined;
@@ -75,10 +76,10 @@ async function ensureSession(): Promise<string> {
   if (sessionId) return sessionId;
   if (sessionRequest) return sessionRequest;
   sessionRequest = (async () => {
-    try { sessionId = sessionStorage.getItem('jv_qr_session2') ?? ''; } catch { /* storage unavailable */ }
+    sessionId = readGuestSession();
     if (!sessionId) {
       sessionId = (await QrApi.session()).session;
-      try { sessionStorage.setItem('jv_qr_session2', sessionId); } catch { /* storage unavailable */ }
+      saveGuestSession(sessionId);
     }
     return sessionId;
   })().finally(() => { sessionRequest = null; });
@@ -146,7 +147,7 @@ function Ordering({ token }: { token: string }) {
   const [menu, setMenu] = useState<Menu | null>(null);
   const [problem, setProblem] = useState<{ title: string; text: string; retry: boolean } | null>(null);
   const [screen, setScreen] = useState<Screen>(currentScreen);
-  const navigate = (target: Screen) => { const url=new URL(location.href); if(target!=='STATUS')url.searchParams.delete('order');url.hash=target.toLowerCase();history.pushState({},'',url);setScreen(target); };
+  const navigate = (target: Screen) => { const url=new URL(location.href); if(target!=='STATUS')url.searchParams.delete('order');else{const id=store.get(`jv_qr_last:${token}`);if(id)url.searchParams.set('order',id);}url.hash=target.toLowerCase();history.pushState({},'',url);setScreen(target); };
   useEffect(()=>{if(info&&screen==='HOME'&&!info.restaurantPage)navigate('MENU');},[info,screen]);
   useEffect(()=>{const restore=()=>setScreen(currentScreen());window.addEventListener('popstate',restore);return()=>window.removeEventListener('popstate',restore);},[]);
   const [cart, setCart] = useState<Cart>(() => parseCart(store.get(`jv_qr_cart:${token}`)));
@@ -207,8 +208,9 @@ function Ordering({ token }: { token: string }) {
     const last = returned || store.get(`jv_qr_last:${token}`);
     let active = true;
     if(returned){restoredActive.current=true;setScreen('STATUS');}
-    if (last) QrApi.status(last).then((p) => { if(!active)return;setPlaced(p);setRestoreError(null);store.set(`jv_qr_last:${token}`,p.publicOrderId);if (returned || location.hash==='#status' || (p.status !== 'COMPLETED' && p.status !== 'CANCELLED' && !location.hash)){restoredActive.current=true;setScreen('STATUS');} })
-      .catch((error:ApiError) => { if(!active)return;if(error.status===404)store.del(`jv_qr_last:${token}`);setRestoreError(error.message); });
+    if(!last&&location.hash==='#status')setRestoreError('This link does not contain an order reference. Ask the restaurant to help locate your bill.');
+    if (last) ensureSession().then(() => QrApi.status(last)).then((p) => { if(!active)return;setPlaced(p);setRestoreError(null);store.set(`jv_qr_last:${token}`,p.publicOrderId);if (returned || location.hash==='#status' || (p.status !== 'COMPLETED' && p.status !== 'CANCELLED' && !location.hash)){restoredActive.current=true;setScreen('STATUS');} })
+      .catch((error:ApiError) => { if(!active)return;setRestoreError(error.message); });
     return()=>{active=false;};
   }, [token,restoreAttempt]);
 
@@ -288,7 +290,8 @@ function Ordering({ token }: { token: string }) {
       )}
       {screen === 'STATUS' && placed && <StatusScreen placed={placed} setPlaced={setPlaced} showStatus={info.ordering.settings.showOrderStatus} onMore={() => navigate('MENU')} />}
       {screen==='STATUS'&&placed?.status==='COMPLETED'&&info.advanced?.feedbackEnabled&&<OrderFeedback key={placed.publicOrderId} order={placed}/>}
-      {screen === 'STATUS' && !placed && <Message title={restoreError?"Could not restore your order":"Checking your order"} text={restoreError?`${restoreError} If you placed this order in a different tab, browser or device, please reopen it there — a fresh tab here can't prove it's yours. Otherwise, ask a team member for help.`:"Please wait while we restore the order status."} action={restoreError?{label:'Check again',run:()=>setRestoreAttempt(a=>a+1)}:{label:'Back to menu',run:()=>navigate('MENU')}} />}
+      {screen === 'STATUS' && !placed && <Message title={restoreError?"Could not restore your order":"Checking your order"} text={restoreError?`${restoreError} Reopen it in the browser where you ordered. Private browsing, cleared browser data or a different device may require help from the restaurant.`:"Please wait while we restore the order status."} action={restoreError?{label:'Check again',run:()=>setRestoreAttempt(a=>a+1)}:{label:'Back to menu',run:()=>navigate('MENU')}} />}
+      {screen === 'STATUS' && !placed && restoreError && <button className="primary restore-order-more" onClick={() => navigate('MENU')}>Order more for this table</button>}
       {restaurantPage&&<RestaurantContactFooter content={translatedPage(restaurantPage.content,store.get('jv_qr_language')||restaurantPage.content.defaultLanguage||'en')} branchName={info.branch.name} onAction={action=>recordPageAction(restaurantPage,action)}/>}
       {!restaurantPage&&effectiveBrand?.contactMessage&&<p className="muted pad">{effectiveBrand.contactMessage}</p>}{!restaurantPage&&effectiveBrand?.footerMessage && <footer className="muted pad" style={{ textAlign: 'center' }}>{effectiveBrand.footerMessage}</footer>}
       {!restaurantPage&&<footer className="brand-footer">Thoughtfully served with <strong>Jamanvaar</strong><span>by Kelviontech</span></footer>}
@@ -705,14 +708,7 @@ export function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed
       </>}
       {error&&<p role="alert" className="warn">{error}<button className="link" onClick={()=>void refresh()}>Check again</button></p>}
       {placed.balance&&<p className="muted" role="status">Collected: {inr(placed.balance.collectedPaise/100)} · Remaining: {inr(placed.balance.outstandingPaise/100)}{placed.balance.refundedPaise>0?` · Refunded: ${inr(placed.balance.refundedPaise/100)}`:''}</p>}
-      <details className="receipt" id="qr-order-receipt"><summary>Order details / receipt</summary>
-        <p><b>{placed.restaurantName}</b>{placed.branchName && ` · ${placed.branchName}`}</p>
-        <p>{new Date(placed.placedAt).toLocaleString()}</p>
-        <ul className="lines">{placed.items?.map((item,i)=><li key={i}><div className="grow"><b>{item.name} × {item.quantity}</b><p className="idesc">{item.options.join(', ')} {item.note}</p></div><span>{inr(item.lineTotal)}</span></li>)}</ul>
-        <dl className="totals"><div><dt>Subtotal</dt><dd>{inr(placed.subtotal??0)}</dd></div><div><dt>Tax</dt><dd>{inr(placed.tax??0)}</dd></div><div><dt>Discount</dt><dd>{inr(placed.discount??0)}</dd></div><div className="grand"><dt>Total</dt><dd>{inr(placed.total)}</dd></div></dl>
-        <p className="receipt-payment-status">{placed.status === 'CANCELLED' ? 'Order cancelled' : placed.paymentStatus === 'SUCCESS' || (placed.balance ? placed.balance.outstandingPaise <= 0 : false) ? 'Payment received' : placed.paymentMethod === 'ONLINE' ? 'Online payment pending verification' : 'Payment due at counter'} · Reference {placed.publicOrderId}</p>
-        {placed.paymentStatus==='SUCCESS'&&<button className="link no-print" onClick={()=>printElement('#qr-order-receipt', { title: `${placed.restaurantName} - ${placed.orderNumber || placed.publicOrderId}`, margin: '12mm' })}>Print / save receipt</button>}
-      </details>
+      <OrderReceipt order={placed}/>
       <button className="primary" onClick={onMore}>Order more</button>
     </section>
   );

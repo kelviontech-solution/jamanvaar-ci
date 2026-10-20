@@ -54,6 +54,9 @@ export class BrandingService {
     const rows = await this.prisma.platformDb.platformSetting.findMany({ where: { key: { in: ['platform.branding', 'platform.billing'] } } });
     const stored = (key: string) => (rows.find((r) => r.key === key)?.value as Record<string, string> | undefined) ?? {};
     const branding = { ...SETTING_DEFAULTS['platform.branding'], ...stored('platform.branding') } as unknown as PlatformBranding;
+    // Repair the old shipped placeholder while preserving custom support contacts.
+    if (['support@jamanvaar.app', 'support@kelviontech.in'].includes(branding.supportEmail?.trim().toLowerCase())) branding.supportEmail = 'kelviontech@gmail.com';
+    if (branding.supportPhone?.replace(/\D/g, '') === '919876543210') branding.supportPhone = '';
     const billing = { ...SETTING_DEFAULTS['platform.billing'], ...stored('platform.billing') } as Record<string, string>;
     const seller: SellerEntity = {
       name: billing.tradeName,

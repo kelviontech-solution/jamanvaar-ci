@@ -1,156 +1,84 @@
-import React, { useState } from 'react';
-import { AlertCircle, CheckCircle2, KeyRound } from 'lucide-react';
-import { CloudApiError, cloudRequestPasswordResetOwner, cloudResetPasswordOwner, cloudRecoverRestaurantId } from '../../cloud/cloudClient';
+import { useState, type FormEvent } from 'react';
+import { cloudRecoverRestaurantId } from '../../cloud/cloudClient';
+import { OwnerPasswordRecovery } from './OwnerPasswordRecovery';
 
 interface Props {
   defaultRestaurantCode?: string;
   onBack: () => void;
-  /** Opens the first-time activation screen, for an owner who has not set a password yet. */
   onActivate: () => void;
-  /** Called after the password was changed; the sign-in screen can say so. */
   onDone: () => void;
 }
-
-/**
- * "Forgot password" for the restaurant owner (spec section 34): enter the Restaurant ID, get a
- * 6-digit code emailed to the owner's recovery address (shown masked), enter the code with a
- * new password. The code expires in 15 minutes and works once.
- */
-export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '', onBack, onActivate, onDone }) => {
-  const [step, setStep] = useState<'RESTAURANT_ID' | 'CODE'>('RESTAURANT_ID');
-  const [restaurantCode, setRestaurantCode] = useState(defaultRestaurantCode);
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [maskedEmail, setMaskedEmail] = useState('');
-  const [discovery, setDiscovery] = useState(false); const [recoveryEmail, setRecoveryEmail] = useState(''); const [recoverySent, setRecoverySent] = useState(false);
-
-  const fail = (err: unknown, fallback: string) => setError(err instanceof CloudApiError ? err.message : fallback);
-  const inputClass = 'w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors';
-
-  const sendCode = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    setError('');
+export function ForgotPasswordPanel({ defaultRestaurantCode, onBack, onActivate, onDone }: Props) {
+  const [discovery, setDiscovery] = useState(false),
+    [email, setEmail] = useState('');
+  const [sent, setSent] = useState(false),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false);
+  async function recoverId(event: FormEvent) {
+    event.preventDefault();
     setBusy(true);
+    setError('');
     try {
-      const { maskedEmail: masked, activationRequired } = await cloudRequestPasswordResetOwner(restaurantCode.trim());
-      if (activationRequired) {
-        setError('This account is not activated yet. Activate it first with the invitation token from your welcome email.');
-        return;
-      }
-      setMaskedEmail(masked);
-      setStep('CODE');
+      await cloudRecoverRestaurantId(email);
+      setSent(true);
     } catch (err) {
-      fail(err, 'Could not send the code. Check your Restaurant ID and try again.');
+      setError(err instanceof Error ? err.message : 'Could not request recovery. Please try again.');
     } finally {
       setBusy(false);
     }
-  };
-
-  const submitReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    if (newPassword.length < 8) return setError('Choose a password of at least 8 characters.');
-    if (newPassword !== confirm) return setError('The two passwords do not match.');
-    setBusy(true);
-    try {
-      await cloudResetPasswordOwner(restaurantCode.trim(), otp.trim(), newPassword);
-      onDone();
-    } catch (err) {
-      fail(err, 'Could not reset the password. Check the code and try again.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
+  }
   return (
-    <div className="space-y-4 pt-1">
-      <div className="text-center space-y-1">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold">
-          <KeyRound className="w-3.5 h-3.5 text-amber-600" />
-          <span>FORGOT PASSWORD</span>
-        </div>
-        <h3 className="text-base font-bold text-jaman-navy pt-1">Reset your password</h3>
-        <p className="text-xs text-slate-500 max-w-xs mx-auto">
-          {step === 'RESTAURANT_ID' ? "Enter your Restaurant ID. We'll email a 6-digit code to your recovery email." : 'Enter the code from your email and choose a new password.'}
-        </p>
-      </div>
-
-      {discovery ? <form className="space-y-3" onSubmit={async event => {
-        event.preventDefault(); setBusy(true); setError('');
-        try { await cloudRecoverRestaurantId(recoveryEmail); setRecoverySent(true); }
-        catch (error) { fail(error, 'Could not request recovery. Please try again.'); }
-        finally { setBusy(false); }
-      }}>
-        <label htmlFor="restaurant-id-recovery-email" className="text-xs font-bold">Registered owner email</label>
-        <input id="restaurant-id-recovery-email" type="email" required value={recoveryEmail} onChange={event => setRecoveryEmail(event.target.value)} className={inputClass} autoComplete="email"/>
-        <p className="text-xs text-slate-500">Restaurant IDs are sent only to the registered owner email. No activation keys or passwords are disclosed.</p>
-        {recoverySent && <p role="status" className="text-sm text-emerald-800">If this email owns an active restaurant, its Restaurant IDs have been emailed. Check your inbox and spam folder.</p>}
-        {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
-        <button type="submit" disabled={busy} className="min-h-11 w-full rounded-xl bg-jaman-saffron text-white font-bold">{busy ? 'Sending…' : 'Email my Restaurant IDs'}</button>
-        <button type="button" onClick={() => {setDiscovery(false); setError('');}} className="min-h-11 w-full font-bold">I have my Restaurant ID</button>
-      </form> : step === 'RESTAURANT_ID' ? (
-        <form onSubmit={sendCode} className="space-y-3">
-          <div>
-            <label htmlFor="forgot-restaurant-id" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Restaurant ID *</label>
-            <input id="forgot-restaurant-id" type="text" value={restaurantCode} onChange={(e) => { setRestaurantCode(e.target.value); setError(''); }} placeholder="e.g. JM9876543210" autoFocus required className={`${inputClass} font-mono`} />
-          </div>
-          {error && error.includes('not activated yet') && (
-            <button type="button" onClick={onActivate} className="w-full py-2.5 rounded-2xl bg-jaman-navy text-white text-xs font-bold cursor-pointer">
-              Activate account
+    <div className="owner-recovery">
+      {discovery ? (
+        <>
+          <h2>Find your Restaurant ID</h2>
+          <form onSubmit={recoverId}>
+            <label>
+              Registered owner email
+              <input type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+            </label>
+            <p>Restaurant IDs are sent only to the registered owner email. No passwords or activation keys are disclosed.</p>
+            {sent && (
+              <p role="status">If this email owns an active restaurant, its Restaurant IDs have been requested by email. Check your inbox and spam folder.</p>
+            )}
+            {error && (
+              <p role="alert" className="owner-recovery-error">
+                {error}
+              </p>
+            )}
+            <button type="submit" disabled={busy}>
+              {busy ? 'Please wait...' : 'Email my Restaurant IDs'}
             </button>
-          )}
-          {error && (
-            <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-          <button type="submit" disabled={busy || !restaurantCode.trim()} className="w-full py-3.5 rounded-2xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2">
-            {busy ? 'Sending…' : 'Email me a code'}
+          </form>
+          <button
+            type="button"
+            className="owner-recovery-secondary"
+            onClick={() => {
+              setDiscovery(false);
+              setError('');
+            }}
+          >
+            I have my Restaurant ID
           </button>
-          <button type="button" onClick={() => {setDiscovery(true); setError('');}} className="min-h-11 w-full text-brand font-bold text-sm">Forgot your Restaurant ID?</button>
-        </form>
+        </>
       ) : (
-        <form onSubmit={submitReset} className="space-y-3">
-          {maskedEmail && (
-            <div className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl flex items-start gap-1.5" role="status">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-px" />
-              <span>Code sent to {maskedEmail}. It works for 15 minutes.</span>
-            </div>
-          )}
-          <div>
-            <label htmlFor="forgot-6-digit-code" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">6-digit code *</label>
-            <input id="forgot-6-digit-code" type="text" inputMode="numeric" maxLength={6} value={otp} onChange={(e) => { setOtp(e.target.value.replace(/\D/g, '')); setError(''); }} placeholder="123456" autoFocus required className={`${inputClass} text-center font-mono tracking-[0.4em]`} />
-          </div>
-          <div>
-            <label htmlFor="forgot-new-password" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">New password *</label>
-            <input id="forgot-new-password" type="password" value={newPassword} onChange={(e) => { setNewPassword(e.target.value); setError(''); }} placeholder="At least 8 characters" required className={inputClass} />
-          </div>
-          <div>
-            <label htmlFor="forgot-confirm-new-password" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Confirm new password *</label>
-            <input id="forgot-confirm-new-password" type="password" value={confirm} onChange={(e) => { setConfirm(e.target.value); setError(''); }} placeholder="Type it again" required className={inputClass} />
-          </div>
-          {error && (
-            <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-          <button type="submit" disabled={busy || otp.length !== 6} className="w-full py-3.5 rounded-2xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2">
-            {busy ? 'Saving…' : 'Set new password'}
+        <>
+          <OwnerPasswordRecovery defaultRestaurantCode={defaultRestaurantCode} onDone={onDone} onActivate={onActivate} />
+          <button
+            type="button"
+            className="owner-recovery-secondary"
+            onClick={() => {
+              setDiscovery(true);
+              setError('');
+            }}
+          >
+            Forgot your Restaurant ID?
           </button>
-          <button type="button" disabled={busy} onClick={() => void sendCode()} className="w-full py-2 text-center text-xs font-bold text-brand hover:underline cursor-pointer">
-            Send a new code
-          </button>
-        </form>
+        </>
       )}
-
-      <button type="button" onClick={onBack} className="w-full py-2.5 text-center text-xs font-bold text-slate-500 hover:text-jaman-navy transition-colors cursor-pointer">
-        ← Back to Sign In
+      <button type="button" className="owner-recovery-secondary" onClick={onBack}>
+        Back to sign in
       </button>
     </div>
   );
-};
+}

@@ -3,6 +3,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
+import {ApplicationEntitlementsService} from '../src/modules/application-entitlements/application-entitlements.service';
 
 describe('Plan.entitlements keys are DB-driven (Phase 11)', () => {
   let app: INestApplication;
@@ -131,5 +132,15 @@ describe('Plan responses carry computed defaultApps (Phase 11)', () => {
     expect(detail.body.defaultApps).toEqual(kiosk.body.defaultApps);
     const list = await api('get', '/api/v1/plans');
     expect(list.body.every((p: { defaultApps: unknown }) => Array.isArray(p.defaultApps))).toBe(true);
+  });
+  it('returns the exact flag-derived app defaults used by provisioning, including optional QR modules',async()=>{
+    const result=await api('post','/api/v1/plans').send({tier:'CORE',productFamily:'RESTAURANT',name:`TEST defaults with QR ${Date.now()}`,priceMonthly:5000,maxBranches:1,maxDevices:5,maxUsers:10,entitlements:{qrTableOrdering:true}});
+    expect(result.status).toBe(201);planIds.push(result.body.id);
+    expect(result.body.defaultApps).toContain('QR_ORDERING');expect(result.body.defaultApps).toContain('POS_ADMIN');
+    const expected=await prisma.runAsPlatform(tx=>app.get(ApplicationEntitlementsService).appsForPlan(tx,result.body.productFamily,result.body.tier,result.body.entitlements));
+    expect(result.body.defaultApps).toEqual(expected);
+    expect(result.body.featureDefinitions).toEqual(expect.arrayContaining([expect.objectContaining({key:'qrTableOrdering',appCode:'QR_ORDERING'})]));
+    const qr=await api('post','/api/v1/plans').send({tier:'QR',productFamily:'RESTAURANT',name:`TEST defaults QR only ${Date.now()}`,priceMonthly:5000,maxBranches:1,maxDevices:5,maxUsers:10,entitlements:{qrTableOrdering:true}});
+    expect(qr.status).toBe(201);planIds.push(qr.body.id);expect(qr.body.defaultApps).toEqual(['QR_ORDERING']);
   });
 });

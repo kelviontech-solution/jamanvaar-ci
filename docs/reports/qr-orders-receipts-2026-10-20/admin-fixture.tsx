@@ -1,0 +1,10 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {QrReceiptSettings} from '../../../apps/restaurant-system/pos-admin/src/components/qrconsole/QrReceiptSettings';
+import {QrGuestDetails} from '../../../apps/restaurant-system/pos-admin/src/components/qrconsole/QrGuestDetails';
+import '../../../apps/restaurant-system/pos-admin/src/index.css';
+import '../../../apps/restaurant-system/pos-admin/src/qr/workspace.css';
+const design={heading:'Order bill',thankYou:'Thank you!',footer:'',contact:'',accent:'#0b253a',showTaxBreakup:true,showCustomer:true,showNotes:true};
+(window as any).__receiptFixture={settings:{design,version:0,scope:'branch-a'},requests:[]};
+const order={id:'fixture-order',orderNumber:'QR-24',customerName:'Asha Shah',customerPhone:'+919876543210',customerEmail:'asha@example.invalid',notes:'Peanut allergy. Call when ready.',pickupAt:'2026-10-20T13:00:00Z',pickupTimezone:'Asia/Kolkata',pickupInstructions:'Collect from the main counter',sharedGuests:[{label:'Guest 2',lines:[{itemId:'Thali',quantity:1,note:'No chilli'}]}]};
+createRoot(document.getElementById('root')!).render(<main className="qr-admin-app" style={{padding:20,minHeight:'100vh'}}><h1 style={{fontSize:26,fontWeight:750,marginBottom:20}}>QR Admin · receipt verification</h1><QrReceiptSettings/><div style={{maxWidth:620,margin:'24px auto'}}><h2 style={{fontSize:22}}>QR order details</h2><QrGuestDetails order={order as any}/></div></main>);

@@ -1,0 +1,78 @@
+const fs=require('fs'),path=require('path'),assert=require('assert/strict');
+const root=path.resolve(__dirname,'../../..');
+(async()=>{
+  const{createServer,loadConfigFromFile}=await import('vite'),react=(await import('@vitejs/plugin-react')).default;
+  const config=await loadConfigFromFile({command:'serve',mode:'development'},path.join(root,'cloud/super-admin-web/vite.config.ts'));
+  const tailwind=(await import('tailwindcss')).default,autoprefixer=(await import('autoprefixer')).default;
+  const tw=(await import(require('url').pathToFileURL(path.join(root,'cloud/super-admin-web/tailwind.config.js')).href)).default;
+  tw.content=[path.join(root,'cloud/super-admin-web/index.html'),path.join(root,'cloud/super-admin-web/src/**/*.{js,ts,jsx,tsx}'),path.join(root,'packages/ui/src/**/*.{js,ts,jsx,tsx}')];
+  const mock=`export class ApiError extends Error {};
+  async function call(method,url,body){const fixture=window.__onboarding;fixture.calls.push({method,url,body});
+   if(url.includes('/platform/settings'))return [];
+   if(url.startsWith('/api/v1/plans')&&method==='get')return [fixture.plan];
+   if(url==='/api/v1/features')return [{id:'feature-page',code:'QR_RESTAURANT_PAGE',name:'Restaurant landing page',legacyEntitlementKey:'qrRestaurantPage',isActive:true,rolloutPercent:100}];
+   if(url==='/api/v1/restaurants'&&method==='post')return {restaurant:{id:'fixture-restaurant',restaurantCode:'JM1234567890'},owner:{id:'fixture-owner'},activationToken:'fixture-not-a-real-token',emailSent:false};
+   if(url==='/api/v1/subscriptions')return {id:'fixture-subscription'};
+   if(url==='/api/v1/activation-keys')return {id:'fixture-key',code:'FIXTURE-NOT-AN-ACTIVATION-KEY',allowedDeviceType:body.allowedDeviceType};
+   if(url.startsWith('/api/v1/plans/')&&method==='patch')return {...fixture.plan,...body};
+   throw Error('Unexpected isolated request '+method+' '+url);
+  }
+  export const api={get:(url)=>call('get',url),post:(url,body)=>call('post',url,body),patch:(url,body)=>call('patch',url,body)};`;
+  const server=await createServer({root,configFile:false,publicDir:false,resolve:config.config.resolve,plugins:[react(),{name:'isolated-api',enforce:'pre',load(id){if(id.replaceAll('\\','/').endsWith('/super-admin-web/src/api/client.ts'))return mock;}}],css:{postcss:{plugins:[tailwind(tw),autoprefixer()]}},define:{'import.meta.env.VITE_RESTAURANT_ADMIN_URL':JSON.stringify('http://localhost:5176'),'import.meta.env.VITE_QR_ADMIN_URL':JSON.stringify('http://localhost:5176/qr/login')},optimizeDeps:{include:['react','react-dom/client','react-router-dom','qrcode']},server:{host:'127.0.0.1',port:5544,strictPort:true,watch:null,fs:{allow:[root]}}});
+  await server.listen();const{chromium}=require('playwright'),browser=await chromium.launch({channel:'chrome',headless:true}),results=[];
+  const base='https://control.example.test/docs/reports/onboarding-access-2026-10-20/fixture.html';
+  try{
+    for(const width of [1440,390]){
+      console.log('Checking onboarding',width);
+      const context=await browser.newContext({viewport:{width,height:1000}});
+      await context.route('https://control.example.test/**',async route=>{const response=await route.fetch({url:route.request().url().replace('https://control.example.test','http://127.0.0.1:5544')});await route.fulfill({response});});
+      await context.addInitScript(()=>{window.__copied='';Object.defineProperty(navigator,'clipboard',{value:{writeText:async value=>{window.__copied=value;}}});});
+      const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+      await page.goto(base,{waitUntil:'domcontentloaded'});await page.getByRole('button',{name:'Resume Draft',exact:true}).click();
+      const summary=page.getByRole('region',{name:'Selected plan review'});
+      await summary.getByRole('heading',{name:'Included for these products'}).waitFor();
+      assert.equal(await summary.locator('.plan-access-features').getByText('POS Terminal',{exact:true}).count(),0);
+      assert.equal(await summary.locator('.plan-access-features').getByText('Captain App',{exact:true}).count(),0);
+      assert.ok((await summary.locator('.plan-access-features').innerText()).includes('Restaurant website'));
+      await page.screenshot({path:path.join(__dirname,`modules-${width}.png`),fullPage:true});
+      await page.getByRole('button',{name:/Next: Device Provisioning/}).click();
+      await page.getByText('QR Ordering Console',{exact:true}).waitFor();
+      assert.equal(await page.getByText('Main Billing POS',{exact:true}).isVisible(),false);
+      assert.equal(await page.getByText('Restaurant Admin Console',{exact:true}).isVisible(),false);
+      await page.getByRole('button',{name:/Next: Review/}).click();
+      await summary.locator('.plan-access-limits').waitFor();
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+      assert.ok(await summary.locator('.plan-access-features li').first().evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=14));
+      await page.screenshot({path:path.join(__dirname,`review-${width}.png`),fullPage:true});
+      await summary.screenshot({path:path.join(__dirname,`review-features-${width}.png`)});
+      await page.getByRole('button',{name:/Activate Restaurant & Issue Welcome Kit/}).click();
+      await page.getByText('1. QR Admin sign-in details',{exact:true}).waitFor();
+      const kit=page.locator('.welcome-kit-container');
+      const link=kit.getByRole('link',{name:'https://control.example.test/qr/login',exact:true});await link.waitFor();
+      assert.equal(await link.getAttribute('href'),'https://control.example.test/qr/login');
+      assert.equal(/localhost|127\.0\.0\.1/.test(await kit.innerText()),false,'No development URLs in deployed welcome kit');
+      await page.getByRole('button',{name:'Copy WhatsApp / Email Greeting',exact:true}).click();
+      assert.ok(await page.evaluate(()=>window.__copied.includes('https://control.example.test/qr/login')));
+      const calls=await page.evaluate(()=>window.__onboarding.calls);
+      assert.deepEqual(calls.find(row=>row.url==='/api/v1/subscriptions').body.applications,['QR_ORDERING']);
+      assert.equal(calls.filter(row=>row.url==='/api/v1/activation-keys').length,1);
+      assert.equal(calls.find(row=>row.url==='/api/v1/activation-keys').body.allowedDeviceType,'POS_ADMIN');
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+      await page.screenshot({path:path.join(__dirname,`welcome-${width}.png`),fullPage:true});
+      assert.deepEqual(errors,[]);results.push({width,selectedQrFeaturesOnly:true,readableReview:true,deployedQrUrl:true,staleLocalhostOverrideRejected:true,qrOnlySubscription:true,singleManagementKey:true,overflow:false});await context.close();
+    }
+    const context=await browser.newContext({viewport:{width:1440,height:1000}});
+    await context.route('https://control.example.test/**',async route=>{const response=await route.fetch({url:route.request().url().replace('https://control.example.test','http://127.0.0.1:5544')});await route.fulfill({response});});
+    const page=await context.newPage();
+    await page.goto(base+'?mode=editor',{waitUntil:'domcontentloaded'});
+    await page.getByRole('button',{name:'Use QR-only feature set',exact:true}).click();
+    await page.getByRole('button',{name:'Save Changes',exact:true}).click();
+    await page.waitForFunction(()=>window.__onboarding.saved);
+    const saved=await page.evaluate(()=>window.__onboarding.calls.find(row=>row.method==='patch').body.entitlements);
+    for(const key of ['posTerminal','captainApp','restaurantAdmin','inventoryManagement','selfOrderKiosk','offlineBilling','shiftAndCashDrawer'])assert.equal(saved[key],false);
+    for(const key of ['qrTableOrdering','qrRestaurantPage','menuManagement','foodCustomization','tableManagement'])assert.equal(saved[key],true);
+    results.push({planEditorCleanup:true,qrFlagsPreserved:true,unrelatedFlagsCleared:true});
+    await page.screenshot({path:path.join(__dirname,'plan-editor-1440.png'),fullPage:true});await context.close();
+    console.log(JSON.stringify(results,null,2));
+  }finally{fs.writeFileSync(path.join(__dirname,'browser-results.json'),JSON.stringify(results,null,2));await browser.close();await server.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

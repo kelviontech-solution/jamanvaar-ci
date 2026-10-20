@@ -1,5 +1,5 @@
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
-import { copyText } from '../../../../../packages/utils/src/clipboard';
+import { CopyButton } from '../../components/CopyButton';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import { APP_CODE_LABELS, type AppCode, type Branch, type RestaurantListItem } from '../../api/types';
@@ -36,7 +36,6 @@ export function GenerateActivationKeyModal({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [quotaPreview, setQuotaPreview] = useState<{ current: number; quota: number | null; branchCurrent:number; branchQuota:number|null; available:boolean; enabled:boolean; reason:string } | null>(null);
   const [quotaLoading, setQuotaLoading] = useState(false);
   // Reported live: a key generated for an app this restaurant's plan never had enabled was
@@ -122,17 +121,7 @@ export function GenerateActivationKeyModal({
             {['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'].includes(deviceType)&&<a className="btn btn-ghost" href={RESTAURANT_ADMIN_URL} target="_blank" rel="noopener noreferrer">Open admin sign-in</a>}
             <Link className="btn btn-ghost" to={`/restaurants/${restaurantId}?tab=devices${branchId?'&branchId='+encodeURIComponent(branchId):''}`} onClick={onClose}>Check branch connection status</Link>
             <div className="modal-actions">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={async () => {
-                  if (!(await copyText(createdCode))) return;
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
-              >
-                {copied ? 'Copied ✓' : 'Copy Code'}
-              </Button>
+              <CopyButton text={createdCode} label="Copy code" />
               <Button
                 variant="primary"
                 onClick={() => {

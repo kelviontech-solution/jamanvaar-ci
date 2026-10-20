@@ -153,9 +153,12 @@ describe('Owner-only restaurant-code login (Phase 3)', () => {
 
     const statuses: number[] = [];
     for (let i = 0; i < 25; i += 1) {
-      statuses.push(
-        (await request(app.getHttpServer()).post('/api/v1/tenant-auth/login-owner').send({ restaurantCode: floodRestaurantCode, password: `wrong-${i}` })).status
-      );
+      const response = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login-owner').send({ restaurantCode: floodRestaurantCode, password: `wrong-${i}` });
+      statuses.push(response.status);
+      if (response.status === 429) {
+        expect(response.body.message).toBe('Too many attempts. Please wait a minute and try again.');
+        expect(JSON.stringify(response.body)).not.toContain('ThrottlerException');
+      }
     }
     expect(statuses.some((s) => s === 429)).toBe(true);
   }, 30_000);

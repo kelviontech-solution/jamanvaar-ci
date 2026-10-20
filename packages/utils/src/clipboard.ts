@@ -21,14 +21,17 @@ export async function copyText(text: string): Promise<boolean> {
 
 function legacyCopy(text: string): boolean {
   if (typeof document === 'undefined' || !document.body) return false;
-  const area = document.createElement('textarea');
-  area.value = text;
-  area.setAttribute('readonly', '');
-  Object.assign(area.style, { position: 'fixed', top: '0', left: '-9999px', opacity: '0' });
-  // Inside the element that has focus (a dialog or focus-trapped panel can refuse focus to something appended to <body>).
-  const host: HTMLElement = (document.activeElement && document.activeElement.parentElement) || document.body;
-  host.appendChild(area);
+  const focused = document.activeElement as HTMLElement | null;
+  let area: HTMLTextAreaElement | undefined;
+  let host: HTMLElement | undefined;
   try {
+    area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    Object.assign(area.style, { position: 'fixed', top: '0', left: '-9999px', opacity: '0' });
+    // Inside the element that has focus (a dialog or focus-trapped panel can refuse focus to something appended to <body>).
+    host = (document.activeElement && document.activeElement.parentElement) || document.body;
+    host.appendChild(area);
     area.focus();
     area.select();
     area.setSelectionRange?.(0, text.length);
@@ -36,6 +39,17 @@ function legacyCopy(text: string): boolean {
   } catch {
     return false;
   } finally {
-    host.removeChild(area);
+    if (area && host) {
+      try {
+        host.removeChild(area);
+      } catch {
+        /* A dialog may have closed during the fallback. */
+      }
+    }
+    try {
+      focused?.focus({ preventScroll: true });
+    } catch {
+      /* Preserve the copy result if focus was removed. */
+    }
   }
 }

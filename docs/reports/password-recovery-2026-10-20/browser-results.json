@@ -1,0 +1,48 @@
+[
+  {
+    "width": 1440,
+    "experience": "QR Admin",
+    "separateVerification": true,
+    "resendAfter60Seconds": true,
+    "oldCodeRejected": true,
+    "confirmationRequired": true,
+    "completed": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "experience": "Restaurant/Kiosk Admin",
+    "separateVerification": true,
+    "resendAfter60Seconds": true,
+    "oldCodeRejected": true,
+    "confirmationRequired": true,
+    "completed": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "experience": "QR Admin",
+    "separateVerification": true,
+    "resendAfter60Seconds": true,
+    "oldCodeRejected": true,
+    "confirmationRequired": true,
+    "completed": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "experience": "Restaurant/Kiosk Admin",
+    "separateVerification": true,
+    "resendAfter60Seconds": true,
+    "oldCodeRejected": true,
+    "confirmationRequired": true,
+    "completed": true,
+    "overflow": false
+  },
+  {
+    "friendlyThrottle": true
+  },
+  {
+    "expiredCodeCanBeReplaced": true
+  }
+]

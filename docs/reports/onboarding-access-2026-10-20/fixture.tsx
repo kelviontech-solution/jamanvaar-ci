@@ -1,0 +1,12 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {BrowserRouter} from 'react-router-dom';
+import {OnboardRestaurantPage} from '../../../cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage';
+import {PlanFormModal} from '../../../cloud/super-admin-web/src/pages/Plans/PlanFormModal';
+import '../../../cloud/super-admin-web/src/styles.css';
+const flags={qrTableOrdering:true,menuManagement:true,tableManagement:true,foodCustomization:true,qrRestaurantPage:true,posTerminal:true,captainApp:true,restaurantAdmin:true,inventoryManagement:true,selfOrderKiosk:true,advancedCaptainReports:true,offlineBilling:true,shiftAndCashDrawer:true};
+const plan={id:'fixture-qr-plan',name:'QR plan review',tier:'QR',productFamily:'RESTAURANT',status:'ACTIVE',priceMonthly:75000,priceYearly:null,maxBranches:5,maxDevices:20,maxUsers:50,entitlements:flags,defaultApps:['QR_ORDERING']};
+(window as any).__onboarding={plan,calls:[],saved:false};
+const mode=new URLSearchParams(location.search).get('mode');
+if(mode!=='editor')localStorage.setItem('jamanvaar_onboarding_draft_v1',JSON.stringify({step:'modules',details:{name:'River House QR',mobile:'9999999999',legalName:'',gstin:'',fssaiNumber:'',address:'River Road',city:'Ahmedabad',state:'Gujarat',country:'India',restaurantType:'Cafe'},owner:{ownerName:'Fixture Owner',ownerEmail:'owner@example.invalid',ownerPhone:'',passwordMode:'invite'},planForm:{planId:plan.id,status:'ACTIVE',billingCycle:'monthly',durationDays:'30'},modulesForm:{branchName:'Main Dining & Kitchen',branchCode:'MAIN',maxBranches:5,maxDevices:20,applications:['QR_ORDERING'],aiState:'PLAN'},activationForm:{deviceTypes:[],expiryDays:'30'},restaurantId:null,subscriptionId:null,inviteEmailSent:false,savedAt:new Date().toISOString()}));
+createRoot(document.getElementById('root')!).render(<BrowserRouter>{mode==='editor'?<PlanFormModal plan={plan as any} onClose={()=>{}} onSaved={()=>{(window as any).__onboarding.saved=true;}}/>:<div style={{padding:20,maxWidth:1200,margin:'auto'}}><OnboardRestaurantPage/></div>}</BrowserRouter>);

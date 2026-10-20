@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PlanStatus, PlanTier, PlatformUser, Prisma, ProductFamily } from '@prisma/client';
-import { defaultAppsFor } from '../application-entitlements/application-entitlements.service';
+import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CreatePlanDto, UpdatePlanDto } from './dto/plan.dto';
@@ -20,7 +20,8 @@ type TxClient = Prisma.TransactionClient;
 export class PlansService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly access: ApplicationEntitlementsService
   ) {}
 
   /**
@@ -40,12 +41,23 @@ export class PlansService {
           include: { _count: { select: { subscriptions: true } } }
         })
       )
-      .then((plans) => plans.map((p) => this.withDefaultApps(p)));
+      .then((plans) => Promise.all(plans.map((p) => this.withDefaultApps(p))));
   }
 
-  /** Computed at read time from productFamily+tier — never stored. */
-  private withDefaultApps<T extends { productFamily: ProductFamily; tier: PlanTier }>(plan: T) {
-    return { ...plan, defaultApps: defaultAppsFor(plan.productFamily, plan.tier) };
+  /** Use the same flag/catalog resolution as subscription provisioning, never a tier-only guess. */
+  private async withDefaultApps<T extends { productFamily: ProductFamily; tier: PlanTier; entitlements: unknown }>(plan: T) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const defaultApps = await this.access.appsForPlan(tx, plan.productFamily, plan.tier, plan.entitlements);
+      const features = await tx.feature.findMany({
+        where: { legacyEntitlementKey: { not: null } },
+        select: { legacyEntitlementKey: true, name: true, appCode: true }
+      });
+      return {
+        ...plan,
+        defaultApps,
+        featureDefinitions: features.map((feature) => ({ key: feature.legacyEntitlementKey!, name: feature.name, appCode: feature.appCode }))
+      };
+    });
   }
 
   async getById(id: string) {

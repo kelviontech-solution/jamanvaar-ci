@@ -1,13 +1,13 @@
 import '../../components/shared.css';
 import { RESTAURANT_ADMIN_URL } from '../../lib/appUrls';
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
-import { copyText } from '../../../../../packages/utils/src/clipboard';
+import { CopyButton } from '../../components/CopyButton';
 import { generateSecurePassword } from '../../../../../packages/utils/src/uuid';
 import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { CreateRestaurantInput, RestaurantDetail, ActivationKey, Plan } from '../../api/types';
 import { Button, ModalShell } from '../../components/ui';
-import { Copy, Check, Eye, EyeOff, RefreshCw, KeyRound } from 'lucide-react';
+import { Eye, EyeOff, RefreshCw, KeyRound } from 'lucide-react';
 import './restaurants.css';
 
 // B2-003: was built from Math.random() for every character, including the final shuffle
@@ -40,7 +40,6 @@ export function CreateRestaurantModal({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const [createdResult, setCreatedResult] = useState<{
     restaurant: RestaurantDetail;
@@ -53,11 +52,6 @@ export function CreateRestaurantModal({
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  async function handleCopy(text: string, id: string) {
-    if (!(await copyText(text))) return;
-    setCopiedKey(id);
-    setTimeout(() => setCopiedKey(null), 2500);
-  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -160,10 +154,7 @@ export function CreateRestaurantModal({
                   <span style={{ fontSize: 11, color: 'var(--jv-text-secondary)', fontWeight: 700, textTransform: 'uppercase' }}>Login Email</span>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>{createdResult.ownerEmail}</div>
                 </div>
-                <Button size="sm" variant="ghost" onClick={() => handleCopy(createdResult.ownerEmail, 'email')}>
-                  {copiedKey === 'email' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedKey === 'email' ? 'Copied' : 'Copy'}</span>
-                </Button>
+                <CopyButton text={createdResult.ownerEmail} label="Copy" title="Copy email" />
               </div>
 
               {createdResult.ownerPassword && (
@@ -174,10 +165,7 @@ export function CreateRestaurantModal({
                       {createdResult.ownerPassword}
                     </div>
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => handleCopy(createdResult.ownerPassword!, 'pass')}>
-                    {copiedKey === 'pass' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedKey === 'pass' ? 'Copied' : 'Copy'}</span>
-                  </Button>
+                  <CopyButton text={createdResult.ownerPassword!} label="Copy" title="Copy pass" />
                 </div>
               )}
 
@@ -194,10 +182,7 @@ export function CreateRestaurantModal({
                       {createdResult.activationKey}
                     </div>
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => handleCopy(createdResult.activationKey!, 'key')}>
-                    {copiedKey === 'key' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedKey === 'key' ? 'Copied' : 'Copy'}</span>
-                  </Button>
+                  <CopyButton text={createdResult.activationKey!} label="Copy" title="Copy key" />
                 </div>
               )}
             </div>

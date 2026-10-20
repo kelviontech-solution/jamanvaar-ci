@@ -1,14 +1,83 @@
-import type { Plan } from '../../api/types';
-import { APP_CODE_LABELS, ENTITLEMENT_LABELS } from '../../api/types';
-
-export function PlanReview({ plan, expiresAt }: { plan: Plan; expiresAt?: string }) {
-  const included = Object.entries(plan.entitlements || {}).filter(([, value]) => value === true);
-  return <section aria-label="Selected plan review" style={{ border:'1px solid var(--jv-border)', borderRadius:12, padding:16 }}>
-    <h3>{plan.name}: review access</h3>
-    <p>{plan.maxBranches} branches · {plan.maxDevices} devices · {plan.maxUsers} staff accounts</p>
-    <p>Default products: {plan.defaultApps?.length ? plan.defaultApps.map(code=>APP_CODE_LABELS[code]).join(', ') : 'No default product list returned; review Products & access before issuing codes.'}</p>
-    <p>Included features: {included.length ? included.map(([key]) => ENTITLEMENT_LABELS[key as keyof typeof ENTITLEMENT_LABELS] || key).join(', ') : 'None listed'}</p>
-    {expiresAt && <p>Access expires: {new Date(expiresAt).toLocaleString('en-IN')}</p>}
-    <p>Branch restrictions and existing overrides can further limit access. Confirm effective access and connected devices after saving.</p>
-  </section>;
+import type { AppCode, Plan } from '../../api/types';
+import { Link } from 'react-router-dom';
+import { planFeatureSummary, productNames } from '../../lib/planAccess';
+import './plan-review.css';
+export function PlanReview({
+  plan,
+  expiresAt,
+  applications,
+  compact = false
+}: {
+  plan: Plan;
+  expiresAt?: string;
+  applications?: AppCode[];
+  compact?: boolean;
+}) {
+  const apps = applications ?? plan.defaultApps ?? [],
+    summary = planFeatureSummary(plan, apps);
+  return (
+    <section className={`plan-access-review ${compact ? 'is-compact' : ''}`} aria-label="Selected plan review">
+      <header>
+        <div>
+          <span className="plan-access-eyebrow">{compact ? 'Selected product features' : 'Review products & access'}</span>
+          <h3>{plan.name}</h3>
+        </div>
+        <span className="plan-access-product-count">
+          {apps.length} {apps.length === 1 ? 'product' : 'products'}
+        </span>
+      </header>
+      {!compact && (
+        <dl className="plan-access-limits">
+          <div>
+            <dt>Branches</dt>
+            <dd>{plan.maxBranches}</dd>
+          </div>
+          <div>
+            <dt>Devices</dt>
+            <dd>{plan.maxDevices}</dd>
+          </div>
+          <div>
+            <dt>Staff accounts</dt>
+            <dd>{plan.maxUsers}</dd>
+          </div>
+        </dl>
+      )}
+      <h4>Selected products</h4>
+      <ul className="plan-access-products">
+        {productNames(apps).map((name) => (
+          <li key={name}>{name}</li>
+        ))}
+      </ul>
+      {!apps.length && <p>No products selected. Choose products before provisioning.</p>}
+      <h4>Included for these products</h4>
+      <ul className="plan-access-features">
+        {summary.included.map((feature) => (
+          <li key={feature.key}>
+            <span aria-hidden="true">✓</span>
+            {feature.label}
+          </li>
+        ))}
+      </ul>
+      {!summary.included.length && <p>No enabled feature flags for these products.</p>}
+      {summary.outsideSelection.length > 0 && (
+        <details className="plan-access-warning">
+          <summary>{summary.outsideSelection.length} configured features are outside the selected products</summary>
+          <p>
+            These flags are stored on this plan, but are not shown as included for this onboarding selection. They do not activate an unselected product. Review
+            the plan configuration before assigning it to other restaurants.
+          </p>
+          <ul>
+            {summary.outsideSelection.map((feature) => (
+              <li key={feature.key}>{feature.label}</li>
+            ))}
+          </ul>
+          <Link to={`/plans/${encodeURIComponent(plan.id)}`}>Review plan settings</Link>
+        </details>
+      )}
+      {expiresAt && <p>Access expires: {new Date(expiresAt).toLocaleString('en-IN')}</p>}
+      {!compact && (
+        <p className="plan-access-note">Branch restrictions and restaurant overrides can further limit access. Confirm effective access after saving.</p>
+      )}
+    </section>
+  );
 }

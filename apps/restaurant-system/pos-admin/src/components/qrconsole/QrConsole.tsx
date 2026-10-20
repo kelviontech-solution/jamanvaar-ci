@@ -1,6 +1,8 @@
+import {QrReceiptSettings} from './QrReceiptSettings';
 import {QrRestaurantPage} from './QrRestaurantPage';
 import {QrRestaurantPageQr} from './QrRestaurantPageQr';
 import {OperationsConsole} from '../operations/OperationsConsole';
+import {storedAdminBranch} from '../../adminBranchScope';
 import { QrOnboarding } from './QrOnboarding';
 import { QrAiAssistant } from './QrAiAssistant';
 import { QrPaymentWizard, QrReconciliation, QrPickupCalendar } from './QrWorkflows';
@@ -385,7 +387,8 @@ export function QrConsole({
             <QrSetupHealth navigate={(t) => navigate(t as Tab)} />
           </div>
         )}
-        {tab === 'OPERATIONS' && <OperationsConsole/>}
+        {tab === 'RECEIPTS' && <QrReceiptSettings/>}
+        {tab === 'OPERATIONS' && <OperationsConsole branchId={storedAdminBranch()}/>}
         {tab === "CRM" && <QrCrm />}
         {tab === "SERVICE" && <QrServiceOperations />}
         {tab === "PICKUP" && <QrPickupOperations />}

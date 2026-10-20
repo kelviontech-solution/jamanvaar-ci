@@ -1,0 +1,38 @@
+[
+  {
+    "guestCheckout": true,
+    "submittedContactAndNotes": true,
+    "closeReopenReady": true,
+    "persistedProof": true,
+    "downloadName": "bill-QR-24.pdf",
+    "completedReopen": true,
+    "orderMoreSameTable": true,
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "differentBrowserCannotReadOrder": true,
+    "recoveryCanOrderSameTable": true
+  },
+  {
+    "adminWidth": 390,
+    "livePreview": true,
+    "savedDesign": true,
+    "guestContactLinks": true,
+    "kitchenAndSharedNotes": true,
+    "pdfDownload": true,
+    "overflow": false
+  },
+  {
+    "adminWidth": 1440,
+    "livePreview": true,
+    "savedDesign": true,
+    "guestContactLinks": true,
+    "kitchenAndSharedNotes": true,
+    "pdfDownload": true,
+    "overflow": false
+  },
+  {
+    "missingReferenceHasActionableRecovery": true
+  }
+]

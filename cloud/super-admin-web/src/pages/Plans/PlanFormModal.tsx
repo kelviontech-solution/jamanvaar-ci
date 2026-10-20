@@ -16,6 +16,7 @@ import { Button, ModalShell } from '../../components/ui';
 import '../../components/shared.css';
 import './plans.css';
 import { QrLandingPagePlanSection } from './QrLandingPagePlanSection';
+import { qrOnlyFeatures } from '../../lib/planAccess';
 
 interface FormState {
   productFamily: 'RESTAURANT' | 'KIOSK';
@@ -512,6 +513,21 @@ export function PlanFormModal({
 
           {/* TAB 2: PRICING & DETAILS */}
           {activeSubTab === 'matrix' && <section className="form-field" style={{marginTop:20}}>
+            {form.tier === 'QR' && (
+              <div role="note" style={{ padding: 16, border: '1px solid var(--jv-border)', borderRadius: 12, marginBottom: 16 }}>
+                <h3>Keep this a standalone QR plan</h3>
+                <p className="form-note">
+                  Old plans may contain POS, Captain or Kiosk flags. Clear unrelated features in this draft before saving a QR-only plan.
+                  QR capabilities and shared menu tools stay as configured. Existing restaurant product grants must be reviewed separately.
+                </p>
+                <Button variant="ghost" onClick={() => setForm((current) => ({
+                  ...current,
+                  entitlements: qrOnlyFeatures(current.entitlements) as FormState['entitlements']
+                }))}>
+                  Use QR-only feature set
+                </Button>
+              </div>
+            )}
             <label htmlFor="plan-product-family">Product family</label>
             <select id="plan-product-family" value={form.productFamily} onChange={e => update('productFamily',e.target.value as FormState['productFamily'])}><option value="RESTAURANT">Restaurant / standalone QR</option><option value="KIOSK">Kiosk</option></select>
             <h3>QR module capabilities</h3><p className="form-note">These flags apply to QR inside any plan. Platform feature activation and rollout still control availability.</p>

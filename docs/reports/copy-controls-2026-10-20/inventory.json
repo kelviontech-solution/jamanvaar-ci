@@ -1,0 +1,50 @@
+[
+  {
+    "file": "cloud/super-admin-web/src/pages/ActivationKeys/ActivationKeysListPage.tsx",
+    "copyControls": 1
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/ActivationKeys/GenerateActivationKeyModal.tsx",
+    "copyControls": 1
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Branches/BranchDetailPage.tsx",
+    "copyControls": 1
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+    "copyControls": 9
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Owners/OwnerDetailPage.tsx",
+    "copyControls": 1
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Restaurants/CreateRestaurantModal.tsx",
+    "copyControls": 3
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Restaurants/LicenseCertificatePanel.tsx",
+    "copyControls": 1
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Restaurants/OwnerHandover.tsx",
+    "copyControls": 1
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+    "copyControls": 6
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantsListPage.tsx",
+    "copyControls": 1
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+    "copyControls": 1
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/Team/InviteTeammateModal.tsx",
+    "copyControls": 1
+  }
+]

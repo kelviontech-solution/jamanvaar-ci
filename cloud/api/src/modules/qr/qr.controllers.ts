@@ -58,6 +58,14 @@ export class QrPublicController {
     return this.qr.orderStatus(publicOrderId, undefined, req.qrSession);
   }
 
+  @Get('orders/:publicOrderId/receipt.pdf')
+  async receipt(@Param('publicOrderId') id:string,@Req()req:Request&{qrSession?:string},@Res({passthrough:true})res:Response){
+    const result=await this.qr.receiptPdf(id,req.qrSession);
+    res.setHeader('Cache-Control','private, no-store');res.setHeader('Content-Type','application/pdf');
+    res.setHeader('Content-Disposition',`attachment; filename="${result.filename}"`);
+    return new StreamableFile(result.pdf);
+  }
+
   @Post('orders/:publicOrderId/payment')
   @HttpCode(200)
   retryPayment(@Param('publicOrderId') publicOrderId: string, @Req() req: Request & { qrSession?: string }) {

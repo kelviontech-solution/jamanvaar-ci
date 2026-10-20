@@ -1,3 +1,4 @@
+import {QrGuestDetails} from './QrGuestDetails';
 import { QrOrderTimeline } from './QrWorkflows';
 import { Modal } from '@jamanvaar/ui';
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
@@ -1023,6 +1024,7 @@ export function QrOperationalOrders({ showToast }: Props) {
                   : "Online payment pending"}{" "}
               · <b>{money(o.total)}</b>
             </p>
+            {(o.customerName||o.customerPhone)&&<p className="text-sm mt-2 font-semibold">Guest: {[o.customerName,o.customerPhone].filter(Boolean).join(" / ")}</p>}
             <ul className="text-sm space-y-1 my-3">
               {o.items.slice(0, 3).map((i, n) => (
                 <li key={n}>
@@ -1088,7 +1090,7 @@ export function QrOperationalOrders({ showToast }: Props) {
       <Modal isOpen={!!detail} onClose={()=>setDetail(null)} title="QR order details">{detail && <div>            <h2 className="text-xl font-bold">
               {detail.orderNumber} · {detail.table}
             </h2>
-            <ul className="my-4 space-y-3">
+            <QrGuestDetails order={detail}/><ul className="my-4 space-y-3">
               {detail.items.map((i, n) => (
                 <li key={n}>
                   <b>

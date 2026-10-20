@@ -69,12 +69,20 @@ export const forgotPasswordOwnerSchema = z.object({
 });
 export type ForgotPasswordOwnerDto = z.infer<typeof forgotPasswordOwnerSchema>;
 
+export const verifyPasswordResetOwnerSchema = z.object({
+  restaurantCode: z.string().trim().toUpperCase().optional(),
+  restaurantId: z.string().uuid().optional(),
+  otp: z.string().trim().regex(/^\d{6}$/, 'The code is 6 digits')
+}).refine((v) => Boolean(v.restaurantCode || v.restaurantId), { message: 'Restaurant ID is required', path: ['restaurantCode'] });
+export type VerifyPasswordResetOwnerDto = z.infer<typeof verifyPasswordResetOwnerSchema>;
+
 export const resetPasswordOwnerSchema = z.object({
   restaurantCode: z.string().trim().toUpperCase().optional(),
   restaurantId: z.string().uuid().optional(),
-  otp: z.string().trim().regex(/^\d{6}$/, 'The code is 6 digits'),
+  otp: z.string().trim().regex(/^\d{6}$/, 'The code is 6 digits').optional(),
+  resetToken: z.string().min(32).max(256).optional(),
   newPassword: strongPassword
-}).refine((v) => Boolean(v.restaurantCode || v.restaurantId), {
+}).refine((v) => Boolean(v.otp) !== Boolean(v.resetToken), { message: 'Verify your recovery code before choosing a password', path: ['resetToken'] }).refine((v) => Boolean(v.restaurantCode || v.restaurantId), {
   message: 'Either restaurantCode or restaurantId is required',
   path: ['restaurantCode']
 });

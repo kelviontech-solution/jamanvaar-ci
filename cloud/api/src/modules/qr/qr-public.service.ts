@@ -1,4 +1,5 @@
 import {QrRestaurantPageService} from './qr-restaurant-page.service';
+import {QrReceiptService} from './qr-receipt.service';
 import {assertBranchAccepting,branchServiceState} from '../operations/operations-policy';
 import {QrOperationsService} from './qr-operations.service';
 import { reserveQrDishStock } from '../payments/qr-dish-stock';
@@ -90,7 +91,8 @@ export class QrPublicService {
     private readonly advanced: QrAdvancedService,
     private readonly promotions: QrPromotionsService,
     private readonly loyalty: QrLoyaltyService,
-    private readonly pages: QrRestaurantPageService
+    private readonly pages: QrRestaurantPageService,
+    private readonly receipts: QrReceiptService
   ) {}
 
   // ------------------------------------------------------------------ resolution (spec 13, 14)
@@ -507,6 +509,7 @@ export class QrPublicService {
       status: order.status === 'DRAFT' ? 'PENDING_PAYMENT' : customerKitchenStatus(order.status, order.items),
       paymentStatus: order.paymentStatus ?? 'PENDING',
       paymentMethod: order.paymentMethod,
+      cgst:(Number.isInteger(meta.cgstPaise)?Number(meta.cgstPaise):Math.round((order.taxAmount??0)/2))/100,sgst:((order.taxAmount??0)-(Number.isInteger(meta.cgstPaise)?Number(meta.cgstPaise):Math.round((order.taxAmount??0)/2)))/100,
       subtotal: (order.subtotal ?? 0) / 100, tax: (order.taxAmount ?? 0) / 100, discount: (order.discountAmount ?? 0) / 100,
       items: Array.isArray(order.items) ? order.items.map((line: any) => ({ name: line.name, quantity: line.quantity, unitPrice: line.unitPrice / 100, lineTotal: line.lineTotal / 100, options: Array.isArray(line.modifiers) ? line.modifiers : [], note: line.specialInstructions })) : [],
       total: order.totalAmount / 100,
@@ -516,6 +519,14 @@ export class QrPublicService {
   }
 
   // ------------------------------------------------------------------ status (spec 35, 56)
+
+  async receiptPdf(publicOrderId:string,sessionId?:string){
+    if(!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId??''))throw new NotFoundException('Order not found.');
+    const order=await this.prisma.runAsPlatform(tx=>tx.syncedOrder.findUnique({where:{publicOrderId}}));
+    if(!order||order.source!=='QR')throw new NotFoundException('Order not found.');
+    this.assertOwnsOrder(order,sessionId);
+    return this.receipts.pdf(order);
+  }
 
   /**
    * An order created under a browser session (the common case: the rate-limit interceptor issues and verifies one
@@ -537,12 +548,13 @@ export class QrPublicService {
     const payment = order.paymentMethod === 'ONLINE' || order.paymentMethod === 'RAZORPAY' ? checkout ?? await this.payments.qrPaymentStatus(order.restaurantId, order.externalOrderId) : null;
     if (payment?.status === 'SUCCESS') order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUniqueOrThrow({ where: { publicOrderId } }));
     const settings = await this.settingsService.effective(order.restaurantId, order.branchId);
+    const receipt = await this.receipts.settings(order.restaurantId, order.branchId);
     const view = this.confirmation(order);
     const entries = await this.prisma.runAsTenant(order.restaurantId, tx => tx.orderPaymentEntry.findMany({ where: { restaurantId: order!.restaurantId, orderId: order!.id }, select: { kind: true, amount: true } }));
     const balance = paymentBalance(order.totalAmount, entries);
     // Legacy orders remain readable before their first staff reconciliation; no new collection is invented here.
     const displayBalance = entries.length ? balance : { ...balance, collectedPaise: order.paymentStatus === 'SUCCESS' ? order.totalAmount : 0, outstandingPaise: order.paymentStatus === 'SUCCESS' ? 0 : order.totalAmount, settlement: order.paymentStatus === 'SUCCESS' ? 'SETTLED' : 'UNPAID' };
-    return { ...(settings.showOrderStatus || order.status === 'DRAFT' ? view : { ...view, status: 'RECEIVED' as const }), balance: displayBalance, payment, preparationMinutes: settings.rules?.preparationMinutes ?? DEFAULT_QR_RULES.preparationMinutes, allowCounterPayment: settings.allowCash && order.status === 'DRAFT' && order.paymentMethod === 'ONLINE' && payment?.checkoutMode !== 'STANDARD' };
+    return { ...(settings.showOrderStatus || order.status === 'DRAFT' ? view : { ...view, status: 'RECEIVED' as const }), receiptDesign:receipt.design,customer:{name:(order.meta as any)?.customerName??null,phone:(order.meta as any)?.customerPhone??null,email:(order.meta as any)?.customerEmail??null},notes:order.notes,balance: displayBalance, payment, preparationMinutes: settings.rules?.preparationMinutes ?? DEFAULT_QR_RULES.preparationMinutes, allowCounterPayment: settings.allowCash && order.status === 'DRAFT' && order.paymentMethod === 'ONLINE' && payment?.checkoutMode !== 'STANDARD' };
   }
 
   async switchToCounter(publicOrderId: string, sessionId?: string) {

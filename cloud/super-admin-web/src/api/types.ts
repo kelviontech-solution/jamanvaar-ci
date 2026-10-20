@@ -66,8 +66,9 @@ export interface Plan {
   maxDevices: number;
   maxUsers: number;
   entitlements: Entitlements & Record<string, boolean>;
-  /** Computed server-side from productFamily+tier: which AppCodes this plan turns on by default. */
+  /** Computed by the server's canonical tier + feature-catalog resolver, as used for provisioning. */
   defaultApps?: AppCode[];
+  featureDefinitions?:Array<{key:string;name:string;appCode:AppCode|null}>;
   status: 'ACTIVE' | 'INACTIVE';
   createdAt: string;
   _count?: { subscriptions: number };

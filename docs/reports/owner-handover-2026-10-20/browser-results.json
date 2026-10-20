@@ -1,0 +1,26 @@
+[
+  {
+    "width": 1440,
+    "hostedLinks": true,
+    "qrOnlyConsole": true,
+    "combinedConsole": true,
+    "readableLayout": true,
+    "overflow": false,
+    "signInPreservesTask": true,
+    "linkedBranchSelected": true,
+    "foreignBranchRejected": true,
+    "bothTaskButtonsWork": true
+  },
+  {
+    "width": 390,
+    "hostedLinks": true,
+    "qrOnlyConsole": true,
+    "combinedConsole": true,
+    "readableLayout": true,
+    "overflow": false,
+    "signInPreservesTask": true,
+    "linkedBranchSelected": true,
+    "foreignBranchRejected": true,
+    "bothTaskButtonsWork": true
+  }
+]

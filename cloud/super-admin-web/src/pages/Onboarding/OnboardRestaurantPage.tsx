@@ -1,13 +1,14 @@
 import { PlanReview } from '../Subscriptions/PlanReview';
-import { RESTAURANT_ADMIN_URL, KIOSK_ADMIN_URL } from '../../lib/appUrls';
+import {onboardingKeyTypes} from '../../lib/planAccess';
+import { KIOSK_ADMIN_URL, ownerPortal } from '../../lib/appUrls';
 // Deep import, not the '@jamanvaar/ui' barrel (see layout/ProtectedLayout.tsx).
 import { printElement } from '../../../../../packages/ui/src/printElement';
-import { useCopied } from '../../components/CopyButton';
+import { CopyButton } from '../../components/CopyButton';
 import React, { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
-import type { Plan, EntitlementKey, AppCode } from '../../api/types';
-import { ENTITLEMENT_LABELS, APP_CODES, APP_CODE_LABELS } from '../../api/types';
+import type { Plan, AppCode } from '../../api/types';
+import { APP_CODES, APP_CODE_LABELS } from '../../api/types';
 import { Button, Card, Badge } from '../../components/ui';
 // See ProtectedLayout.tsx for why this bypasses the '@jamanvaar/ui' barrel.
 import { JAMANVAAR_LOGOS } from '../../../../../packages/ui/src/assets';
@@ -24,7 +25,6 @@ import {
   Check,
   CheckCircle2,
   Sparkles,
-  Copy,
   Printer,
   ExternalLink,
   ShieldCheck,
@@ -399,11 +399,14 @@ export function OnboardRestaurantPage() {
   }, []);
 
   const selectedPlan = plans.find((p) => p.id === planForm.planId);
+  const portal=ownerPortal(modulesForm.applications);
+  const onlyQr=modulesForm.applications.length===1&&modulesForm.applications[0]==='QR_ORDERING';
 
   function handleSelectPlan(plan: Plan) {
     setPlanForm((f) => ({ ...f, planId: plan.id }));
     // Applications pre-selected for a previously chosen plan must not carry over to this one.
     setModulesForm((m) => ({ ...m, applications: [] }));
+    setActivationForm(f=>({...f,deviceTypes:[]}));
     setModulesForm((m) => ({
       ...m,
       maxBranches: plan.maxBranches,
@@ -430,12 +433,6 @@ export function OnboardRestaurantPage() {
 
   // A real tick on the button that was clicked (only when the copy worked), plus a toast
   // that stays on screen wherever the page is scrolled to.
-  const { copy: copyWithTick, isCopied } = useCopied();
-  async function handleCopy(text: string, label: string) {
-    const ok = await copyWithTick(text, label);
-    setCopyToast(ok ? `Copied ${label} to clipboard!` : `Could not copy ${label} automatically. Select it and press Ctrl+C.`);
-    setTimeout(() => setCopyToast(null), 3000);
-  }
 
   function handlePrint() {
     printElement('.welcome-kit-container', { title: 'Welcome kit', pageSize: 'A4 portrait' });
@@ -577,7 +574,7 @@ export function OnboardRestaurantPage() {
     setProcessing(true);
     try {
       const results: ProvisionedKey[] = [];
-      const types = activationForm.deviceTypes.length > 0 ? activationForm.deviceTypes : (['POS', 'CAPTAIN', 'KDS'] as Array<'POS' | 'CAPTAIN' | 'KDS'>);
+      const types = activationForm.deviceTypes.length > 0 ? activationForm.deviceTypes : onboardingKeyTypes(modulesForm.applications);
       const keyExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
       for (const type of types) {
         const keyRes = await api.post<{ id: string; code: string; allowedDeviceType: string }>(
@@ -614,8 +611,8 @@ export function OnboardRestaurantPage() {
       `Namaste ${owner.ownerName},`,
       `Your restaurant *${details.name}* is officially onboarded and activated on JAMANVAAR SaaS.`,
       ``,
-      `*YOUR RESTAURANT ADMIN CREDENTIALS:*`,
-      `• Restaurant Admin Portal (POS/Captain/KDS): ${RESTAURANT_ADMIN_URL}`,
+      `*YOUR ${portal.name.toUpperCase()} CREDENTIALS:*`,
+      `• ${portal.name} login: ${portal.url}`,
       ...(hasKioskAdmin ? [`• Kiosk Admin Portal: ${KIOSK_ADMIN_URL}`] : []),
       // Was `restaurantId` — the internal UUID, not the customer-facing code every login screen
       // and terminal activation flow actually asks for (see OwnerHandover.tsx's own use of
@@ -629,12 +626,12 @@ export function OnboardRestaurantPage() {
         : `• Invitation Token (open the Admin Portal → "First time? Set your password"): ${ownerActivationToken ?? 'unavailable — see warning in console'}`,
       `• Plan: ${selectedPlan?.name || 'JAMANVAAR PRO'} (Status: ${planForm.status})`,
       ``,
-      `*HARDWARE ACTIVATION KEYS:*`
+      `*MANAGEMENT & DEVICE ACTIVATION KEYS:*`
     ];
 
     if (provisionedKeys.length > 0) {
       provisionedKeys.forEach((k) => {
-        lines.push(`• ${k.deviceType} Terminal: *${k.code}*`);
+        lines.push(`• ${k.requestedType === 'QR_ORDERING' ? 'QR Admin management console' : k.deviceType}: *${k.code}*`);
       });
     } else {
       lines.push(`• Key: (Generated in console)`);
@@ -643,9 +640,9 @@ export function OnboardRestaurantPage() {
     lines.push(
       ``,
       `*FIRST TIME SETUP INSTRUCTIONS:*`,
-      `1. Open Restaurant Admin on your manager PC (${RESTAURANT_ADMIN_URL}).`,
-      `2. Go to Subscription / Activation and enter your activation key.`,
-      `3. Enter your login credentials to verify your live menu and POS terminals.`,
+      `1. Open ${portal.name} (${portal.url}).`,
+      `2. Sign in with your Restaurant ID and password. Enter the matching activation key if prompted.`,
+      onlyQr ? `3. Publish your menu, set up table QRs and test guest ordering in QR Admin.` : `3. Verify your enabled products, menu and connected terminals.`,
       ...(hasKioskAdmin
         ? [
             `4. To manage your self-order kiosks, open Restaurant Admin (${KIOSK_ADMIN_URL}) and enter your KIOSK_ADMIN key.`,
@@ -1184,7 +1181,7 @@ export function OnboardRestaurantPage() {
               // after going back and forth isn't silently clobbered.
               setActivationForm((f) => ({
                 ...f,
-                deviceTypes: f.deviceTypes.length > 0 ? f.deviceTypes : (modulesForm.applications as ActivationForm['deviceTypes'])
+                deviceTypes: f.deviceTypes.length > 0 ? f.deviceTypes.filter(type=>onboardingKeyTypes(modulesForm.applications).includes(type as AppCode)) : onboardingKeyTypes(modulesForm.applications) as ActivationForm['deviceTypes']
               }));
               setStep('activation');
             }}
@@ -1252,7 +1249,7 @@ export function OnboardRestaurantPage() {
                 Products for this restaurant
               </div>
               <p style={{ fontSize: 11, color: 'var(--jv-slate-500)', marginTop: 0, marginBottom: 10 }}>
-                Pre-selected from {selectedPlan?.name || 'the selected plan'}'s tier — uncheck anything this
+                Pre-selected from {selectedPlan?.name || 'the selected plan'}'s configured products — uncheck anything this
                 restaurant shouldn't have, or enable one the plan doesn't normally include.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
@@ -1306,7 +1303,7 @@ export function OnboardRestaurantPage() {
                 value={modulesForm.aiState ?? 'PLAN'}
                 onChange={(e) => setModulesForm((m) => ({ ...m, aiState: e.target.value as ModulesForm['aiState'] }))}
               >
-                <option value="PLAN">Follow the plan (PRO: on, CORE: locked teaser)</option>
+                <option value="PLAN">Follow the configured AI access in the plan</option>
                 <option value="ON">On: works</option>
                 <option value="LOCKED">Locked: visible with a lock, answers nothing</option>
                 <option value="OFF">Off: hidden</option>
@@ -1314,46 +1311,7 @@ export function OnboardRestaurantPage() {
               <span className="muted" style={{ fontSize: 12 }}>Can be changed later, per restaurant, on the JAMAN AI page.</span>
             </div>
 
-            {/* Plan Feature Entitlement Summary Tags (informational — the
-                separate Feature Entitlements matrix still governs these) */}
-            <div
-              style={{
-                marginTop: 12,
-                padding: '16px',
-                borderRadius: 12,
-                backgroundColor: 'var(--jv-paper-soft)',
-                border: '1px solid var(--jv-line)'
-              }}
-            >
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-slate-600)', marginBottom: 8, textTransform: 'uppercase' }}>
-                Plan Feature Entitlements ({selectedPlan?.name || 'Selected Plan'}):
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {selectedPlan &&
-                  Object.entries(selectedPlan.entitlements)
-                    .filter(([_, enabled]) => enabled)
-                    .map(([key]) => (
-                      <span
-                        key={key}
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 600,
-                          padding: '3px 8px',
-                          borderRadius: 6,
-                          backgroundColor: 'var(--jv-success-soft)',
-                          color: '#065f46',
-                          border: '1px solid var(--jv-ok-line)',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 4
-                        }}
-                      >
-                        <Check className="w-3 h-3 text-emerald-600" />
-                        {ENTITLEMENT_LABELS[key as EntitlementKey] || key}
-                      </span>
-                    ))}
-              </div>
-            </div>
+            {selectedPlan&&<PlanReview plan={selectedPlan} applications={modulesForm.applications} compact/>}
 
             <div className="modal-actions" style={{ marginTop: 24 }}>
               <Button type="button" variant="ghost" onClick={() => setStep('plan')}>
@@ -1377,10 +1335,10 @@ export function OnboardRestaurantPage() {
           >
             <div className="form-section-title">
               <Laptop2 className="w-4 h-4 text-[var(--jv-accent-text)]" />
-              <span>Pre-Generate Hardware Activation Keys</span>
+              <span>Prepare management and device activation keys</span>
             </div>
             <p className="form-subtext">
-              Select which hardware station keys to automatically generate now for the customer's Welcome Kit.
+              Choose keys for the selected products only. QR Admin uses a management-console key; guests scanning table QR codes do not need a device key.
             </p>
 
             <div className="device-key-picker">
@@ -1389,7 +1347,7 @@ export function OnboardRestaurantPage() {
                   now has a real POS_ADMIN value, so this issues a key
                   actually scoped to POS_ADMIN instead of one valid for any
                   device type. */}
-              <label className="device-key-option" style={{ border: activationForm.deviceTypes.includes('POS_ADMIN') ? '1.5px solid #ea580c' : undefined, background: activationForm.deviceTypes.includes('POS_ADMIN') ? '#fffaf5' : undefined }}>
+              <label className="device-key-option" style={{ display: onboardingKeyTypes(modulesForm.applications).includes('POS_ADMIN') ? undefined : 'none', border: activationForm.deviceTypes.includes('POS_ADMIN') ? '1.5px solid #ea580c' : undefined, background: activationForm.deviceTypes.includes('POS_ADMIN') ? '#fffaf5' : undefined }}>
                 <input
                   type="checkbox"
                   checked={activationForm.deviceTypes.includes('POS_ADMIN')}
@@ -1397,13 +1355,13 @@ export function OnboardRestaurantPage() {
                 />
                 <div>
                   <div className="device-key-option-label" style={{ fontWeight: 800, color: 'var(--jv-ink)' }}>
-                    Restaurant Admin Console (POS_ADMIN) ★
+                    Restaurant Admin Console
                   </div>
-                  <div className="device-key-option-desc">Manager PC / Browser Management Suite ({RESTAURANT_ADMIN_URL})</div>
+                  <div className="device-key-option-desc">Owner management console ({portal.url})</div>
                 </div>
               </label>
 
-              <label className="device-key-option">
+              <label className="device-key-option" style={onboardingKeyTypes(modulesForm.applications).includes('POS')?undefined:{display:'none'}}>
                 <input
                   type="checkbox"
                   checked={activationForm.deviceTypes.includes('POS')}
@@ -1415,7 +1373,7 @@ export function OnboardRestaurantPage() {
                 </div>
               </label>
 
-              <label className="device-key-option">
+              <label className="device-key-option" style={onboardingKeyTypes(modulesForm.applications).includes('CAPTAIN')?undefined:{display:'none'}}>
                 <input
                   type="checkbox"
                   checked={activationForm.deviceTypes.includes('CAPTAIN')}
@@ -1427,7 +1385,7 @@ export function OnboardRestaurantPage() {
                 </div>
               </label>
 
-              <label className="device-key-option">
+              <label className="device-key-option" style={onboardingKeyTypes(modulesForm.applications).includes('KDS')?undefined:{display:'none'}}>
                 <input
                   type="checkbox"
                   checked={activationForm.deviceTypes.includes('KDS')}
@@ -1439,7 +1397,7 @@ export function OnboardRestaurantPage() {
                 </div>
               </label>
 
-              <label className="device-key-option">
+              <label className="device-key-option" style={onboardingKeyTypes(modulesForm.applications).includes('KIOSK')?undefined:{display:'none'}}>
                 <input
                   type="checkbox"
                   checked={activationForm.deviceTypes.includes('KIOSK')}
@@ -1455,7 +1413,7 @@ export function OnboardRestaurantPage() {
                   wizard — there was no ActivationKeyDeviceType/DeviceType
                   value for it to redeem as, so it could never be issued a
                   key at all regardless of UI. */}
-              <label className="device-key-option">
+              <label className="device-key-option" style={onboardingKeyTypes(modulesForm.applications).includes('KIOSK_ADMIN')?undefined:{display:'none'}}>
                 <input
                   type="checkbox"
                   checked={activationForm.deviceTypes.includes('KIOSK_ADMIN')}
@@ -1470,7 +1428,7 @@ export function OnboardRestaurantPage() {
               {/* Solo QR Ordering: a restaurant with no POS/Kiosk at all, only QR table ordering.
                   Redeems as a POS_ADMIN-typed device (the QR console lives in the same app), but
                   needs its own checkbox here or there is no way to provision it during onboarding. */}
-              <label className="device-key-option">
+              <label className="device-key-option" style={onboardingKeyTypes(modulesForm.applications).includes('QR_ORDERING')?undefined:{display:'none'}}>
                 <input
                   type="checkbox"
                   checked={activationForm.deviceTypes.includes('QR_ORDERING')}
@@ -1569,7 +1527,7 @@ export function OnboardRestaurantPage() {
                 </div>
                 <div className="credential-item">
                   <span className="credential-label">Hardware Keys to Issue</span>
-                  <span className="credential-value">{activationForm.deviceTypes.join(', ')}</span>
+                  <span className="credential-value">{activationForm.deviceTypes.map(type=>type==='QR_ORDERING'?'QR Admin management key':APP_CODE_LABELS[type as AppCode]||type).join(', ')}</span>
                 </div>
               </div>
             </div>
@@ -1580,7 +1538,7 @@ export function OnboardRestaurantPage() {
               </div>
             )}
 
-            {selectedPlan&&<PlanReview plan={selectedPlan}/>}
+            {selectedPlan&&<PlanReview plan={selectedPlan} applications={modulesForm.applications}/>}
             <div className="modal-actions" style={{ marginTop: 24 }}>
               <Button type="button" variant="ghost" onClick={() => setStep('activation')} disabled={processing}>
                 ← Back
@@ -1649,37 +1607,23 @@ export function OnboardRestaurantPage() {
 
             {/* Owner Credentials Card */}
             <div className="credentials-box">
-              <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--jv-ink)', marginBottom: 12 }}>
-                1. Restaurant Admin Console Credentials
+              <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--jv-ink)', marginBottom: 16 }}>
+                1. {portal.name} sign-in details
               </div>
               <div className="credentials-grid">
                 <div className="credential-item">
                   <span className="credential-label">Restaurant ID</span>
                   <div className="credential-value">
                     <span>{restaurantCode ?? restaurantId}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(restaurantCode ?? restaurantId ?? '', 'Restaurant ID')}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
-                      title="Copy"
-                    >
-                      {isCopied('Restaurant ID') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
+                    <CopyButton text={restaurantCode ?? restaurantId ?? ''} label="" title={"Copy " + 'Restaurant ID'} style={{minHeight:36,padding:"6px 9px"}} />
                   </div>
                 </div>
 
                 <div className="credential-item">
-                  <span className="credential-label">Restaurant Admin Portal URL (POS / Captain / KDS)</span>
+                  <span className="credential-label">{portal.name} login URL</span>
                   <div className="credential-value">
-                    <span>{RESTAURANT_ADMIN_URL}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(RESTAURANT_ADMIN_URL, 'Restaurant Admin Portal URL')}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
-                      title="Copy"
-                    >
-                      {isCopied('Restaurant Admin Portal URL') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
+                    <a href={portal.url} target="_blank" rel="noopener noreferrer">{portal.url}</a>
+                    <CopyButton text={portal.url} label="" title={`Copy ${portal.name} login URL`} style={{minHeight:36,padding:"6px 9px"}} />
                   </div>
                 </div>
 
@@ -1692,14 +1636,7 @@ export function OnboardRestaurantPage() {
                     <span className="credential-label">Kiosk Admin Portal URL</span>
                     <div className="credential-value">
                       <span>{KIOSK_ADMIN_URL}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(KIOSK_ADMIN_URL, 'Kiosk Admin Portal URL')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
-                        title="Copy"
-                      >
-                        {isCopied('Kiosk Admin Portal URL') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
+                      <CopyButton text={KIOSK_ADMIN_URL} label="" title={"Copy " + 'Kiosk Admin Portal URL'} style={{minHeight:36,padding:"6px 9px"}} />
                     </div>
                   </div>
                 )}
@@ -1708,14 +1645,7 @@ export function OnboardRestaurantPage() {
                   <span className="credential-label">Owner Login Email</span>
                   <div className="credential-value">
                     <span>{owner.ownerEmail}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(owner.ownerEmail, 'Login Email')}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
-                      title="Copy"
-                    >
-                      {isCopied('Login Email') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
+                    <CopyButton text={owner.ownerEmail} label="" title={"Copy " + 'Login Email'} style={{minHeight:36,padding:"6px 9px"}} />
                   </div>
                 </div>
 
@@ -1730,14 +1660,7 @@ export function OnboardRestaurantPage() {
                           : owner.initialPassword}
                     </span>
                     {owner.passwordMode === 'set_now' && !resumedExistingAccount && (
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(owner.initialPassword, 'Password')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
-                        title="Copy"
-                      >
-                        {isCopied('Password') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
+                      <CopyButton text={owner.initialPassword} label="" title={"Copy " + 'Password'} style={{minHeight:36,padding:"6px 9px"}} />
                     )}
                   </div>
                 </div>
@@ -1753,14 +1676,7 @@ export function OnboardRestaurantPage() {
                     <div className="credential-value" style={{ color: 'var(--jv-accent-text)', fontFamily: 'monospace', fontSize: 11, wordBreak: 'break-all' }}>
                       <span>{ownerActivationToken ?? 'Unavailable — password activation step failed, see warning above'}</span>
                       {ownerActivationToken && (
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(ownerActivationToken, 'Invitation token')}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
-                          title="Copy"
-                        >
-                          {isCopied('Invitation token') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
+                        <CopyButton text={ownerActivationToken} label="" title={"Copy " + 'Invitation token'} style={{minHeight:36,padding:"6px 9px"}} />
                       )}
                     </div>
                   </div>
@@ -1775,35 +1691,20 @@ export function OnboardRestaurantPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <KeyRound className="w-5 h-5 text-orange-600" />
                     <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--jv-ink)' }}>
-                      2. Pre-Generated Device Activation Keys ({provisionedKeys.length})
+                      2. Management & Device Activation Keys ({provisionedKeys.length})
                     </span>
                   </div>
                   <p style={{ margin: '6px 0 0 0', fontSize: 13, color: 'var(--jv-slate-500)' }}>
-                    Provide these keys to the restaurant owner. On first login, entering the matching key registers and
-                    binds the device — <strong>POS_ADMIN / POS / CAPTAIN / KDS</strong> keys at{' '}
-                    <strong>{RESTAURANT_ADMIN_URL}</strong>
-                    {provisionedKeys.some((k) => k.deviceType === 'KIOSK_ADMIN') && (
-                      <>
-                        , and the <strong>KIOSK_ADMIN</strong> key at <strong>{KIOSK_ADMIN_URL}</strong>
-                      </>
-                    )}
-                    .
+                    {onlyQr ? <>
+                      Open <strong>{portal.url}</strong> and sign in as the owner. Use the QR Admin management key when prompted to activate the console. Guests open table QR codes without an activation key.
+                    </> : <>
+                      Give the owner these keys. Open <strong>{portal.url}</strong> to activate the management console. Enter each terminal key in its matching app when connecting that device.
+                    </>}
                   </p>
                 </div>
 
                 {provisionedKeys.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      const allText = provisionedKeys.map((k) => `${k.deviceType}: ${k.code}`).join(' | ');
-                      handleCopy(allText, 'All Activation Keys');
-                    }}
-                    style={{ fontWeight: 700, color: 'var(--jv-accent-text)' }}
-                  >
-                    {isCopied('All Activation Keys') ? <Check className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
-                    {isCopied('All Activation Keys') ? 'Copied' : 'Copy All Keys'}
-                  </Button>
+                  <CopyButton text={provisionedKeys.map(k => `${k.deviceType}: ${k.code}`).join(" | ")} label="Copy All Keys" />
                 )}
               </div>
 
@@ -1843,14 +1744,7 @@ export function OnboardRestaurantPage() {
                       <div className="device-code-pill" style={{ fontWeight: 900, color: 'var(--jv-ink)', fontSize: 14 }}>
                         {k.code}
                       </div>
-                      <Button
-                        variant="ghost"
-                        style={{ fontSize: 11, padding: '4px 10px', color: 'var(--jv-accent-text)', fontWeight: 700 }}
-                        onClick={() => handleCopy(k.code, `${k.deviceType} Key`)}
-                      >
-                        {isCopied(`${k.deviceType} Key`) ? <Check className="w-3 h-3 mr-1" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3 h-3 mr-1" />}
-                        {isCopied(`${k.deviceType} Key`) ? 'Copied' : 'Copy Code'}
-                      </Button>
+                      <CopyButton text={k.code} label="Copy Code" title={`Copy ${k.requestedType} activation key`} />
                     </div>
                   ))}
                 </div>
@@ -1864,13 +1758,7 @@ export function OnboardRestaurantPage() {
                   <Printer className="w-4 h-4 mr-1.5" />
                   Print Official Welcome Kit
                 </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleCopy(getHandoverWhatsAppText(), 'WhatsApp Handover Message')}
-                >
-                  {isCopied('WhatsApp Handover Message') ? <Check className="w-4 h-4 mr-1.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-4 h-4 mr-1.5" />}
-                  {isCopied('WhatsApp Handover Message') ? 'Copied' : 'Copy WhatsApp / Email Greeting'}
-                </Button>
+                <CopyButton text={getHandoverWhatsAppText()} label="Copy WhatsApp / Email Greeting" />
               </div>
 
               <div style={{ display: 'flex', gap: 10 }}>

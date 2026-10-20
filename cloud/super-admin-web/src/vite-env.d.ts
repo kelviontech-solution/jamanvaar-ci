@@ -3,6 +3,7 @@
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string;
   readonly VITE_RESTAURANT_ADMIN_URL?: string;
+  readonly VITE_QR_ADMIN_URL?: string;
   readonly VITE_KIOSK_ADMIN_URL?: string;
   // Set only when this console is served under a path prefix instead of a domain's root
   // (e.g. "/admin" on a dedicated testing box routing every app by path -- see

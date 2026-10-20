@@ -3,7 +3,7 @@ import { NotificationGatewayService } from '../src/modules/notifications/notific
 import { createHmac } from 'node:crypto';
 import request from 'supertest';
 import { beforeAll, afterAll, it, expect, vi } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession, ownerDeviceSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 import { QrRateLimiter } from '../src/modules/qr/qr-rate-limit';
@@ -399,4 +399,62 @@ it('publication review compares canonical dish values without JSON key-order fal
  const row=await prisma.runAsTenant(restaurantId,tx=>tx.syncedEntity.findFirstOrThrow({where:{restaurantId,entityType:'MENU_ITEM',externalId:'meal'}}));
  const item={...(row.payload as any),description:'Menu review description change'};await push('MENU_ITEM','meal',item);
  const changed=await auth('get','/api/v1/menu/draft-status');expect(changed.body.changes.updated.map((i:any)=>i.id)).toEqual(['meal']);
+});
+
+it('persists guest contact, order notes and item requests and exposes them only to the authorised branch',async()=>{
+ const sid=await browserSession();
+ const response=await http().post(`/api/v1/public/qr/${qr}/orders`).set('x-qr-session',sid).send({...body('guest-contact-receipt'),customerName:'Receipt guest',customerPhone:'919876543210',orderNotes:'Call when ready; peanut allergy',items:[{itemId:'meal',quantity:1,optionIds:[],note:'Less spicy'}]});
+ expect(response.status,JSON.stringify(response.body)).toBe(201);
+ const order=await stored(response.body.publicOrderId);
+ expect(order.meta).toMatchObject({customerName:'Receipt guest',customerPhone:'919876543210'});expect(order.notes).toBe('Call when ready; peanut allergy');
+ const list=await auth('get','/api/v1/restaurant/qr/order-list?search=919876543210');
+ expect(list.status,JSON.stringify(list.body)).toBe(200);
+ const row=list.body.rows.find((r:any)=>r.id===order.externalOrderId);
+ expect(row).toMatchObject({customerName:'Receipt guest',customerPhone:'919876543210',notes:'Call when ready; peanut allergy'});expect(row.items[0].specialInstructions).toBe('Less spicy');
+ expect((await auth('get','/api/v1/restaurant/qr/order-list?search=919876543210',adminB)).body.rows).toHaveLength(0);
+ const guest=await http().get(`/api/v1/public/qr/orders/${order.publicOrderId}`).set('x-qr-session',sid);
+ expect(guest.body.customer).toMatchObject({name:'Receipt guest',phone:'919876543210'});
+ expect((await http().get(`/api/v1/public/qr/orders/${order.publicOrderId}`).set('x-qr-session',await browserSession())).status).toBe(404);
+});
+
+it('generates a real PDF for paid and unpaid bills, enforcing guest ownership and admin branch access',async()=>{
+ const sid=await browserSession(),other=await browserSession();
+ const placed=await http().post(`/api/v1/public/qr/${qr}/orders`).set('x-qr-session',sid).send(body('pdf-ownership'));
+ expect(placed.status).toBe(201);const order=await stored(placed.body.publicOrderId),path=`/api/v1/public/qr/orders/${order.publicOrderId}/receipt.pdf`;
+ const pdf=await http().get(path).set('x-qr-session',sid);
+ expect(pdf.status,JSON.stringify(pdf.body)).toBe(200);expect(pdf.headers['content-type']).toContain('application/pdf');expect(pdf.headers['cache-control']).toContain('no-store');expect(Buffer.isBuffer(pdf.body)).toBe(true);expect(pdf.body.subarray(0,5).toString()).toBe('%PDF-');expect(pdf.body.length).toBeGreaterThan(5000);
+ expect((await http().get(path).set('x-qr-session',other)).status).toBe(404);expect((await http().get(path)).status).toBe(404);
+ const adminPath=`/api/v1/restaurant/qr/receipts/orders/${order.externalOrderId}/pdf`;
+ expect((await auth('get',adminPath)).status).toBe(200);expect((await auth('get',adminPath,adminB)).status).toBe(404);expect((await http().get(adminPath)).status).toBe(401);
+ expect((await action(order.publicOrderId!,'COLLECT')).status).toBe(200);
+ expect((await http().get(path).set('x-qr-session',sid)).status).toBe(200);
+ const refreshed=await http().get(`/api/v1/public/qr/orders/${order.publicOrderId}`).set('x-qr-session',sid);expect(refreshed.body.balance).toMatchObject({collectedPaise:order.totalAmount,outstandingPaise:0});
+});
+
+it('edits receipt design with concurrency checks, inherits defaults and preserves financial records',async()=>{
+ const path='/api/v1/restaurant/qr/receipts';
+ const initial=await auth('get',path);expect(initial.status,JSON.stringify(initial.body)).toBe(200);
+ const beforeB=await auth('get',path,adminB);
+ const design={...initial.body.design,heading:'Guest bill',contact:'Call our restaurant',footer:'See you soon',accent:'#235b46',showTaxBreakup:false};
+ const saved=await auth('put',path).send({design,version:initial.body.version});expect(saved.status,JSON.stringify(saved.body)).toBe(200);
+ expect((await auth('put',path).send({design,version:initial.body.version})).status).toBe(409);
+ expect((await auth('get',path,adminB)).body).toEqual(beforeB.body);
+ expect((await auth('put',path).send({design:{...design,total:0},version:saved.body.version})).status).toBe(400);
+ expect((await http().put(path).send({design,version:saved.body.version})).status).toBe(401);
+ const p=await place('receipt-design-view'),order=await stored(p.publicOrderId);
+ expect(p.receiptDesign).toMatchObject(design);expect(p.total).toBe(order.totalAmount/100);
+ expect((await stored(p.publicOrderId)).totalAmount).toBe(order.totalAmount);
+ // The next branch still inherits its restaurant default rather than branch A's design.
+ expect((await auth('get',path,adminB)).body.design.heading).toBe(beforeB.body.design.heading);
+});
+
+it('requires owner proof for restaurant receipt defaults and keeps a branch override intact',async()=>{
+ const path='/api/v1/restaurant/qr/receipts',proof=await ownerDeviceSession(prisma,admin);
+ expect((await auth('get',path).set('x-admin-branch','all')).status).toBe(403);
+ const originalA=(await auth('get',path)).body.design;
+ const defaults=await auth('get',path).set('x-admin-branch','all').set('x-owner-authorization',proof);expect(defaults.status,JSON.stringify(defaults.body)).toBe(200);
+ const design={...defaults.body.design,footer:'Restaurant default footer'};
+ const saved=await auth('put',path).set('x-admin-branch','all').set('x-owner-authorization',proof).send({design,version:defaults.body.version});expect(saved.status,JSON.stringify(saved.body)).toBe(200);
+ expect((await auth('get',path,adminB)).body.design.footer).toBe('Restaurant default footer');
+ expect((await auth('get',path)).body.design).toEqual(originalA);
 });

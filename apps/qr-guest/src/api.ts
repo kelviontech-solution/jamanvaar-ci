@@ -1,6 +1,7 @@
 import { resolveMenuImage } from '../../../packages/utils/src/menu_image';
 import type {RestaurantPageContent,RestaurantPageView,RestaurantPageDish} from '../../../packages/ui/src/restaurant-page/types';
 import { guestErrorMessage } from './guestErrors';
+import {readGuestSession} from './guestSession';
 import { menuDishImage } from '../../../packages/utils/src/dish_photos';
 
 /**
@@ -35,8 +36,10 @@ export interface Menu { languages?:string[]; defaultLanguage?:string; menuVersio
 
 export interface Quote { discount?:number; menuVersion?: number; lines: Array<{ itemId: string; name: string; quantity: number; unitPrice: number; lineTotal: number; options: string[] }>; subtotal: number; tax: number; total: number }
 export interface Placed {pickupAt?:string;pickupTimezone?:string; publicOrderId: string; restaurantName?: string; branchName?: string; currency?: string; orderNumber: string | null; status: 'PENDING_PAYMENT' | 'RECEIVED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED'; total: number; table: string | null; placedAt: string;
+  receiptDesign?:{heading:string;thankYou:string;footer:string;contact:string;accent:string;showTaxBreakup:boolean;showCustomer:boolean;showNotes:boolean};
+  customer?:{name?:string|null;phone?:string|null;email?:string|null};notes?:string|null;
   balance?:{totalPaise:number;collectedPaise:number;refundedPaise:number;outstandingPaise:number;settlement:string};
-  paymentStatus?: string; paymentMethod?: string; preparationMinutes?: number; allowCounterPayment?: boolean; subtotal?: number; tax?: number; discount?: number;
+  paymentStatus?: string; paymentMethod?: string; preparationMinutes?: number; allowCounterPayment?: boolean; subtotal?: number; cgst?:number; sgst?:number; tax?: number; discount?: number;
   items?: Array<{name:string;quantity:number;unitPrice:number;lineTotal:number;options:string[];note?:string}>;
   payment?: {status:string;url:string|null;expiresAt:string|null;checkoutMode?:string;checkout?: {key:string;orderId:string;amount:number;currency:string}} | null }
 
@@ -64,7 +67,7 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
   // Order status/payment routes are session-bound too. Returning from checkout
   // must carry the same server-signed browser proof as order creation.
   let session=init.session;
-  if(!session){try{session=sessionStorage.getItem('jv_qr_session2')||undefined;}catch{/* unavailable storage carries no fabricated proof */}}
+  if(!session) session = readGuestSession() || undefined;
   let res: Response;
   try {
     res = await fetch(`${base}/api/v1/public/qr${path}`, {
@@ -84,6 +87,14 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
 }
 
 export const QrApi = {
+  receipt: async (id:string) => {
+    const base=apiBase();if(!base)throw new Error('The ordering service is not configured.');
+    const session=readGuestSession();
+    const response=await fetch(`${base}/api/v1/public/qr/orders/${encodeURIComponent(id)}/receipt.pdf`,{headers:session?{'X-QR-Session':session}:{},cache:'no-store',signal:AbortSignal.timeout(25000)});
+    if(!response.ok){const body=await response.json().catch(()=>null);throw new Error(body?.message||'Could not download your bill. Please try again.');}
+    if(!response.headers.get('content-type')?.includes('application/pdf'))throw new Error('The bill could not be downloaded. Please try again.');
+    return response.blob();
+  },
   pageEvent:async(slug:string,type:string)=>call(`/sites/${encodeURIComponent(slug)}/events`,{method:'POST',body:JSON.stringify({type})}),
   site:async(slug:string)=>(await call<RestaurantPageView&{items:RestaurantPageDish[];menuReady:boolean;reservationsEnabled:boolean}>(`/sites/${encodeURIComponent(slug)}`)).data!,
   reservation:async(slug:string,body:{name:string;phone:string;date:string;time:string;guests:number;note:string})=>(await call<{id:string;status:string}>(`/sites/${encodeURIComponent(slug)}/reservations`,{method:'POST',body:JSON.stringify(body)})).data!,

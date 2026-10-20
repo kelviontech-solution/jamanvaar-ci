@@ -1,0 +1,27 @@
+[
+  {
+    "width": 1440,
+    "selectedQrFeaturesOnly": true,
+    "readableReview": true,
+    "deployedQrUrl": true,
+    "staleLocalhostOverrideRejected": true,
+    "qrOnlySubscription": true,
+    "singleManagementKey": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "selectedQrFeaturesOnly": true,
+    "readableReview": true,
+    "deployedQrUrl": true,
+    "staleLocalhostOverrideRejected": true,
+    "qrOnlySubscription": true,
+    "singleManagementKey": true,
+    "overflow": false
+  },
+  {
+    "planEditorCleanup": true,
+    "qrFlagsPreserved": true,
+    "unrelatedFlagsCleared": true
+  }
+]

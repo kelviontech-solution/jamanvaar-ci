@@ -1,3 +1,4 @@
+import { CopyButton } from '../../components/CopyButton';
 import React, { useState, useEffect, useRef } from 'react';
 import { api, ApiError } from '../../api/client';
 import { copyText } from '../../../../../packages/utils/src/clipboard';
@@ -21,7 +22,6 @@ import {
   Clock,
   Send,
   UserCog,
-  Copy
 } from 'lucide-react';
 import '../../components/shared.css';
 import './support.css';
@@ -372,15 +372,7 @@ export function SupportPage() {
                       color: 'var(--jv-text)'
                     }}
                   />
-                  <Button
-                    variant="ghost"
-                    onClick={async () => {
-                      const copied = await copyText(impersonationResult.accessToken);
-                      setSuccessToast(copied ? 'Token copied to clipboard' : 'Could not copy automatically — select and copy it manually');
-                    }}
-                  >
-                    <Copy className="w-4 h-4" />
-                  </Button>
+                  <CopyButton text={impersonationResult.accessToken} label="Copy token" />
                 </div>
               </Card>
             )}

@@ -14,7 +14,7 @@ export function PlatformBrandingCard({ settings, saving, setSaving, onSaved, onD
 }) {
   const [platformName, setPlatformName] = useState('JAMANVAAR SaaS Control Plane');
   const [companyName, setCompanyName] = useState('Kelviontech');
-  const [supportEmail, setSupportEmail] = useState('support@jamanvaar.app');
+  const [supportEmail, setSupportEmail] = useState('kelviontech@gmail.com');
   const [supportPhone, setSupportPhone] = useState('');
   const [error, setError] = useState<string | undefined>();
   const [saved, setSaved] = useState({ platformName: '', companyName: '', supportEmail: '', supportPhone: '' });

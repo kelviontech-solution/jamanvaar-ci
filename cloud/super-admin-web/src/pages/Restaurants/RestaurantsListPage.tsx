@@ -1,5 +1,5 @@
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
-import { copyText } from '../../../../../packages/utils/src/clipboard';
+import { CopyButton } from '../../components/CopyButton';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import '../../components/shared.css';
@@ -24,8 +24,6 @@ import {
   Repeat,
   KeyRound,
   FileText,
-  Copy,
-  Check,
   LayoutGrid,
   List,
   Search,
@@ -62,7 +60,6 @@ export function RestaurantsListPage() {
   const [confirmingStatusRestaurant, setConfirmingStatusRestaurant] = useState<RestaurantListItem | null>(null);
   const [statusActionPending, setStatusActionPending] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
@@ -127,12 +124,6 @@ export function RestaurantsListPage() {
     }
   };
 
-  const handleCopyId = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (!(await copyText(id))) return;
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
 
   const filteredRestaurants = useMemo(() => {
     if (!restaurants) return [];
@@ -607,13 +598,7 @@ export function RestaurantsListPage() {
                       onChange={() => {}}
                       title="Select restaurant"
                     />
-                    <span
-                      className="mgmt-card-id-pill"
-                      title="Click to copy ID"
-                      onClick={(e) => handleCopyId(e, r.id)}
-                    >
-                      {copiedId === r.id ? <Check className="w-3 h-3 text-emerald-600" /> : `#${r.id.slice(-6)}`}
-                    </span>
+                    <CopyButton text={r.restaurantCode || r.id} label={r.restaurantCode || `#${r.id.slice(-6)}`} title={r.restaurantCode ? "Copy Restaurant ID" : "Copy internal restaurant UUID"} style={{fontSize:12, minHeight:36, padding:"5px 9px"}} />
                   </div>
 
                   <div className="mgmt-card-header-right">

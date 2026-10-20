@@ -1031,14 +1031,24 @@ export class TenantAuthService {
   /**
    * "Forgot password" step 1 (BUG-142). Emails a 6-digit one-time code to an active user. It always answers the
    * same way, whether or not the address belongs to a user, so it cannot be used to find out who has an account.
-   * Only a hash of the code is stored; asking again within a minute is ignored.
+   * Only a hash of the code is stored; a live challenge has a 60-second resend wait.
+   * Expired/exhausted challenges, completed resets and failed sends do not block recovery.
    */
-  async requestPasswordReset(restaurantId: string, email: string): Promise<void> {
+  async requestPasswordReset(restaurantId: string, email: string): Promise<{ retryAfterSeconds: number; expiresInSeconds: number }> {
     const found = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await tx.$queryRaw`SELECT "id" FROM "User" WHERE "restaurantId" = ${restaurantId} AND "email" = ${email} FOR UPDATE`;
       const user = await tx.user.findFirst({ where: { restaurantId, email } });
       if (!user || user.status !== TenantUserStatus.ACTIVE || !user.passwordHash) return null;
       const now = new Date();
-      if (user.passwordResetSentAt && now.getTime() - user.passwordResetSentAt.getTime() < TenantAuthService.RESET_RESEND_SECONDS * 1000) return null;
+      const elapsed = user.passwordResetSentAt ? now.getTime() - user.passwordResetSentAt.getTime() : Infinity;
+      if (user.passwordResetHash && user.passwordResetExpiresAt && user.passwordResetExpiresAt > now &&
+          user.passwordResetAttempts < TenantAuthService.RESET_MAX_ATTEMPTS && elapsed < TenantAuthService.RESET_RESEND_SECONDS * 1000) {
+        return {
+          cooldown: true as const,
+          retryAfterSeconds: Math.ceil((TenantAuthService.RESET_RESEND_SECONDS * 1000 - elapsed) / 1000),
+          expiresInSeconds: Math.ceil((user.passwordResetExpiresAt.getTime() - now.getTime()) / 1000)
+        };
+      }
 
       const otp = String(randomInt(0, 1_000_000)).padStart(6, '0');
       await tx.user.update({
@@ -1055,9 +1065,11 @@ export class TenantAuthService {
         { actorType: 'TENANT', actorId: user.id, restaurantId, action: 'TENANT_PASSWORD_RESET_REQUESTED', category: 'AUTH', details: { email: user.email } },
         tx
       );
-      return { user, otp };
+      return { cooldown: false as const, user, otp };
     });
-    if (!found) return;
+    const timing = { retryAfterSeconds: TenantAuthService.RESET_RESEND_SECONDS, expiresInSeconds: TenantAuthService.RESET_CODE_MINUTES * 60 };
+    if (!found) return timing;
+    if (found.cooldown) return { retryAfterSeconds: found.retryAfterSeconds, expiresInSeconds: found.expiresInSeconds };
 
     // B2-047: this used to `await` the SMTP round trip inside the request — 5.1s for a real
     // account (mail actually sent) vs 0.01s for one that doesn't exist (nothing to send),
@@ -1066,15 +1078,23 @@ export class TenantAuthService {
     // message. Firing the send without awaiting it means both paths now return as soon as the
     // (comparably fast) database write finishes, regardless of how slow the mail server is.
     const mail = passwordResetOtpEmail({ fullName: found.user.fullName, otp: found.otp, minutesValid: TenantAuthService.RESET_CODE_MINUTES });
-    void this.email.send(found.user.email, mail.subject, mail.html).catch(() => {
-      // A mail server problem must not reveal anything to the caller; the code simply never arrives and they can ask again.
-    });
-    // #16: the same working code also reaches the verified recovery mailbox, if one exists --
-    // the whole point of verifying it is so a reset is still possible when the primary login
-    // email itself is the thing the owner has lost access to.
-    if (found.user.recoveryEmail && found.user.recoveryEmailVerifiedAt) {
-      void this.email.send(found.user.recoveryEmail, mail.subject, mail.html).catch(() => {});
-    }
+    const addresses = [found.user.email, ...(found.user.recoveryEmail && found.user.recoveryEmailVerifiedAt ? [found.user.recoveryEmail] : [])];
+    // Keep response timing independent of SMTP. Failed delivery must release this request's
+    // cooldown and code; compare its hash so a late failure cannot erase a newer request.
+    void Promise.allSettled(addresses.map((address) => this.email.send(address, mail.subject, mail.html))).then(async (results) => {
+      if (results.some(result => result.status === 'fulfilled' && result.value)) return;
+      await this.prisma.runAsTenant(restaurantId, async (tx) => {
+        await tx.user.updateMany({
+          where: { id: found.user.id, passwordResetHash: hashLowEntropySecret(found.otp, this.config.get<string>('JWT_ACCESS_SECRET')!) },
+          data: { passwordResetHash: null, passwordResetExpiresAt: null, passwordResetSentAt: null }
+        });
+        await this.audit.log({
+          actorType: 'TENANT', actorId: found.user.id, restaurantId,
+          action: 'TENANT_PASSWORD_RESET_DELIVERY_FAILED', category: 'AUTH', details: { retryAllowed: true }
+        }, tx);
+      });
+    }).catch(() => undefined);
+    return timing;
   }
 
   /**
@@ -1082,18 +1102,19 @@ export class TenantAuthService {
    * get the same answer; after too many wrong guesses the code is dropped and a new one must be requested. A
    * successful reset signs the user out everywhere.
    */
-  async resetPassword(restaurantId: string, email: string, otp: string, newPassword: string): Promise<void> {
+  async resetPassword(restaurantId: string, email: string, otp: string, newPassword: string, resetToken?: string): Promise<void> {
     // The wrong-guess count and the dropped code must be saved even though the request fails, so the checks run in
     // a transaction that returns the outcome, and the refusal is thrown only after it has committed.
     const outcome = await this.prisma.runAsTenant(restaurantId, async (tx): Promise<'ok' | 'invalid'> => {
+      await tx.$queryRaw`SELECT "id" FROM "User" WHERE "restaurantId" = ${restaurantId} AND "email" = ${email} FOR UPDATE`;
       const user = await tx.user.findFirst({ where: { restaurantId, email } });
       if (!user || user.status !== TenantUserStatus.ACTIVE || !user.passwordResetHash || !user.passwordResetExpiresAt) return 'invalid';
-      if (user.passwordResetExpiresAt < new Date() || user.passwordResetAttempts >= TenantAuthService.RESET_MAX_ATTEMPTS) {
+      if (user.passwordResetExpiresAt <= new Date() || user.passwordResetAttempts >= TenantAuthService.RESET_MAX_ATTEMPTS) {
         await tx.user.update({ where: { id: user.id }, data: { passwordResetHash: null, passwordResetExpiresAt: null } });
         return 'invalid';
       }
 
-      const given = Buffer.from(hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!));
+      const given = Buffer.from(resetToken ? `verified:${hashOpaqueToken(resetToken)}` : hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!));
       const stored = Buffer.from(user.passwordResetHash);
       if (given.length !== stored.length || !timingSafeEqual(given, stored)) {
         await tx.user.update({ where: { id: user.id }, data: { passwordResetAttempts: { increment: 1 } } });
@@ -1106,7 +1127,10 @@ export class TenantAuthService {
           passwordHash: await bcrypt.hash(newPassword, BCRYPT_COST),
           passwordResetHash: null,
           passwordResetExpiresAt: null,
-          passwordResetAttempts: 0
+          passwordResetAttempts: 0,
+          passwordResetSentAt: null,
+          failedLoginAttempts: 0,
+          lockedUntil: null
         }
       });
       // Whoever knew the old password (or had a stolen session) is signed out.
@@ -1227,7 +1251,7 @@ export class TenantAuthService {
     return {success: true};
   }
 
-  async forgotPasswordOwner(identifier: { restaurantCode?: string; restaurantId?: string }): Promise<{ success: true; maskedEmail: string; activationRequired: boolean }> {
+  async forgotPasswordOwner(identifier: { restaurantCode?: string; restaurantId?: string }) {
     const restaurantId = identifier.restaurantId ?? (await this.restaurants.resolveByCode(identifier.restaurantCode!)).restaurantId;
     const owner = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.user.findFirst({ where: { restaurantId, role: 'OWNER' } })
@@ -1237,8 +1261,8 @@ export class TenantAuthService {
     if (owner.passwordHash === null) {
       return { success: true, maskedEmail: maskEmail(owner.email), activationRequired: true };
     }
-    await this.requestPasswordReset(restaurantId, owner.email);
-    return { success: true, maskedEmail: maskEmail(owner.email), activationRequired: false };
+    const timing = await this.requestPasswordReset(restaurantId, owner.email);
+    return { success: true, maskedEmail: maskEmail(owner.email), activationRequired: false, ...timing };
   }
 
   /** First-time activation for the owner, addressed by Restaurant ID instead of the internal id. */
@@ -1248,13 +1272,35 @@ export class TenantAuthService {
   }
 
   /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
-  async resetPasswordOwner(identifier: { restaurantCode?: string; restaurantId?: string }, otp: string, newPassword: string): Promise<void> {
+  async resetPasswordOwner(identifier: { restaurantCode?: string; restaurantId?: string }, otp: string, newPassword: string, resetToken?: string): Promise<void> {
     const restaurantId = identifier.restaurantId ?? (await this.restaurants.resolveByCode(identifier.restaurantCode!)).restaurantId;
     const owner = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.user.findFirst({ where: { restaurantId, role: 'OWNER' } })
     );
     if (!owner) throw new NotFoundException('Restaurant not found');
 
-    await this.resetPassword(restaurantId, owner.email, otp, newPassword);
+    await this.resetPassword(restaurantId, owner.email, otp, newPassword, resetToken);
+  }
+
+  /** Exchange the email code for a short-lived, one-use password-change credential. */
+  async verifyPasswordResetOwner(identifier: { restaurantCode?: string; restaurantId?: string }, otp: string) {
+    const restaurantId = identifier.restaurantId ?? (await this.restaurants.resolveByCode(identifier.restaurantCode!)).restaurantId;
+    const result = await this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.$queryRaw`SELECT "id" FROM "User" WHERE "restaurantId" = ${restaurantId} AND "role" = 'OWNER' FOR UPDATE`;
+      const user = await tx.user.findFirst({ where: { restaurantId, role: 'OWNER', status: 'ACTIVE' } });
+      if (!user?.passwordResetHash || !user.passwordResetExpiresAt) return null;
+      if (user.passwordResetExpiresAt.getTime() <= Date.now() || user.passwordResetAttempts >= TenantAuthService.RESET_MAX_ATTEMPTS) return null;
+      const given = Buffer.from(hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!)), stored = Buffer.from(user.passwordResetHash);
+      if (given.length !== stored.length || !timingSafeEqual(given, stored)) {
+        await tx.user.update({ where: { id: user.id }, data: { passwordResetAttempts: { increment: 1 } } });
+        return null;
+      }
+      const resetToken = generateOpaqueToken();
+      const expiresAt = new Date(Math.min(user.passwordResetExpiresAt.getTime(), Date.now() + 5 * 60_000));
+      await tx.user.update({ where: { id: user.id }, data: { passwordResetHash: `verified:${hashOpaqueToken(resetToken)}`, passwordResetExpiresAt: expiresAt, passwordResetAttempts: 0 } });
+      return { resetToken, expiresInSeconds: Math.max(1, Math.floor((expiresAt.getTime() - Date.now()) / 1000)) };
+    });
+    if (!result) throw new BadRequestException('That code is not valid or has expired. Request a new code and use the latest email.');
+    return result;
   }
 }

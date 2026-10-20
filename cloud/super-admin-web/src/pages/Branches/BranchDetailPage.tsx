@@ -1,6 +1,6 @@
+import { CopyButton } from '../../components/CopyButton';
 import { BranchLicensing } from './BranchLicensing';
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
-import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
@@ -26,8 +26,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Activity,
-  Copy,
-  Check,
   ChevronRight
 } from 'lucide-react';
 import '../../components/card-grid.css';
@@ -56,7 +54,6 @@ export function BranchDetailPage() {
   const [params,setParams]=useSearchParams();
   const tab:Tab=TABS.some(t=>t.key===params.get('tab'))?params.get('tab') as Tab:'overview';
   const setTab=(next:Tab)=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('tab',next);return p;});
-  const [copiedId, setCopiedId] = useState(false);
 
   // Tab data
   const [devices, setDevices] = useState<Device[] | null>(null);
@@ -126,12 +123,6 @@ export function BranchDetailPage() {
     loadTabData();
   }, [tab, branch, restaurant]);
 
-  async function handleCopyId() {
-    if (!branch) return;
-    if (!(await copyText(branch.id))) return;
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
-  }
 
   if (loading) {
     return (
@@ -203,13 +194,7 @@ export function BranchDetailPage() {
                     {branch.code}
                   </code>
                 </span>
-                <button
-                  type="button"
-                  onClick={handleCopyId}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontFamily: 'monospace', background: 'var(--jv-bg-muted)', border: '1px solid var(--jv-border)', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', color: 'var(--jv-text-secondary)' }}
-                >
-                  {copiedId ? <><Check className="w-3 h-3 text-emerald-500" /> Copied</> : <><Copy className="w-3 h-3" /> {branch.id.slice(0, 8)}…</>}
-                </button>
+                <CopyButton text={branch.id} label={branch.id.slice(0, 8) + '...'} title="Copy branch ID" />
               </div>
             </div>
           </div>

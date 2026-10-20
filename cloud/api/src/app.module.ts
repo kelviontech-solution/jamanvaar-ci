@@ -60,7 +60,7 @@ import { validateEnv } from './config/env.validation';
     // Under test, test/setup.ts has already loaded .env into process.env and then removed the developer's
     // real payment keys; re-reading the file here would silently put them back.
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnv, ignoreEnvFile: process.env.NODE_ENV === 'test' }),
-    ThrottlerModule.forRoot([
+    ThrottlerModule.forRoot({ errorMessage: 'Too many attempts. Please wait a minute and try again.', throttlers: [
       {
         ttl: 60000,
         limit: 120
@@ -87,7 +87,7 @@ import { validateEnv } from './config/env.validation';
       { name: 'paymentStatus', ttl: 60_000, limit: 1_000_000 },
       { name: 'paymentRefund', ttl: 60_000, limit: 1_000_000 },
       { name: 'tenantRefresh', ttl: 60_000, limit: 1_000_000 }
-    ]),
+    ] }),
     PrismaModule,
     NotificationsModule,
     AuditModule,

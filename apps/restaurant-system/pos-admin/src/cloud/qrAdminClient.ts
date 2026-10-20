@@ -80,6 +80,10 @@ export interface QrOrderRow {
   notes?: string;
   history: Array<{action:string;at:string;reason?:string}>;
   customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  orderType?: string;
+  sharedGuests?: Array<{label:string;lines:Array<{itemId:string;quantity:number;note?:string}>}>;
   orderNumber: string | null;
   table: string | null;
   branchId: string | null;

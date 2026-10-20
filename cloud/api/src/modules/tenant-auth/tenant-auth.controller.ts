@@ -36,6 +36,8 @@ import {
   loginOwnerSchema,
   forgotPasswordOwnerSchema,
   resetPasswordOwnerSchema,
+  verifyPasswordResetOwnerSchema,
+  VerifyPasswordResetOwnerDto,
   TenantLoginDto,
   ActivateDeviceDto,
   TenantRefreshDto,
@@ -126,13 +128,21 @@ export class TenantAuthController {
     return this.authService.forgotPasswordOwner(body);
   }
 
-  /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
+  /** Verify the email code before asking the owner to choose a password. */
+  @Post('verify-password-reset-owner')
+  @HttpCode(200)
+  @PublicAuthThrottle()
+  @UsePipes(new ZodValidationPipe(verifyPasswordResetOwnerSchema))
+  async verifyPasswordResetOwner(@Body() body: VerifyPasswordResetOwnerDto) {
+    return this.authService.verifyPasswordResetOwner(body, body.otp);
+  }
+
   @Post('reset-password-owner')
   @HttpCode(200)
   @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(resetPasswordOwnerSchema))
   async resetPasswordOwner(@Body() body: ResetPasswordOwnerDto) {
-    await this.authService.resetPasswordOwner(body, body.otp, body.newPassword);
+    await this.authService.resetPasswordOwner(body, body.otp ?? '', body.newPassword, body.resetToken);
     return { success: true };
   }
 

@@ -305,7 +305,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   if (!res.ok) {
     const issues = Array.isArray(data?.issues) ? (data.issues as Array<{ message?: string }>).map((i) => i.message).filter(Boolean).join(' ') : '';
-    throw new CloudApiError(issues || data?.message || `Request failed (${res.status})`, res.status);
+    throw new CloudApiError(res.status === 429 ? 'Too many attempts. Please wait a minute and try again.' : issues || data?.message || `Request failed (${res.status})`, res.status);
   }
   return data as T;
 }
@@ -554,8 +554,8 @@ export async function cloudResetPassword(email: string, otp: string, newPassword
  * all (it's only set inside cloudLogin/cloudLoginOwner on success), so the operator types the
  * Restaurant ID directly here instead.
  */
-export async function cloudRequestPasswordResetOwner(restaurantCode: string): Promise<{ maskedEmail: string; activationRequired: boolean }> {
-  return request<{ maskedEmail: string; activationRequired: boolean }>('/api/v1/tenant-auth/forgot-password-owner', {
+export async function cloudRequestPasswordResetOwner(restaurantCode: string): Promise<{ maskedEmail: string; activationRequired: boolean; retryAfterSeconds?: number; expiresInSeconds?: number }> {
+  return request('/api/v1/tenant-auth/forgot-password-owner', {
     method: 'POST',
     body: { restaurantCode },
     skipAuthRetry: true
@@ -573,6 +573,14 @@ export async function cloudResetPasswordOwner(restaurantCode: string, otp: strin
     body: { restaurantCode, otp, newPassword },
     skipAuthRetry: true
   });
+}
+
+export async function cloudVerifyPasswordResetOwner(restaurantCode: string, otp: string): Promise<{resetToken: string; expiresInSeconds: number}> {
+  return request('/api/v1/tenant-auth/verify-password-reset-owner', { method: 'POST', body: {restaurantCode, otp}, skipAuthRetry: true });
+}
+
+export async function cloudCompletePasswordResetOwner(restaurantCode: string, resetToken: string, newPassword: string): Promise<void> {
+  await request('/api/v1/tenant-auth/reset-password-owner', { method: 'POST', body: {restaurantCode, resetToken, newPassword}, skipAuthRetry: true });
 }
 
 /**
@@ -1534,6 +1542,14 @@ export async function publishMenu(note?: string): Promise<{ version: number }> {
 /** A JSON call to the cloud as this Restaurant Admin console (its device credential). Throws CloudApiError with the server's own message. */
 export async function qrApi<T>(path: string, init: RequestInit = {}): Promise<T> {
   return jsonOrThrowCloud<T>(await deviceFetch(path, init), 'QR ordering');
+}
+
+/** Binary QR bills use the same authenticated, branch-scoped transport as other console calls. */
+export async function qrReceiptPdf(orderId:string):Promise<Blob> {
+  const response=await deviceFetch(`/api/v1/restaurant/qr/receipts/orders/${encodeURIComponent(orderId)}/pdf`);
+  if(!response.ok)await jsonOrThrowCloud(response,'Download bill');
+  if(!response.headers.get('content-type')?.includes('application/pdf'))throw new Error('The bill is not ready. Please retry.');
+  return response.blob();
 }
 
 /** Standalone QR Admin always recovers a current user session before rendering private data. */

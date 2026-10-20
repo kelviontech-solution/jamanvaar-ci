@@ -1,0 +1,11 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {BrowserRouter} from 'react-router-dom';
+import {RestaurantsListPage} from '../../../cloud/super-admin-web/src/pages/Restaurants/RestaurantsListPage';
+import {OwnerHandover} from '../../../cloud/super-admin-web/src/pages/Restaurants/OwnerHandover';
+import {CopyButton} from '../../../cloud/super-admin-web/src/components/CopyButton';
+import '../../../cloud/super-admin-web/src/styles.css';
+const sample=[['Restaurant ID','JM1234567890'],['Internal UUID','fixture-internal-uuid'],['Activation key','FIXTURE-NOT-A-REAL-KEY'],['Invitation link','https://system.example.test/activate/fixture'],['Support token','fixture-not-a-real-token'],['License certificate','fixture.payload.signature'],['Owner email','owner@example.invalid']];
+const status={branch:{name:'Main Dining'},products:[{appCode:'QR_ORDERING',purchased:true,enabled:true,configured:true,ready:false,reason:'OK'}],checks:[],delivery:[],handovers:[],publishedMenuVersion:1};
+(window as any).__copyFixture={requests:[]};
+createRoot(document.getElementById('root')!).render(<BrowserRouter><main style={{maxWidth:1200,margin:'20px auto',padding:20}}><RestaurantsListPage/><OwnerHandover name="River House" restaurantCode="JM1234567890" branchId="fixture-branch" status={status as any} onOwner={()=>{}} onDevices={()=>{}}/><section aria-label="Shared copy variants" style={{padding:24,marginTop:24,background:'white',borderRadius:16,border:'1px solid #ddd'}}><h2>Copy control variants</h2><div style={{display:'flex',gap:16,flexWrap:'wrap',marginTop:20}}>{sample.map(([label,text])=><CopyButton key={label} text={text} label={`Copy ${label}`} title={`Copy ${label}`}/>)}<CopyButton text="fixture-icon-value" label="" title="Copy icon-only value"/></div></section></main></BrowserRouter>);

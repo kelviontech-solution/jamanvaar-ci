@@ -337,7 +337,7 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
       value: {
         platformName: 'JAMANVAAR SaaS Control Plane',
         companyName: 'Kelviontech',
-        supportEmail: 'support@jamanvaar.app',
+        supportEmail: 'kelviontech@gmail.com',
         supportPhone: '+91 98765 43210'
       }
     },

@@ -398,3 +398,14 @@
     background: #ffffff !important;
   }
 }
+.onboard-wizard .credentials-grid {grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:20px;}
+.onboard-wizard .credential-item {min-width:0;gap:8px;}
+.onboard-wizard .credential-value {font-family:inherit;font-size:15px;font-weight:650;line-height:1.6;min-height:46px;gap:12px;overflow-wrap:anywhere;}
+.onboard-wizard .credential-value>span,.onboard-wizard .credential-value>a {min-width:0;overflow-wrap:anywhere;}
+.onboard-wizard .credential-value>button {flex-shrink:0;min-width:32px;min-height:32px;}
+.onboard-wizard .credential-label {font-size:12px;line-height:1.5;}
+@media (max-width: 600px) {
+  .onboard-wizard .onboard-card {padding:16px;}
+  .onboard-wizard .modal-form {padding:0;}
+  .onboard-wizard .welcome-kit-container {padding:16px;}
+}

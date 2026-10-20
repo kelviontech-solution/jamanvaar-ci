@@ -161,4 +161,87 @@ describe('Restaurant user "forgot password" (BUG-142)', () => {
     expect((await reset('123456', 'short')).status).toBe(400);
     expect((await reset('12ab56', 'long-enough-password-8')).status).toBe(400);
   });
+
+  it('verifies the email code before accepting a new password and consumes the verified session once', async () => {
+    sent = []; await clearCooldown(); await forgot();
+    const code = lastCode();
+    const verified = await http().post('/api/v1/tenant-auth/verify-password-reset-owner').send({restaurantId, otp: code});
+    expect(verified.status, JSON.stringify(verified.body)).toBe(200);
+    expect(verified.body.resetToken).toHaveLength(43);
+    expect(verified.body.expiresInSeconds).toBeLessThanOrEqual(300);
+    const row = await prisma.runAsPlatform(tx => tx.user.findFirstOrThrow({where: {restaurantId, email: ownerEmail}}));
+    expect(row.passwordResetHash).toMatch(/^verified:/);
+    expect(row.passwordResetHash).not.toContain(verified.body.resetToken);
+    expect((await reset(code, 'recovery-verified-password-8')).status).toBe(400);
+    const body = {restaurantId, resetToken: verified.body.resetToken, newPassword: 'recovery-verified-password-8'};
+    const completed = await http().post('/api/v1/tenant-auth/reset-password-owner').send(body);
+    expect(completed.status, JSON.stringify(completed.body)).toBe(200);
+    expect((await http().post('/api/v1/tenant-auth/reset-password-owner').send(body)).status).toBe(400);
+    expect((await login(body.newPassword)).status).toBe(200);
+    // A second recovery immediately after success must send another email without clearing a cooldown manually.
+    sent = []; expect((await forgot()).status).toBe(200); expect(sent).toHaveLength(1);
+  });
+
+  it('allows a resend after 60 seconds, replaces the previous code and reports the actual cooldown', async () => {
+    sent = []; await clearCooldown(); await forgot(); const oldCode = lastCode();
+    const cooldown = await http().post('/api/v1/tenant-auth/forgot-password-owner').send({restaurantId});
+    expect(cooldown.status).toBe(200); expect(cooldown.body.retryAfterSeconds).toBeGreaterThan(0);
+    expect(cooldown.body.retryAfterSeconds).toBeLessThanOrEqual(60); expect(sent).toHaveLength(1);
+    await prisma.runAsPlatform(tx => tx.user.updateMany({where: {restaurantId, email: ownerEmail}, data: {passwordResetSentAt: new Date(Date.now() - 61_000)}}));
+    await forgot(); expect(sent).toHaveLength(2); const newCode = lastCode();
+    if (oldCode !== newCode) expect((await reset(oldCode, 'resend-password-9')).status).toBe(400);
+    expect((await reset(newCode, 'resend-password-9')).status).toBe(200);
+  });
+
+  it('releases failed email delivery so a new request can send, without changing the password', async () => {
+    sent = []; await clearCooldown();
+    vi.spyOn(app.get(EmailService), 'send').mockResolvedValueOnce(false);
+    await forgot();
+    await vi.waitFor(async () => {
+      const user = await prisma.runAsPlatform(tx => tx.user.findFirstOrThrow({where: {restaurantId, email: ownerEmail}}));
+      expect(user.passwordResetSentAt).toBeNull(); expect(user.passwordResetHash).toBeNull();
+    });
+    await forgot(); expect(sent).toHaveLength(1);
+    expect((await login('resend-password-9')).status).toBe(200);
+  });
+
+  it('rejects expired verification, allows immediate replacement and invalidates an old verified session on resend', async () => {
+    sent = []; await clearCooldown(); await forgot();
+    await prisma.runAsPlatform(tx => tx.user.updateMany({where: {restaurantId, email: ownerEmail}, data: {passwordResetExpiresAt: new Date(Date.now() - 1)}}));
+    expect((await http().post('/api/v1/tenant-auth/verify-password-reset-owner').send({restaurantId, otp: lastCode()})).status).toBe(400);
+    await forgot(); expect(sent).toHaveLength(2);
+    const verified = await http().post('/api/v1/tenant-auth/verify-password-reset-owner').send({restaurantId, otp: lastCode()});
+    expect(verified.status).toBe(200);
+    await clearCooldown(); await forgot();
+    expect((await http().post('/api/v1/tenant-auth/reset-password-owner').send({restaurantId, resetToken: verified.body.resetToken, newPassword: 'expired-session-password-10'})).status).toBe(400);
+  });
+
+  it('serializes parallel verification so the same email code produces only one verified session', async () => {
+    sent = []; await clearCooldown(); await forgot(); const otp = lastCode();
+    const results = await Promise.all([1,2].map(() => http().post('/api/v1/tenant-auth/verify-password-reset-owner').send({restaurantId, otp})));
+    expect(results.map(row => row.status).sort()).toEqual([200,400]);
+    const resetToken = results.find(row => row.status === 200)!.body.resetToken;
+    const completed = await Promise.all([1,2].map(() => http().post('/api/v1/tenant-auth/reset-password-owner').send({restaurantId, resetToken, newPassword: 'parallel-recovery-password-11'})));
+    expect(completed.map(row => row.status).sort()).toEqual([200,400]);
+  });
+
+  it('rejects an expired verified session and accepts a fresh request immediately', async () => {
+    sent = []; await clearCooldown(); await forgot();
+    const verified = await http().post('/api/v1/tenant-auth/verify-password-reset-owner').send({restaurantId, otp: lastCode()});
+    await prisma.runAsPlatform(tx => tx.user.updateMany({where: {restaurantId, email: ownerEmail}, data: {passwordResetExpiresAt: new Date(Date.now() - 1)}}));
+    expect((await http().post('/api/v1/tenant-auth/reset-password-owner').send({restaurantId, resetToken: verified.body.resetToken, newPassword:'expired-verified-password-12'})).status).toBe(400);
+    await forgot(); expect(sent).toHaveLength(2);
+  });
+
+  it('allows replacement after five wrong verification attempts without a 15-minute wait', async () => {
+    sent = []; await clearCooldown(); await forgot(); const code = lastCode(); const wrong = code === '000000' ? '111111' : '000000';
+    for (let i=0; i<5; i++) expect((await http().post('/api/v1/tenant-auth/verify-password-reset-owner').send({restaurantId,otp:wrong})).status).toBe(400);
+    expect((await http().post('/api/v1/tenant-auth/verify-password-reset-owner').send({restaurantId,otp:code})).status).toBe(400);
+    await forgot(); expect(sent).toHaveLength(2);
+  });
+
+  it('serializes simultaneous send requests into a single email', async () => {
+    sent = []; await clearCooldown(); const responses = await Promise.all([forgot(),forgot()]);
+    expect(responses.map(row=>row.status)).toEqual([200,200]); expect(sent).toHaveLength(1);
+  });
 });

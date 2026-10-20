@@ -1,10 +1,10 @@
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
-import { copyText } from '../../../../../packages/utils/src/clipboard';
+import { CopyButton } from '../../components/CopyButton';
 import React, { useState } from 'react';
 import { Modal, Button, Input } from '../../components/ui';
 import { api, ApiError } from '../../api/client';
 import type { PlatformRole } from '../../api/types';
-import { UserPlus, Check, Copy } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 
 interface InviteTeammateModalProps {
   onClose: () => void;
@@ -30,7 +30,6 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
     emailSent: boolean;
     activationUrl?: string;
   } | null>(null);
-  const [copied, setCopied] = useState(false);
 
   function reset() {
     setFullName('');
@@ -38,7 +37,6 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
     setRole('READ_ONLY');
     setError(null);
     setInviteResult(null);
-    setCopied(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -70,12 +68,6 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
     }
   }
 
-  async function handleCopyActivationLink() {
-    if (inviteResult?.activationUrl && (await copyText(inviteResult.activationUrl))) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    }
-  }
 
   return (
     <Modal
@@ -165,15 +157,7 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
                     borderRadius: 6
                   }}
                 />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopyActivationLink}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                >
-                  {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                  {copied ? 'Copied' : 'Copy'}
-                </Button>
+                <CopyButton text={inviteResult.activationUrl} label="Copy invitation link" />
               </div>
             </div>
           )}

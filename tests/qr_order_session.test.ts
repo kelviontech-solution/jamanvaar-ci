@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
-import { afterEach, describe, it, expect, vi } from 'vitest';
-import { QrApi } from '../apps/qr-guest/src/api';
+import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
+beforeEach(()=>{sessionStorage.clear();localStorage.clear();vi.resetModules();});
 afterEach(() => {
   sessionStorage.clear();
   vi.unstubAllGlobals();
 });
 describe('QR order and payment recovery retain the signed browser session', () => {
   it('sends the original proof on status, retry, verification and counter fallback', async () => {
+    const {QrApi}=await import('../apps/qr-guest/src/api');
     const proof = 'original-server-signed-browser-session';
     sessionStorage.setItem('jv_qr_session2', proof);
     const fetch = vi
@@ -31,6 +32,7 @@ describe('QR order and payment recovery retain the signed browser session', () =
     }
   });
   it('never invents a proof when storage has no signed session', async () => {
+    const {QrApi}=await import('../apps/qr-guest/src/api');
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ publicOrderId: 'legacy-order' }), { status: 200 }));
     vi.stubGlobal('fetch', fetch);
     await QrApi.status('legacy-order');

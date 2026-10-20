@@ -77,4 +77,9 @@ describe('copyText', () => {
     g.document = undefined;
     expect(await copyText('X')).toBe(false);
   });
+  it('reports failure if the fallback DOM operation is blocked instead of throwing', async () => {
+    setNavigator({});fakeDocument(true);
+    g.document.body.appendChild=()=>{throw new Error('DOM is no longer available');};
+    await expect(copyText('X')).resolves.toBe(false);
+  });
 });

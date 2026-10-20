@@ -1,0 +1,14 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {BrowserRouter} from 'react-router-dom';
+import {OwnerHandover} from '../../../cloud/super-admin-web/src/pages/Restaurants/OwnerHandover';
+import QrWorkspace from '../../../apps/restaurant-system/pos-admin/src/qr/QrWorkspace';
+import '../../../cloud/super-admin-web/src/styles.css';
+import '../../../apps/restaurant-system/pos-admin/src/qr/product.css';
+const combined = new URLSearchParams(location.search).has('combined');
+const applications = combined ? ['POS_ADMIN','POS','QR_ORDERING'] : ['QR_ORDERING'];
+const status={branch:{name:'Main Dining & Kitchen'},products:applications.map(appCode=>({appCode,purchased:true,enabled:true,configured:true,ready:false,reason:'OK'})),checks:[{id:'test-QR',label:'QR channel test',done:false}],delivery:[],handovers:[],publishedMenuVersion:1};
+(window as any).__tasks={ownerAccess:false,devices:false};
+localStorage.setItem('jamanvaar_cloud_restaurant_id','fixture-restaurant');
+if(!localStorage.getItem('jamanvaar_admin_branch:fixture-restaurant'))localStorage.setItem('jamanvaar_admin_branch:fixture-restaurant','branch-b');
+createRoot(document.getElementById('root')!).render(<BrowserRouter>{location.pathname.startsWith('/qr/') ? <QrWorkspace page={location.pathname.includes('/login/')?'LOGIN':'ADMIN'} toast={()=>{}}/> : <div style={{maxWidth:1160,padding:20,margin:'30px auto'}}><OwnerHandover name="River House" restaurantCode="JM1234567890" branchId="branch-a" status={status as any} owner={{id:'fixture-owner',status:'ACTIVE'} as any} onOwner={()=>{(window as any).__tasks.ownerAccess=true;}} onDevices={()=>{(window as any).__tasks.devices=true;}}/></div>}</BrowserRouter>);

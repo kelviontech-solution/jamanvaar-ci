@@ -86,7 +86,7 @@ export const SETTING_DEFAULTS: Record<string, Record<string, unknown>> = {
   'platform.branding': {
     platformName: 'JAMANVAAR SaaS Control Plane',
     companyName: 'Kelviontech',
-    supportEmail: 'support@jamanvaar.app',
+    supportEmail: 'kelviontech@gmail.com',
     supportPhone: ''
   },
   // The values invoices carried before this was editable; replace them with the real company's details.

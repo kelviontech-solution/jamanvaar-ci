@@ -1,0 +1,109 @@
+.copy-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+  vertical-align: middle;
+}
+.copy-control-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.copy-control[data-copy-state='copied'] {
+  background: var(--jv-success-soft, #e9f8ef) !important;
+  border-color: var(--jv-success-text, #15804b) !important;
+  color: var(--jv-success-text, #12613d) !important;
+  animation: copy-confirm 0.3s ease-out;
+}
+.copy-control[data-copy-state='copied'] .copy-control-icon {
+  animation: copy-tick 0.28s ease-out;
+}
+.copy-control[data-copy-state='copying'] .copy-control-icon {
+  animation: copy-spin 0.8s linear infinite;
+}
+.copy-control[data-copy-state='failed'] {
+  border-color: var(--jv-danger-text, #b42318) !important;
+  color: var(--jv-danger-text, #b42318) !important;
+}
+.copy-manual {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--jv-text, #0b253a);
+}
+.copy-manual h2 {
+  font-size: 21px;
+  font-weight: 750;
+  margin: 0;
+}
+.copy-manual p {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0;
+}
+.copy-manual label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.copy-manual textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 140px;
+  max-height: 50vh;
+  padding: 12px;
+  border: 1px solid var(--jv-border, #d9ddd7);
+  border-radius: 10px;
+  background: var(--jv-surface, #fff);
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+  overflow-wrap: anywhere;
+}
+.copy-manual .btn {
+  align-self: flex-end;
+  min-height: 44px;
+}
+@keyframes copy-confirm {
+  0% {
+    box-shadow: 0 0 0 0 #16834b35;
+  }
+  100% {
+    box-shadow: 0 0 0 7px #16834b00;
+  }
+}
+@keyframes copy-tick {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.3;
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes copy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .copy-control {
+    transition: none;
+  }
+  .copy-control[data-copy-state],
+  .copy-control .copy-control-icon {
+    animation: none !important;
+  }
+}
