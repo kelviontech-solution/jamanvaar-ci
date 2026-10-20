@@ -1,0 +1,90 @@
+{
+  "checks": [
+    {
+      "name": "1440: floating Display is absent from DOM",
+      "status": "PASS"
+    },
+    {
+      "name": "1440: footer metrics remain intact",
+      "status": "PASS"
+    },
+    {
+      "name": "1440: operational shortcuts unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1440: no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: floating Display is absent from DOM",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: footer metrics remain intact",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: operational shortcuts unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: floating Display is absent from DOM",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: footer metrics remain intact",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: operational shortcuts unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Settings retains default ON toggle",
+      "status": "PASS"
+    },
+    {
+      "name": "Settings toggle still persists OFF",
+      "status": "PASS"
+    },
+    {
+      "name": "Floating Display remains removed even with toggle ON",
+      "status": "PASS"
+    },
+    {
+      "name": "Existing large display preset works in Settings",
+      "status": "PASS"
+    },
+    {
+      "name": "Existing contrast display preset works in Settings",
+      "status": "PASS"
+    },
+    {
+      "name": "Existing standard display preset works in Settings",
+      "status": "PASS"
+    },
+    {
+      "name": "Existing screen-size slider responds to keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "Floating Display stays absent after reload",
+      "status": "PASS"
+    },
+    {
+      "name": "No uncaught browser errors",
+      "status": "PASS",
+      "evidence": []
+    }
+  ],
+  "errors": []
+}

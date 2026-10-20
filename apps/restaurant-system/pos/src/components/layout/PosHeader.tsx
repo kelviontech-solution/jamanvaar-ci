@@ -612,12 +612,13 @@ export const PosHeader: React.FC = () => {
                     {hardwareStatus.localDb ? 'ACTIVE' : 'UNAVAILABLE'}
                   </span>
                 </div>
-                <div
+                <button
+                  type="button"
                   onClick={() => {
                     setProfileDropdownOpen(false);
                     setIsPrintQueueOpen(true);
                   }}
-                  className="flex items-center justify-between cursor-pointer"
+                  className="w-full flex items-center justify-between cursor-pointer rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jaman-saffron/60"
                 >
                   <span className="flex items-center gap-1.5 text-slate-600">
                     <Printer className={`w-3 h-3 ${isPrinterOffline ? 'text-rose-600' : 'text-emerald-600'}`} />
@@ -626,7 +627,7 @@ export const PosHeader: React.FC = () => {
                   <span className={`font-bold ${isPrinterOffline ? 'text-rose-700' : 'text-emerald-700'}`}>
                     {isPrinterOffline ? 'OFFLINE' : 'READY'}
                   </span>
-                </div>
+                </button>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5 text-slate-600">
                     <ChefHat className={`w-3 h-3 ${kdsConnected ? 'text-emerald-600' : 'text-amber-600'}`} />
@@ -636,7 +637,7 @@ export const PosHeader: React.FC = () => {
                     {kdsConnected ? 'SYNCED' : 'NOT CONNECTED'}
                   </span>
                 </div>
-                <div onClick={toggleNetworkStatus} className="flex items-center justify-between cursor-pointer">
+                <button type="button" onClick={toggleNetworkStatus} className="w-full flex items-center justify-between cursor-pointer rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jaman-saffron/60">
                   <span className="flex items-center gap-1.5 text-slate-600">
                     {isOnline ? <Wifi className="w-3 h-3 text-emerald-600" /> : <WifiOff className="w-3 h-3 text-amber-600" />}
                     LAN / Cloud Sync
@@ -644,7 +645,7 @@ export const PosHeader: React.FC = () => {
                   <span className={`font-bold ${isOnline ? 'text-emerald-700' : 'text-amber-700'}`}>
                     {isOnline ? 'ONLINE' : 'OFFLINE'}
                   </span>
-                </div>
+                </button>
               </div>
 
               <div className="pt-1 space-y-0.5">

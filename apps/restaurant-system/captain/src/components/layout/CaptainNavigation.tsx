@@ -61,8 +61,8 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
 
   return (
     <>
-      {/* ── Desktop / Tablet Top Navigation Bar ── */}
-      <nav className="hidden md:block bg-white border-b border-jaman-border px-4 py-2 shadow-2xs">
+      {/* ── Landscape tablet / desktop top navigation bar (lg and up) ── */}
+      <nav className="hidden lg:block bg-white border-b border-jaman-border px-4 py-2 shadow-2xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           {/* Primary 4 Tabs */}
           <div className="flex items-center gap-2">
@@ -127,15 +127,16 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
         </div>
       </nav>
 
-      {/* ── Mobile / Tablet Bottom Navigation Bar (Fixed Touch Ergonomics) ──
+      {/* ── Phone / portrait-tablet Bottom Navigation Bar (Fixed Touch Ergonomics) ──
           paddingBottom adds the device's safe-area inset (notch/home-indicator
           devices) on top of the normal 6px padding, so the row of buttons
           never sits flush against a gesture bar. */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-jaman-border px-2 pt-1.5 shadow-lg select-none"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-jaman-border px-1.5 pt-1.5 shadow-lg select-none"
         style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}
+        aria-label="Captain sections"
       >
-        <div className="grid grid-cols-5 gap-1">
+        <div className="grid grid-cols-5 gap-0.5">
           {primaryTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -145,12 +146,13 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
                 key={tab.id}
                 type="button"
                 onClick={() => onSelectTab(tab.id as any)}
-                className={`py-1.5 px-1 min-h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
+                aria-current={isActive ? 'page' : undefined}
+                className={`py-1 px-0.5 min-h-[52px] min-w-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer active:scale-95 ${
                   isActive
                     ? 'bg-jaman-navy text-white shadow-sm'
                     : tab.isUrgent
-                    ? 'text-emerald-700 font-bold bg-emerald-50'
-                    : 'text-slate-600 hover:bg-jaman-cream'
+                    ? 'text-emerald-700 font-bold bg-emerald-50 active:bg-emerald-100'
+                    : 'text-slate-600 hover:bg-jaman-cream active:bg-jaman-cream'
                 }`}
               >
                 <div className="relative">
@@ -173,7 +175,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
                     </span>
                   )}
                 </div>
-                <span className="text-[11px] font-bold tracking-tight truncate max-w-[60px]">
+                <span className="text-[10px] min-[360px]:text-[11px] font-bold leading-[1.1] text-center break-words line-clamp-2 w-full">
                   {t(tab.label)}
                 </span>
               </button>
@@ -184,10 +186,10 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
           <button
             type="button"
             onClick={onOpenMoreDrawer}
-            className={`py-1.5 px-1 min-h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
+            className={`py-1 px-0.5 min-h-[52px] min-w-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer active:scale-95 ${
               activeTab === 'KOTS' || activeTab === 'REQUESTS' || activeTab === 'SHIFT'
                 ? 'bg-jaman-navy text-white shadow-sm'
-                : 'text-slate-600 hover:bg-jaman-cream'
+                : 'text-slate-600 hover:bg-jaman-cream active:bg-jaman-cream'
             }`}
           >
             <div className="relative">
@@ -196,7 +198,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               )}
             </div>
-            <span className="text-[11px] font-bold tracking-tight">{t('More Options')}</span>
+            <span className="text-[10px] min-[360px]:text-[11px] font-bold leading-[1.1] text-center break-words line-clamp-2 w-full">{t('More Options')}</span>
           </button>
         </div>
       </nav>

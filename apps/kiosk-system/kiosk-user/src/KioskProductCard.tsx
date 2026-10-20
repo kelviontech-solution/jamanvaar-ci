@@ -62,7 +62,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
           </span>
         </div>
 
-        <div className="kiosk-product-actions flex items-center justify-end gap-2 shrink-0">
+        <div className="kiosk-product-actions">
           {hasModifiers && onCustomize && (
             <button
               type="button"
@@ -70,7 +70,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
                 e.stopPropagation();
                 onCustomize(item);
               }}
-              className="kiosk-product-action kiosk-product-customize text-sm font-bold whitespace-nowrap"
+              className="kiosk-product-action kiosk-product-customize"
               title="Customize"
             >
               Customize
@@ -86,7 +86,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
             title="Add to Cart"
             aria-label={`Add ${displayName || item.name} to cart`}
           >
-            <Plus className="w-6 h-6 stroke-[2.5]" />
+            <Plus size={18} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>

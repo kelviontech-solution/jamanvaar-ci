@@ -57,7 +57,31 @@ async function open(app, role = app, viewport = { width: 1440, height: 960 }) {
 async function snap(p, label) {
   const file = `${label.replace(/[^a-z0-9_-]/gi, '-')}.png`;
   await p.screenshot({ path: path.join(reportDir, 'evidence', file), fullPage: true, mask: [p.getByText(/JMV-[A-Z0-9]{4}-[A-Z0-9-]+/), p.locator('input[placeholder="JMV-XXXX-XXXX-XXXX"]')] });
-  const info = await p.evaluate(() => ({ title: document.title, text: document.body.innerText, headings: [...document.querySelectorAll('h1,h2,h3')].map(e => e.textContent), buttons: [...document.querySelectorAll('button')].map(e => ({ text: e.innerText, aria: e.getAttribute('aria-label'), title: e.title, disabled: e.disabled })), inputs: [...document.querySelectorAll('input,select,textarea')].map(e => ({ tag: e.tagName, type: e.type, placeholder: e.getAttribute('placeholder'), name: e.name, id: e.id, options: e.tagName === 'SELECT' ? [...e.options].map(o => ({ value: o.value, text: o.text })) : undefined })), links: [...document.querySelectorAll('a[href]')].map(e => ({ text: e.textContent, href: e.getAttribute('href') })), overflow: document.documentElement.scrollWidth > innerWidth }));
+  await p.waitForTimeout(100);
+  const info = await p.evaluate(() => {
+    const visible = (element) => {
+      const style = getComputedStyle(element);
+      return element.getClientRects().length > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+    };
+    const buttons = [...document.querySelectorAll('button')].map(e => ({
+      text: (e.innerText || e.textContent || '').trim(),
+      aria: e.getAttribute('aria-label'),
+      title: e.title,
+      disabled: e.disabled,
+      visible: visible(e)
+    }));
+    return {
+      title: document.title,
+      text: document.body.innerText,
+      headings: [...document.querySelectorAll('h1,h2,h3')].map(e => e.textContent),
+      buttons,
+      inputs: [...document.querySelectorAll('input,select,textarea')].map(e => ({ tag: e.tagName, type: e.type, placeholder: e.getAttribute('placeholder'), name: e.name, id: e.id, visible: visible(e), options: e.tagName === 'SELECT' ? [...e.options].map(o => ({ value: o.value, text: o.text })) : undefined })),
+      links: [...document.querySelectorAll('a[href]')].map(e => ({ text: (e.innerText || e.textContent || '').trim(), href: e.getAttribute('href'), visible: visible(e) })),
+      images: [...document.querySelectorAll('img')].map(e => ({ src: e.currentSrc || e.src, alt: e.alt, width: e.naturalWidth, height: e.naturalHeight, loaded: e.complete && e.naturalWidth > 0, visible: visible(e) })),
+      overflow: document.documentElement.scrollWidth > innerWidth,
+      unlabelledButtons: buttons.filter(button => button.visible && !button.text.trim() && !button.aria && !button.title).length
+    };
+  });
   fs.writeFileSync(path.join(reportDir, 'evidence', file.replace('.png', '.json')), scrub(JSON.stringify(info, null, 2)));
   return info;
 }
@@ -85,4 +109,4 @@ async function api(method, endpoint, data, token = state.platformToken) {
 }
 async function mustApi(method, endpoint, data, token) { const r = await api(method, endpoint, data, token); if (r.status >= 400) throw Error(`${method} ${endpoint}: ${r.status}: ${scrub(JSON.stringify(r.body)).slice(0, 700)}`); return r.body; }
 async function close() { for (const c of contexts) await c.close(); }
-module.exports = { fs, path, root, privateDir, reportDir, state, saveState, open, snap, test, api, mustApi, close, append, expect, ports };
+module.exports = { fs, path, root, privateDir, reportDir, state, saveState, open, snap, test, api, mustApi, close, append, expect, ports, scrub };

@@ -1,0 +1,30 @@
+{
+  "checks": [
+    {
+      "name": "admin: OFF removes launcher",
+      "status": "PASS"
+    },
+    {
+      "name": "admin: OFF persists after reload",
+      "status": "PASS"
+    },
+    {
+      "name": "admin: ON restores launcher",
+      "status": "PASS"
+    },
+    {
+      "name": "admin: existing Display panel still opens",
+      "status": "PASS"
+    },
+    {
+      "name": "admin: existing larger text mode applies",
+      "status": "PASS"
+    },
+    {
+      "name": "admin: no uncaught browser errors",
+      "status": "PASS",
+      "evidence": []
+    }
+  ],
+  "errors": []
+}

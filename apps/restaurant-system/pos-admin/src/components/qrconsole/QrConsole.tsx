@@ -1,6 +1,7 @@
 import {QrReceiptSettings} from './QrReceiptSettings';
 import {QrRestaurantPage} from './QrRestaurantPage';
 import {QrRestaurantPageQr} from './QrRestaurantPageQr';
+import { DisplayButtonSetting } from '@jamanvaar/ui';
 import {OperationsConsole} from '../operations/OperationsConsole';
 import {storedAdminBranch} from '../../adminBranchScope';
 import { QrOnboarding } from './QrOnboarding';
@@ -1370,6 +1371,7 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
   if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
   return (
     <div className="rounded-2xl border border-jaman-border bg-white divide-y max-w-2xl">
+      <div className="p-4"><DisplayButtonSetting /></div>
       <div className="p-4 bg-jaman-ivory rounded-t-2xl" role="status">
         <strong className="block text-sm text-jaman-navy">
           Mobile online payment:{" "}

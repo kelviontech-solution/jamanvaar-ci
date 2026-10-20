@@ -3,7 +3,7 @@ const loadKitchenWait = async () => { const r = await deviceFetch('/api/v1/opera
 import { KioskSearchKeyboard } from './KioskSearchKeyboard';
 import {checkBranchService} from './branchService';
 import { DeviceCommandRunner, AppUpdate, type AppUpdateOffer } from '@jamanvaar/sync';
-import { KioskWelcomeScreen, KioskLanguageScreen, registerNativeUpdateGuard } from '@jamanvaar/ui';
+import { DisplayButtonSetting, KioskWelcomeScreen, KioskLanguageScreen, registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
 import { welcomePresentation, languageScreenPresentation, kioskScreenBackgroundSources, welcomeBackgroundUrl, WelcomeImageCache, resolveMenuImage } from '@jamanvaar/utils';
 import { kioskActivationError } from './activationErrors';
@@ -14,6 +14,7 @@ import { runStaffTriggeredUpdate, type DesktopUpdateProgress } from './desktopUp
 import React, { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { KioskProductCard } from './KioskProductCard';
+import { useKioskCartFeedback } from './useKioskCartFeedback';
 import { KioskReceiptDeliveryDialog, type ReceiptDeliveryChannel, type ReceiptDeliveryResult } from './KioskReceiptDeliveryDialog';
 import { useKioskConfirmationReturn } from './useKioskConfirmationReturn';
 import { cancelAbandonedKioskDraft } from './kioskOrderLifecycle';
@@ -955,6 +956,9 @@ export default function KioskUserApp() {
   const netTotalPayable = step === 'CHECKOUT_PAYMENT' && paymentMethod === 'UPI' && quotedPayable !== null
     ? quotedPayable : Math.max(0, rawCalculated.totalPayable - loyaltyDiscountAmount - staffDiscount);
   const cartItemQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const { cartSummaryRef, cartTotalRef } = useKioskCartFeedback(
+    cartItemQuantity, netTotalPayable, step === 'MENU' && !isCartOpen
+  );
   const kioskSurfaceClass = 'rounded-xl border border-jaman-border bg-white shadow-sm';
   const kioskAmountClass = 'text-right tabular-nums whitespace-nowrap';
   const kioskCategoryTileClass = (active: boolean) =>
@@ -2158,6 +2162,9 @@ export default function KioskUserApp() {
         ::view-transition-new(root) {
           animation: none;
         }
+        ::view-transition {
+          pointer-events: none;
+        }
         ::view-transition-old(kiosk-menu) {
           animation: 200ms ease-out both kioskFadeOut;
         }
@@ -2856,14 +2863,14 @@ export default function KioskUserApp() {
                               </div>
                               <span className="kiosk-product-note block text-xs font-bold text-emerald-600">{kioskCopy("screen_save__2eaea5", "Save ₹")}{combo.savingsAmount}</span>
                             </div>
-                            <div className="kiosk-product-actions flex items-center justify-end gap-2 shrink-0">
+                            <div className="kiosk-product-actions">
                               <button
                                 onClick={() => handleSelectCombo(combo)}
                                 className="kiosk-product-action kiosk-product-add bg-jaman-saffron text-white"
                                 title="Add Combo to Cart"
                                 aria-label={`Add ${localizedName(combo, lang)} combo to cart`}
                               >
-                                <Plus className="w-6 h-6 stroke-[2.5]" />
+                                <Plus size={18} strokeWidth={2} aria-hidden="true" />
                               </button>
                             </div>
                           </div>
@@ -3164,28 +3171,29 @@ export default function KioskUserApp() {
               className="kiosk-cart-dock pointer-events-none absolute z-40 flex justify-center"
             >
               <button
+                ref={cartSummaryRef}
                 type="button"
                 onClick={() => {
                   SoundService.playTap();
                   setIsCartOpen(true);
                 }}
-                className="kiosk-cart-summary pointer-events-auto w-full max-w-[760px] min-w-0 rounded-2xl overflow-hidden bg-jaman-saffron text-white shadow-[0_8px_24px_rgba(11,37,58,0.16)] flex items-stretch justify-between active:scale-[0.99] transition-transform"
+                className="kiosk-cart-summary pointer-events-auto w-full min-w-0 overflow-hidden bg-jaman-saffron text-white flex items-stretch justify-between"
               >
-                <span className="kiosk-cart-info flex items-center gap-2.5 px-3 min-w-0">
-                  <span className="kiosk-cart-icon w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                    <ShoppingBag className="w-5 h-5 text-white" />
+                <span className="kiosk-cart-info flex items-center min-w-0">
+                  <span className="kiosk-cart-icon flex items-center justify-center shrink-0">
+                    <ShoppingBag size={18} className="text-white" aria-hidden="true" />
                   </span>
                   <span className="text-left min-w-0">
                     <span className="kiosk-cart-count block font-semibold text-white/90">
                       {cartItemQuantity} {cartItemQuantity === 1 ? kioskCopy("screen_item_in_cart_9f91ad", "item in cart") : kioskCopy("screen_items_in_cart_07b69e", "items in cart")}
                     </span>
-                    <span className="kiosk-cart-total block font-black leading-tight tabular-nums whitespace-nowrap">{formatINR(netTotalPayable)}</span>
+                    <span ref={cartTotalRef} className="kiosk-cart-total block font-bold leading-tight tabular-nums whitespace-nowrap">{formatINR(netTotalPayable)}</span>
                   </span>
                 </span>
-                <span className="kiosk-cart-checkout bg-white/95 text-jaman-saffron px-3 flex items-center gap-2 text-sm font-bold whitespace-nowrap border-l border-jaman-saffron/15 shrink-0">
+                <span className="kiosk-cart-checkout bg-white/95 text-jaman-saffron flex items-center font-semibold whitespace-nowrap border-l border-jaman-saffron/15 shrink-0">
                   <span className="kiosk-cart-checkout-full">{kioskCopy("screen_view_cart_checkout_2d62d4", "View Cart & Checkout")}</span>
                   <span className="kiosk-cart-checkout-short">{kioskCopy("screen_checkout_8b785d", "Checkout")}</span>
-                  <ArrowRight className="w-5 h-5 shrink-0" />
+                  <ArrowRight size={18} className="shrink-0" aria-hidden="true" />
                 </span>
               </button>
             </div>
@@ -4257,6 +4265,7 @@ export default function KioskUserApp() {
       >
         <div className="space-y-3 py-2">
           <p className="text-xs text-[#4A5568]">{verifiedStaffName ? `Signed in as ${verifiedStaffName}.` : 'Staff verified.'} Choose what you need:</p>
+          <DisplayButtonSetting />
           <Button variant="accent" className="w-full justify-center" onClick={handleApplyManagerDiscount}>
             Apply 10% Manager Discount
           </Button>

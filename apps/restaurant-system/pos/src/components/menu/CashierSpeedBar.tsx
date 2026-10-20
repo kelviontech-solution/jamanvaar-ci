@@ -4,6 +4,7 @@ import { usePosStore } from '../../store/posStore';
 import { deviceFetch } from '../../cloud/cloudClient';
 import { cashierSettings, saveCashierSettings, type CashierSettings } from '../../cashierSpeed';
 import { resolveModifierGroups, dishNeedsChoiceBeforeAdd } from '@jamanvaar/business';
+import { PosOperationalShortcuts } from '../layout/PosOperationalShortcuts';
 export function CashierSpeedBar() {
   const [settings, setSettings] = useState(cashierSettings),
     [code, setCode] = useState(''),
@@ -44,30 +45,33 @@ export function CashierSpeedBar() {
   };
   return (
     <section className="shrink-0 rounded-xl border border-orange-200 bg-orange-50/70 p-2 text-sm">
-      <div className="flex flex-wrap gap-2 items-center">
-        <button className="rounded-lg bg-white px-3 py-2 font-bold text-jaman-navy" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>
-          Quick service {expanded ? '−' : '+'}
-        </button>
-        <button
-          disabled={cart.items.length > 0}
-          className="rounded-lg bg-white px-3 py-2 disabled:opacity-40"
-          onClick={() => {
-            const repeated = repeatLastOrder();
-            setNotice(repeated ? 'Previous order restored at current prices. Review before charging.' : 'No previous completed order is available.');
-          }}
-        >
-          Repeat last order
-        </button>
-        {settings.favoriteItemIds.map((id) => {
-          const item = db.menuItems.find((i) => i.id === id);
-          return (
-            item && (
-              <button key={id} disabled={item.isAvailable === false} className="rounded-lg bg-white px-3 py-2 disabled:opacity-40" onClick={() => add(id)}>
-                {item.name}
-              </button>
-            )
-          );
-        })}
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="flex flex-1 basis-[260px] min-w-0 flex-wrap gap-2 items-center">
+          <button className="min-h-11 rounded-lg bg-white px-3 py-2 font-bold text-jaman-navy" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>
+            Quick service {expanded ? '−' : '+'}
+          </button>
+          <button
+            disabled={cart.items.length > 0}
+            className="min-h-11 rounded-lg bg-white px-3 py-2 disabled:opacity-40"
+            onClick={() => {
+              const repeated = repeatLastOrder();
+              setNotice(repeated ? 'Previous order restored at current prices. Review before charging.' : 'No previous completed order is available.');
+            }}
+          >
+            Repeat last order
+          </button>
+          {settings.favoriteItemIds.map((id) => {
+            const item = db.menuItems.find((i) => i.id === id);
+            return (
+              item && (
+                <button key={id} disabled={item.isAvailable === false} className="rounded-lg bg-white px-3 py-2 disabled:opacity-40" onClick={() => add(id)}>
+                  {item.name}
+                </button>
+              )
+            );
+          })}
+        </div>
+        <PosOperationalShortcuts />
       </div>
       {expanded && (
         <form

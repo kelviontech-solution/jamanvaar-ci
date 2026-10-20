@@ -223,7 +223,10 @@ export const App: React.FC = () => {
   return (
     <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN">
       <div data-jv-workspace="captain" className="min-h-dvh bg-[#FBF8F2] flex flex-col select-none text-jaman-navy">
-        <div className="sticky top-0 z-30 bg-white">
+        {/* Below md only the header sticks (the priority chips scroll away with the content, so a phone keeps its
+            height for the tables); from md up the whole header / chips / nav block sticks together. `contents`
+            lets the children take part in the outer column on a phone without a wrapper box. */}
+        <div className="contents md:block md:sticky md:top-0 md:z-30 md:bg-white">
         {/* ── Brand Header with Master Logo & Quick Actions ── */}
         <CaptainHeader
           onOpenNotifications={() => setIsNotificationsOpen(true)}
@@ -248,7 +251,7 @@ export const App: React.FC = () => {
         </div>
 
         {/* ── Main View Container ── */}
-        <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6">
+        <main className="flex-1 min-w-0 max-w-7xl w-full mx-auto px-3 pt-3 pb-[calc(var(--cap-nav-h)+4.5rem)] sm:px-5 sm:pt-5 lg:pb-6 lg:px-6 lg:pt-6">
           {/* TAB 1: MY TABLES (HOME) */}
           {activeTab === 'TABLES' && (
             <CaptainFloorView
@@ -301,11 +304,11 @@ export const App: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsAiAssistantOpen(true)}
-          className="fixed bottom-16 md:bottom-6 right-4 md:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-jaman-navy to-[#1a4a6e] text-white flex items-center justify-center shadow-md border-2 border-jaman-saffron hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+          className="fixed bottom-[calc(var(--cap-nav-h)+8px)] lg:bottom-6 right-3 lg:right-6 z-40 w-11 h-11 lg:w-14 lg:h-14 rounded-full bg-gradient-to-tr from-jaman-navy to-[#1a4a6e] text-white flex items-center justify-center shadow-md border-2 border-jaman-saffron hover:scale-105 active:scale-95 transition-all cursor-pointer group"
           title="JAMAN AI Floor Intelligence Assistant"
           aria-label="Open JAMAN AI Floor Intelligence Assistant"
         >
-          <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-jaman-saffron fill-jaman-saffron group-hover:rotate-12 transition-transform" />
+          <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 text-jaman-saffron fill-jaman-saffron group-hover:rotate-12 transition-transform" />
           <span className="sr-only">JAMAN AI</span>
         </button>
         )}

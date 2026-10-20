@@ -4,3 +4,11 @@
 {"at":"2026-10-06T03:11:36.682Z","app":"kds","role":"kds","status":200,"contentType":"text/event-stream"}
 {"at":"2026-10-06T03:11:45.724Z","app":"pos","role":"pos","status":200,"contentType":"text/event-stream"}
 {"at":"2026-10-06T03:11:47.064Z","app":"kds","role":"kds","status":200,"contentType":"text/event-stream"}
+{"at":"2026-10-17T10:44:05.572Z","app":"pos","role":"pos","status":200,"contentType":"text/event-stream"}
+{"at":"2026-10-17T10:44:18.246Z","app":"pos","role":"pos","status":200,"contentType":"text/event-stream"}
+{"at":"2026-10-17T10:58:37.871Z","app":"admin","role":"admin","status":200,"contentType":"text/event-stream"}
+{"at":"2026-10-17T10:58:43.110Z","app":"pos","role":"pos","status":200,"contentType":"text/event-stream"}
+{"at":"2026-10-17T10:58:47.343Z","app":"kiosk","role":"kiosk","status":200,"contentType":"text/event-stream"}
+{"at":"2026-10-17T10:59:40.058Z","app":"admin","role":"admin","status":200,"contentType":"text/event-stream"}
+{"at":"2026-10-17T10:59:45.052Z","app":"pos","role":"pos","status":200,"contentType":"text/event-stream"}
+{"at":"2026-10-17T10:59:50.132Z","app":"kiosk","role":"kiosk","status":200,"contentType":"text/event-stream"}

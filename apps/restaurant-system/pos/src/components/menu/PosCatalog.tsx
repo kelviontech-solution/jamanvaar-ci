@@ -199,25 +199,11 @@ export const PosCatalog: React.FC = () => {
     return sorted.slice(0, 5);
   }, [db.orders, db.menuItems]);
 
-  // What the category rail in the sidebar has selected, shown here as a small heading so it's
-  // clear which list of dishes is on screen (the categories themselves live in PosSidebar now).
-  const selectedGroup = displayCategoryGroups.find(
-    (g) => g.canonicalKey === selectedCategory || g.categoryIds.includes(selectedCategory)
-  );
-  const currentCategoryLabel = selectedCategory === 'ALL' ? 'All Menu' : selectedGroup?.displayLabel ?? 'Menu';
-
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent space-y-2.5 select-none min-w-0">
       <CashierSpeedBar />
-      {/* 1. CURRENT CATEGORY HEADING (the categories themselves are chosen in the left sidebar) */}
-      <div className="shrink-0 px-1 pt-1">
-        <h2 className="font-bold text-xl sm:text-2xl text-jaman-navy tracking-tight truncate leading-tight">{currentCategoryLabel}</h2>
-        <span className="text-xs font-semibold text-slate-500">
-          {filteredMenuItems.length} dish{filteredMenuItems.length === 1 ? '' : 'es'}
-        </span>
-      </div>
 
-      {/* 2. SECONDARY TOOLBAR: DIETARY FILTERS + QUICK ADD */}
+      {/* DIETARY FILTERS + QUICK ADD */}
       <div className="flex items-center justify-between gap-2 shrink-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {/* Left: Food Type Dietary Filter Pills */}
         <div className="flex items-center gap-1.5 shrink-0">
@@ -312,7 +298,7 @@ export const PosCatalog: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. MENU GRID (Spacious 3-4 column layout with large, high-legibility cards) */}
+      {/* MENU GRID (Spacious 3-4 column layout with large, high-legibility cards) */}
       <div className="flex-1 overflow-y-auto p-3 scrollbar-thin bg-white border border-jaman-border rounded-2xl shadow-2xs">
         {filteredMenuItems.length > 0 ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(196px,1fr))] gap-2.5 pb-1">

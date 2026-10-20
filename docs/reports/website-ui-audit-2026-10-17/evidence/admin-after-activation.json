@@ -1,0 +1,312 @@
+{
+  "title": "JAMANVAAR | Restaurant Admin",
+  "text": "JAMANVAAR RESTAURANT\nRESTAURANT ADMIN\nAll branches\nCtrl+K\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nQA-Restaurant-A-1792232615381 — Main Branch · MAIN\nQA-Branch-A · QAA\nQA-Branch-A2 · QA2\nChoose a branch to manage orders, tables and devices.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nQR ORDERING\nREPORTS\nSETUP\nToday at your restaurant\n\nAll branches · Confirmed sales, open payments and device health\n\nToday\nYesterday\nLast 7 days\nLast 30 days\nThis month\nThis year\nCustom dates\nAll sources\nPOS\nCAPTAIN\nKIOSK\nQR\nWHATSAPP\nONLINE\nRefresh\nWhat needs attention\n0 unpaid bills · ₹0 → View bills\nCheck device connections\nReview guest menu\nReview register shifts\nReview stock alerts\n\nLive tasks for this branch scope, independent of the sales date and source filters. Up to 20 tasks shown per group.\n\nUnpaid bills\n\n0 need review\n\nNothing needs attention.\n\nDelayed orders · over 20 min\n\n0 need review\n\nNothing needs attention.\n\nUnavailable dishes\n\n0 need review\n\nNothing needs attention.\n\nDevice issues\n\n0 need review\n\nNothing needs attention.\n\nA task with a branch opens that branch automatically. Choose a branch for shared-menu edits or billing.\n\nNET SALES\n\n₹0\n\nORDERS\n\n0\n\nAVERAGE PAID ORDER\n\n₹0\n\nAWAITING PAYMENT\n\n₹0\n\nGross paid sales ₹0 · Refunds ₹0 · 0 unpaid orders · 2026-10-17 to 2026-10-17 (Asia/Kolkata) · Updated 15:54:31\n\nBusiness summaries & reports\nSales trend\n\nNo sales in this period.\n\nSales by source\n\nNo sales in this period.\n\nSales by branch\nBranch\tNet sales\tOrders\tAOV\tOnline devices\tActivated setup\nQA-Branch-A\nQAA · ACTIVE\n\t₹0\t0\t₹0\t1/1\tPOS_ADMIN\nQA-Branch-A2\nQA2 · ACTIVE\n\t₹0\t0\t₹0\t0/0\tNo devices activated\nQA-Restaurant-A-1792232615381 — Main Branch\nMAIN · ACTIVE\n\t₹0\t0\t₹0\t0/0\tNo devices activated\n\nSubscriptions apply to the restaurant. Activated devices and QR codes determine each branch’s setup.\n\nTop items\n\nNo paid items in this period.\n\nDevice health\nPOS_ADMIN\n\n1/1 online\n\nOnline requires a recent heartbeat. Registered devices are not assumed connected.\n\nAlerts\n\nNo device or stock alerts.\n\nRecent orders\nOrder\tBranch\tSource\tStatus\tPayment\tAmount\tBill\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Today at your restaurant",
+    "What needs attention",
+    "Unpaid bills",
+    "Delayed orders · over 20 min",
+    "Unavailable dishes",
+    "Device issues",
+    "Sales trend",
+    "Sales by source",
+    "Sales by branch",
+    "Top items",
+    "Device health",
+    "Alerts",
+    "Recent orders"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All branches",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "0 unpaid bills · ₹0 → View bills",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Check device connections",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Review guest menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Review register shifts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Review stock alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": ":r3:",
+      "options": [
+        {
+          "value": "",
+          "text": "Choose branch"
+        },
+        {
+          "value": "all",
+          "text": "All restaurant · overview"
+        },
+        {
+          "value": "9baca310-c199-4291-8a60-8ae797ca7908",
+          "text": "QA-Restaurant-A-1792232615381 — Main Branch · MAIN"
+        },
+        {
+          "value": "ceb233ff-79f6-425b-b41c-ecad93a0b0e4",
+          "text": "QA-Branch-A · QAA"
+        },
+        {
+          "value": "85c8e797-03f9-4680-8fdd-da53f9818c13",
+          "text": "QA-Branch-A2 · QA2"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "TODAY",
+          "text": "Today"
+        },
+        {
+          "value": "YESTERDAY",
+          "text": "Yesterday"
+        },
+        {
+          "value": "7_DAYS",
+          "text": "Last 7 days"
+        },
+        {
+          "value": "30_DAYS",
+          "text": "Last 30 days"
+        },
+        {
+          "value": "THIS_MONTH",
+          "text": "This month"
+        },
+        {
+          "value": "THIS_YEAR",
+          "text": "This year"
+        },
+        {
+          "value": "CUSTOM",
+          "text": "Custom dates"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All sources"
+        },
+        {
+          "value": "POS",
+          "text": "POS"
+        },
+        {
+          "value": "CAPTAIN",
+          "text": "CAPTAIN"
+        },
+        {
+          "value": "KIOSK",
+          "text": "KIOSK"
+        },
+        {
+          "value": "QR",
+          "text": "QR"
+        },
+        {
+          "value": "WHATSAPP",
+          "text": "WHATSAPP"
+        },
+        {
+          "value": "ONLINE",
+          "text": "ONLINE"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "standard",
+          "text": "Standard"
+        },
+        {
+          "value": "large",
+          "text": "Larger text & touch targets"
+        },
+        {
+          "value": "contrast",
+          "text": "Stronger contrast & large controls"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

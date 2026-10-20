@@ -8,7 +8,7 @@ import { DeviceGateOverlay, PlatformNoticeBanner } from '@jamanvaar/ui';
 import { DeviceGate } from '@jamanvaar/sync';
 import { resetTerminal } from './cloud/cloudClient';
 import './index.css';
-initializeDisplayPreferences();
+initializeDisplayPreferences({ application: 'kiosk-user', restaurantKey: 'jamanvaar_kiosk_user_restaurant_id', subscribe: listener => DeviceGate.subscribe(listener) });
 
 // BUG-145 follow-up: a device credential the cloud no longer recognises is fixed by activating this terminal
 // again, not by blocking the screen — see DeviceGate's own comment. This is what actually does that unbinding.

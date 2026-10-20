@@ -12,6 +12,7 @@ import { PosActivationScreen } from './components/auth/PosActivationScreen';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
 import { PosSidebar } from './components/layout/PosSidebar';
+import { PosOperationalShortcuts } from './components/layout/PosOperationalShortcuts';
 import { PosFooterKpiStrip } from './components/layout/PosFooterKpiStrip';
 import { PosBillingWorkspace } from './components/menu/PosBillingWorkspace';
 import { PosFloorPlan } from './components/tables/PosFloorPlan';
@@ -88,6 +89,8 @@ export const App: React.FC = () => {
     isDiscountModalOpen,
     setIsDiscountModalOpen
   } = usePosStore();
+  const showBillingCatalog = activeTab === 'MENU' &&
+    (orderType !== 'DINE_IN' || Boolean(selectedTable) || (cart?.items?.length ?? 0) > 0);
 
   useEffect(() => registerNativeUpdateGuard(() => {
     const state = usePosStore.getState();
@@ -278,7 +281,8 @@ export const App: React.FC = () => {
         <div className="hidden xl:flex min-h-0"><PosSidebar /></div>
 
         {/* Dynamic Center Stage */}
-        <main className={`flex-1 flex overflow-hidden relative min-w-0 ${activeTab === 'MENU' ? '' : 'rounded-2xl border border-jaman-border bg-white'}`}>
+        <main className={`flex-1 overflow-hidden relative min-w-0 ${showBillingCatalog ? 'flex' : 'grid grid-rows-[auto_minmax(0,1fr)]'} ${activeTab === 'MENU' ? '' : 'rounded-2xl border border-jaman-border bg-white'}`}>
+          {!showBillingCatalog && <div className="shrink-0 p-2 border-b border-jaman-border bg-white"><PosOperationalShortcuts /></div>}
           {activeTab === 'MENU' && (
             // Dine-in starts with the table: a full-width picker until a table is chosen (or the order
             // type is switched, or dishes are already in the cart from a recalled/held order).

@@ -1,0 +1,269 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nDAILY WORK\nToday & attention\nRestaurant Health & Risk\nSupport tasks\nDevices\nRESTAURANTS & BILLING\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nPRODUCTS & CONFIGURATION\nPLATFORM OPERATIONS\nSECURITY & SETTINGS\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nDATABASE ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nRestaurants\n\nManage every restaurant tenant, branch, subscription, and connected device from one place.\n\nExport CSV\n+ Quick create\nOnboard Restaurant\nAll\n0\nActive\n0\nSuspended\n0\nTrial\n0\nNo Plan\nAll SaaS Tiers\nCORE (₹5,000)\nPRO (₹7,000)\nENTERPRISE\nNo Plan\nRecently Onboarded\nName (A → Z)\nName (Z → A)\nMost Branches\nMost Devices\nSubscription Status\nCards\nTable\n0 of 0\nNo restaurants onboarded yet\n\nLaunch your first restaurant tenant using the 7-step onboarding wizard.\n\nOnboard Restaurant Now\nKELVIONTECH ENTERPRISE\nOpening platform console\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nPreparing application\n•\nCloud workspace\n•\nMulti-Tenant Active",
+  "headings": [
+    "Restaurants",
+    "No restaurants onboarded yet"
+  ],
+  "buttons": [
+    {
+      "text": "DAILY WORK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "RESTAURANTS & BILLING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PRODUCTS & CONFIGURATION",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PLATFORM OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & SETTINGS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "+ Quick create",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Onboard Restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Active\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Suspended\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Trial\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "No Plan",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Cards",
+      "aria": null,
+      "title": "SaaS Cards View",
+      "disabled": false
+    },
+    {
+      "text": "Table",
+      "aria": null,
+      "title": "Tabular View",
+      "disabled": false
+    },
+    {
+      "text": "Onboard Restaurant Now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search name, owner, city, ID…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All SaaS Tiers"
+        },
+        {
+          "value": "CORE",
+          "text": "CORE (₹5,000)"
+        },
+        {
+          "value": "PRO",
+          "text": "PRO (₹7,000)"
+        },
+        {
+          "value": "ENTERPRISE",
+          "text": "ENTERPRISE"
+        },
+        {
+          "value": "NO_PLAN",
+          "text": "No Plan"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "recent",
+          "text": "Recently Onboarded"
+        },
+        {
+          "value": "name_asc",
+          "text": "Name (A → Z)"
+        },
+        {
+          "value": "name_desc",
+          "text": "Name (Z → A)"
+        },
+        {
+          "value": "branches_desc",
+          "text": "Most Branches"
+        },
+        {
+          "value": "devices_desc",
+          "text": "Most Devices"
+        },
+        {
+          "value": "status",
+          "text": "Subscription Status"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Today & attention",
+      "href": "/"
+    },
+    {
+      "text": "Restaurant Health & Risk",
+      "href": "/restaurant-health"
+    },
+    {
+      "text": "Support tasks",
+      "href": "/tickets"
+    },
+    {
+      "text": "Devices",
+      "href": "/devices"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    }
+  ],
+  "overflow": false
+}

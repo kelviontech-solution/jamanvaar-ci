@@ -1,0 +1,294 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1792232615381\n\nQA-Restaurant-A-1792232615381\n•\neb452fee-97d8-4b86-9716-78bfef245691\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\nLive Orders\nBills & Invoices\nCustomers CRM\nShift & Cash\nMore tools\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nBilling\nOrders\nTables\nCollect\nTable service requests\nLive Restaurant Orders\nSession Active\n\nShowing real-time orders for current business session: 17 October 2026 (BD-20261017)\n\nActive Session (0)\nAll History (0)\nAll orders\nOutstanding bills · 0 · ₹0\nAll Sources\nQR Table\nCounter POS\nSelf-Order Kiosk\nFloor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\nActive Session Ready • 0 Live Orders\n\nBusiness Day 17 October 2026 is open and ready. New orders from Kiosk, Captain, or Counter POS will appear here automatically.\n\nSelect an order from the list to view full itemized breakdown and print receipt.\n\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n0% (0/1)\nPending KOT:\n0\nLocal-first billing",
+  "headings": [
+    "Live Restaurant Orders",
+    "Active Session Ready • 0 Live Orders"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — All Systems OK",
+      "disabled": false
+    },
+    {
+      "text": "Pages & categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "More tools",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Active Session (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All History (0)",
+      "aria": null,
+      "title": "View complete historical orders across all past days",
+      "disabled": false
+    },
+    {
+      "text": "All orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Outstanding bills · 0 · ₹0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Sources",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Counter POS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Self-Order Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor Captain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "New",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Confirmed",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Preparing",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Ready",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Served",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Completed",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n0",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "en",
+          "text": "English"
+        },
+        {
+          "value": "gu",
+          "text": "ગુજરાતી"
+        },
+        {
+          "value": "hi",
+          "text": "हिन्दी"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search order #, token, table, customer...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

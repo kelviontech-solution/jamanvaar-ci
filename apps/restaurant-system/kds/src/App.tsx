@@ -4,7 +4,7 @@ import { DeviceGate, getAssignedStation, lanMeshSync, SyncOutboxEngine, Endpoint
 import { KOTRecord, KOTStatus, KOTItem } from '@jamanvaar/types';
 import { KdsTicketCard } from './KdsTicketCard';
 import { loadKitchenDisplay, saveKitchenDisplay } from './displayPreferences';
-import { StaffLanguagePicker, useStaffLanguage, StaffPracticePanel } from '@jamanvaar/ui';
+import { DisplayButtonSetting, StaffLanguagePicker, useStaffLanguage, StaffPracticePanel } from '@jamanvaar/ui';
 import { KitchenStationRepository } from '@jamanvaar/database';
 import { KdsExpoBoard } from './KdsExpoBoard';
 import { buildExpoBoard, connectionLevel, effectiveItemStatus, liveItems, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge, matchesKitchenSearch, ticketsForStation, needsCancellationAcknowledgement } from './kdsLogic';
@@ -577,6 +577,7 @@ export const App: React.FC = () => {
         {/* STATUS TABS */}
         <details className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 shrink-0">
           <summary className="min-h-11 cursor-pointer font-bold text-sm text-jaman-navy">Display & station timing</summary>
+          <div className="py-3 max-w-xl"><DisplayButtonSetting /></div>
           <div className="flex flex-wrap gap-3 py-3 text-sm">
             <label>Screen layout<select aria-label="Kitchen screen layout" value={display.density} onChange={e => updateDisplay({density:e.target.value as typeof display.density})} className="block min-h-11 rounded-xl border px-3"><option value="compact">Compact</option><option value="comfortable">Comfortable / tablet</option><option value="tv">Large / TV</option></select></label>
             {(['minimumMinutes','fallbackMinutes','maximumMinutes'] as const).map(field => <label key={`${selectedStation}:${field}`}>{field === 'minimumMinutes' ? 'Minimum prep (min)' : field === 'maximumMinutes' ? 'Maximum prep (min)' : 'Default prep (min)'}<input aria-label={field} type="number" min="1" max="240" defaultValue={display[field]} onBlur={e => updateDisplay({[field]:Number(e.target.value)})} className="block min-h-11 w-32 rounded-xl border px-3"/></label>)}

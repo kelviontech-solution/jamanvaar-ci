@@ -40,6 +40,8 @@ import {
   JamanAiFloatingButton,
   JAMANVAARStartup,
   SettingsPageHeader,
+  DisplayPreferences,
+  notifyDisplayPreferenceScopeChange,
   Modal,
   NotificationDrawerModal,
   NotificationToastContainer,
@@ -223,6 +225,7 @@ export default function PosAdminApp() {
   const availableProducts = availableAdminProducts(enabledApps);
   const contextReady = isAdminLoggedIn && !entitlementsLoading && !entitlementError;
   const context = useAdminProduct(tenantId, availableProducts, contextReady, enabledApps);
+  useEffect(() => notifyDisplayPreferenceScopeChange(), [context.product, tenantId]);
   useEffect(() => {
     if (contextReady && ownerEntryPath(enabledApps) === '/qr/admin/') window.location.replace('/qr/admin/');
   }, [contextReady, enabledApps.join(',')]);
@@ -1159,6 +1162,7 @@ export default function PosAdminApp() {
                 />
                 <section aria-label="Settings scope and shortcuts" className="rounded-2xl border border-blue-200 bg-blue-50 p-4 space-y-3"><h2 className="font-bold">{db.restaurant.name} / {db.outlet.name}</h2><p className="text-sm text-slate-600">Restaurant identity and legal information are shared across your restaurant. Menu, operating rules and kiosk defaults use the selected branch. Screen size preferences affect this device; individual kiosk overrides are managed in Welcome Screen and Kiosk Settings.</p><div className="flex flex-wrap gap-2">{([{tab:'MENU_OPTIONS',label:'Tax & customisations'},{tab:product === 'KIOSK_ADMIN' ? 'KIOSK_PAYMENTS' : 'PAYMENTS',label:'Payments'},{tab:'RECEIPTS',label:'Receipts'},{tab:'SYNC',label:'Devices & connections'},{tab:'LICENSE',label:'Licensed products'}] as const).filter(entry=>product && Object.hasOwn(PRODUCT_PAGES[product],entry.tab)).map(entry=><button type="button" key={entry.tab} className="min-h-11 rounded-xl border bg-white px-4 text-sm font-bold" onClick={()=>setActiveTab(entry.tab)}>{entry.label}</button>)}</div></section>
                 <TerminalDisplaySettings showToast={showToast} />
+                <DisplayPreferences />
                 {!isKioskAdmin && hasApp('WHATSAPP_ORDERING') && <WhatsAppChannelPanel showToast={showToast} />}
                 <ReportBrandingSettings
                   showToast={showToast}

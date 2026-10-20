@@ -73,6 +73,8 @@ interface PosState {
 
   // Navigation & Filtering
   activeTab: PosTab;
+  isMenuNavigationOpen: boolean;
+  setIsMenuNavigationOpen: (open: boolean) => void;
   orderInboxMode: 'ALL' | 'COLLECTIONS';
   setOrderInboxMode: (mode: 'ALL' | 'COLLECTIONS') => void;
   selectedCategory: string; // 'ALL' or category id
@@ -628,6 +630,8 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     activeTab: (savedSession?.activeTab as PosTab) || 'MENU',
+    isMenuNavigationOpen: false,
+    setIsMenuNavigationOpen: (open) => set({ isMenuNavigationOpen: open }),
     orderInboxMode: 'ALL',
     setOrderInboxMode: (mode) => set({ orderInboxMode: mode }),
     selectedCategory: 'ALL',
@@ -753,7 +757,8 @@ export const usePosStore = create<PosState>((set, get) => {
         currentUser: null,
         authStatus: 'UNAUTHENTICATED',
         isAuthenticated: false,
-        isLocked: false
+        isLocked: false,
+        isMenuNavigationOpen: false
       });
     },
 
@@ -770,7 +775,7 @@ export const usePosStore = create<PosState>((set, get) => {
       // persisted session with no lock recorded, dropping straight back into
       // the previous user's unlocked session with no PIN prompt.
       SessionPersistence.update('pos', { locked: true });
-      set({ isLocked: true });
+      set({ isLocked: true, isMenuNavigationOpen: false });
     },
 
     unlockTerminal: async (pin: string) => {
@@ -796,7 +801,8 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     setActiveTab: (tab) => {
-      set({ activeTab: tab });
+      // Navigation from either the sidebar or workspace returns billing to its categories.
+      set({ activeTab: tab, isMenuNavigationOpen: false });
       // Keep session activeTab in sync for deep-link restoration on refresh
       SessionPersistence.update('pos', { activeTab: tab });
     },

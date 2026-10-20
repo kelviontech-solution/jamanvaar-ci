@@ -5,6 +5,7 @@ import { useEffect, useId, useRef } from 'react';
  * confirmation opened from inside a form closes by itself instead of taking the form with it.
  */
 const openDialogs: string[] = [];
+let previousBodyOverflow = '';
 
 const FOCUSABLE =
   'a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -36,6 +37,10 @@ export function useDialogFocus<T extends HTMLElement>(isOpen: boolean, onClose: 
   useEffect(() => {
     if (!isOpen) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
+    if (openDialogs.length === 0) {
+      previousBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
     openDialogs.push(dialogId);
 
     const card = cardRef.current;
@@ -69,6 +74,7 @@ export function useDialogFocus<T extends HTMLElement>(isOpen: boolean, onClose: 
       document.removeEventListener('keydown', onKeyDown, true);
       const at = openDialogs.lastIndexOf(dialogId);
       if (at >= 0) openDialogs.splice(at, 1);
+      if (openDialogs.length === 0) document.body.style.overflow = previousBodyOverflow;
       // Return focus to whatever opened the dialog, if it is still in the page.
       if (previouslyFocused && document.contains(previouslyFocused)) previouslyFocused.focus({ preventScroll: true });
     };

@@ -1,0 +1,340 @@
+{
+  "phase": "after",
+  "results": [
+    {
+      "width": 1440,
+      "height": 900,
+      "heading": null,
+      "dishCount": false,
+      "filters": {
+        "x": 244,
+        "y": 169,
+        "width": 729.609375,
+        "height": 48,
+        "bottom": 217,
+        "right": 973.609375
+      },
+      "quick": {
+        "x": 244,
+        "y": 97,
+        "width": 729.609375,
+        "height": 62,
+        "bottom": 159,
+        "right": 973.609375
+      },
+      "grid": {
+        "x": 244,
+        "y": 227,
+        "width": 729.609375,
+        "height": 613,
+        "bottom": 840,
+        "right": 973.609375
+      },
+      "card": {
+        "x": 257,
+        "y": 240,
+        "width": 224.53125,
+        "height": 138.75,
+        "bottom": 378.75,
+        "right": 481.53125
+      },
+      "order": {
+        "x": 983.609375,
+        "y": 97,
+        "width": 446.390625,
+        "height": 743,
+        "bottom": 840,
+        "right": 1430
+      },
+      "orderText": "New Order — Unsaved• QA ManagerDine-InTakeawayDeliveryTokenAttach CustomerChef NotesBilling Counter ReadyTap any dish from the menu to add it to this order.DiscountHold OrderClear AllSubtotal ₹0GST ₹0Total Payable₹0PAY ₹0SEND KOTInstant BillCash • Auto Print",
+      "header": {
+        "x": 10,
+        "y": 10,
+        "width": 1420,
+        "height": 77,
+        "bottom": 87,
+        "right": 1430
+      },
+      "footer": {
+        "x": 10,
+        "y": 850,
+        "width": 1420,
+        "height": 40,
+        "bottom": 890,
+        "right": 1430
+      },
+      "overflow": false,
+      "filterText": "AllVegJainNon-VegQUICK:Hara Bhara Kebab (6 Pcs)₹220Crispy Corn Salt & Pepper₹240Cheese Corn Cigar Rolls (5 Pcs)₹210Paneer Tikka (Tandoori Angaar)₹260Dal Makhani (Slow Cooked)₹195Menu",
+      "category": "PIZZA_PASTA"
+    },
+    {
+      "width": 1280,
+      "height": 768,
+      "heading": null,
+      "dishCount": false,
+      "filters": {
+        "x": 244,
+        "y": 221.5,
+        "width": 619.203125,
+        "height": 48,
+        "bottom": 269.5,
+        "right": 863.203125
+      },
+      "quick": {
+        "x": 244,
+        "y": 149.5,
+        "width": 619.203125,
+        "height": 62,
+        "bottom": 211.5,
+        "right": 863.203125
+      },
+      "grid": {
+        "x": 244,
+        "y": 279.5,
+        "width": 619.203125,
+        "height": 428.5,
+        "bottom": 708,
+        "right": 863.203125
+      },
+      "card": {
+        "x": 257,
+        "y": 292.5,
+        "width": 286.59375,
+        "height": 118.125,
+        "bottom": 410.625,
+        "right": 543.59375
+      },
+      "order": {
+        "x": 873.203125,
+        "y": 149.5,
+        "width": 396.796875,
+        "height": 558.5,
+        "bottom": 708,
+        "right": 1270
+      },
+      "orderText": "New Order — Unsaved• QA ManagerDine-InTakeawayDeliveryTokenAttach CustomerChef NotesBilling Counter ReadyTap any dish from the menu to add it to this order.DiscountHold OrderClear AllSubtotal ₹0GST ₹0Total Payable₹0PAY ₹0SEND KOTInstant BillCash • Auto Print",
+      "header": {
+        "x": 10,
+        "y": 10,
+        "width": 1260,
+        "height": 129.5,
+        "bottom": 139.5,
+        "right": 1270
+      },
+      "footer": {
+        "x": 10,
+        "y": 718,
+        "width": 1260,
+        "height": 40,
+        "bottom": 758,
+        "right": 1270
+      },
+      "overflow": false,
+      "filterText": "AllVegJainNon-VegQUICK:Hara Bhara Kebab (6 Pcs)₹220Crispy Corn Salt & Pepper₹240Cheese Corn Cigar Rolls (5 Pcs)₹210Paneer Tikka (Tandoori Angaar)₹260Dal Makhani (Slow Cooked)₹195Menu",
+      "category": "PIZZA_PASTA"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "heading": null,
+      "dishCount": false,
+      "filters": {
+        "x": 10,
+        "y": 320,
+        "width": 1004,
+        "height": 48,
+        "bottom": 368,
+        "right": 1014
+      },
+      "quick": {
+        "x": 10,
+        "y": 248,
+        "width": 1004,
+        "height": 62,
+        "bottom": 310,
+        "right": 1014
+      },
+      "grid": {
+        "x": 10,
+        "y": 378,
+        "width": 1004,
+        "height": 330,
+        "bottom": 708,
+        "right": 1014
+      },
+      "card": {
+        "x": 23,
+        "y": 391,
+        "width": 234.5,
+        "height": 138.75,
+        "bottom": 529.75,
+        "right": 257.5
+      },
+      "order": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "bottom": 0,
+        "right": 0
+      },
+      "orderText": "New Order — Unsaved• QA ManagerDine-InTakeawayDeliveryTokenAttach CustomerChef NotesBilling Counter ReadyTap any dish from the menu to add it to this order.DiscountHold OrderClear AllSubtotal ₹0GST ₹0Total Payable₹0PAY ₹0SEND KOTInstant BillCash • Auto Print",
+      "header": {
+        "x": 10,
+        "y": 10,
+        "width": 1004,
+        "height": 122,
+        "bottom": 132,
+        "right": 1014
+      },
+      "footer": {
+        "x": 10,
+        "y": 718,
+        "width": 1004,
+        "height": 40,
+        "bottom": 758,
+        "right": 1014
+      },
+      "overflow": false,
+      "filterText": "AllVegJainNon-VegQUICK:Hara Bhara Kebab (6 Pcs)₹220Crispy Corn Salt & Pepper₹240Cheese Corn Cigar Rolls (5 Pcs)₹210Paneer Tikka (Tandoori Angaar)₹260Dal Makhani (Slow Cooked)₹195Menu",
+      "category": "PIZZA_PASTA"
+    }
+  ],
+  "checks": [
+    {
+      "name": "1440: redundant heading and count removed",
+      "status": "PASS"
+    },
+    {
+      "name": "1440: filters and grid move up",
+      "status": "PASS",
+      "evidence": {
+        "reclaimed": 70
+      }
+    },
+    {
+      "name": "1440: normal 10px spacing after Quick service",
+      "status": "PASS"
+    },
+    {
+      "name": "1440: right order panel unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1440: header unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1440: no page overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "1440: all filter and quick controls retained",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: redundant heading and count removed",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: filters and grid move up",
+      "status": "PASS",
+      "evidence": {
+        "reclaimed": 70
+      }
+    },
+    {
+      "name": "1280: normal 10px spacing after Quick service",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: right order panel unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: header unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: no page overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "1280: all filter and quick controls retained",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: redundant heading and count removed",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: filters and grid move up",
+      "status": "PASS",
+      "evidence": {
+        "reclaimed": 70
+      }
+    },
+    {
+      "name": "1024: normal 10px spacing after Quick service",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: right order panel unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: header unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: no page overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "1024: all filter and quick controls retained",
+      "status": "PASS"
+    },
+    {
+      "name": "Sidebar still identifies the active Pizza & Pasta category",
+      "status": "PASS"
+    },
+    {
+      "name": "All Menu category switching works",
+      "status": "PASS"
+    },
+    {
+      "name": "Category switching restores the 12 selected dishes",
+      "status": "PASS"
+    },
+    {
+      "name": "Modify opens existing dish customization",
+      "status": "PASS"
+    },
+    {
+      "name": "Selecting product adds it and calculates bill",
+      "status": "PASS"
+    },
+    {
+      "name": "Quick add shortcut retains its handler",
+      "status": "PASS"
+    },
+    {
+      "name": "Pay opens existing billing workflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Narrow view retains category navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "Narrow view opens existing order panel",
+      "status": "PASS"
+    },
+    {
+      "name": "No uncaught browser errors",
+      "status": "PASS",
+      "evidence": []
+    }
+  ],
+  "errors": []
+}

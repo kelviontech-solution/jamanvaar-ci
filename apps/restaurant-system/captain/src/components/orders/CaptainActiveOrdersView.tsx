@@ -45,13 +45,13 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
   });
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3 sm:space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-jaman-border shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-jaman-border shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-jaman-saffron" />
-            <h2 className="text-xl font-bold text-jaman-navy">Active Dining Orders</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-jaman-navy">Active Dining Orders</h2>
             <span className="bg-[#FFF4ED] text-jaman-saffron text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#FDBA74]">
               {activeDiningTables.length} Active Tables
             </span>
@@ -62,7 +62,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
         </div>
 
         {/* Search */}
-        <div className="relative min-w-[200px] max-w-xs">
+        <div className="relative w-full sm:w-auto sm:min-w-[200px] sm:max-w-xs">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -70,14 +70,14 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search active dining orders"
             placeholder="Search table, token or order..."
-            className="w-full pl-9 pr-3 py-1.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
+            className="w-full h-11 sm:h-9 pl-9 pr-3 bg-jaman-cream border border-jaman-border rounded-xl text-sm sm:text-xs text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
           />
         </div>
       </div>
 
       {/* Orders List */}
       {activeDiningTables.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-16 md:pb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
           {activeDiningTables.map((table) => {
             const isBillReq = table.status === 'BILL_REQUESTED';
             const serviceStatus = getServiceStatus(table.tableNumber);
@@ -85,14 +85,14 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
             return (
               <div
                 key={table.id}
-                className={`bg-white rounded-2xl border-2 p-5 space-y-4 shadow-sm flex flex-col justify-between ${
+                className={`min-w-0 bg-white rounded-xl sm:rounded-2xl border-2 p-3 sm:p-5 space-y-3 sm:space-y-4 shadow-sm flex flex-col justify-between ${
                   isBillReq ? 'border-purple-500 bg-purple-50/15' : 'border-jaman-border'
                 }`}
               >
                 <div>
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="text-2xl font-bold text-jaman-navy">TABLE {table.tableNumber}</span>
+                      <span className="text-base sm:text-2xl font-bold text-jaman-navy normal-case sm:uppercase">Table {table.tableNumber}</span>
                       <span className="text-xs text-slate-500 font-bold block mt-0.5">
                         {(table as any).section || table.zone || 'Main Dining'} • {table.currentGuests || 2} Guests
                       </span>
@@ -109,7 +109,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
                     </span>
                   </div>
 
-                  <div className="mt-4 p-3 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5 text-xs font-semibold text-slate-600">
+                  <div className="mt-2.5 sm:mt-4 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5 text-xs font-semibold text-slate-600">
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500">Service Status:</span>
                       <span
@@ -135,7 +135,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
                   <button
                     type="button"
                     onClick={() => onOpenTableWorkspace(table.tableNumber)}
-                    className="w-full py-3 px-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-bold text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex items-center justify-between"
+                    className="w-full min-h-[44px] py-2.5 sm:py-3 px-4 rounded-xl sm:rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-bold text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex items-center justify-between"
                   >
                     <span>Open Table Workspace</span>
                     <ArrowRight className="w-4 h-4 text-jaman-saffron" />
@@ -145,7 +145,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
                     <button
                       type="button"
                       onClick={() => requestBill(table.tableNumber)}
-                      className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                      className="w-full min-h-[44px] py-2.5 px-3 rounded-xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <Receipt className="w-3.5 h-3.5" />
                       <span>Request Bill from Counter POS</span>

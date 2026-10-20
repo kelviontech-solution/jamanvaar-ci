@@ -1,0 +1,99 @@
+{
+  "title": "Order",
+  "text": "QA-Restaurant-A-1792232615381\nQA-Branch-A · Table QA01\nTable QA01\nGood food.Great company.\n\nPick your favourites, make them yours, and let us take care of the rest.\n\nAll diets\nVEG\nText-only menu (save data)\nAll\nQA Pizza\nMADE FOR YOUR APPETITE\nExplore our menu\n1 dishes\nQA Pizza 01\nVEG\n₹249\nAdd\n2 items\n₹498\nView Cart\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "headings": [
+    "Good food.Great company.",
+    "Explore our menu"
+  ],
+  "buttons": [
+    {
+      "text": "All diets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "VEG",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "QA Pizza",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "Add",
+      "aria": "Add QA Pizza 01",
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "2 items\n₹498\nView Cart",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "visible": true
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "search",
+      "placeholder": "Find your next favourite…",
+      "name": "",
+      "id": "",
+      "visible": true
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "visible": true
+    }
+  ],
+  "links": [],
+  "images": [
+    {
+      "src": "http://localhost:5190/q/assets/branding/jamanvaar-logo.png",
+      "alt": "Jamanvaar by Kelviontech",
+      "width": 1205,
+      "height": 670,
+      "loaded": true,
+      "visible": true
+    },
+    {
+      "src": "http://localhost:5190/q/assets/menu/common/fallback-dish.svg",
+      "alt": "From our menu",
+      "width": 400,
+      "height": 300,
+      "loaded": false,
+      "visible": false
+    },
+    {
+      "src": "http://localhost:5190/q/assets/menu/common/fallback-dish.svg",
+      "alt": "QA Pizza 01",
+      "width": 400,
+      "height": 300,
+      "loaded": true,
+      "visible": true
+    }
+  ],
+  "overflow": false,
+  "unlabelledButtons": 0
+}
