@@ -1,5 +1,5 @@
 import {PickupDisplay} from './components/operations/PickupDisplay';
-import {initializeDisplayPreferences,DisplayPreferences} from '@jamanvaar/ui';
+import {initializeDisplayPreferences} from '@jamanvaar/ui';
 import { verifyInstalledUpdate } from '@jamanvaar/ui';
 import { bootDurableStorage } from '@jamanvaar/database';
 import React from 'react';
@@ -37,7 +37,6 @@ if(new URLSearchParams(location.search).has('pickup')){
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />
-      <DisplayPreferences compact/>
       <PlatformNoticeBanner />
       <CommandActivityToast />
       <DeviceGateOverlay appName="Admin device" />

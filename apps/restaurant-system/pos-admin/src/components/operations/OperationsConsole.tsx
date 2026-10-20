@@ -393,7 +393,7 @@ function Workspace({ branch, branches }: { branch: string; branches: CloudBranch
                   </div>
                 ))}</div>
             </nav>
-            <main key={task+String(focusVersion)}>
+            <section key={task+String(focusVersion)} aria-label={tasks.find((t) => t[0] === task)?.[1]}>
               <h2>{tasks.find((t) => t[0] === task)?.[1]}</h2>
               {task === 'rollback' && <ConfigurationRollback branch={branch} />}
               {(task === 'recurring' || task === 'cashier') && <ServiceConfiguration branch={branch} view={task} />}
@@ -412,7 +412,7 @@ function Workspace({ branch, branches }: { branch: string; branches: CloudBranch
               {task === 'acceptance' && <AcceptanceView branch={branch} />}
               {task === 'support' && <Support branch={branch} />}
               {task === 'training' && <StaffPracticePanel />}
-            </main>
+            </section>
           </div>
         </>
       )}
@@ -1533,7 +1533,7 @@ function Support({ branch }: { branch: string }) {
   const state = useData<unknown>(branch, 'diagnostics');
   return (
     <>
-      <DisplayPreferences />
+      <DisplayPreferences showButtonSetting={false} />
       <Card
         title="Share support diagnostics"
         help="The export contains versions, device connection states and pending sync counts. Customer names, contact details, PINs, credentials, raw logs and payment details are excluded."

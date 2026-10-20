@@ -197,7 +197,8 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search KOT, table, dish..."
-              className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-8 pr-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-brand"
+              aria-label="Search kitchen tickets"
+              className="w-full min-h-9 bg-jaman-cream border border-jaman-border rounded-xl pl-8 pr-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -214,7 +215,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
             <button
               key={st.id}
               onClick={() => setStatusFilter(st.id)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`min-h-9 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 statusFilter === st.id
                   ? 'bg-brand text-white shadow-2xs'
                   : 'bg-jaman-cream text-slate-700 hover:bg-slate-200'

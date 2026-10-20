@@ -555,7 +555,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               </button>
 
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl sm:text-3xl font-bold text-jaman-navy uppercase tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-bold text-jaman-navy uppercase tracking-tight">
                   {currentDaySummary.formattedDate}
                 </h2>
                 <span className="text-xs font-bold text-slate-500">({currentDaySummary.dayOfWeek})</span>
@@ -602,7 +602,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <button
                 type="button"
                 onClick={handleExportDayOrdersCsv}
-                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 min-h-[40px] shadow-xs ml-2"
+                className="px-3.5 py-2 bg-white hover:bg-[#F5F3EE] text-jaman-navy border border-jaman-border hover:border-[#D8D1C3] rounded-xl text-xs font-bold flex items-center gap-1.5 min-h-[40px] ml-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               >
                 <FileSpreadsheet className="w-4 h-4" />
                 <span>Export Day CSV</span>

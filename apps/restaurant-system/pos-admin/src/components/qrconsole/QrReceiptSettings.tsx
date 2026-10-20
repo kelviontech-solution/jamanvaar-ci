@@ -66,7 +66,7 @@ export function QrReceiptSettings() {
   return (
     <div className="qr-bill-editor">
       <section>
-        <h2>Bills & receipts</h2>
+        <h2 className="sr-only">Bills & receipts</h2>
         <p>
           {saved?.scope === 'restaurant' ? 'Applies to branches using restaurant defaults.' : 'Applies to the selected branch.'} Guests can download their own
           bill; your team can download it from QR Orders → Details.

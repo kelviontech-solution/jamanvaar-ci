@@ -1,4 +1,4 @@
-import {initializeDisplayPreferences,DisplayPreferences} from '@jamanvaar/ui';
+import {initializeDisplayPreferences} from '@jamanvaar/ui';
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "../index.css";
@@ -8,6 +8,6 @@ document.documentElement.classList.add('qr-document');
 initializeDisplayPreferences({ application: 'qr-admin', restaurantKey: 'jamanvaar_cloud_restaurant_id' });
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <QrProduct /><DisplayPreferences compact/>
+    <QrProduct />
   </React.StrictMode>,
 );

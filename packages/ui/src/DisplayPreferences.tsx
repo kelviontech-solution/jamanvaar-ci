@@ -76,7 +76,7 @@ const SELECT_CLASS =
   'jv-display-select w-full min-h-[44px] appearance-none rounded-xl border border-jaman-border bg-white pl-3.5 pr-10 py-2 text-sm text-jaman-navy ' +
   'hover:border-slate-400 focus:border-jaman-saffron focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jaman-saffron/40 transition-colors';
 
-export function DisplayPreferences({ compact = false }: { compact?: boolean }) {
+export function DisplayPreferences({ compact = false, showButtonSetting = true }: { compact?: boolean; showButtonSetting?: boolean }) {
   const preset = useSyncExternalStore(subscribeDisplayButton, currentPreset, () => 'standard' as Preset);
   const { visible } = useDisplayButtonVisibility();
   const selectId = useId();
@@ -115,7 +115,7 @@ export function DisplayPreferences({ compact = false }: { compact?: boolean }) {
       icon={<MonitorCog className="w-4 h-4 text-jaman-saffron" />}
     >
       <div className="divide-y divide-slate-100 [&>*]:py-4 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
-        <DisplayButtonSetting />
+        {showButtonSetting && <DisplayButtonSetting />}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <label htmlFor={selectId} className="text-sm font-medium text-jaman-navy">Display size and contrast</label>
           <div className="relative w-full sm:w-72 shrink-0">

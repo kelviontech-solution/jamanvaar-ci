@@ -1,7 +1,7 @@
 .ops-console {
   color: #0b253a;
-  max-width: 1500px;
-  margin: auto;
+  max-width: none; /* the hub uses the full workspace like every other Restaurant Admin page */
+  margin: 0;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -32,50 +32,99 @@
   font-weight: 750;
 }
 .ops-scope {
-  border-left: 4px solid #ec720e;
-  background: #fff6e9;
-  padding: 12px 16px;
+  border: 1px solid #ebe6dd;
+  border-left: 4px solid rgb(191 84 15 / 0.6);
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px 16px;
   margin-bottom: 20px;
+  font-size: 13px;
 }
 .ops-layout {
   display: grid;
-  grid-template-columns: 235px minmax(0, 1fr);
+  grid-template-columns: clamp(220px, 20vw, 280px) minmax(0, 1fr);
   gap: 24px;
 }
 .ops-layout > nav {
   align-self: start;
   background: white;
-  border: 1px solid #e8e2da;
+  border: 1px solid #ebe6dd;
   border-radius: 16px;
   padding: 12px;
   position: sticky;
-  top: 0;
+  top: 12px;
+  /* The task list is longer than a laptop screen. Unbounded, a sticky list pins its lower entries below the fold where
+     they can never be reached; bounding it to the visible workspace lets it scroll on its own. */
+  max-height: calc(100dvh - 176px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
-.ops-layout main {
+.ops-layout > main,
+.ops-layout > section {
   min-width: 0;
 }
 .ops-nav-row {
   display: flex;
+  align-items: stretch;
   gap: 2px;
 }
-.ops-nav-row button:first-child {
+.ops-task-list .ops-nav-row button {
+  min-height: 40px;
+  margin: 1px 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 13px;
+  transition: background-color 0.15s, color 0.15s;
+}
+.ops-task-list .ops-nav-row button:first-child {
+  position: relative;
   flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
   text-align: left;
-  border: 0;
+  font-weight: 500;
+  color: #334155;
 }
-.ops-nav-row button[aria-current='page'] {
-  background: #0b253a;
-  color: white;
+.ops-task-list .ops-nav-row button:first-child:hover {
+  background: rgb(191 84 15 / 0.05);
+  color: #0b253a;
 }
-.ops-nav-row button:last-child {
-  border: 0;
-  padding: 7px;
-  color: #9b520e;
+/* selected task: the same tint and accent bar as the sidebars, not a filled block */
+.ops-task-list .ops-nav-row button[aria-current='page'] {
+  background: rgb(191 84 15 / 0.09);
+  color: #bf540f;
+  font-weight: 600;
+}
+.ops-task-list .ops-nav-row button[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  bottom: 9px;
+  width: 4px;
+  border-radius: 9999px;
+  background: #bf540f;
+}
+.ops-task-list .ops-nav-row button:last-child {
+  flex: none;
+  width: 40px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: #64748b;
+}
+.ops-task-list .ops-nav-row button:last-child:hover,
+.ops-task-list .ops-nav-row button[aria-pressed='true'] {
+  color: #bf540f;
+}
+.ops-task-list .ops-nav-row button:last-child:hover {
+  background: rgb(191 84 15 / 0.05);
 }
 .ops-card {
   background: white;
-  border: 1px solid #e8e2da;
-  border-radius: 18px;
+  border: 1px solid #ebe6dd;
+  border-radius: 16px;
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -89,8 +138,8 @@
 .ops-console textarea {
   font: inherit;
   min-height: 44px;
-  border: 1px solid #d6dce1;
-  border-radius: 10px;
+  border: 1px solid #ebe6dd;
+  border-radius: 12px;
   padding: 9px 12px;
   max-width: 100%;
 }
@@ -114,14 +163,18 @@
 .ops-console input:focus-visible,
 .ops-console select:focus-visible,
 .ops-console summary:focus-visible {
-  outline: 3px solid #1e6fa8;
+  outline: 2px solid rgb(191 84 15 / 0.55);
   outline-offset: 2px;
 }
 .ops-console .ops-primary {
-  background: #0b253a;
+  background: #bf540f;
   color: white;
-  border-color: #0b253a;
+  border-color: #bf540f;
   font-weight: 650;
+}
+.ops-console .ops-primary:hover:not(:disabled) {
+  background: #a9480c;
+  border-color: #a9480c;
 }
 .ops-field,
 .ops-console form label:not(.ops-check) {
@@ -136,6 +189,35 @@
   align-items: center;
   gap: 10px;
   margin: 10px 0;
+}
+.ops-field-label {
+  margin: 16px 0 6px;
+  font-weight: 550;
+}
+/* Related checkboxes sit together in a wrapping row of selectable chips instead of a centred vertical stack. */
+.ops-check-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 8px;
+}
+.ops-check-group .ops-check {
+  margin: 0;
+  padding: 0 14px;
+  min-height: 44px;
+  border: 1px solid #ebe6dd;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+.ops-check-group .ops-check:hover {
+  border-color: #d8d1c3;
+  background: #f5f3ee;
+}
+.ops-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0 16px;
 }
 .ops-check input {
   width: 22px;
@@ -255,6 +337,8 @@
   }
   .ops-layout > nav {
     position: static;
+    max-height: none;
+    overflow: visible;
     display: flex;
     flex-wrap: wrap;
     gap: 5px;

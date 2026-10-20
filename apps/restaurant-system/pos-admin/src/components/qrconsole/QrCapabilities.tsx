@@ -6,11 +6,10 @@ import { useEffect, useState, useRef } from "react";
 import { qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi, type QrOrderRow } from "../../cloud/qrAdminClient";
 import { FeatureRequestButton } from "./FeatureRequestButton";
+import { QR_BUTTON, QR_FIELD } from './qrUi';
 const base = "/api/v1/restaurant/qr/advanced";
-const input =
-  "mt-1 w-full min-w-0 rounded-xl border border-jaman-border bg-white px-3 py-2.5 text-sm";
-const button =
-  "rounded-xl bg-jaman-navy px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40";
+const input = QR_FIELD;
+const button = QR_BUTTON;
 type Configuration = {
   version: number;
   overrideKeys: string[];

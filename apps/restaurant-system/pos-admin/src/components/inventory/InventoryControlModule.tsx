@@ -36,7 +36,7 @@ interface Props {
 export const InventoryControlModule: React.FC<Props> = ({ showToast }) => {
   const [tab, setTab] = useState<Tab>('RECEIVE');
   return (
-    <div className="space-y-5 max-w-6xl mx-auto">
+    <div className="space-y-5">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Purchasing & Stock Control</h1>
         <p className="text-xs sm:text-sm text-[#4A5568] mt-0.5">Record what you buy and at what price, count the shelves, see what to reorder and what is about to expire.</p>

@@ -188,6 +188,90 @@ a:focus-visible,
 }
 
 /* ========================================================================= */
+/* DESIGN TOKENS — one place for motion, surfaces and focus; components below reuse them. */
+/* ========================================================================= */
+:root {
+  --jv-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --jv-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --jv-dur-fast: 120ms;
+  --jv-dur-base: 180ms;
+  --jv-dur-slow: 260ms;
+  --jv-brand: #BF540F;
+  --jv-brand-tint: rgb(191 84 15 / 0.08);
+  --jv-surface: #FFFFFF;
+  --jv-border: #EBE6DD;
+  --jv-focus-ring: 0 0 0 2px #FAF8F5, 0 0 0 4px rgb(191 84 15 / 0.55);
+}
+
+/* Interactive controls ease their colour, border and shadow; press gives a small, layout-neutral response. */
+button, [role='button'], summary, a {
+  transition-property: color, background-color, border-color, box-shadow, opacity;
+  transition-duration: var(--jv-dur-base);
+  transition-timing-function: var(--jv-ease-out);
+}
+button:not(:disabled):active, [role='button']:active {
+  scale: 0.985; /* the independent `scale` property, so it never clobbers a button's own translate/transform */
+}
+button:disabled { cursor: not-allowed; }
+
+/* Numbers in headers, tables and badges keep a fixed width so values do not jitter as they update. */
+.jv-tabular { font-variant-numeric: tabular-nums; }
+
+/* Native <details> disclosure: consistent chevron, hover/focus feedback and a short reveal of the content. */
+details.jv-disclosure > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-weight: 700;
+  color: #0B253A;
+}
+details.jv-disclosure > summary::-webkit-details-marker { display: none; }
+details.jv-disclosure > summary:hover { background: #F5F3EE; }
+details.jv-disclosure > summary::after {
+  content: '';
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid #64748B;
+  border-bottom: 2px solid #64748B;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform var(--jv-dur-base) var(--jv-ease-out);
+}
+details.jv-disclosure[open] > summary::after { transform: rotate(-135deg) translate(-1px, -1px); }
+details.jv-disclosure[open] > *:not(summary) {
+  animation: jv-fade-up var(--jv-dur-slow) var(--jv-ease-out) backwards;
+}
+
+/* One page-title scale for every module page. `[class]` lifts specificity just above the per-page text-* utilities,
+   so titles that used 20/28/30px now share a single size without touching each module. */
+.jv-page h1[class] {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+@media (max-width: 639px) {
+  .jv-page h1[class] { font-size: 1.25rem; line-height: 1.75rem; }
+}
+
+/* A navigation group opening reveals its items rather than snapping in. */
+.jv-nav-reveal { animation: jv-fade-up var(--jv-dur-base) var(--jv-ease-out) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):active, [role='button']:active { scale: none; }
+  details.jv-disclosure[open] > *:not(summary),
+  .jv-nav-reveal { animation: none !important; }
+  button, [role='button'], summary, a { transition-duration: 0.01ms !important; }
+  details.jv-disclosure > summary::after { transition: none; }
+}
+
+/* ========================================================================= */
 /* MOTION — calm, short, CSS-only. Everything respects prefers-reduced-motion. */
 /* ========================================================================= */
 

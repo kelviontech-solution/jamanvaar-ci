@@ -22,18 +22,24 @@ export function AttentionTasks({ data, onOpen }: { data: TenantDashboard; onOpen
   ];
   return (
     <section aria-label="Live attention tasks">
-      <p className="mt-3 text-xs text-slate-500">
-        Live tasks for this branch scope, independent of the sales date and source filters. Up to 20 tasks shown per group.
-      </p>
-      <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-3 mt-3">
-        {sections.map((section) => (
+      <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-3 mt-4 items-start" title="Live tasks for this branch scope, independent of the sales date and source filters. Up to 20 tasks shown per group.">
+        {sections.some((section) => !section.rows.length) && (
+          <div className="rounded-xl border bg-jaman-cream p-3 min-w-0">
+            <h3 className="text-sm font-bold text-jaman-navy">All clear</h3>
+            <ul className="mt-1 space-y-1">
+              {sections.filter((section) => !section.rows.length).map((section) => (
+                <li key={section.page} className="flex items-center gap-1.5 text-sm text-emerald-800"><span aria-hidden="true">✓</span> {section.label}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {sections.filter((section) => section.rows.length > 0).map((section) => (
           <div key={section.page} className="rounded-xl border bg-jaman-cream p-3 min-w-0">
-            <h3 className="text-sm font-bold">{section.label}</h3>
-            <p className="text-xs text-slate-500 mt-1">{section.rows.length === 20 ? 'First 20 shown' : `${section.rows.length} need review`}</p>
-            {!section.rows.length ? (
-              <p className="text-sm text-emerald-800 mt-3">Nothing needs attention.</p>
-            ) : (
-              <ul className="mt-2 max-h-52 overflow-y-auto space-y-1">
+            <div className="flex items-baseline justify-between gap-2">
+              <h3 className="text-sm font-bold text-jaman-navy">{section.label}</h3>
+              <span className="shrink-0 text-xs font-semibold text-amber-800">{section.rows.length === 20 ? 'First 20 shown' : `${section.rows.length} need review`}</span>
+            </div>
+            <ul className="mt-2 max-h-52 overflow-y-auto space-y-1">
                 {section.rows.map((row) => (
                   <li key={`${row.id}:${row.branchId}`}>
                     <button
@@ -52,8 +58,7 @@ export function AttentionTasks({ data, onOpen }: { data: TenantDashboard; onOpen
                     </button>
                   </li>
                 ))}
-              </ul>
-            )}
+            </ul>
           </div>
         ))}
       </div>

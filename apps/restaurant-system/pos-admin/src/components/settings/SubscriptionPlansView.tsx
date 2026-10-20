@@ -258,7 +258,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto select-none">
+    <div className="space-y-6 select-none">
       {/* Toast / Feedback Banner */}
       {licenseFeedback && (
         <div className="p-3.5 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl text-xs font-bold flex items-center justify-between animate-fadeIn shadow-xs">

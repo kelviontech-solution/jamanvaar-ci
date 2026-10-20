@@ -1,0 +1,107 @@
+[
+  {
+    "width": 1440,
+    "overflowX": false,
+    "floatingDisplay": false,
+    "displayToggle": false,
+    "sizeContrast": true,
+    "steps": [
+      "11. Menu",
+      "22. Customer experience",
+      "33. Payments",
+      "44. Connect kiosk",
+      "55. Test a real order"
+    ],
+    "checks": 5,
+    "disclosures": 3,
+    "undersizedTargets": 0
+  },
+  {
+    "width": 1366,
+    "overflowX": false,
+    "floatingDisplay": false,
+    "displayToggle": false,
+    "sizeContrast": true,
+    "steps": [
+      "11. Menu",
+      "22. Customer experience",
+      "33. Payments",
+      "44. Connect kiosk",
+      "55. Test a real order"
+    ],
+    "checks": 5,
+    "disclosures": 3,
+    "undersizedTargets": 0
+  },
+  {
+    "width": 1024,
+    "overflowX": false,
+    "floatingDisplay": false,
+    "displayToggle": false,
+    "sizeContrast": true,
+    "steps": [
+      "11. Menu",
+      "22. Customer experience",
+      "33. Payments",
+      "44. Connect kiosk",
+      "55. Test a real order"
+    ],
+    "checks": 5,
+    "disclosures": 3,
+    "undersizedTargets": 0
+  },
+  {
+    "width": 768,
+    "overflowX": false,
+    "floatingDisplay": false,
+    "displayToggle": false,
+    "sizeContrast": true,
+    "steps": [
+      "11. Menu",
+      "22. Customer experience",
+      "33. Payments",
+      "44. Connect kiosk",
+      "55. Test a real order"
+    ],
+    "checks": 5,
+    "disclosures": 3,
+    "undersizedTargets": 0
+  },
+  {
+    "width": 390,
+    "overflowX": false,
+    "floatingDisplay": false,
+    "displayToggle": false,
+    "sizeContrast": true,
+    "steps": [
+      "11. Menu",
+      "22. Customer experience",
+      "33. Payments",
+      "44. Connect kiosk",
+      "55. Test a real order"
+    ],
+    "checks": 5,
+    "disclosures": 3,
+    "undersizedTargets": 0
+  },
+  {
+    "width": 360,
+    "overflowX": false,
+    "floatingDisplay": false,
+    "displayToggle": false,
+    "sizeContrast": true,
+    "steps": [
+      "11. Menu",
+      "22. Customer experience",
+      "33. Payments",
+      "44. Connect kiosk",
+      "55. Test a real order"
+    ],
+    "checks": 5,
+    "disclosures": 3,
+    "undersizedTargets": 0
+  },
+  {
+    "reducedMotionDisclosureAnimation": "none"
+  }
+]

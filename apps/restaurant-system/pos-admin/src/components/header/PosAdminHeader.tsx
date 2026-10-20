@@ -62,7 +62,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
 }) => {
   const ai = useAiAccess();
   return (
-    <header className="h-16 sm:h-20 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EAE3D6] px-2.5 sm:px-6 lg:px-8 flex items-center justify-between gap-2 shadow-2xs sticky top-0 z-30 shrink-0 select-none">
+    <header className="h-16 sm:h-20 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-transparent px-2.5 sm:px-6 lg:px-8 flex items-center justify-between gap-2 shadow-2xs sticky top-0 z-30 shrink-0 select-none">
       {/* ── 1. Left: Premium Brand Identity Lockup ── */}
       <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         {onOpenNav && (
@@ -95,7 +95,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         <div className="hidden sm:block h-8 w-px bg-[#E2D9C8] shrink-0" aria-hidden="true" />
 
         {/* Secondary Restaurant Identity & Context */}
-        <div className="hidden sm:flex flex-col justify-center min-w-0">
+        <div className="hidden sm:flex flex-col justify-center min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 min-w-0">
             <span
               title={restaurantName || 'Restaurant'}
@@ -139,7 +139,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
       </label>}
 
       {/* ── 2. Center: Dedicated Global Search ── */}
-      <div className="hidden md:flex items-center flex-1 max-w-xs lg:max-w-sm xl:max-w-md mx-3 lg:mx-6">
+      <div className="hidden xl:flex items-center flex-1 min-w-[9rem] max-w-xs lg:max-w-sm xl:max-w-md mx-3 lg:mx-4 xl:mx-6">
         <div
           onClick={onOpenGlobalSearch}
           className="relative w-full cursor-pointer group"
@@ -157,11 +157,13 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <input
             type="text"
             readOnly
+            tabIndex={-1}
+            aria-hidden="true"
             placeholder="Search orders, invoices, dishes, tables..."
             value={globalSearch}
-            className="w-full h-10 bg-white/90 hover:bg-white border border-jaman-border group-hover:border-[#D8D1C3] focus:border-brand focus:bg-white rounded-xl pl-10 pr-14 text-xs font-medium text-jaman-navy placeholder:text-slate-500 focus:outline-none cursor-pointer transition-all shadow-2xs"
+            className="w-full h-10 bg-white/90 hover:bg-white border border-jaman-border group-hover:border-[#D8D1C3] focus:border-brand focus:bg-white rounded-xl pl-10 pr-3 2xl:pr-14 text-xs font-medium text-jaman-navy placeholder:text-slate-500 focus:outline-none cursor-pointer transition-all shadow-2xs"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-500 border border-jaman-border bg-[#FAF8F5] px-1.5 py-0.5 rounded shadow-2xs pointer-events-none">
+          <kbd className="hidden 2xl:block absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-500 border border-jaman-border bg-[#FAF8F5] px-1.5 py-0.5 rounded shadow-2xs pointer-events-none">
             Ctrl+K
           </kbd>
         </div>
@@ -173,7 +175,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         <button
           type="button"
           onClick={onOpenGlobalSearch}
-          className="md:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 border border-jaman-border transition-colors shadow-2xs cursor-pointer"
+          className="xl:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 border border-jaman-border transition-colors shadow-2xs cursor-pointer"
           title="Global Search"
           aria-label="Open search"
         >
@@ -193,13 +195,13 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
 
             <span className="w-px h-4 bg-[#E2D9C8]" aria-hidden="true" />
 
-            <span className="text-slate-700 font-medium text-[11px] truncate max-w-[130px]" title={activeShift.cashierName}>
+            <span className="text-slate-700 font-medium text-[11px] truncate max-w-[84px] 2xl:max-w-[130px]" title={activeShift.cashierName}>
               {activeShift.cashierName || 'Unassigned cashier'}
             </span>
 
             <span className="w-px h-4 bg-[#E2D9C8]" aria-hidden="true" />
 
-            <span className="text-jaman-navy font-mono font-bold text-[11px] shrink-0">
+            <span className="jv-tabular text-jaman-navy font-mono font-bold text-[11px] shrink-0">
               Float: {formatINR(activeShift.openingCash ?? 0)}
             </span>
           </div>
