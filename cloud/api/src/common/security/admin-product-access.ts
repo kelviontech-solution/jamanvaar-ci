@@ -31,7 +31,9 @@ export function requiredConsoleApps(pathname: string): readonly AdminApp[] {
   if(entity&&['MENU_ITEM','MENU_CATEGORY','MODIFIER_GROUP','TAX_GROUP'].includes(entity))return ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'];
   if (entity && RESTAURANT_ENTITIES.has(entity)) return ['POS_ADMIN'];
   if (/^\/api\/v1\/inventory(?:\/|$)/.test(path)) return ['POS_ADMIN'];
-  if (/^\/api\/v1\/tenant\/payment-connection(?:\/|$)/.test(path)) return ['KIOSK_ADMIN'];
+  // All owner consoles share the restaurant's payout bank. QR-only owners must be
+  // able to submit it without buying Kiosk Admin; actor checks still apply.
+  if (/^\/api\/v1\/tenant\/payment-connection(?:\/|$)/.test(path)) return ALL_ADMIN_APPS;
   return BOTH;
 }
 

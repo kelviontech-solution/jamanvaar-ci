@@ -40,7 +40,8 @@ const DEVICE_TOKEN_KEY = 'jamanvaar_cloud_device_token';
 export class CloudApiError extends Error {
   constructor(
     message: string,
-    public status: number
+    public status: number,
+    public details?: {code?:string;feature?:string;reason?:string;entitlementKey?:string;planName?:string|null}
   ) {
     super(message);
   }
@@ -1430,7 +1431,7 @@ export interface FleetDevice {
 
 async function jsonOrThrowCloud<T>(res: Response, what: string): Promise<T> {
   const data = await parseJsonResponse(res);
-  if (!res.ok) throw new CloudApiError(data?.message ?? `${what} failed (${res.status})`, res.status);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `${what} failed (${res.status})`, res.status, data ? {code:data.code,feature:data.feature,reason:data.reason,entitlementKey:data.entitlementKey,planName:data.planName}:undefined);
   return data as T;
 }
 
@@ -1592,6 +1593,7 @@ export interface PaymentConnectionStatus {
   payoutMode?: 'MANUAL';
   routeStatus?: 'PENDING';
   effectiveCommissionBps?: number;
+  qrCommissionBps?: number;
   settlementAccountNumberMasked?: string | null;
   settlementBankName?: string | null;
   settlementBankAccountType?: string | null;
@@ -1714,7 +1716,7 @@ export interface RestaurantPayout {
 
 async function signedJsonOrThrow<T>(res: Response, what: string): Promise<T> {
   const data = await parseJsonResponse(res);
-  if (!res.ok) throw new CloudApiError(data?.message ?? `${what} failed (${res.status})`, res.status);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `${what} failed (${res.status})`, res.status, data ? {code:data.code,feature:data.feature,reason:data.reason,entitlementKey:data.entitlementKey,planName:data.planName}:undefined);
   return data as T;
 }
 

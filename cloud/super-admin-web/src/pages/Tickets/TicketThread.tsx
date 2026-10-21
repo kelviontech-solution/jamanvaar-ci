@@ -9,6 +9,10 @@ const MAX_BYTES = 2 * 1024 * 1024;
 const ACCEPT = 'image/png,image/jpeg,image/webp,image/gif,application/pdf,text/plain';
 
 const EVENT_TEXT: Record<string, (from: string | null, to: string | null) => string> = {
+  QR_PAYMENT_ACTIVATION_REQUEST: () => 'requested QR payment activation and accepted the 2% Jamanvaar commission',
+  QR_PAYMENTS_ACTIVATED: () => 'approved QR payment collection',
+  QR_FEATURE_REQUESTED: (_from, to) => `requested QR feature ${to ?? ''}`,
+  QR_FEATURE_GRANTED: (_from, to) => `enabled QR feature ${to ?? ''} on the restaurant subscription`,
   KIOSK_ACTIVATION_REQUEST: () => 'requested a customer kiosk activation key',
   KIOSK_KEY_ISSUED: () => 'issued a branch-scoped kiosk key; share it securely with the owner',
   CREATED: () => 'opened the ticket',

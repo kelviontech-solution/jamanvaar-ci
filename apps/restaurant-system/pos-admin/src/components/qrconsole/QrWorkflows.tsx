@@ -384,7 +384,7 @@ export function QrPickupCalendar() {
       {error && error.includes('not included in the current license') ? (
         <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
           <p>{error}</p>
-          <FeatureRequestButton featureCode="QR_SCHEDULED_PICKUP" featureLabel="Pickup calendar" />
+          <FeatureRequestButton featureCode="QR_SCHEDULED_PICKUP" featureLabel="Pickup calendar" onCheckAccess={load} />
         </div>
       ) : (
         <>

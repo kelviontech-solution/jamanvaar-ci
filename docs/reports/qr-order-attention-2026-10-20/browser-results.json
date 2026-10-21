@@ -1,0 +1,39 @@
+[
+  {
+    "width": 390,
+    "automaticServicePolling": true,
+    "soundOnNewRequest": true,
+    "persistentWhileScrolled": true,
+    "acknowledgementKeepsTask": true,
+    "completedRequestClears": true,
+    "serviceInboxWithoutLeavingOrders": true,
+    "openExactOrder": true,
+    "offlineWarningKeepsLastTasks": true,
+    "branchSwitchClearsOtherBranch": true,
+    "persistedSound": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "automaticServicePolling": true,
+    "soundOnNewRequest": true,
+    "persistentWhileScrolled": true,
+    "acknowledgementKeepsTask": true,
+    "completedRequestClears": true,
+    "serviceInboxWithoutLeavingOrders": true,
+    "openExactOrder": true,
+    "offlineWarningKeepsLastTasks": true,
+    "branchSwitchClearsOtherBranch": true,
+    "persistedSound": true,
+    "overflow": false
+  },
+  {
+    "quietHoursSuppressSound": true,
+    "unacknowledgedReminder": true,
+    "acknowledgementStopsReminder": true
+  },
+  {
+    "nativeChromeAudioContextRunning": true,
+    "actualOscillatorScheduled": true
+  }
+]

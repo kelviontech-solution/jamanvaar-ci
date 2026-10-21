@@ -8,6 +8,8 @@ import { PrismaService } from '../src/prisma/prisma.service';
 import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 import { QrRateLimiter } from '../src/modules/qr/qr-rate-limit';
 import { QrSettingsService } from '../src/modules/qr/qr-settings.service';
+import { ConfigService } from '@nestjs/config';
+import { Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { TENANT_JWT_AUDIENCE, TENANT_JWT_ISSUER } from '../src/modules/tenant-auth/tenant-auth.service';
 
@@ -121,10 +123,55 @@ it('deduplicates refreshes while different signed browser sessions remain separa
  for(let i=0;i<3;i++)await http().get(`/api/v1/public/qr/${qr}/menu`).set('x-qr-session',sid);
  const after=await prisma.runAsTenant(restaurantId,tx=>tx.qrEvent.count({where:{restaurantId,type:'QR_MENU_VIEWED'}}));expect(after-before).toBe(1);
 });
+it('lets a QR-only owner submit an encrypted payout bank without Kiosk Admin and rejects unlicensed sessions', async () => {
+ const proof=await ownerDeviceSession(prisma,admin),path='/api/v1/tenant/payment-connection';
+ const before=await prisma.runAsPlatform(tx=>tx.applicationEntitlement.findMany({where:{restaurantId,enabled:true}}));
+ await prisma.runAsPlatform(tx=>tx.applicationEntitlement.updateMany({where:{restaurantId,appCode:{not:'QR_ORDERING'}},data:{enabled:false}}));
+ try {
+  expect((await auth('get',path,proof)).status).toBe(200);
+  const saved=await http().patch(path+'/bank-details').set('Authorization',`Bearer ${proof}`).send({settlementAccountName:'QR Owner',settlementBankName:'Test Bank',settlementAccountNumber:'123456789012',settlementIfsc:'HDFC0000001',settlementBankAccountType:'CURRENT'});
+  expect(saved.status,JSON.stringify(saved.body)).toBe(200);expect(saved.body.bankVerificationStatus).toBe('PENDING');expect(saved.body.settlementAccountNumberMasked).toContain('9012');expect(JSON.stringify(saved.body)).not.toContain('123456789012');
+  await prisma.runAsPlatform(tx=>tx.applicationEntitlement.updateMany({where:{restaurantId},data:{enabled:false}}));
+  expect((await auth('get',path,proof)).status).toBe(403);
+  expect([403,404]).toContain((await auth('get','/api/v1/tenant/%70ayment-connection',proof)).status);
+ } finally { await prisma.runAsPlatform(tx=>tx.applicationEntitlement.updateMany({where:{id:{in:before.map(e=>e.id)}},data:{enabled:true}})); }
+});
+it('requests QR payment activation with owner consent, deduplicates tickets and approves collection without bypassing plan or gateway checks', async () => {
+ const proof=await ownerDeviceSession(prisma,admin),path='/api/v1/restaurant/qr/payment-activation-request',password='correct-horse-battery-staple';
+ const entitlement=await prisma.runAsPlatform(tx=>tx.applicationEntitlement.findFirstOrThrow({where:{restaurantId,appCode:'QR_ORDERING',enabled:true}}));
+ const config=(entitlement.config??{}) as Prisma.InputJsonObject;
+ await prisma.runAsPlatform(async tx=>{await tx.restaurantPaymentConnection.update({where:{restaurantId},data:{status:'NOT_CONNECTED'}});await tx.applicationEntitlement.update({where:{id:entitlement.id},data:{config:{...config,qrOnlinePayments:false}}});});
+ expect((await auth('post',path).send({acknowledgeCommission:true})).status).toBe(403);
+ expect((await auth('post',path).set('x-owner-authorization',proof).send({acknowledgeCommission:false})).status).toBe(400);
+ expect((await auth('put','/api/v1/restaurant/qr/settings').send({allowOnlinePayment:true})).status).toBe(403);
+ const results=await Promise.all([auth('post',path).set('x-owner-authorization',proof).send({acknowledgeCommission:true}),auth('post',path).set('x-owner-authorization',proof).send({acknowledgeCommission:true})]);
+ for(const result of results)expect(result.status,JSON.stringify(result.body)).toBe(201);
+ expect(results[0].body.ticketId).toBe(results[1].body.ticketId);const ticket=results[0].body.ticketId;
+ const preview=()=>http().get(`/api/v1/support-tickets/${ticket}/qr-payment`).set('Authorization',`Bearer ${platform}`);
+ const approve=(body:object,token=platform)=>http().patch(`/api/v1/support-tickets/${ticket}/qr-payment`).set('Authorization',`Bearer ${token}`).send(body);
+ expect((await preview()).body.request.blockedReason).toContain('not included');
+ expect((await approve({password})).status).toBe(409);
+ const accessReview=await http().patch(`/api/v1/qr-ordering/restaurants/${restaurantId}/entitlement`).set('Authorization',`Bearer ${platform}`).send({onlinePayments:true});expect(accessReview.status,JSON.stringify(accessReview.body)).toBe(200);
+ const service=app.get(ConfigService) as ConfigService;service.set('RAZORPAY_WEBHOOK_SECRET','');
+ expect((await preview()).body.request).toMatchObject({gatewayReady:false,canApprove:false});expect((await approve({password})).status).toBe(409);service.set('RAZORPAY_WEBHOOK_SECRET',secret);
+ const supportEmail=`qr-pay-support-${stamp}@example.invalid`;
+ await createTestPlatformUser(prisma,{email:supportEmail,password,role:'SUPPORT_ADMIN'});
+ try{const token=(await platformLogin(app,supportEmail,password)).body.accessToken;expect((await approve({password},token)).status).toBe(403);}finally{await prisma.platformUser.deleteMany({where:{email:supportEmail}});}
+ expect((await approve({})).status).toBe(403);
+ const approvals=await Promise.all([approve({password}),approve({password})]);for(const result of approvals)expect(result.status,JSON.stringify(result.body)).toBe(200);
+ const detail=(await auth('get',`/api/v1/support-tickets/${ticket}`,platform)).body;expect(detail.status).toBe('RESOLVED');expect(detail.events.filter((e:any)=>e.type==='QR_PAYMENTS_ACTIVATED')).toHaveLength(1);
+ const repeated=await auth('post',path).set('x-owner-authorization',proof).send({acknowledgeCommission:true});expect(repeated.status).toBe(201);expect(repeated.body.ticketId).toBe(ticket);
+ const ready=await auth('get','/api/v1/restaurant/qr/settings/payment-readiness');expect(ready.body).toMatchObject({available:true,guestAvailable:true,commissionBps:200,collectionStatus:'ACTIVE'});
+ expect((await auth('put','/api/v1/restaurant/qr/settings').send({allowOnlinePayment:false})).status).toBe(200);expect((await auth('get','/api/v1/restaurant/qr/settings/payment-readiness')).body.guestAvailable).toBe(false);
+ await auth('put','/api/v1/restaurant/qr/settings').send({allowOnlinePayment:true});
+});
+
 it('opens in-page Standard Checkout with one payment and original provider order across retries',async()=>{
  const p=await place('standard-idempotent',true);expect(p).toMatchObject({status:'PENDING_PAYMENT',payment:{status:'PENDING',url:null,checkout:{key:'rzp_test_isolated',amount:25000,currency:'INR'}}});
  expect((await stored(p.publicOrderId)).status).toBe('DRAFT');expect(p.allowCounterPayment).toBe(false);
  const retry=await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/payment`);expect(retry.body.payment.checkout.orderId).toBe(p.payment.checkout.orderId);expect((await pay(p.publicOrderId)).amount).toBe(25000);expect(gateway.createPaymentLink).not.toHaveBeenCalled();
+ expect(await pay(p.publicOrderId)).toMatchObject({commissionBps:200,platformAmount:500,restaurantAmount:24500});
+ const canonical=await stored(p.publicOrderId);expect(await prisma.runAsPlatform(tx=>tx.paymentTransaction.count({where:{restaurantId,order:{externalOrderId:canonical.externalOrderId}}}))).toBe(1);
 });
 it('never trusts callback signatures alone, mismatched amounts, currencies or provider orders',async()=>{
  const p=await place('standard-signature',true),oid=p.payment.checkout.orderId,pid='pay_moduleInvalid';
@@ -133,11 +180,19 @@ it('never trusts callback signatures alone, mismatched amounts, currencies or pr
  vi.mocked(gateway.fetchCheckoutPayments).mockResolvedValueOnce([{id:pid,status:'captured',...entry}] as any);await verify(p.publicOrderId,pid,oid);expect((await stored(p.publicOrderId)).status).toBe('DRAFT');
  }
 });
+it('retains an existing payment commission snapshot when reopening an older checkout',async()=>{
+ const p=await place('legacy-commission-snapshot',true),payment=await pay(p.publicOrderId);
+ await prisma.runAsPlatform(tx=>tx.paymentTransaction.update({where:{id:payment.id},data:{commissionBps:0,platformAmount:0,restaurantAmount:25000}}));
+ const retry=await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/payment`);expect(retry.status).toBe(200);expect(retry.body.payment.checkout.orderId).toBe(p.payment.checkout.orderId);
+ expect(await pay(p.publicOrderId)).toMatchObject({id:payment.id,commissionBps:0,platformAmount:0,restaurantAmount:25000});
+});
 it('verifies captured SDK payments on the server and repeated callbacks admit exactly once',async()=>{
  const p=await place('standard-captured',true),oid=p.payment.checkout.orderId,pid='pay_moduleCaptured';
  vi.mocked(gateway.fetchCheckoutPayments).mockResolvedValue([{id:pid,order_id:oid,amount:25000,currency:'INR',status:'captured'}] as any);
  const result=await verify(p.publicOrderId,pid,oid);expect(result.status,JSON.stringify(result.body)).toBe(200);expect(result.body).toMatchObject({status:'RECEIVED',paymentStatus:'SUCCESS'});
  const first=await stored(p.publicOrderId);await verify(p.publicOrderId,pid,oid);expect((await stored(p.publicOrderId)).syncVersion).toBe(first.syncVersion);
+ const payment=await pay(p.publicOrderId);expect(payment).toMatchObject({status:'SUCCESS',amount:25000,commissionBps:200,platformAmount:500,restaurantAmount:24500});
+ const ledger=await auth('get',`/api/v1/payments/${payment.id}`,platform);expect(ledger.status).toBe(200);expect(ledger.body).toMatchObject({commissionBps:200,platformAmount:500,restaurantAmount:24500,order:{source:'QR'}});
  expect((await action(p.publicOrderId,'CANCELLED',admin,'Paid cancellation')).status).toBe(400);vi.mocked(gateway.fetchCheckoutPayments).mockResolvedValue([]);
 });
 it('recovers a lost provider create response against the SAME reference, never a second charge attempt',async()=>{
@@ -446,6 +501,152 @@ it('edits receipt design with concurrency checks, inherits defaults and preserve
  expect((await stored(p.publicOrderId)).totalAmount).toBe(order.totalAmount);
  // The next branch still inherits its restaurant default rather than branch A's design.
  expect((await auth('get',path,adminB)).body.design.heading).toBe(beforeB.body.design.heading);
+});
+
+it('recovers saved menu-only codes after reload, separately from table codes, and exposes the actual branch mode', async () => {
+ const path='/api/v1/restaurant/qr/menu-codes';
+ await auth('put','/api/v1/restaurant/qr/settings').send({menuOnlyEnabled:false});
+ const created=await auth('post',path).send({branchId:branch,label:'Counter menu'});
+ expect(created.status,JSON.stringify(created.body)).toBe(201);
+ expect(created.body).toMatchObject({mode:'MENU_ONLY',tableId:null,displayNumber:'Counter menu',branchId:branch,status:'ACTIVE'});
+ const saved=await auth('get',`${path}?branchId=${branch}`);
+ expect(saved.status,JSON.stringify(saved.body)).toBe(200);expect(saved.headers['cache-control']).toContain('no-store');
+ expect(saved.body).toMatchObject({menuOnlyEnabled:false,publicBaseUrlConfigured:true});
+ expect(saved.body.rows.find((row:any)=>row.id===created.body.id)).toMatchObject({url:created.body.url,displayNumber:'Counter menu'});
+ expect(saved.body.rows.every((row:any)=>row.mode==='MENU_ONLY'&&row.tableId===null)).toBe(true);
+ const token=created.body.url.split('/q/')[1];
+ expect((await http().get(`/api/v1/public/qr/${token}`)).status).toBe(410);
+ expect((await auth('put','/api/v1/restaurant/qr/settings').send({menuOnlyEnabled:true})).status).toBe(200);
+ expect((await auth('get',`${path}?branchId=${branch}`)).body.menuOnlyEnabled).toBe(true);
+ const guest=await http().get(`/api/v1/public/qr/${token}`);expect(guest.status,JSON.stringify(guest.body)).toBe(200);
+ expect(guest.body).toMatchObject({mode:'MENU_ONLY',table:null});
+ const print=await auth('get',`/api/v1/restaurant/qr/codes/${created.body.id}/print-data`);
+ expect(print.status).toBe(200);expect(print.body).toMatchObject({tableLabel:'Counter menu',url:created.body.url,design:{instruction:'Scan to view our menu'}});
+});
+
+it('protects saved menu codes by authentication, branch and scoped pagination cursor', async () => {
+ const path='/api/v1/restaurant/qr/menu-codes';
+ const created=await auth('post',path,adminB).send({branchId:branchB,label:'Second branch menu'});expect(created.status).toBe(201);
+ expect((await http().get(`${path}?branchId=${branch}`)).status).toBe(401);
+ expect((await auth('get',`${path}?branchId=${branchB}`)).status).toBe(403);
+ const mine=await auth('get',`${path}?branchId=${branch}`);expect(mine.body.rows.some((row:any)=>row.id===created.body.id)).toBe(false);
+ expect((await auth('get',`${path}?branchId=${branch}&cursor=${created.body.id}`)).status).toBe(400);
+ expect((await auth('get',`${path}?branchId=invalid`)).status).toBe(400);
+ expect((await auth('get',`${path}?branchId=${branch}&cursor=invalid`)).status).toBe(400);
+ for(const action of ['enable','disable','regenerate','revoke'])expect((await auth('post',`/api/v1/restaurant/qr/codes/${created.body.id}/${action}`).send({})).status).toBe(404);
+ expect((await auth('get',`/api/v1/restaurant/qr/codes/${created.body.id}/print-data`)).status).toBe(404);
+});
+
+it('persists menu-code off/on/replacement/revocation and invalidates the old printed URL', async () => {
+ const path='/api/v1/restaurant/qr/menu-codes',root='/api/v1/restaurant/qr/codes';
+ const created=await auth('post',path).send({branchId:branch,label:'Lobby menu'});expect(created.status).toBe(201);
+ const id=created.body.id,oldToken=created.body.url.split('/q/')[1];
+ expect((await auth('post',`${root}/${id}/disable`).send({})).status).toBe(200);
+ expect((await auth('get',`${path}?branchId=${branch}`)).body.rows.find((row:any)=>row.id===id)).toMatchObject({status:'DISABLED',url:null});
+ expect((await auth('get',`${root}/${id}/print-data`)).status).toBe(409);
+ expect((await auth('post',`${root}/${id}/enable`).send({})).status).toBe(200);
+ const replaced=await auth('post',`${root}/${id}/regenerate`).send({});expect(replaced.status).toBe(201);
+ expect(replaced.body).toMatchObject({mode:'MENU_ONLY',tableId:null,displayNumber:'Lobby menu',version:2,status:'ACTIVE'});
+ expect(replaced.body.url).not.toBe(created.body.url);expect((await http().get(`/api/v1/public/qr/${oldToken}`)).status).toBe(410);
+ const list=await auth('get',`${path}?branchId=${branch}`);expect(list.body.rows.find((row:any)=>row.id===id)).toMatchObject({status:'REVOKED',url:null});
+ expect(list.body.rows.some((row:any)=>row.id===replaced.body.id)).toBe(true);
+ expect((await auth('post',`${root}/${replaced.body.id}/revoke`).send({})).status).toBe(200);
+ expect((await auth('post',`${root}/${replaced.body.id}/enable`).send({})).status).toBe(409);
+});
+
+it('paginates large saved menu-code histories without losing rows or mixing table codes', async () => {
+ const ids=Array.from({length:52},()=>randomUUID());
+ try {
+  await prisma.runAsTenant(restaurantId,tx=>tx.qrCode.createMany({data:ids.map((id,index)=>({id,restaurantId,branchId:branch,mode:'MENU_ONLY',tableId:null,tableNumber:`History ${index}`,publicToken:`menu-history-${id}`,status:'DISABLED'}))}));
+  let cursor:string|null=null,total=0;const seen:string[]=[];
+  do {
+   const result=await auth('get',`/api/v1/restaurant/qr/menu-codes?branchId=${branch}${cursor?`&cursor=${cursor}`:''}`);
+   expect(result.status,JSON.stringify(result.body)).toBe(200);expect(result.body.rows.length).toBeLessThanOrEqual(50);
+   expect(result.body.rows.every((row:any)=>row.mode==='MENU_ONLY'&&row.branchId===branch)).toBe(true);
+   seen.push(...result.body.rows.map((row:any)=>row.id));total=result.body.total;cursor=result.body.nextCursor;
+  } while(cursor);
+  expect(new Set(seen).size).toBe(seen.length);expect(seen.length).toBe(total);expect(ids.every(id=>seen.includes(id))).toBe(true);
+ } finally { await prisma.runAsTenant(restaurantId,tx=>tx.qrCode.deleteMany({where:{id:{in:ids},restaurantId}})); }
+});
+
+it('publishes uploaded dish photos and category-based sizes/add-ons, enforcing choices and prices on customer orders',async()=>{
+ const save=async(type:string,id:string,payload:Record<string,unknown>)=>{const result=await push(type,id,payload);expect(result.status,JSON.stringify(result.body)).toBe(201);expect(result.body.results[0].status,JSON.stringify(result.body)).toBe('ok');};
+ const sharp=(await import('sharp')).default;
+ const photo='data:image/png;base64,'+(await sharp({create:{width:8,height:8,channels:3,background:'#c75e28'}}).png().toBuffer()).toString('base64');
+ const sizes={name:'Pizza sizes',kind:'SIZE',isRequired:true,minSelections:1,maxSelections:1,options:[{id:'pizza-normal',name:'Normal',priceDelta:0,isAvailable:true},{id:'pizza-medium',name:'Medium',priceDelta:50,isAvailable:true},{id:'pizza-large',name:'Large',priceDelta:100,isAvailable:true}]};
+ await save('MODIFIER_GROUP','pizza-sizes',sizes);
+ await save('MODIFIER_GROUP','pizza-extras',{name:'Pizza extras',kind:'ADD_ON',isRequired:false,minSelections:0,maxSelections:1,options:[{id:'pizza-cheese',name:'Extra cheese',priceDelta:30,isAvailable:true}]});
+ await save('MENU_CATEGORY','pizza-category',{name:'Pizzas',isActive:true,defaultModifierGroupIds:['pizza-sizes','pizza-extras']});
+ for(const id of ['pizza-one','pizza-two'])await save('MENU_ITEM',id,{name:id,categoryId:'pizza-category',price:200,isAvailable:true,imageUrl:photo,modifierGroupIds:['pizza-sizes','pizza-extras']});
+ expect((await auth('put','/api/v1/restaurant/qr/settings').send({allowModifiers:true})).status).toBe(200);
+ expect((await auth('post','/api/v1/menu/publish').send({})).status).toBe(201);
+ const menu=await http().get(`/api/v1/public/qr/${qr}/menu`);expect(menu.status).toBe(200);
+ const dish=menu.body.items.find((row:any)=>row.id==='pizza-one');expect(dish.modifierGroupIds).toEqual(['pizza-sizes','pizza-extras']);expect(dish.imageUrl).not.toContain('data:');
+ expect(menu.body.modifierGroups.find((row:any)=>row.id==='pizza-sizes').options).toEqual(expect.arrayContaining([expect.objectContaining({name:'Medium',priceDelta:50})]));
+ const image=await http().get(dish.imageUrl);expect(image.status).toBe(200);expect(image.headers['content-type']).toContain('image/png');expect(image.body.length).toBeGreaterThan(30);
+ const quote=(optionIds:string[])=>http().post(`/api/v1/public/qr/${qr}/quote`).send({items:[{itemId:'pizza-one',quantity:1,optionIds}]});
+ expect((await quote([])).status).toBe(400);expect((await quote(['pizza-normal','pizza-large'])).status).toBe(400);
+ const priced=await quote(['pizza-large','pizza-cheese']);expect(priced.status,JSON.stringify(priced.body)).toBe(200);expect(priced.body.subtotal).toBe(330);
+ // A dish-specific copy changes that pizza alone; the category and sibling still use the original sizes.
+ await save('MODIFIER_GROUP','pizza-one-sizes',{...sizes,options:sizes.options.map(option=>({...option,id:`special-${option.id}`,priceDelta:option.id==='pizza-medium'?80:option.priceDelta}))});
+ await save('MENU_ITEM','pizza-one',{...dish,imageUrl:photo,isAvailable:true,modifierGroupIds:['pizza-one-sizes','pizza-extras']});
+ expect((await auth('post','/api/v1/menu/publish').send({})).status).toBe(201);
+ const updated=await http().get(`/api/v1/public/qr/${qr}/menu`);
+ expect(updated.body.items.find((row:any)=>row.id==='pizza-one').modifierGroupIds).toEqual(['pizza-one-sizes','pizza-extras']);expect(updated.body.items.find((row:any)=>row.id==='pizza-two').modifierGroupIds).toEqual(['pizza-sizes','pizza-extras']);
+ const customized=await quote(['special-pizza-medium']);expect(customized.status).toBe(200);expect(customized.body.subtotal).toBe(280);
+ expect((await quote(['pizza-medium'])).status).toBe(400);
+ const ordered=await http().post(`/api/v1/public/qr/${qr}/orders`).send({items:[{itemId:'pizza-one',quantity:1,optionIds:['special-pizza-medium']}],paymentMethod:'CASH_AT_COUNTER',idempotencyKey:'category-pizza-custom-order'});
+ expect(ordered.status,JSON.stringify(ordered.body)).toBe(201);const canonical=await stored(ordered.body.publicOrderId);expect(canonical.totalAmount).toBe(28000);expect(JSON.stringify(canonical.items)).toContain('Medium');
+ const category=await prisma.runAsTenant(restaurantId,tx=>tx.syncedEntity.findUniqueOrThrow({where:{restaurantId_entityType_externalId:{restaurantId,entityType:'MENU_CATEGORY',externalId:'pizza-category'}}}));
+ expect((category.payload as any).defaultModifierGroupIds).toEqual(['pizza-sizes','pizza-extras']);
+ const invalid=await push('MENU_CATEGORY','invalid-choice-category',{name:'Invalid',defaultModifierGroupIds:'pizza-sizes'});expect(invalid.body.results[0].status).toBe('error');
+});
+
+it('distinguishes saved drafts from live dishes, publishes the reviewed version and explains every branch visibility restriction',async()=>{
+ const statusPath=`/api/v1/restaurant/qr/menu-status?branchId=${branch}`;
+ const save=async(id:string,changes:Record<string,unknown>={})=>{const response=await push('MENU_ITEM',id,{name:id,categoryId:'main',price:150,isAvailable:true,modifierGroupIds:[],...changes});expect(response.body.results[0].status,JSON.stringify(response.body)).toBe('ok');};
+ await save('visibility-draft-only');
+ let status=await auth('get',statusPath);expect(status.status,JSON.stringify(status.body)).toBe(200);expect(status.headers['cache-control']).toContain('no-store');
+ expect(status.body.rows.find((row:any)=>row.id==='visibility-draft-only')).toMatchObject({state:'DRAFT_ONLY',live:false,afterPublishVisible:true,reason:'Not published yet.'});
+ expect((await http().get(`/api/v1/public/qr/${qr}/menu`)).body.items.some((row:any)=>row.id==='visibility-draft-only')).toBe(false);
+ const publish=(review:any)=>auth('post','/api/v1/menu/publish').send({expectedChecksum:review.checksum,expectedVersion:review.publishedVersion});
+ expect((await publish(status.body.review)).status).toBe(201);
+ status=await auth('get',statusPath);expect(status.body.rows.find((row:any)=>row.id==='visibility-draft-only')).toMatchObject({state:'LIVE',live:true});
+ const publicMenu=await http().get(`/api/v1/public/qr/${qr}/menu`);expect(status.body.counts.live).toBe(publicMenu.body.items.length);
+ // A price edit remains a draft until publication; the admin displays the actual live price beside it.
+ await save('visibility-draft-only',{price:170});status=await auth('get',statusPath);expect(status.body.rows.find((row:any)=>row.id==='visibility-draft-only')).toMatchObject({state:'LIVE_WITH_CHANGES',livePrice:150});
+ const reviewed=status.body.review;await save('visibility-draft-only',{price:180});expect((await publish(reviewed)).status).toBe(409);
+ status=await auth('get',statusPath);expect((await publish(status.body.review)).status).toBe(201);expect((await publish(status.body.review)).status).toBe(409);
+ await save('visibility-qr-hidden',{isQrOrderingEnabled:false,salesChannels:['QR','POS']});
+ await save('visibility-digital-hidden',{isDigitalMenuVisible:false});
+ await save('visibility-no-stock',{stockQuantity:0});
+ await save('visibility-other-branch',{branchIds:[branchB]});
+ await push('MENU_CATEGORY','visibility-hidden-category',{name:'Hidden QR category',isActive:true,qrVisible:false});
+ await save('visibility-category-hidden',{categoryId:'visibility-hidden-category'});
+ await save('visibility-unavailable',{isAvailable:false});
+ status=await auth('get',statusPath);expect((await publish(status.body.review)).status).toBe(201);
+ status=await auth('get',statusPath);
+ const reasons={'visibility-qr-hidden':'Hidden from QR ordering','visibility-digital-hidden':'Hidden from QR ordering','visibility-no-stock':'Out of stock','visibility-other-branch':'Not sold in this branch','visibility-category-hidden':'Its category is hidden or inactive','visibility-unavailable':'Marked unavailable for the whole restaurant'};
+ for(const[id,reason]of Object.entries(reasons))expect(status.body.rows.find((row:any)=>row.id===id)).toMatchObject({state:'HIDDEN',live:false,afterPublishVisible:false,reason});
+ expect(status.body.counts.live).toBe((await http().get(`/api/v1/public/qr/${qr}/menu`)).body.items.length);
+ expect((await auth('get',`/api/v1/restaurant/qr/menu-status?branchId=${branchB}`)).status).toBe(403);
+ expect((await http().get(statusPath)).status).toBe(401);
+ expect((await auth('get','/api/v1/restaurant/qr/menu-status?branchId=invalid')).status).toBe(400);
+ // A branch pause is live immediately. Clearing its draft flag alone does not undo an already-published pause.
+ expect((await auth('put','/api/v1/menu/branch-overrides').send({branchId:branch,itemId:'visibility-draft-only',isAvailable:false})).status).toBe(200);
+ status=await auth('get',statusPath);expect(status.body.rows.find((row:any)=>row.id==='visibility-draft-only')).toMatchObject({reason:'Switched off for this branch',canRestoreBranchPause:true});
+ expect((await publish(status.body.review)).status).toBe(201);
+ await auth('put','/api/v1/menu/branch-overrides').send({branchId:branch,itemId:'visibility-draft-only',isAvailable:true});
+ status=await auth('get',statusPath);expect(status.body.rows.find((row:any)=>row.id==='visibility-draft-only')).toMatchObject({live:false,afterPublishVisible:true,canRestoreBranchPause:false});
+ expect((await publish(status.body.review)).status).toBe(201);
+ status=await auth('get',statusPath);expect(status.body.rows.find((row:any)=>row.id==='visibility-draft-only')).toMatchObject({live:true,state:'LIVE'});
+ await auth('put','/api/v1/restaurant/qr/settings').send({orderingEnabled:false});
+ status=await auth('get',statusPath);expect(status.body.counts.live).toBe(0);expect(status.body.notices).toContain('QR ordering is switched off in QR Settings.');expect(status.body.liveItems).toEqual([]);
+ expect((await http().get(`/api/v1/public/qr/${qr}/menu`)).status).toBe(410);
+ await auth('put','/api/v1/restaurant/qr/settings').send({orderingEnabled:true});
+ // A removed branch override must not keep a dish unavailable through live availability filtering.
+ await prisma.runAsTenant(restaurantId,async tx=>{const row=await tx.syncedEntity.findUniqueOrThrow({where:{restaurantId_entityType_externalId:{restaurantId,entityType:'BRANCH_MENU_OVERRIDE',externalId:`${branch}:visibility-draft-only`}}});await tx.syncedEntity.update({where:{id:row.id},data:{payload:{...(row.payload as any),isAvailable:false,deleted:true}}});});
+ status=await auth('get',statusPath);expect(status.body.rows.find((row:any)=>row.id==='visibility-draft-only').live).toBe(true);
 });
 
 it('requires owner proof for restaurant receipt defaults and keeps a branch override intact',async()=>{

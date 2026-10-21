@@ -1,10 +1,13 @@
+import { QrOnlinePaymentSetup } from './QrOnlinePaymentSetup';
+import { QrPayoutBank } from './QrPayoutBank';
+import {QrOrderAttention} from './QrOrderAttention';
 import {QrGuestDetails} from './QrGuestDetails';
 import { QrOrderTimeline } from './QrWorkflows';
 import { Modal } from '@jamanvaar/ui';
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { activeAdminBranch } from "../../adminBranchScope";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Download, Printer, Save, RefreshCw, Palette, Clock, CreditCard } from "lucide-react";
+import { Download, Printer, Save, RefreshCw, Palette, Clock } from "lucide-react";
 import {
   QrAdminApi,
   type QrBranch,
@@ -447,8 +450,7 @@ export function QrOrderingRules({
   const { confirm, prompt, confirmDialog } = useConfirm();
   const branches = useData("branches", QrAdminApi.branches);
   const [branch, setBranch] = useState(scopedBranch);
-  const settings = useData(branch, () => QrAdminApi.settings(branch)),
-    ready = useData(branch, () => QrAdminApi.paymentReadiness(branch));
+  const settings = useData(branch, () => QrAdminApi.settings(branch));
   const [rules, setRules] = useState<QrRules | null>(null),
     [dirty, setDirty] = useState(false),
     [busy, setBusy] = useState(false),[saveError,setSaveError]=useState('');
@@ -471,7 +473,6 @@ export function QrOrderingRules({
       await QrAdminApi.saveSettings(body, branch);
       setDirty(false);
       settings.reload();
-      ready.reload();
       showToast("Settings saved.");
     } catch (e) {
       setSaveError((e as Error).message);
@@ -503,7 +504,6 @@ export function QrOrderingRules({
     try {
       await QrAdminApi.saveSettings({ [key]: checked }, branch);
       showToast("Settings saved.");
-      ready.reload();
     } catch (e) {
       settings.setData((current) => (current ? { ...current, [key]: previous } : current));
       setSaveError((e as Error).message);
@@ -524,10 +524,7 @@ export function QrOrderingRules({
       string,
     ]
   > = payments
-    ? [
-        ["allowOnlinePayment", "Online payment"],
-        ["allowCash", "Cash at Counter"],
-      ]
+    ? [["allowCash", "Cash at Counter"]]
     : [
         ["orderingEnabled", "Accept QR orders"],
         ["autoAccept", "Send accepted orders straight to the kitchen"],
@@ -549,8 +546,11 @@ export function QrOrderingRules({
                 cancelLabel: "Keep editing",
                 tone: "danger",
               }))
-            )
+            ) {
+              setDirty(false);
+              setRules(null);
               setBranch(v);
+            }
           }}
           branches={branches.data}
         />
@@ -558,7 +558,7 @@ export function QrOrderingRules({
           Restaurant defaults apply until a branch overrides a setting. Other
           branches keep their own configuration.
         </p>
-        <Failure error={saveError || settings.error || ready.error} />
+        <Failure error={saveError || settings.error} />
         {branch && (
           <button
             disabled={busy}
@@ -573,6 +573,7 @@ export function QrOrderingRules({
               )
                 try {
                   await QrAdminApi.inheritSettings(branch);
+                  setDirty(false);
                   settings.reload();
                   showToast("Restaurant defaults restored.");
                 } catch (e) {
@@ -584,35 +585,8 @@ export function QrOrderingRules({
           </button>
         )}
       </div>
-      {payments && (
-        <div className={box}>
-          <h2 className="font-bold flex items-center gap-2">
-            <CreditCard size={18} />
-            Secure payment collection
-          </h2>
-          <p role="status" className="mt-3 text-sm">
-            {ready.data?.message || "Checking gateway readiness…"}
-          </p>
-          <div className="flex gap-2 mt-3 text-xs font-bold">
-            <span className="bg-slate-100 rounded-full px-3 py-1">
-              {ready.data?.provider || "Razorpay"}
-            </span>
-            <span className="bg-slate-100 rounded-full px-3 py-1">
-              {ready.data?.mode || "Not configured"}
-            </span>
-            <span className="bg-slate-100 rounded-full px-3 py-1">
-              {ready.data?.guestAvailable
-                ? "Enabled for guests"
-                : "Unavailable to guests"}
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mt-3">
-            UPI and other methods are offered by the secure provider according
-            to merchant activation. Configure credentials and collection
-            approval through Super Admin. Secrets are never shown here.
-          </p>
-        </div>
-      )}
+      {payments && <QrOnlinePaymentSetup key={branch} branch={branch} onSaved={() => settings.reload()} />}
+      {payments && <QrPayoutBank />}
       <div className={box + " space-y-4"}>
         {switches.map(([key, label]) => (
           <div key={key}>
@@ -622,26 +596,20 @@ export function QrOrderingRules({
                 type="checkbox"
                 disabled={
                   busy ||
-                  !settings.data ||
-                  (key === "allowOnlinePayment" &&
-                    !ready.data?.available &&
-                    !settings.data?.allowOnlinePayment)
+                  !settings.data
                 }
                 checked={settings.data?.[key] ?? false}
                 onChange={(e) => void saveSwitch(key, e.target.checked)}
               />
             </label>
-            {key === "allowOnlinePayment" && settings.data?.allowOnlinePayment && !ready.data?.available && (
-              <p className="text-xs text-amber-700 mt-1">
-                Turned on, but guests can't pay online yet — the payment provider above isn't configured. Ask your Super Admin to activate it, or guests will see Cash at Counter only.
-              </p>
-            )}
+
           </div>
         ))}
         {payments && rules && (
           <label className="block text-xs font-bold">
             Payment instructions
             <textarea
+              aria-label="Payment instructions"
               className={input}
               maxLength={300}
               value={rules.paymentInstructions}
@@ -935,6 +903,12 @@ export function QrOperationalOrders({ showToast }: Props) {
   return (
     <>
     <div className="space-y-4">
+      <QrOrderAttention key={branch} branchId={branch} onOpenOrder={async id=>{
+        const result=await QrAdminApi.orderPage({branchId:branch,search:id,view:'ALL'});
+        const order=result.rows.find(row=>row.id===id);
+        if(!order)throw new Error('This order is no longer available in this branch. Refresh the orders list.');
+        setDetail(order);
+      }}/>
       <div className={box + " flex flex-wrap gap-4 items-end"}>
         <BranchSelect
           value={branch}
@@ -1520,128 +1494,6 @@ export function QrAnalyticsView({
           )}
         </div>
       )}
-    </div>
-  );
-}
-
-export function QrMenuAvailability({ showToast }: Props) {
-  const [branch, setBranch] = useState(scopedBranch),
-    [query, setQuery] = useState(""),
-    [busy, setBusy] = useState(false),[availabilityPage,setAvailabilityPage]=useState(0);
-  useEffect(()=>setAvailabilityPage(0),[query,branch]);
-  const branches = useData("branches", QrAdminApi.branches),
-    menu = useData(branch, () => QrAdminApi.menuPreview(branch));
-  const run = async (
-    fn: () => Promise<unknown>,
-    message = "Menu updated. Publish the catalog to release availability changes to guests.",
-  ) => {
-    setBusy(true);
-    try {
-      await fn();
-      menu.reload();
-      showToast(message);
-    } catch (e) {
-      showToast((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <div className={box + " space-y-4"}>
-      <h2 className="font-bold text-lg">Publish & branch availability</h2>
-      <p className="text-sm text-slate-500">
-        {/^\/qr\//.test(location.pathname)
-          ? // Solo-QR restaurants have no separate Restaurant Admin app, so QrCatalog's "Shared
-            // menu editor" renders directly above this on the same page — this used to still say
-            // "Edit dishes in Menu & Categories" with the link to it hidden, pointing guests at a
-            // page that, in this exact context, both doesn't exist and isn't needed: the editor is
-            // already right there.
-            'Add, edit or remove dishes using Edit shared draft. This list controls published guest availability for each branch.'
-          : 'Uses the same catalog, modifiers, taxes and branch availability as your restaurant. Publishing makes the current catalog available to guests.'}
-      </p>
-      {!/^\/qr\//.test(location.pathname) && (
-        <a
-          href={location.pathname.startsWith('/kiosk-admin/') ? '/kiosk-admin/menu' : '/restaurant-admin/menu'}
-          className="text-brand font-bold text-sm"
-        >
-          Open Menu & Categories →
-        </a>
-      )}
-      <div className="flex flex-wrap items-end gap-3">
-        <BranchSelect
-          value={branch}
-          onChange={setBranch}
-          branches={branches.data}
-        />
-        <label className="text-xs font-bold flex-1">
-          Search dishes
-          <input
-            className={input}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </label>
-        <button
-          className={button}
-          disabled={busy}
-          onClick={() =>
-            void run(QrAdminApi.publishMenu, "Menu published for guests.")
-          }
-        >
-          Publish current menu
-        </button>
-      </div>
-      <Failure error={menu.error} />
-      {menu.data?.items
-        .filter((i) => i.name.toLowerCase().includes(query.toLowerCase())).slice(availabilityPage*24,(availabilityPage+1)*24)
-        .map((i) => (
-          <div
-            className="flex flex-wrap gap-3 items-center justify-between border-t py-3 text-sm"
-            key={i.id}
-          >
-            <b>{i.name}</b>
-            <span>Visible in preview</span>
-            {branch && (
-              <button
-                className="text-rose-600"
-                disabled={busy}
-                onClick={() =>
-                  void run(() =>
-                    QrAdminApi.branchAvailability(branch, i.id, false),
-                  )
-                }
-              >
-                Mark unavailable
-              </button>
-            )}
-          </div>
-        ))}
-      {menu.data?.hidden
-        .filter((i) => i.name.toLowerCase().includes(query.toLowerCase())).slice(availabilityPage*24,(availabilityPage+1)*24)
-        .map((i) => (
-          <div
-            key={i.itemId}
-            className="flex flex-wrap justify-between gap-2 text-sm border-t py-3"
-          >
-            <span>
-              {i.name} · {i.reason}
-            </span>
-            {branch && (
-              <button
-                className="text-emerald-700 font-bold"
-                disabled={busy}
-                onClick={() =>
-                  void run(() =>
-                    QrAdminApi.branchAvailability(branch, i.itemId, true),
-                  )
-                }
-              >
-                Restore branch availability
-              </button>
-            )}
-          </div>
-        ))}
-      <div className="flex gap-3 items-center"><button className={button} disabled={!availabilityPage} onClick={()=>setAvailabilityPage(p=>p-1)}>Previous dishes</button><span>Page {availabilityPage+1}</span><button className={button} disabled={Math.max(menu.data?.items.filter(i=>i.name.toLowerCase().includes(query.toLowerCase())).length??0,menu.data?.hidden.filter(i=>i.name.toLowerCase().includes(query.toLowerCase())).length??0)<=(availabilityPage+1)*24} onClick={()=>setAvailabilityPage(p=>p+1)}>Next dishes</button></div>
     </div>
   );
 }

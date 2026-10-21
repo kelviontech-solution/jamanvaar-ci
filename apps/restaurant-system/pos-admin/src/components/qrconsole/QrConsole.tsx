@@ -8,7 +8,8 @@ import { QrAiAssistant } from './QrAiAssistant';
 import { QrPaymentWizard, QrReconciliation, QrPickupCalendar } from './QrWorkflows';
 import { QrPrintPack } from './QrPrintPack';
 import { QR_BEFORE_NAVIGATE, requestQrLeave } from './useQrUnsavedChanges';
-import { QrCatalog } from "./QrCatalog";
+import { QrMenuWorkspace } from './QrMenuWorkspace';
+import { QrMenuCodes } from './QrMenuCodes';
 import {
   QrSetupHealth,
   QrServiceOperations,
@@ -53,7 +54,7 @@ import {
   ScanLine,
   type LucideIcon,
 } from "lucide-react";
-import { generateQrDataUrl } from "@jamanvaar/utils";
+import { copyText, generateQrDataUrl } from "@jamanvaar/utils";
 import { CloudApiError } from "../../cloud/cloudClient";
 import {
   QrAdminApi,
@@ -70,7 +71,6 @@ import {
   QrOrderingRules,
   QrOperationalOrders,
   QrAnalyticsView,
-  QrMenuAvailability,
 } from "./QrAdvanced";
 import { useDialogFocus } from '@jamanvaar/ui';
 import { QrCrm } from './QrCrm';
@@ -113,6 +113,7 @@ export function QrConsole({
   const sidebar = useRef<HTMLElement>(null);
   const workspace = layout !== "embedded";
   const navigate = async (next: Tab, section = "Settings", branchScope?:string) => {
+    if (next === tab && (next !== 'ADVANCED' || section === feature) && !branchScope) { setMenuOpen(false); return; }
     if (!window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE, {cancelable:true})) && !(await confirmNavigation({title:'Leave without saving?',message:'Your changes on this page have not been saved.',confirmLabel:'Discard & continue',cancelLabel:'Keep editing',tone:'danger'}))) return;
     setTab(next);
     setFeature(section);
@@ -348,7 +349,7 @@ export function QrConsole({
           </div>
           <QrAiAssistant />
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Enabled{" "}
+            <CheckCircle2 className="w-3.5 h-3.5" /> QR Ordering active{" "}
             {entitlement.source === "MANUAL_OVERRIDE"
               ? " (special access)"
               : ""}
@@ -398,9 +399,11 @@ export function QrConsole({
         {tab === 'RESTAURANT_PAGE' && <QrRestaurantPage onNavigate={(next,scope)=>void navigate(next,'Settings',scope)} />}
         {tab === 'WEBSITE_QR' && <QrRestaurantPageQr onNavigate={(next,scope)=>void navigate(next,'Settings',scope)}/>}
         {tab === "TABLES" && <><div className="rounded-xl border border-blue-200 bg-blue-50 p-4 my-4 text-sm"><strong>Table Ordering QR → ordering menu for that table</strong><p className="mt-1">Place these cards on dining tables. A fresh scan opens the menu directly and keeps the table number. For a website QR on your entrance or visiting card, use Restaurant Page QR.</p><button type="button" className="qr-btn secondary mt-3" onClick={()=>void navigate('WEBSITE_QR')}>Design Restaurant Page QR</button></div><TablesAndQr showToast={showToast} /></>}
-        {tab === "MENU" && <QrMenuWorkspace showToast={showToast} />}
+        {tab === "MENU" && <QrMenuWorkspace />}
         {tab === "ADVANCED" && (
           <QrCapabilities
+            key={workspace ? feature : 'advanced'}
+            onOpenSettings={() => void navigate('ADVANCED', 'Settings')}
             showToast={showToast}
             section={workspace ? feature : undefined}
             hideNavigation={workspace}
@@ -649,6 +652,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
   const [viewing, setViewing] = useState<QrTableRow | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [adding, setAdding] = useState(false);
+  const [creatingMenuCode, setCreatingMenuCode] = useState(false);
   const [newNumber, setNewNumber] = useState("");
   const [newCapacity, setNewCapacity] = useState("4");
   const [renaming, setRenaming] = useState<{
@@ -675,6 +679,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
   );
   const chosenBranch =
     branchId || (activeBranches.length === 1 ? activeBranches[0].id : "");
+  useEffect(() => setCreatingMenuCode(false), [chosenBranch]);
 
   const run = async (key: string, fn: () => Promise<unknown>, done: string) => {
     setBusy(key);
@@ -850,18 +855,12 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
           <Download className="w-3.5 h-3.5" /> Download All
         </button>
         <button
-          disabled={!chosenBranch || busy === "menu"}
-          onClick={() =>
-            run(
-              "menu",
-              () => QrAdminApi.menuCode(chosenBranch, "Menu card"),
-              "Menu-only code created",
-            )
-          }
+          disabled={!chosenBranch}
+          onClick={() => setCreatingMenuCode(true)}
           className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40"
-          title="A code with no table, for menu cards"
+          title={chosenBranch ? 'Create a menu QR without a fixed table, then view, share or print it' : 'Choose a branch above to create a menu QR'}
         >
-          <Plus className="w-3.5 h-3.5" /> Menu-only code
+          <Plus className="w-3.5 h-3.5" /> Create menu QR
         </button>
       </div>
 
@@ -1142,6 +1141,10 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
           })}
         </div>
       )}
+      {chosenBranch ? <QrMenuCodes key={chosenBranch}
+        branchId={chosenBranch} branchName={activeBranches.find(branch => branch.id === chosenBranch)?.name || 'Selected branch'}
+        creating={creatingMenuCode} onCreate={() => setCreatingMenuCode(true)} onCloseCreate={() => setCreatingMenuCode(false)} showToast={showToast}
+      /> : <p className="text-sm text-slate-600">Choose a branch above to view or create menu QR codes without a fixed table.</p>}
       {viewing?.qr?.url && (
         <QrDialog
           row={viewing}
@@ -1165,6 +1168,9 @@ function QrDialog({
   showToast: (m: string) => void;
 }) {
   const url = row.qr!.url!;
+  const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => () => clearTimeout(copiedTimer.current), []);
   const {cardRef,dialogId}=useDialogFocus<HTMLDivElement>(true,onClose);
   return (
     <div
@@ -1192,13 +1198,16 @@ function QrDialog({
         <div className="text-[11px] text-slate-500 break-all">{url}</div>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => {
-              void navigator.clipboard?.writeText(url);
-              showToast("Link copied");
+            onClick={async () => {
+              const ok = await copyText(url);
+              setCopied(ok);
+              showToast(ok ? 'Link copied' : 'Copy was blocked. Select and copy the link above.');
+              clearTimeout(copiedTimer.current);
+              copiedTimer.current = setTimeout(() => setCopied(false), 2500);
             }}
             className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center gap-1"
           >
-            <Copy className="w-3.5 h-3.5" /> Copy link
+            {copied ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />} {copied ? 'Copied!' : 'Copy link'}
           </button>
           <button
             onClick={async () => {
@@ -1409,5 +1418,3 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
     </div>
   );
 }
-
-function QrMenuWorkspace({showToast}:{showToast:(message:string)=>void}){const [mode,setMode]=useState('EDIT');return <div className="space-y-4"><div className="sticky top-0 z-10 rounded-xl border bg-white p-3 flex flex-wrap gap-3">{['EDIT','AVAILABILITY'].map(value=><button type="button" key={value} aria-pressed={mode===value} className="min-h-11 rounded-xl border px-4 font-bold" onClick={async()=>{if(await requestQrLeave())setMode(value);}}>{value==='EDIT'?'Edit shared draft':'Published guest availability'}</button>)}</div>{mode==='EDIT'?<QrCatalog/>:<QrMenuAvailability showToast={showToast}/>}</div>;}

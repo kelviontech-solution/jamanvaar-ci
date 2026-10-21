@@ -12,8 +12,11 @@ import { PlatformNotificationsService } from '../platform-notifications/platform
 import { QrResolutionCache } from './qr-resolution-cache';
 import { QrSettingsService, QrSettingsUpdate, QrBrandingUpdate } from './qr-settings.service';
 import { PaymentsService } from '../payments/payments.service';
+import { QrPaymentActivationService } from '../payments/qr-payment-activation.service';
+import { QR_COMMISSION_BPS } from '../payments/commission.util';
 import { OrderSyncService } from '../order-sync/order-sync.service';
 import { newPublicToken, QR_APP_CODE, QR_AUDIT, QR_EVENT, QR_MODE, QR_STATUS, startOfDayIn } from './qr.support';
+import { QR_CAPABILITIES } from '../application-entitlements/qr-capabilities';
 
 export const generateQrSchema = z
   .object({
@@ -48,7 +51,7 @@ export type UpdateTable = z.infer<typeof updateTableSchema>;
 
 export const requestFeatureSchema = z
   .object({
-    featureCode: z.string().trim().min(1).max(60),
+    featureCode: z.string().trim().refine(code => Object.prototype.hasOwnProperty.call(QR_CAPABILITIES, code), 'Unknown optional QR feature'),
     featureLabel: z.string().trim().min(1).max(120),
     note: z.string().trim().max(2000).optional()
   })
@@ -75,7 +78,8 @@ export class QrAdminService {
     private readonly realtime: RealtimeBus,
     private readonly payments: PaymentsService,
     private readonly orderSync: OrderSyncService,
-    private readonly notifications: PlatformNotificationsService
+    private readonly notifications: PlatformNotificationsService,
+    private readonly paymentActivation: QrPaymentActivationService
   ) {}
 
   /** Only the restaurant's own Restaurant Admin console may manage QR codes. */
@@ -120,6 +124,7 @@ export class QrAdminService {
       const created = await tx.supportTicket.create({
         data: {
           restaurantId,
+          branchId: device.branchId,
           subject,
           description,
           category: 'FEATURE_REQUEST',
@@ -132,6 +137,7 @@ export class QrAdminService {
         }
       });
       await tx.ticketEvent.create({ data: { ticketId: created.id, type: 'CREATED', actorType: 'RESTAURANT', actorName: raiser?.fullName ?? 'Restaurant', toValue: 'OPEN' } });
+      await tx.ticketEvent.create({ data: { ticketId: created.id, type: 'QR_FEATURE_REQUESTED', actorType: 'RESTAURANT', actorName: raiser?.fullName ?? 'Restaurant', toValue: input.featureCode } });
       return created;
     });
     await this.audit.log({
@@ -261,6 +267,31 @@ export class QrAdminService {
     return device.branchId ?? requested;
   }
 
+  async menuCodes(device: Device, query: { branchId?: string; cursor?: string }) {
+    const parsed = z.object({ branchId: z.string().uuid().optional(), cursor: z.string().uuid().optional() }).safeParse(query);
+    if (!parsed.success) throw new BadRequestException('Choose a valid branch and menu QR page.');
+    await this.requireEnabled(device.restaurantId);
+    const branchId = this.scopedBranch(device, parsed.data.branchId);
+    if (!branchId) throw new BadRequestException('Choose a branch to view its menu QR codes.');
+    const page = await this.prisma.runAsTenant(device.restaurantId, async tx => {
+      const branch = await tx.branch.findFirst({ where: { restaurantId: device.restaurantId, id: branchId }, select: { name: true } });
+      if (!branch) throw new NotFoundException('Branch not found.');
+      const where = { restaurantId: device.restaurantId, branchId, mode: QR_MODE.MENU_ONLY };
+      if (parsed.data.cursor && !await tx.qrCode.findFirst({ where: { ...where, id: parsed.data.cursor }, select: { id: true } })) {
+        throw new BadRequestException('This menu QR page is no longer available. Refresh the list.');
+      }
+      const [rows, total] = await Promise.all([
+        tx.qrCode.findMany({ where, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 51,
+          ...(parsed.data.cursor ? { cursor: { id: parsed.data.cursor }, skip: 1 } : {}) }),
+        tx.qrCode.count({ where })
+      ]);
+      return { rows: rows.slice(0, 50).map(code => ({ ...this.view(code), branchName: branch.name, createdAt: code.createdAt.toISOString() })),
+        total, nextCursor: rows.length > 50 ? rows[49].id : null };
+    });
+    const settings = await this.settings.get(device.restaurantId, branchId);
+    return { ...page, menuOnlyEnabled: settings.menuOnlyEnabled, publicBaseUrlConfigured: this.publicBaseUrl() !== null };
+  }
+
   private async resolveBranch(tx: Tx, restaurantId: string, requested: string | undefined, tablePayload: Record<string, unknown> | null): Promise<string> {
     const branches = await tx.branch.findMany({ where: { restaurantId, status: 'ACTIVE' }, select: { id: true } });
     const wanted = requested ?? (typeof tablePayload?.branchId === 'string' ? (tablePayload.branchId as string) : undefined);
@@ -306,7 +337,7 @@ export class QrAdminService {
     await this.requireEnabled(restaurantId);
     const next = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const current = await this.own(tx, restaurantId, codeId, device.branchId);
-      if (current.status === QR_STATUS.REVOKED) throw new ConflictException('This code was already revoked. Generate a new one for the table.');
+      if (current.status === QR_STATUS.REVOKED) throw new ConflictException('This code was already revoked. Create a new QR code.');
       // The old code stops working in the same transaction the new one starts, so there is never a moment with two live tokens.
       await tx.qrCode.update({ where: { id: current.id }, data: { status: QR_STATUS.REVOKED, revokedAt: new Date() } });
       const fresh = await tx.qrCode.create({
@@ -387,7 +418,12 @@ export class QrAdminService {
     });
     if (code.status !== QR_STATUS.ACTIVE) throw new ConflictException('Only an active code can be printed.');
     const branding = await this.settings.branding(restaurantId);
-    return { restaurantName: restaurant.name, branchName: branch?.name ?? null, tableLabel: code.tableNumber ? `Table ${code.tableNumber}` : 'Scan to view menu', url: this.urlFor(code.publicToken), tagline: 'Scan • Order • Enjoy', logoUrl: branding.logoUrl, design: await this.settings.printDesign(restaurantId) };
+    const design = await this.settings.printDesign(restaurantId);
+    const menuOnly = code.mode === QR_MODE.MENU_ONLY;
+    return { restaurantName: restaurant.name, branchName: branch?.name ?? null,
+      tableLabel: menuOnly ? code.tableNumber || 'Menu QR' : code.tableNumber ? `Table ${code.tableNumber}` : 'Scan to view menu',
+      url: this.urlFor(code.publicToken), tagline: 'Scan • Order • Enjoy', logoUrl: branding.logoUrl,
+      design: menuOnly ? { ...(isObject(design) ? design : {}), instruction: 'Scan to view our menu' } : design };
   }
 
   // ------------------------------------------------------------------ orders and dashboard (from real data)
@@ -582,7 +618,20 @@ export class QrAdminService {
   async paymentReadiness(restaurantId: string, branchId?: string) {
     const settings = await this.settings.get(restaurantId, branchId ?? null);
     const readiness = await this.payments.qrOnlineReadiness(restaurantId);
-    return { ...readiness, enabled: settings.allowOnlinePayment, guestAvailable: settings.allowOnlinePayment && readiness.available };
+    const entitlement = await this.entitlement(restaurantId, branchId);
+    const planAllowed = entitlement.enabled && entitlement.limits.qrOnlinePayments !== false;
+    const connection = await this.prisma.runAsTenant(restaurantId, tx => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId }, select: { status: true, bankVerificationStatus: true } }));
+    const pending = await this.paymentActivation.pending(restaurantId);
+    const available = readiness.available && planAllowed;
+    return { ...readiness, available, code: planAllowed ? readiness.code : 'PLAN_ACCESS_REQUIRED', message: !planAllowed ? 'Super Admin needs to include QR online payments for this branch.' : readiness.available ? 'Collection is approved. Turn Online payment on to offer secure checkout.' : connection?.status === 'SUSPENDED' ? 'Payment collection is suspended. Send an activation request for Super Admin to review.' : pending ? 'Activation request sent. Super Admin will review payment collection. Use Check payment status after approval.' : 'Online payment needs activation. Request it below; Super Admin receives the request directly.', planAllowed, gatewayReady: this.paymentActivation.gatewayReady(), collectionStatus: connection?.status ?? 'NOT_CONNECTED', bankVerificationStatus: connection?.bankVerificationStatus ?? 'PENDING', ticketNumber: pending?.number ?? null, commissionBps: QR_COMMISSION_BPS, collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', enabled: settings.allowOnlinePayment, guestAvailable: settings.allowOnlinePayment && available };
+  }
+
+  async requestPaymentActivation(device: Device) {
+    this.assertConsole(device);
+    const result = await this.paymentActivation.request(device);
+    const entitlement = await this.entitlement(device.restaurantId, device.branchId);
+    if (entitlement.enabled && entitlement.limits.qrOnlinePayments !== false) await this.settings.update(device.restaurantId, { id: device.id, type: device.type }, { allowOnlinePayment: true }, device.branchId);
+    return result;
   }
 }
 

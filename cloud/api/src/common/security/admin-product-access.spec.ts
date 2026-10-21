@@ -9,9 +9,9 @@ describe('shared console resource authorization', () => {
   it.each(['MENU_ITEM','MENU_CATEGORY','MODIFIER_GROUP','TAX_GROUP','COMBO','COUPON','DINING_TABLE','STAFF_USER','CUSTOMER_FEEDBACK'])('retains shared management of %s', type => {
     expect(requiredConsoleApps(`/api/v1/entity-sync/${type}`)).toEqual(['MENU_ITEM','MENU_CATEGORY','MODIFIER_GROUP','TAX_GROUP'].includes(type) ? ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'] : ['POS_ADMIN','KIOSK_ADMIN']);
   });
-  it('requires kiosk access for customer configuration and bank setup', () => {
+  it('keeps kiosk configuration separate while sharing payout bank setup across owner consoles', () => {
     expect(requiredConsoleApps('/api/v1/entity-sync/KIOSK_CONFIGURATION')).toEqual(['POS_ADMIN', 'KIOSK_ADMIN']);
-    expect(requiredConsoleApps('/api/v1/tenant/payment-connection/bank-details')).toEqual(['KIOSK_ADMIN']);
+    expect(requiredConsoleApps('/api/v1/tenant/payment-connection/bank-details')).toEqual(['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING']);
     expect(requiredConsoleApps('/api/v1/inventory/movements')).toEqual(['POS_ADMIN']);
   });
   it('separates session buckets behind the same NAT without exposing refresh credentials', () => {
@@ -22,6 +22,6 @@ describe('shared console resource authorization', () => {
   });
   it('checks decoded resource names using the same interpretation as the API router', () => {
     expect(requiredConsoleApps('/api/v1/entity-sync/%49NVENTORY_ITEM?afterSeq=0')).toEqual(['POS_ADMIN']);
-    expect(requiredConsoleApps('/api/v1/tenant/%70ayment-connection')).toEqual(['KIOSK_ADMIN']);
+    expect(requiredConsoleApps('/api/v1/tenant/%70ayment-connection')).toEqual(['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING']);
   });
 });

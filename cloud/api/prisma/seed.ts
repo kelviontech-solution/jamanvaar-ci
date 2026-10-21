@@ -542,7 +542,7 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
         legacyEntitlementKey: f.legacyEntitlementKey ?? null
       },
       update: { name: f.name, description: f.description, categoryId: categoryIdByCode.get(f.categoryCode)!,
-        ...(f.code === 'QR_RESTAURANT_PAGE' ? {legacyEntitlementKey:f.legacyEntitlementKey} : {}) }
+        ...(['QR_RESTAURANT_PAGE', 'QR_RESERVATIONS'].includes(f.code) ? {legacyEntitlementKey:f.legacyEntitlementKey} : {}) }
     });
     featureIdByCode.set(f.code, row.id);
   }

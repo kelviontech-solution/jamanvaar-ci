@@ -1,0 +1,40 @@
+[
+  {
+    "width": 390,
+    "categoryDefaultsPersisted": true,
+    "newDishesInheritSizesAndExtras": true,
+    "photoUploadedAndOptimized": true,
+    "dishCopyPreservesSiblingAndCategory": true,
+    "unsavedChoicesProtected": true,
+    "lostResponseRetryNoDuplicateGroups": true,
+    "csvInheritsDefaults": true,
+    "publish": true,
+    "realCustomerSizeRequired": true,
+    "realCustomerAddonNamesAndPrices": true,
+    "customerTotal325": true,
+    "updatedDefaultsDoNotRewriteExistingDishes": true,
+    "nextDishUsesRevisedDefaults": true,
+    "invalidOptionNamesRejectedBeforeSaving": true,
+    "unsupportedImageRejected": true,
+    "horizontalOverflow": false
+  },
+  {
+    "width": 1440,
+    "categoryDefaultsPersisted": true,
+    "newDishesInheritSizesAndExtras": true,
+    "photoUploadedAndOptimized": true,
+    "dishCopyPreservesSiblingAndCategory": true,
+    "unsavedChoicesProtected": true,
+    "lostResponseRetryNoDuplicateGroups": true,
+    "csvInheritsDefaults": true,
+    "publish": true,
+    "realCustomerSizeRequired": true,
+    "realCustomerAddonNamesAndPrices": true,
+    "customerTotal325": true,
+    "updatedDefaultsDoNotRewriteExistingDishes": true,
+    "nextDishUsesRevisedDefaults": true,
+    "invalidOptionNamesRejectedBeforeSaving": true,
+    "unsupportedImageRejected": true,
+    "horizontalOverflow": false
+  }
+]

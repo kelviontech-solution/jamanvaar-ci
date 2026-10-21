@@ -6,7 +6,8 @@ import { publishCatalogNow } from '@jamanvaar/sync';
 import { publishMenuToGuests } from '../../cloud/cloudClient';
 import { toCsvRow } from '@jamanvaar/utils';
 import { getCurrentAdminName } from '../../currentAdminIdentity';
-export function downloadMenuFile(name: string, body: string, type = 'text/csv;charset=utf-8') { const url = URL.createObjectURL(new Blob([body], { type })); const link = document.createElement('a'); link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+import {downloadMenuFile} from './menuFileDownload';
+export {downloadMenuFile} from './menuFileDownload';
 export function MenuCsvPreviewModal({ preview, onClose }: { preview: MenuCsvPreview | null; onClose: () => void }) {
   const [strategy, setStrategy] = useState('SKIP_DUPLICATE'); const [busy, setBusy] = useState(false); const [message, setMessage] = useState('');
   return <Modal isOpen={!!preview} onClose={busy ? () => {} : onClose} title="CSV Import Preview" maxWidth="3xl">{preview && <div className="space-y-4">

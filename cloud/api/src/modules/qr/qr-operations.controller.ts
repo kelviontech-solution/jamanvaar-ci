@@ -1,7 +1,10 @@
+import {QrAttentionService} from './qr-attention.service';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Header,
   HttpCode,
   Param,
   Post,
@@ -27,7 +30,8 @@ import {
 @Controller("api/v1/restaurant/qr/operations")
 @UseGuards(DeviceAuthGuard)
 export class QrOperationsController {
-  constructor(private readonly ops: QrOperationsService) {}
+  constructor(private readonly ops: QrOperationsService,private readonly attention:QrAttentionService) {}
+  @Get('attention') @Header('Cache-Control','private, no-store') readAttention(@CurrentDevice()device:Device,@Query('branchId')branchId?:string){if(branchId&&!z.string().uuid().safeParse(branchId).success)throw new BadRequestException('Choose a valid branch.');return this.attention.read(device,branchId);}
   @Get() configuration(@CurrentDevice() d: Device) {
     return this.ops.configuration(d);
   }

@@ -182,7 +182,7 @@ export class DeviceAuthGuard implements CanActivate {
     const payoutPath = /^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(authorizationPath);
     const requiresRestaurantOwner = payoutPath && await this.prisma.runAsTenant(device.restaurantId, tx => tx.branch.count({ where: { restaurantId: device.restaurantId } })) > 1;
     const managesQrCrm = /^\/api\/v1\/restaurant\/qr\/crm(?:\/|$)/.test(authorizationPath);
-    const requiresFinancialActor = managesQrCrm || /^\/api\/v1\/restaurant\/qr\/workflows(?:\/|$)/.test(authorizationPath) || /^\/api\/v1\/restaurant\/qr\/advanced\/orders\/[^/]+\/refund-cash(?:\?|$)/.test(authorizationPath);
+    const requiresFinancialActor = managesQrCrm || /^\/api\/v1\/restaurant\/qr\/payment-activation-request(?:\?|$)/.test(authorizationPath) || /^\/api\/v1\/restaurant\/qr\/workflows(?:\/|$)/.test(authorizationPath) || /^\/api\/v1\/restaurant\/qr\/advanced\/orders\/[^/]+\/refund-cash(?:\?|$)/.test(authorizationPath);
     const managesRestaurantProfile = request.method === 'PATCH' && ['/api/v1/devices/me/restaurant', '/api/v1/devices/me/branch-operating-profile'].includes(authorizationPath);
     if (managesRestaurantProfile && !['POS_ADMIN', 'KIOSK_ADMIN'].includes(device.type)) throw new ForbiddenException('Only an administrator console can change the restaurant profile');
     const managesStaff = request.method === 'POST' && /^\/api\/v1\/entity-sync\/STAFF_USER$/.test(authorizationPath) && device.type === 'POS_ADMIN';

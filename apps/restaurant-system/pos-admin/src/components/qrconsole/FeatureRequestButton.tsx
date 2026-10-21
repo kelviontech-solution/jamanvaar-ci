@@ -10,9 +10,11 @@ import { QrAdminApi } from "../../cloud/qrAdminClient";
 export function FeatureRequestButton({
   featureCode,
   featureLabel,
+  onCheckAccess,
 }: {
   featureCode: string;
   featureLabel: string;
+  onCheckAccess?: () => Promise<unknown>;
 }) {
   const [busy, setBusy] = useState(false);
   // Q07: "Request sent" used to be the only trace of this ever happening — no ticket number,
@@ -23,9 +25,28 @@ export function FeatureRequestButton({
   const [error, setError] = useState("");
   if (sentTicket !== null) {
     return (
-      <p className="mt-2 text-sm font-bold text-emerald-700">
-        Request sent as ticket TKT-{String(sentTicket).padStart(6, "0")}. Track it under Help & Support.
-      </p>
+      <div className="mt-2">
+        <p className="text-sm font-bold text-emerald-700">
+          Request sent as ticket TKT-{String(sentTicket).padStart(6, "0")}. Track it under Help & Support.
+        </p>
+        {onCheckAccess && (
+          <button
+            type="button"
+            className="mt-3 rounded-xl border bg-white px-4 py-2 text-sm font-bold"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              setError('');
+              try { await onCheckAccess(); }
+              catch (e) { setError((e as Error).message); }
+              finally { setBusy(false); }
+            }}
+          >
+            {busy ? 'Checking access…' : 'Check access again'}
+          </button>
+        )}
+        {error && <p role="alert" className="mt-1 text-xs text-rose-700">{error}</p>}
+      </div>
     );
   }
   return (

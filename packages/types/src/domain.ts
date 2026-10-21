@@ -238,6 +238,8 @@ export interface Category {
   updatedAt?: string;
   parentId?: string;
   templateCategoryKey?: string;
+  /** Copied into a new dish by menu editors; existing dishes keep their explicit choices. */
+  defaultModifierGroupIds?: string[];
 }
 
 export interface ModifierOption {
@@ -263,6 +265,7 @@ export interface ModifierGroup {
   isRequired: boolean;
   options: ModifierOption[];
   sortOrder: number;
+  kind?: 'SIZE' | 'ADD_ON';
 }
 
 export interface MenuItem {

@@ -1,0 +1,210 @@
+.qr-menu-codes {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 20px;
+  color: #163347;
+  min-width: 0;
+  font-size: 14px;
+}
+.qr-menu-codes header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.qr-menu-codes h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-weight: 750;
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.qr-menu-codes h3 span {
+  font-size: 12px;
+  background: #eef4f7;
+  border-radius: 20px;
+  padding: 4px 9px;
+}
+.qr-menu-codes p {
+  color: #526476;
+  line-height: 1.6;
+  margin: 6px 0 12px;
+}
+.qr-menu-codes button,
+.qr-menu-codes-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  color: #163347;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  max-width: 100%;
+  white-space: normal;
+}
+.qr-menu-codes button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.qr-menu-codes button:focus-visible,
+.qr-menu-codes input:focus-visible,
+.qr-menu-codes a:focus-visible {
+  outline: 3px solid #cc8648;
+  outline-offset: 2px;
+}
+.qr-menu-codes .qr-menu-codes-primary {
+  background: #0b253a;
+  color: white;
+  border-color: #0b253a;
+}
+.qr-menu-codes-notice {
+  background: #fff8e8;
+  border: 1px solid #efcd87;
+  border-radius: 14px;
+  padding: 14px;
+  margin: 14px 0;
+  text-align: left;
+  font-size: 13px;
+}
+.qr-menu-codes-notice p {
+  color: #6b511e;
+}
+.qr-menu-codes-error {
+  background: #fff1f2;
+  color: #9f1239 !important;
+  padding: 12px;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+  margin: 12px 0;
+}
+.qr-menu-codes ul {
+  padding: 0;
+  margin: 8px 0;
+  list-style: none;
+}
+.qr-menu-codes li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-top: 1px solid #e2e8f0;
+  padding: 16px 0;
+}
+.qr-menu-codes-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.qr-menu-codes-summary strong {
+  overflow-wrap: anywhere;
+}
+.qr-menu-codes-summary small {
+  flex-basis: 100%;
+  color: #64748b;
+}
+.qr-menu-codes-status {
+  font-size: 12px;
+  border-radius: 16px;
+  padding: 3px 9px;
+  background: #f1f5f9;
+  color: #475569;
+}
+.qr-menu-codes-status--active {
+  background: #e7f7ef;
+  color: #146244;
+}
+.qr-menu-codes-status--mode-off {
+  background: #fff3d7;
+  color: #785415;
+}
+.qr-menu-codes-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.qr-menu-codes .qr-menu-codes-danger {
+  color: #9f1239;
+  border-color: #fecdd3;
+}
+.qr-menu-codes-empty {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 14px;
+  margin-top: 14px;
+}
+.qr-menu-codes-count {
+  font-size: 12px;
+}
+.qr-menu-codes-form {
+  display: grid;
+  gap: 14px;
+}
+.qr-menu-codes-form label,
+.qr-menu-codes-preview label {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+  font-weight: 650;
+  font-size: 13px;
+}
+.qr-menu-codes-form input,
+.qr-menu-codes-preview input {
+  display: block;
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  min-height: 46px;
+  padding: 10px 12px;
+  font-size: 16px;
+  color: #163347;
+  background: white;
+}
+.qr-menu-codes-preview {
+  text-align: center;
+  min-width: 0;
+}
+.qr-menu-codes-preview img {
+  max-width: 100%;
+  height: auto;
+  margin: 12px auto;
+  background: white;
+}
+.qr-menu-codes-preview .qr-menu-codes-actions {
+  justify-content: center;
+  margin: 16px 0;
+}
+@media (max-width: 600px) {
+  .qr-menu-codes {
+    padding: 16px;
+  }
+  .qr-menu-codes li {
+    display: block;
+  }
+  .qr-menu-codes-summary {
+    margin-bottom: 12px;
+  }
+  .qr-menu-codes-actions {
+    gap: 6px;
+  }
+  .qr-menu-codes-actions button,
+  .qr-menu-codes-actions a {
+    flex-grow: 1;
+  }
+  .qr-menu-codes-preview .qr-menu-codes-actions button {
+    flex-basis: 44%;
+  }
+}

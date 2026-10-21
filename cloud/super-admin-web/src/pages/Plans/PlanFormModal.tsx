@@ -1,3 +1,4 @@
+import {QrPlanCapabilities} from './QrPlanCapabilities';
 import { useState, useMemo, useEffect, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import { ENTITLEMENT_KEYS, ENTITLEMENT_LABELS, type Entitlements, type Plan, type FeatureRecord } from '../../api/types';
@@ -91,8 +92,9 @@ export function PlanFormModal({
   }
 
   function handleTierChange(tier: FormState['tier']) {
+    if(tier===form.tier)return;
     // Apply canonical defaults, with a dedicated standalone QR selection.
-    const resolved = tier === 'QR' ? {...EMPTY_ENTITLEMENTS,menuManagement:true,tableManagement:true,foodCustomization:true,qrTableOrdering:true} : resolveTierEntitlements(tier, form.entitlements);
+    const resolved = tier === 'QR' ? {...EMPTY_ENTITLEMENTS,...qrOnlyFeatures(form.entitlements),menuManagement:true,tableManagement:true,foodCustomization:true,qrTableOrdering:true} : resolveTierEntitlements(tier, form.entitlements);
     let defaultPrice = form.priceMonthly;
     let defaultName = form.name;
     let defaultDescription = form.description;
@@ -275,10 +277,11 @@ export function PlanFormModal({
           {activeSubTab === 'matrix' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <QrLandingPagePlanSection feature={qrFeatures.find(f => f.code === 'QR_RESTAURANT_PAGE')} loading={catalogLoading} error={catalogError} included={form.entitlements.qrRestaurantPage === true} onChange={included => setForm(f => ({...f, entitlements: {...f.entitlements, qrRestaurantPage: included, ...(included ? {qrTableOrdering:true,menuManagement:true,tableManagement:true} : {})}}))} />
+              <QrPlanCapabilities features={qrFeatures} flags={form.entitlements} loading={catalogLoading} error={catalogError} onChange={flags=>setForm(f=>({...f,entitlements:flags as FormState['entitlements']}))}/>
               {/* Tier Selection & Inheritance Banner */}
               <div className="plan-tier-selector">
                 <button type="button" className={`tier-option-card ${form.tier === 'QR' ? 'selected' : ''}`} onClick={() => handleTierChange('QR')}>
-                  <span className="tier-title">Standalone QR</span><span className="tier-desc">Independent QR management. Add optional capabilities below; no POS or Kiosk license required.</span>
+                  <span className="tier-title">Standalone QR</span><span className="tier-desc">Independent QR management. Choose Essential or Complete above; no POS or Kiosk license required.</span>
                 </button>
                 <div
                   className={`tier-option-card ${form.tier === 'CORE' ? 'selected' : ''}`}
@@ -530,10 +533,7 @@ export function PlanFormModal({
             )}
             <label htmlFor="plan-product-family">Product family</label>
             <select id="plan-product-family" value={form.productFamily} onChange={e => update('productFamily',e.target.value as FormState['productFamily'])}><option value="RESTAURANT">Restaurant / standalone QR</option><option value="KIOSK">Kiosk</option></select>
-            <h3>QR module capabilities</h3><p className="form-note">These flags apply to QR inside any plan. Platform feature activation and rollout still control availability.</p>
-            {catalogError && <p role="alert">{catalogError}</p>}
-            <button type="button" disabled={!qrFeatures.length} onClick={()=>setForm(f=>({...f,entitlements:{...f.entitlements,qrTableOrdering:true,...Object.fromEntries(qrFeatures.map(feature=>[feature.legacyEntitlementKey!,true]))}}))}>Include all QR capabilities</button>
-            <div className="module-entitlement-grid">{qrFeatures.filter(feature=>feature.code!=='QR_RESTAURANT_PAGE').map(feature=><label key={feature.id} className="entitlement-checkbox-label"><input type="checkbox" checked={form.entitlements[feature.legacyEntitlementKey!] === true} onChange={e=>setForm(f=>({...f,entitlements:{...f.entitlements,[feature.legacyEntitlementKey!]:e.target.checked}}))}/><span>{feature.name}{!feature.isActive?' · platform inactive':feature.rolloutPercent < 100?` · ${feature.rolloutPercent}% rollout`:''}</span></label>)}</div>
+
           </section>}
           {activeSubTab === 'details' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

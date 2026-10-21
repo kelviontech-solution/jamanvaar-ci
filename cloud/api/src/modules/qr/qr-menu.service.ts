@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { MenuPublicationsService } from '../menu-publications/menu-publications.service';
 import { publicImageUrl, viewForBranch } from '../menu-publications/menu-snapshot';
 import type { MenuSnapshotItemLookup, ModifierGroupSnapshot } from '../payments/pricing.util';
+import { qrLiveRestriction } from './qr-live-availability';
 
 export interface QrMenuCategory {
   translations?: Record<string, {name: string; description?: string}>;
@@ -82,11 +83,11 @@ export class QrMenuService {
         tx.syncedEntity.findMany({ where: { restaurantId, entityType: { in: ['MENU_ITEM', 'MENU_CATEGORY','BRANCH_MENU_OVERRIDE'] } }, select: { externalId: true, entityType: true, payload: true } })
       );
       const hiddenCategories = new Set(rows.filter(row => row.entityType==='MENU_CATEGORY' && ((row.payload as any)?.deleted || (row.payload as any)?.isActive===false || (row.payload as any)?.qrVisible===false)).map(row=>row.externalId));
-      const overrides=new Map(rows.filter(row=>row.entityType==='BRANCH_MENU_OVERRIDE'&&(row.payload as any)?.branchId===branchId).map(row=>[(row.payload as any).itemId,row.payload as any]));
+      const overrides=new Map(rows.filter(row=>row.entityType==='BRANCH_MENU_OVERRIDE'&&(row.payload as any)?.branchId===branchId&&(row.payload as any)?.deleted!==true).map(row=>[(row.payload as any).itemId,row.payload as any]));
       const ids = new Set(rows.filter(row=>{
         if(row.entityType!=='MENU_ITEM')return false;
-        const p=row.payload as Record<string,any>,override=overrides.get(row.externalId),stock=override?.stockQuantity??p.stockQuantity;
-        return (typeof stock==='number'&&stock<=0) || override?.isAvailable===false || p.deleted===true || !!p.archivedAt || p.isAvailable===false || p.isQrOrderingEnabled===false || hiddenCategories.has(p.categoryId) || (Array.isArray(p.salesChannels)&&!p.salesChannels.includes('QR')) || (p.branchIds?.length && !p.branchIds.includes(branchId));
+        const p=row.payload as Record<string,any>;
+        return !!qrLiveRestriction(p,overrides.get(row.externalId),hiddenCategories,branchId);
       }).map(r=>r.externalId));
       this.liveOff.set(key, { at: Date.now(), ids });
       if (this.liveOff.size > 1000) this.liveOff.delete(this.liveOff.keys().next().value as string);

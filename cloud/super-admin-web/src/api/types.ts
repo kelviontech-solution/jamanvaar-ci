@@ -1030,7 +1030,7 @@ export interface TicketComment {
 
 export interface TicketEvent {
   id: string;
-  type: 'CREATED' | 'STATUS' | 'PRIORITY' | 'ASSIGNEE' | 'ATTACHMENT' | 'KIOSK_ACTIVATION_REQUEST' | 'KIOSK_KEY_ISSUED';
+  type: 'CREATED' | 'STATUS' | 'PRIORITY' | 'ASSIGNEE' | 'ATTACHMENT' | 'KIOSK_ACTIVATION_REQUEST' | 'KIOSK_KEY_ISSUED' | 'QR_FEATURE_REQUESTED' | 'QR_FEATURE_GRANTED' | 'QR_PAYMENT_ACTIVATION_REQUEST' | 'QR_PAYMENTS_ACTIVATED';
   actorType: 'PLATFORM' | 'RESTAURANT';
   actorName: string | null;
   fromValue: string | null;

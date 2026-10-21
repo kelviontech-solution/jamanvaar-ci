@@ -1,8 +1,9 @@
 import {QrRestaurantPageService} from './qr-restaurant-page.service';
+import { QrMenuStatusService } from './qr-menu-status.service';
 import { pageEventSchema } from './qr-restaurant-page.schema';
 import { QrReservationsService } from './qr-reservations.service';
 import { createReservationSchema, CreateReservation, reservationActionSchema, ReservationAction } from './qr-reservations.schema';
-import { Body, Controller, Get, HttpCode, NotFoundException, StreamableFile, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Header, HttpCode, NotFoundException, StreamableFile, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { Device } from '@prisma/client';
 import type { Request, Response } from 'express';
@@ -152,7 +153,14 @@ export class QrPublicController {
 @Controller('api/v1/restaurant/qr')
 @UseGuards(DeviceAuthGuard)
 export class QrRestaurantController {
-  constructor(private readonly qr: QrAdminService, private readonly reservations: QrReservationsService) {}
+  constructor(private readonly qr: QrAdminService, private readonly reservations: QrReservationsService, private readonly menuStatus: QrMenuStatusService) {}
+
+  @Get('menu-status')
+  @Header('Cache-Control', 'private, no-store')
+  menuVisibility(@CurrentDevice() device: Device, @Query('branchId') branchId?: string) {
+    this.qr.assertConsole(device);
+    return this.menuStatus.status(device, branchId);
+  }
 
   @Get('reservations')
   reservationsList(@CurrentDevice() device: Device) {
@@ -178,6 +186,10 @@ export class QrRestaurantController {
   requestFeature(@CurrentDevice() device: Device, @Body() body: RequestFeature) {
     return this.qr.requestFeature(device, body);
   }
+
+  @Post('payment-activation-request')
+  @UsePipes(new ZodValidationPipe(z.object({ acknowledgeCommission: z.literal(true) }).strict()))
+  requestPayments(@CurrentDevice() device: Device, @Body() _body: { acknowledgeCommission: true }, @Query('branchId') branchId?: string) { return this.qr.requestPaymentActivation({ ...device, branchId: this.qr.scopedBranch(device, branchId) ?? null }); }
 
   @Get('overview')
   overview(@CurrentDevice() device: Device) {
@@ -216,6 +228,13 @@ export class QrRestaurantController {
   generate(@CurrentDevice() device: Device, @Param('tableId') tableId: string, @Body() body: Omit<GenerateQr, 'tableId'>) {
     this.qr.assertConsole(device);
     return this.qr.generate(device, { ...body, tableId });
+  }
+
+  @Get('menu-codes')
+  @Header('Cache-Control', 'private, no-store')
+  menuCodes(@CurrentDevice() device: Device, @Query('branchId') branchId?: string, @Query('cursor') cursor?: string) {
+    this.qr.assertConsole(device);
+    return this.qr.menuCodes(device, { branchId, cursor });
   }
 
   /** A menu-only code (no table), for a menu card. */

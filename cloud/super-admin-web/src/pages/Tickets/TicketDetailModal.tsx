@@ -6,6 +6,8 @@ import { CATEGORY_LABEL } from './ticketShared';
 import { useState } from 'react';
 import { useAuth } from '../../auth/AuthContext';
 import { api } from '../../api/client';
+import { QrFeatureRequestAction } from './QrFeatureRequestAction';
+import { QrPaymentApprovalAction } from './QrPaymentApprovalAction';
 
 /** Extracted from TicketsPage.tsx. `ticket` is still owned by the parent (it's also opened by a
  * `?open=<id>` deep link), so this stays a pure display + "tell the parent what changed" component. */
@@ -46,6 +48,8 @@ export function TicketDetailModal({
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {ticket.events?.some(event => event.type === 'QR_PAYMENT_ACTIVATION_REQUEST') && <QrPaymentApprovalAction key={ticket.id} ticketId={ticket.id} onChanged={onChanged} />}
+        {ticket.source === 'RESTAURANT' && ticket.category === 'FEATURE_REQUEST' && <QrFeatureRequestAction key={ticket.id} ticketId={ticket.id} onChanged={onChanged} />}
         {keyRequest && (
           <section className="detail-card" style={{ padding: 16 }} aria-label="Kiosk activation request">
             <h3>Connect the requested kiosk</h3>

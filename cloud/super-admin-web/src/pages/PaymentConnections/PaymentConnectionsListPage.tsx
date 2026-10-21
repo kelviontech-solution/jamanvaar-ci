@@ -154,9 +154,10 @@ export function PaymentConnectionsListPage() {
             Review restaurants' settlement connections. Razorpay Route is still pending, so approved restaurants collect through
             Jamanvaar's account and are paid out manually — see the Payouts page, and verify bank details below first.
           </p>
+          <p className="muted" style={{fontSize:13,marginTop:8}}>New QR Ordering payments use a fixed 2% Jamanvaar commission. Kiosk commission controls below apply separately.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="muted" style={{ fontSize: 12 }}>Default kiosk QR fee</span>
+          <span className="muted" style={{ fontSize: 12 }}>Kiosk online commission</span>
           <input
             type="number"
             min={0}
@@ -222,7 +223,7 @@ export function PaymentConnectionsListPage() {
                     <th>Settlement</th>
                     <th>Direct settlement</th>
                     <th>Bank verification</th>
-                    <th>Kiosk QR fee</th>
+                    <th>Kiosk commission</th>
                     <th>Actions</th>
                   </tr>
                 </thead>

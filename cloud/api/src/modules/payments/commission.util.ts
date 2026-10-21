@@ -10,6 +10,8 @@ export const MIN_COMMISSION_BPS = RAZORPAY_FEE_BPS;
 
 /** The platform's share of each online payment when Super Admin has not chosen one: 3%. A saved value (including 0%) overrides it. */
 export const DEFAULT_COMMISSION_BPS = 300;
+/** QR online collections use a fixed 2% Jamanvaar share, frozen on each new attempt. */
+export const QR_COMMISSION_BPS = 200;
 
 export async function getDefaultCommissionBps(prisma: PrismaService): Promise<number> {
   const row = await prisma.runAsPlatform((tx) => tx.platformSetting.findUnique({ where: { key: PAYMENT_DEFAULT_COMMISSION_BPS_KEY } }));

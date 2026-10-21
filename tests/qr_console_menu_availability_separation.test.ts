@@ -20,20 +20,23 @@ describe('QR console Menu tab: the dish editor and the availability/publish list
     const src = readFileSync(join(SRC, 'components/qrconsole/QrAdvanced.tsx'), 'utf8');
     // The old, unconditional sentence must be gone as a flat string -- it now only appears inside
     // the non-solo-QR branch of a ternary, paired with the real "Open Menu & Categories" link.
-    const unconditional = /<p className="text-sm text-slate-500">\s*Uses the same catalog, modifiers, taxes and branch availability as your\s*restaurant\. Edit dishes in Menu & Categories\./;
+    const unconditional =
+      /<p className="text-sm text-slate-500">\s*Uses the same catalog, modifiers, taxes and branch availability as your\s*restaurant\. Edit dishes in Menu & Categories\./;
     expect(src).not.toMatch(unconditional);
     // The solo-QR branch must instead point at the editor actually on screen.
-    expect(src).toMatch(/using Edit shared draft/);
+    expect(src).not.toContain('export function QrMenuAvailability');
   });
 
   it('uses an explicit editor/availability selector rather than stacking both menus', () => {
     const src = readFileSync(join(SRC, 'components/qrconsole/QrConsole.tsx'), 'utf8');
     expect(src).toContain('{tab === "MENU" && <QrMenuWorkspace');
-    expect(src).toContain("['EDIT','AVAILABILITY']");
-    expect(src).toContain('Edit shared draft');
-    expect(src).toContain('Published guest availability');
-    expect(src).toContain("mode==='EDIT'?<QrCatalog/>:<QrMenuAvailability");
+    const workspace = readFileSync(join(SRC, 'components/qrconsole/QrMenuWorkspace.tsx'), 'utf8');
+    expect(workspace).toContain("['EDIT', 'LIVE']");
+    expect(workspace).toContain('Dishes & drafts');
+    expect(workspace).toContain('Live QR menu');
+    expect(workspace).toContain('disabled={view === value}');
+    expect(workspace).toContain('<QrCatalog key={view} view={view} />');
     expect(src).not.toContain("mode==='EDIT'&&/^\\/qr\\//");
-    expect(src).toContain('if(await requestQrLeave())setMode(value)');
+    expect(workspace).toContain('QR_BEFORE_NAVIGATE');
   });
 });

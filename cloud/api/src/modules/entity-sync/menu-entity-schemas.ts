@@ -34,17 +34,19 @@ const menuItem = z
     sortOrder: z.number().finite().optional(),
     isAvailable: z.boolean().optional(),
     isQrOrderingEnabled: z.boolean().optional(),
+    isDigitalMenuVisible: z.boolean().optional(),
     allowInstructions: z.boolean().optional()
   })
   .passthrough()
   .refine((v) => v.minQuantity === undefined || v.maxQuantity === undefined || v.minQuantity <= v.maxQuantity, { message: 'minQuantity cannot exceed maxQuantity' });
 
-const category = z.object({ name: nonEmpty(120), description: text(1000).optional(), imageUrl: IMAGE.optional(), sortOrder: z.number().finite().optional(), isActive: z.boolean().optional(), qrVisible: z.boolean().optional() }).passthrough();
+const category = z.object({ name: nonEmpty(120), description: text(1000).optional(), imageUrl: IMAGE.optional(), sortOrder: z.number().finite().optional(), isActive: z.boolean().optional(), qrVisible: z.boolean().optional(), defaultModifierGroupIds: z.array(nonEmpty(128)).max(50).optional() }).passthrough();
 
 const modifierOption = z.object({ id: nonEmpty(128), name: nonEmpty(120), priceDelta: money, isAvailable: z.boolean().optional(), isDefault: z.boolean().optional(), description: text(500).optional(), imageUrl: IMAGE.optional() }).passthrough();
 const modifierGroup = z
   .object({
     name: nonEmpty(120),
+    kind: z.enum(['SIZE', 'ADD_ON']).optional(),
     description: text(500).optional(),
     minSelections: z.number().int().min(0).max(50).optional(),
     maxSelections: z.number().int().min(0).max(50).optional(),

@@ -65,28 +65,30 @@ export function QrPromotions({
     [busy, setBusy] = useState(false),
     [items, setItems] = useState<Array<{ id: string; name: string }>>([]);
   const baseline=useRef(form);
+  const [listLoading, setListLoading] = useState(true), [listError, setListError] = useState(''), [menuError, setMenuError] = useState('');
+  const alive = useRef(true);
   useQrUnsavedChanges(JSON.stringify(form)!==JSON.stringify(baseline.current));
-  const load = async () => setRows(await qrApi<Promotion[]>(base));
+  const load = async () => {
+    setListLoading(true);
+    try { const result = await qrApi<Promotion[]>(base); if (alive.current) { setRows(result); setListError(''); } }
+    catch (e) { if (alive.current) setListError((e as Error).message); throw e; }
+    finally { if (alive.current) setListLoading(false); }
+  };
   useEffect(() => {
-    let active = true;
-    Promise.all([qrApi<Promotion[]>(base), QrAdminApi.menuPreview()])
-      .then(([r, m]) => {
-        if (active) {
-          setRows(r);
-          setItems(m.items);
-        }
-      })
-      .catch((e) => {
-        if (active) setError(e.message);
-      });
+    alive.current = true;
+    void load().catch(() => {});
+    QrAdminApi.menuPreview().then(m => { if (alive.current) setItems(m.items); }).catch(e => { if (alive.current) setMenuError(e.message); });
     return () => {
-      active = false;
+      alive.current = false;
     };
   }, []);
   const save = async () => {
     setBusy(true);
     setError("");
     try {
+      if (!/^[A-Z0-9_-]{2,40}$/.test(form.code.trim())) throw Error('Use 2–40 letters, numbers, hyphens or underscores for the coupon code.');
+      if (!(form.discountValue > 0) || form.discountType === 'PERCENTAGE' && form.discountValue > 100) throw Error('Enter a positive discount. Percentage discounts cannot exceed 100.');
+      if (!(Date.parse(form.validUntil) > Date.parse(form.validFrom))) throw Error('Promotion end must be after its start.');
       const { usageCount, ...promotion } = form;
       await qrApi(edit ? `${base}/${encodeURIComponent(edit.id)}` : base, {
         method: edit ? "PUT" : "POST",
@@ -95,9 +97,10 @@ export function QrPromotions({
         ),
       });
       showToast(edit ? "Promotion updated" : "Promotion created");
-      await load();
       setEdit(null);
       const next=empty();baseline.current=next;setForm(next);
+      // The save already committed. A failed list refresh must not leave a create form ready to submit again.
+      await load().catch(() => {});
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -135,12 +138,15 @@ export function QrPromotions({
         create local promotions. Usage is reserved at order submission; failed
         duplicate taps cannot consume it twice.
       </p>
+      <button type="button" className="qr-btn secondary mt-3" disabled={listLoading || busy} onClick={() => void load().catch(() => {})}>{listLoading ? 'Loading promotions…' : 'Refresh saved promotions'}</button>
+      {listError && <p role="alert" className="my-3 text-sm text-rose-700">Saved promotions could not be refreshed: {listError}. Use Refresh saved promotions to retry.</p>}
+      {menuError && <p role="status" className="my-3 text-sm text-amber-800">Dish choices could not load: {menuError}. You can still create a promotion without restricting it to selected dishes.</p>}
       {error && (
         <p className="my-3 text-sm text-red-700" role="alert">
           {error}
         </p>
       )}
-      <div className="my-4 grid gap-4 md:grid-cols-2">
+      <fieldset disabled={busy} className="my-4 grid gap-4 md:grid-cols-2">
         <label className="text-sm">
           Coupon code
           <input
@@ -208,7 +214,7 @@ export function QrPromotions({
                 setForm({
                   ...form,
                   [key]:
-                    e.target.value === "" ? undefined : Number(e.target.value),
+                    e.target.value === "" ? key === 'minOrderValue' ? 0 : undefined : Number(e.target.value),
                 })
               }
             />
@@ -291,7 +297,7 @@ export function QrPromotions({
             stack with loyalty rewards.
           </p>
         </div>
-      </div>
+      </fieldset>
       <div className="flex gap-3">
         <button
           className={button}
@@ -300,7 +306,7 @@ export function QrPromotions({
         >
           {busy ? "Saving..." : edit ? "Save promotion" : "Create promotion"}
         </button>
-        {edit && (
+        {(edit || JSON.stringify(form) !== JSON.stringify(baseline.current)) && (
           <button
             className="rounded-xl border px-4 py-2.5 text-sm"
             onClick={async () => {
@@ -311,7 +317,7 @@ export function QrPromotions({
               setForm(next);
             }}
           >
-            Cancel editing
+            Discard promotion changes
           </button>
         )}
       </div>

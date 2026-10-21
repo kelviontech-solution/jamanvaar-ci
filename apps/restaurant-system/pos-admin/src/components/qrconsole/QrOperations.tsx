@@ -1,6 +1,6 @@
 import {formatRestaurantDate} from '@jamanvaar/utils';
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CheckCircle2,
   CircleAlert,
@@ -8,7 +8,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { QrServiceInbox } from "@jamanvaar/ui";
-import { qrApi } from "../../cloud/cloudClient";
+import { CloudApiError, qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi, type QrReservationRow } from "../../cloud/qrAdminClient";
 import { FeatureRequestButton } from "./FeatureRequestButton";
 const base = "/api/v1/restaurant/qr/operations";
@@ -148,19 +148,32 @@ export function QrReservationsInbox() {
   const [rows, setRows] = useState<QrReservationRow[] | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState<string | null>(null),
+    [checking, setChecking] = useState(false),
+    [access, setAccess] = useState<CloudApiError['details']>(),
     [filter, setFilter] = useState<(typeof RESERVATION_FILTERS)[number]>("PENDING");
+  const request = useRef(0);
   const load = async () => {
+    const id = ++request.current;
+    setChecking(true);
     try {
-      setRows(await QrAdminApi.reservations());
+      const result = await QrAdminApi.reservations();
+      if (id !== request.current) return;
+      setRows(result);
       setError("");
+      setAccess(undefined);
     } catch (e) {
+      if (id !== request.current) return;
+      setRows(null);
       setError((e as Error).message);
+      setAccess(e instanceof CloudApiError ? e.details : undefined);
+    } finally {
+      if (id === request.current) setChecking(false);
     }
   };
   useEffect(() => {
     void load();
-    const t = setInterval(() => void load(), 20000);
-    return () => clearInterval(t);
+    const t = setInterval(() => { if (!document.hidden) void load(); }, 20000);
+    return () => { ++request.current; clearInterval(t); };
   }, []);
   const act = async (id: string, status: QrReservationRow["status"]) => {
     setBusy(id);
@@ -173,25 +186,31 @@ export function QrReservationsInbox() {
       setBusy(null);
     }
   };
-  if (!rows)
-    return error.includes("not included in the current license") ? (
+  if (!rows) {
+    const locked = access?.code === 'QR_FEATURE_NOT_LICENSED' || error.includes("not included in the current license");
+    const canRequest = access?.reason === 'NOT_INCLUDED' || !access && error.includes("not included in the current license");
+    return (
       <section className={box}>
         <h2 className="text-xl font-bold">Table reservations</h2>
-        <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-          <p>{error}</p>
-          <FeatureRequestButton featureCode="QR_RESERVATIONS" featureLabel="Table reservations" />
-        </div>
+        {error ? <div className={locked ? "rounded-xl bg-amber-50 p-3 text-sm text-amber-900" : "rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800"}>
+          <h3 className="font-bold">{locked ? 'Reservations access needs attention' : 'Could not load reservations'}</h3>
+          <p role="alert">{error}</p>
+          {canRequest && <>
+            <p className="mt-2">Super Admin can open this feature-request ticket and choose “Enable feature & resolve request”. Once approved, check access again here.</p>
+            <FeatureRequestButton featureCode="QR_RESERVATIONS" featureLabel="Table reservations" />
+          </>}
+        </div> : <p role="status">Loading reservations…</p>}
+        <button type="button" className={button} disabled={checking} onClick={() => void load()}>{checking ? 'Checking access…' : locked ? 'Check access again' : 'Try again'}</button>
       </section>
-    ) : (
-      <p>{error || "Loading reservations…"}</p>
     );
+  }
   const visible = rows.filter((r) => filter === "ALL" || r.status === filter);
   return (
     <section className={box}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-bold">Table reservations</h2>
-        <button className="rounded-xl border px-3 py-2 text-xs font-bold flex items-center gap-1.5" onClick={() => void load()}>
-          <RefreshCw size={14} /> Refresh
+        <button disabled={checking || !!busy} className="rounded-xl border px-3 py-2 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40" onClick={() => void load()}>
+          <RefreshCw size={14} /> {checking ? 'Refreshing…' : 'Refresh'}
         </button>
       </div>
       <p className="text-sm text-slate-600">Requests a guest sends from the restaurant website. Confirm, decline, mark seated or cancel.</p>
@@ -644,20 +663,16 @@ function OperationsSettings({ mode }: { mode: "service" | "pickup" }) {
 }
 export function QrMenuPerformance() {
   const today = formatRestaurantDate(new Date(),'ISO_DATE'),
-    [from, setFrom] = useState(today),
-    [to, setTo] = useState(today),
-    [data, setData] = useState<any>(null),
-    [error, setError] = useState("");
-  const load = () =>
-    qrRequestsApi<any>(`/analytics?from=${from}&to=${to}`)
-      .then((r) => {
-        setData(r);
-        setError("");
-      })
-      .catch((e) => setError(e.message));
-  useEffect(() => {
-    void load();
-  }, []);
+    [from, setFrom] = useState(today), [to, setTo] = useState(today),
+    [data, setData] = useState<any>(null), [error, setError] = useState(''),
+    [locked,setLocked]=useState(false),[busy,setBusy]=useState(false),[access,setAccess]=useState<{planName?:string|null;reason?:string;entitlementKey?:string}|null>(null);
+  const load = async () => {
+    setBusy(true);setError('');
+    try{const result=await qrRequestsApi<any>(`/analytics?from=${from}&to=${to}`);setData(result);setLocked(false);setAccess(null);}
+    catch(error){setData(null);setError(error instanceof Error?error.message:'Could not load menu performance.');setLocked(error instanceof CloudApiError && (error.details?.code==='QR_FEATURE_NOT_LICENSED'||(error.status===403&&error.message.includes('not included in the current license'))));setAccess(error instanceof CloudApiError?error.details??null:null);}
+    finally{setBusy(false);}
+  };
+  useEffect(() => {void load();}, []);
   const csv = () => {
     const cell = (v: unknown) =>
       '"' +
@@ -708,9 +723,13 @@ export function QrMenuPerformance() {
   return (
     <section className={box}>
       <h2 className="text-xl font-bold">Menu performance</h2>
-      {error && error.includes("not included in the current license") ? (
+      {locked ? (
         <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+          <h3 className="font-bold">Menu Performance access needs attention</h3>
           <p>{error}</p>
+          {access?.planName&&<p className="mt-2">Current plan: <strong>{access.planName}</strong></p>}
+          <p className="mt-2">Super Admin can open this restaurant's purchased plan and include Menu Performance, or choose QR Complete. Individual restaurant and branch restrictions must also allow it.</p>
+          <button className={button+" mt-3 mr-3"} disabled={busy} onClick={()=>void load()}>{busy?'Checking access...':'Check access again'}</button>
           <FeatureRequestButton
             featureCode="QR_MENU_ANALYTICS"
             featureLabel="Menu analytics"
@@ -737,8 +756,8 @@ export function QrMenuPerformance() {
                 onChange={(e) => setTo(e.target.value)}
               />
             </label>
-            <button className={button} onClick={() => void load()}>
-              Apply dates
+            <button className={button} disabled={busy} onClick={() => void load()}>
+              {busy?'Loading...':'Apply dates'}
             </button>
             {data && (
               <button className={button} onClick={csv}>

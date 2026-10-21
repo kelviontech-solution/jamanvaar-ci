@@ -60,8 +60,10 @@ export class TenantAuthGuard implements CanActivate {
       await assertSessionStillAllowed(this.prisma, payload.restaurantId, payload.did, { allowSuspended: path.startsWith('/api/v1/tenant/billing') });
     }
 
-    const resourceApps = requiredConsoleApps(request.originalUrl ?? request.url ?? '');
-    if (resourceApps.length === 1) {
+    let resourcePath = (request.originalUrl ?? request.url ?? '').split('?')[0];
+    try { resourcePath = decodeURIComponent(resourcePath); } catch { /* Express rejects malformed escapes. */ }
+    const resourceApps = requiredConsoleApps(resourcePath);
+    if (resourceApps.length === 1 || /^\/api\/v1\/tenant\/payment-connection(?:\/|$)/.test(resourcePath)) {
       const apps = await this.prisma.runAsTenant(user.restaurantId, tx => enabledConsoleApps(tx, user.restaurantId));
       if (!resourceApps.some(app => apps.includes(app))) throw new ForbiddenException({ statusCode: 403, code: 'PRODUCT_ACCESS_DENIED', message: 'Your subscription does not enable this application resource.' });
     }

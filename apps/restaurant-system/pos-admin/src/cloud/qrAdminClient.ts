@@ -51,6 +51,19 @@ export interface QrBranch {
   restaurantTimezone?: string;
 }
 
+export interface QrCodeView {
+  id: string;
+  status: 'ACTIVE' | 'DISABLED' | 'REVOKED';
+  mode: 'TABLE_ORDER' | 'MENU_ONLY';
+  version: number;
+  tableId: string | null;
+  displayNumber: string | null;
+  branchId: string | null;
+  url: string | null;
+}
+export interface QrMenuCodeRow extends QrCodeView { branchName: string; createdAt: string }
+export interface QrMenuCodePage { rows: QrMenuCodeRow[]; total: number; nextCursor: string | null; menuOnlyEnabled: boolean; publicBaseUrlConfigured: boolean }
+
 export interface QrOverview {
   entitlement: QrEntitlementView;
   tables: number;
@@ -124,6 +137,17 @@ export interface QrPrintData {
   tagline: string;
 }
 
+export interface QrMenuStatus {
+  branchId: string; branchName: string; checkedAt: string; publishedAt: string | null; publishedVersion: number;
+  counts: { draft: number; live: number; afterPublish: number };
+  review: { checksum: string; publishedVersion: number; hasUnpublishedChanges: boolean; errors: string[]; warnings: string[];
+    changes: Record<'added'|'updated'|'removed'|'optionGroups', Array<{id:string;name:string}>> };
+  notices: string[];
+  rows: Array<{id:string;name:string;categoryId:string;livePrice:number|null;state:'LIVE'|'LIVE_WITH_CHANGES'|'DRAFT_ONLY'|'HIDDEN';live:boolean;afterPublishVisible:boolean;reason:string;afterPublishReason:string;canRestoreBranchPause:boolean}>;
+  liveItems: Array<{id:string;name:string;categoryId:string;price:number;imageUrl?:string}>;
+  removedSinceDraft: Array<{id:string;name:string}>;
+}
+
 const base = '/api/v1/restaurant/qr';
 const branchQuery = (branch?:string) => branch ? `?branchId=${encodeURIComponent(branch)}` : '';
 export interface QrBrandingView { welcomeTitle: string | null; welcomeMessage: string | null; footerMessage: string | null; orderButtonLabel: string | null; accentColor: string | null; logoUrl: string | null }
@@ -140,7 +164,8 @@ export const QrAdminApi = {
   orders: (branchId?: string) => qrApi<QrOrderRow[]>(`${base}/orders${branchId ? `?branchId=${encodeURIComponent(branchId)}` : ''}`),
   orderPage: (query:Record<string,string>={}) => qrApi<{rows:QrOrderRow[];total:number;nextCursor:string|null}>(`${base}/order-list?${new URLSearchParams(query)}`),
   settings: (branch?:string) => qrApi<QrSettings>(`${base}/settings${branchQuery(branch)}`),
-  paymentReadiness: (branch?:string) => qrApi<{ available: boolean; enabled: boolean; guestAvailable: boolean; code: string; message: string; provider?:string; mode?:string; checkout?:string }>(`${base}/settings/payment-readiness${branchQuery(branch)}`),
+  paymentReadiness: (branch?:string) => qrApi<{ available: boolean; enabled: boolean; guestAvailable: boolean; code: string; message: string; provider?:string; mode?:string; checkout?:string; planAllowed?:boolean; gatewayReady?:boolean; collectionStatus?:string; bankVerificationStatus?:string; ticketNumber?:number|null; commissionBps?:number; collectionAccount?:string; payoutMode?:string }>(`${base}/settings/payment-readiness${branchQuery(branch)}`),
+  requestPaymentActivation: (branch?:string) => qrApi<{ticketId:string;ticketNumber:number;commissionBps:number}>(`${base}/payment-activation-request${branchQuery(branch)}`, json({acknowledgeCommission:true})),
   saveSettings: (changes: Partial<QrSettings>,branch?:string) => qrApi<QrSettings>(`${base}/settings${branchQuery(branch)}`, { method: 'PUT', body: JSON.stringify(changes) }),
   inheritSettings: (branch:string) => qrApi<QrSettings>(`${base}/settings/inherit${branchQuery(branch)}`,json({})),
   orderAction: (id:string,action:string,version:number,reason?:string) => qrApi(`${base}/orders/${encodeURIComponent(id)}/action`,json({action,version,...(reason?{reason}:{})})),
@@ -148,18 +173,20 @@ export const QrAdminApi = {
   printDesign: () => qrApi<QrPrintDesign>(`${base}/print-design`),
   savePrintDesign: (design:QrPrintDesign) => qrApi<QrPrintDesign>(`${base}/print-design`,{method:'PUT',body:JSON.stringify(design)}),
   menuPreview: (branch?:string) => qrApi<{categories:Array<{id:string;name:string}>;items:Array<{id:string;name:string;price:number}>;hidden:Array<{itemId:string;name:string;reason:string}>}>(`/api/v1/menu/preview${branchQuery(branch)}`),
-  publishMenu: () => qrApi('/api/v1/menu/publish',json({note:'Published from QR Admin'})),
+  menuStatus: (branch?:string) => qrApi<QrMenuStatus>(`${base}/menu-status${branchQuery(branch)}`),
+  publishMenu: (expected?: {expectedChecksum:string;expectedVersion:number}) => qrApi<{version:number;warnings:string[]}>('/api/v1/menu/publish',json({note:'Published from QR Admin',...expected})),
   branchAvailability: (branchId:string,itemId:string,isAvailable:boolean) => qrApi('/api/v1/menu/branch-overrides',{method:'PUT',body:JSON.stringify({branchId,itemId,isAvailable})}),
   branding: () => qrApi<QrBrandingView>(`${base}/branding`),
   updateBranding: (body: Partial<Record<'welcomeTitle' | 'welcomeMessage' | 'footerMessage' | 'orderButtonLabel' | 'accentColor', string>> & { logo?: string | null }) => qrApi<QrBrandingView>(`${base}/branding`, { method: 'PUT', body: JSON.stringify(body) }),
   createTable: (body: { tableNumber: string; capacity: number; branchId?: string; zone?: string }) => qrApi<{ id: string }>(`${base}/tables`, json(body)),
   updateTable: (tableId: string, body: { tableNumber?: string; capacity?: number; isActive?: boolean }) => qrApi<unknown>(`${base}/tables/${encodeURIComponent(tableId)}`, { method: 'PUT', body: JSON.stringify(body) }),
   generate: (tableId: string, branchId?: string) => qrApi<{ id: string; url: string | null }>(`${base}/tables/${encodeURIComponent(tableId)}/generate`, json(branchId ? { branchId } : {})),
-  menuCode: (branchId: string, label: string) => qrApi<{ id: string; url: string | null }>(`${base}/menu-codes`, json({ branchId, label })),
+  menuCode: (branchId: string, label: string) => qrApi<QrCodeView>(`${base}/menu-codes`, json({ branchId, label })),
+  menuCodes: (branchId: string, cursor?: string) => qrApi<QrMenuCodePage>(`${base}/menu-codes?${new URLSearchParams({ branchId, ...(cursor ? { cursor } : {}) })}`),
   reservations: () => qrApi<QrReservationRow[]>(`${base}/reservations`),
   reservationAction: (id: string, status: QrReservationRow['status']) =>
     qrApi<QrReservationRow>(`${base}/reservations/${encodeURIComponent(id)}/action`, json({ status })),
-  regenerate: (codeId: string) => qrApi<{ id: string; url: string | null }>(`${base}/codes/${codeId}/regenerate`, json({})),
+  regenerate: (codeId: string) => qrApi<QrCodeView>(`${base}/codes/${codeId}/regenerate`, json({})),
   revoke: (codeId: string) => qrApi<unknown>(`${base}/codes/${codeId}/revoke`, json({})),
   disable: (codeId: string) => qrApi<unknown>(`${base}/codes/${codeId}/disable`, json({})),
   enable: (codeId: string) => qrApi<unknown>(`${base}/codes/${codeId}/enable`, json({})),

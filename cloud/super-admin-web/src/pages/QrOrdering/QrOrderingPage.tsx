@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Building2,
   Check,
@@ -95,6 +95,7 @@ function StatTile({
 }
 
 export function QrOrderingPage() {
+  const [params, setParams] = useSearchParams();
   const [restaurants, setRestaurants] = useState<RestaurantQrStatusItem[] | null>(null);
   const [metrics, setMetrics] = useState<PlatformQrMetrics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -145,6 +146,16 @@ export function QrOrderingPage() {
   useEffect(() => {
     void loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    const requested = params.get('restaurantId');
+    const row = restaurants?.find(restaurant => restaurant.id === requested);
+    if (!row) return;
+    setPanelTarget({ row, tab: params.get('tab') === 'entitlement' ? 'entitlement' : 'overview' });
+    const next = new URLSearchParams(params);
+    next.delete('restaurantId'); next.delete('tab');
+    setParams(next, { replace: true });
+  }, [restaurants, params, setParams]);
 
   const applyRowUpdate = useCallback((updated: RestaurantQrStatusItem) => {
     setRestaurants((prev) => (prev ? prev.map((r) => (r.id === updated.id ? updated : r)) : prev));

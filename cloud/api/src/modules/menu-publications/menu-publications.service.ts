@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Device, Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -7,7 +7,7 @@ import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { buildContent, explainHidden, extractImages, publicImageUrl, SnapshotContent, viewForBranch } from './menu-snapshot';
 
-export const publishMenuSchema = z.object({ note: z.string().trim().max(200).optional() });
+export const publishMenuSchema = z.object({ note: z.string().trim().max(200).optional(), expectedChecksum: z.string().regex(/^[a-f0-9]{40}$/).optional(), expectedVersion: z.number().int().nonnegative().optional() });
 export type PublishMenuDto = z.infer<typeof publishMenuSchema>;
 
 /** One branch's own price or availability for one dish. A field left null/absent means "no override": the dish's normal value applies. */
@@ -53,7 +53,7 @@ export class MenuPublicationsService {
       const built = buildContent(await this.draftRows(tx, device.restaurantId));
       const last = await tx.menuSnapshot.findFirst({ where: { restaurantId: device.restaurantId }, orderBy: { version: 'desc' }, select: { version: true, checksum: true, content: true } });
       const previous = last?.content as unknown as SnapshotContent | undefined;
-      const normalized=extractImages(built.content).content;
+      const extracted=extractImages(built.content), normalized=extracted.content;
       const stable=(value:unknown)=>JSON.stringify(value,(_key,current)=>current&&typeof current==='object'&&!Array.isArray(current)?Object.fromEntries(Object.keys(current).sort().map(key=>[key,current[key]])):current);
       const normalizedItems=new Map(normalized.items.map(i=>[i.id,i]));
       const oldItems = new Map((previous?.items || []).map(i => [i.id, i]));
@@ -66,10 +66,11 @@ export class MenuPublicationsService {
       };
       return {
         changes,
+        checksum: built.checksum,
         publishedVersion: last?.version ?? 0,
         hasUnpublishedChanges: !last || last.checksum !== built.checksum,
         errors: built.errors,
-        warnings: built.warnings,
+        warnings: [...built.warnings,...extracted.warnings],
         counts: { categories: built.content.categories.length, items: built.content.items.length, modifierGroups: built.content.groups.length }
       };
     });
@@ -98,12 +99,15 @@ export class MenuPublicationsService {
   }
 
   /** Builds the snapshot from the draft inside an open transaction and records the numbered version. */
-  async publishTx(tx: Prisma.TransactionClient, restaurantId: string, deviceId: string | null, note: string | null) {
+  async publishTx(tx: Prisma.TransactionClient, restaurantId: string, deviceId: string | null, note: string | null, expected?: Pick<PublishMenuDto, 'expectedChecksum' | 'expectedVersion'>) {
     // Serialise concurrent publishes so version numbers stay consecutive.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'menu-publish:' + restaurantId}))`;
     const built = buildContent(await this.draftRows(tx, restaurantId));
     if (built.errors.length > 0) throw new UnprocessableEntityException({ message: 'The menu has problems that must be fixed before publishing', errors: built.errors, warnings: built.warnings });
     const last = await tx.menuPublication.findFirst({ where: { restaurantId }, orderBy: { version: 'desc' } });
+    if (expected?.expectedChecksum && expected.expectedChecksum !== built.checksum || expected?.expectedVersion !== undefined && expected.expectedVersion !== (last?.version ?? 0)) {
+      throw new ConflictException('The menu changed since your review. Refresh the review before publishing.');
+    }
     const version = (last?.version ?? 0) + 1;
     const created = await tx.menuPublication.create({ data: { restaurantId, version, watermark: new Date(), note, publishedByDeviceId: deviceId } });
     const moved = extractImages(built.content);
@@ -122,7 +126,7 @@ export class MenuPublicationsService {
   async publish(device: Device, dto: PublishMenuDto) {
     if (device.type !== 'POS_ADMIN') throw new ForbiddenException('Only Restaurant Admin can publish the menu');
     const { created, warnings } = await this.prisma.runAsTenant(device.restaurantId, async (tx) => {
-      const r = await this.publishTx(tx, device.restaurantId, device.id, dto.note ?? null);
+      const r = await this.publishTx(tx, device.restaurantId, device.id, dto.note ?? null, dto);
       await this.audit.log(
         { actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId, action: 'MENU_PUBLISHED', category: 'MENU', details: { version: r.created.version, note: r.created.note } },
         tx

@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { QrPaymentActivationService } from './qr-payment-activation.service';
+import { ApplicationEntitlementsModule } from '../application-entitlements/application-entitlements.module';
+import { PlatformNotificationsModule } from '../platform-notifications/platform-notifications.module';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { AuditModule } from '../audit/audit.module';
 import { TenantAuthModule } from '../tenant-auth/tenant-auth.module';
@@ -21,7 +24,7 @@ import { StaffAuthModule } from '../entity-sync/staff-auth.module';
 import { RefundAuthorizationGuard } from './refund-authorization.guard';
 
 @Module({
-  imports: [PrismaModule, AuditModule, TenantAuthModule, StaffAuthModule, OrderSyncModule, WhatsAppOutboundWebhookModule],
+  imports: [PrismaModule, AuditModule, TenantAuthModule, StaffAuthModule, OrderSyncModule, WhatsAppOutboundWebhookModule, ApplicationEntitlementsModule, PlatformNotificationsModule],
   controllers: [
     MenuSyncController,
     PaymentOrdersController,
@@ -35,7 +38,7 @@ import { RefundAuthorizationGuard } from './refund-authorization.guard';
     RestaurantPayoutsController,
     PlatformPaymentsController
   ],
-  providers: [PaymentsService, RazorpayGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService, RestaurantPayoutsService, RefundAuthorizationGuard],
-  exports: [PaymentsService, RazorpayGatewayService, RestaurantPayoutsService]
+  providers: [QrPaymentActivationService, PaymentsService, RazorpayGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService, RestaurantPayoutsService, RefundAuthorizationGuard],
+  exports: [QrPaymentActivationService, PaymentsService, RazorpayGatewayService, RestaurantPayoutsService]
 })
 export class PaymentsModule {}

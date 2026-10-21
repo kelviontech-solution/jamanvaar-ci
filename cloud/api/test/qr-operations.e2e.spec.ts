@@ -768,3 +768,56 @@ it('named service assignment, escalation and pickup calendar remain branch-scope
  expect((await auth('post',ops+'/requests/'+created.body.id+'/assign').send({version:latest.version,assignedDeviceId:other.id,reason:'Wrong branch'})).status).toBe(400);
  expect((await auth('post',ops+'/requests/'+created.body.id+'/assign',adminB).send({version:latest.version,reason:'Foreign branch'})).status).toBe(404);
 });
+
+it('uses saved plan capabilities for analytics and preserves an explicit restaurant restriction after an upgrade',async()=>{
+ const snapshot=await prisma.runAsPlatform(async tx=>({plan:await tx.plan.findUniqueOrThrow({where:{id:planId}}),rows:await tx.applicationEntitlement.findMany({where:{restaurantId,appCode:'QR_ORDERING'}})}));
+ try{
+   await prisma.runAsTenant(restaurantId,tx=>tx.applicationEntitlement.updateMany({where:{restaurantId,appCode:'QR_ORDERING'},data:{config:{}}}));
+   const denied=await auth('get',ops+'/analytics');expect(denied.status,JSON.stringify(denied.body)).toBe(403);
+   expect(denied.body).toMatchObject({code:'QR_FEATURE_NOT_LICENSED',feature:'QR_MENU_ANALYTICS',entitlementKey:'qrMenuAnalytics',reason:'NOT_INCLUDED',planName:snapshot.plan.name});
+   const upgraded=await http().patch(`/api/v1/plans/${planId}`).set('Authorization',`Bearer ${platform}`).send({entitlements:{...(snapshot.plan.entitlements as any),qrMenuAnalytics:true}});
+   expect(upgraded.status,JSON.stringify(upgraded.body)).toBe(200);
+   const available=await auth('get',ops+'/analytics');expect(available.status,JSON.stringify(available.body)).toBe(200);expect(Array.isArray(available.body.items)).toBe(true);
+   await prisma.runAsTenant(restaurantId,tx=>tx.applicationEntitlement.updateMany({where:{restaurantId,appCode:'QR_ORDERING'},data:{config:{qrMenuAnalytics:false}}}));
+   expect((await auth('get',ops+'/analytics')).status).toBe(403);
+   await prisma.runAsTenant(restaurantId,tx=>tx.applicationEntitlement.updateMany({where:{restaurantId,appCode:'QR_ORDERING'},data:{config:{}}}));
+   expect((await auth('get',ops+'/analytics')).status).toBe(200);
+ }finally{
+   await prisma.runAsPlatform(async tx=>{await tx.plan.update({where:{id:planId},data:{entitlements:snapshot.plan.entitlements as any}});for(const row of snapshot.rows)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:row.config as any}});});
+ }
+});
+
+it('attention feed exposes live pending service, excludes expired/finished requests and refreshes after actions',async()=>{
+ const id='attention-service-'+stamp,now=Date.now();
+ await prisma.runAsTenant(restaurantId,async tx=>{
+   for(const [suffix,status,expiresAt]of [['open','OPEN',now+3600000],['done','COMPLETED',now+3600000],['expired','OPEN',now-1000],['other','OPEN',now+3600000]] as const){
+     await tx.syncedEntity.create({data:{restaurantId,entityType:'QR_SERVICE_REQUEST',externalId:id+'-'+suffix,createdAt:new Date(now-20*60000),payload:{branchId:suffix==='other'?branchB:branch,tableNumber:'ATT-7',label:'Water needed',typeId:'WATER',note:'Please bring water',status,createdAt:new Date(now-20*60000).toISOString(),expiresAt:new Date(expiresAt).toISOString(),history:[]}}});
+   }
+ });
+ const first=await auth('get',ops+'/attention');expect(first.status,JSON.stringify(first.body)).toBe(200);
+ const request=first.body.items.find((item:any)=>item.requestId===id+'-open');expect(request).toMatchObject({kind:'SERVICE',priority:'URGENT',status:'OPEN',branchId:branch});
+ expect(first.body.items.some((item:any)=>[id+'-done',id+'-expired',id+'-other'].includes(item.requestId))).toBe(false);
+ expect((await auth('get',ops+'/attention',adminB)).body.items.some((item:any)=>item.requestId===id+'-open')).toBe(false);
+ expect((await auth('get',ops+'/attention?branchId='+branchB)).status).toBe(403);expect((await http().get(ops+'/attention')).status).toBe(401);
+ expect((await auth('post',ops+`/requests/${request.requestId}/action`).send({status:'ACKNOWLEDGED',version:request.version})).status).toBe(200);
+ const acknowledged=(await auth('get',ops+'/attention')).body.items.find((item:any)=>item.requestId===request.requestId);expect(acknowledged.status).toBe('ACKNOWLEDGED');
+ expect((await auth('post',ops+`/requests/${request.requestId}/action`).send({status:'COMPLETED',version:acknowledged.version})).status).toBe(200);
+ expect((await auth('get',ops+'/attention')).body.items.some((item:any)=>item.requestId===request.requestId)).toBe(false);
+});
+
+it('attention feed includes delayed orders and real balances without needing the optional notifications add-on',async()=>{
+ const snapshot=await prisma.runAsTenant(restaurantId,tx=>tx.applicationEntitlement.findMany({where:{restaurantId,appCode:'QR_ORDERING'}}));
+ try{
+   await prisma.runAsTenant(restaurantId,async tx=>{
+     await tx.applicationEntitlement.updateMany({where:{restaurantId,appCode:'QR_ORDERING'},data:{config:{qrNotifications:false,qrServiceRequests:false}}});
+     const old=new Date(Date.now()-180*60000);
+     for(const [suffix,status,paymentStatus,branchId]of [['late','PREPARING','PENDING',branch],['due','READY','PENDING',branch],['paid','READY','SUCCESS',branch],['pending','DRAFT','PENDING',branch],['cancel','CANCELLED','PENDING',branch],['other','PREPARING','PENDING',branchB]] as const){
+       const order=await tx.syncedOrder.create({data:{restaurantId,branchId,externalOrderId:'attention-'+suffix+'-'+stamp,source:'QR',orderType:'DINE_IN',tableLabel:'ATT-9',status,paymentStatus,paymentMethod:'CASH_AT_COUNTER',items:[],subtotal:10000,taxAmount:0,totalAmount:10000,createdAt:old,meta:{tokenNumber:'ATT-'+suffix}}});
+       if(suffix==='due')await tx.orderPaymentEntry.create({data:{restaurantId,branchId,orderId:order.id,kind:'COLLECTION',amount:4000,method:'CASH',reference:'attention-collection-'+stamp}});
+     }
+   });
+   const response=await auth('get',ops+'/attention');expect(response.status,JSON.stringify(response.body)).toBe(200);expect(response.body.serviceAvailable).toBe(false);expect(response.body.servicePending).toBe(0);
+   const find=(suffix:string)=>response.body.items.find((item:any)=>item.orderId==='attention-'+suffix+'-'+stamp);
+   expect(find('late')).toMatchObject({kind:'DELAYED_ORDER',priority:'URGENT'});expect(find('pending')).toMatchObject({kind:'PAYMENT_PENDING'});expect(find('due').detail).toContain('60.00');expect(find('paid')).toBeUndefined();expect(find('cancel')).toBeUndefined();expect(find('other')).toBeUndefined();
+ }finally{await prisma.runAsTenant(restaurantId,async tx=>{for(const row of snapshot)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:row.config as any}});});}
+});

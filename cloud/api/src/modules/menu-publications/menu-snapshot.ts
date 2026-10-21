@@ -107,7 +107,7 @@ export function buildContent(rows: Array<{ entityType: string; payload: unknown 
     items.push({
       id, name, description: str(p.description), translations: translations(p.translations), categoryId, pricePaise: Math.round(price * 100), imageUrl: str(p.imageUrl), dietaryType: str(p.dietaryType), allergens: Array.isArray(p.allergens) ? p.allergens.filter((v): v is string => typeof v === 'string').slice(0,30) : [],
       sortOrder: num(p.sortOrder), available: p.isAvailable !== false && !p.archivedAt, kioskEnabled:p.isKioskEnabled !== false, salesChannels: Array.isArray(p.salesChannels) ? (p.salesChannels as unknown[]).filter((c): c is string => typeof c === 'string') : null,
-      qrEnabled: p.isQrOrderingEnabled !== false, branchIds: Array.isArray(p.branchIds) ? (p.branchIds as unknown[]).filter((b): b is string => typeof b === 'string') : [],
+      qrEnabled: p.isQrOrderingEnabled !== false && p.isDigitalMenuVisible !== false, branchIds: Array.isArray(p.branchIds) ? (p.branchIds as unknown[]).filter((b): b is string => typeof b === 'string') : [],
       taxGroupId, modifierGroupIds: Array.isArray(p.modifierGroupIds) ? (p.modifierGroupIds as unknown[]).filter((g): g is string => typeof g === 'string') : [],
       kitchenStation: str(p.kitchenStation), minQuantity: minQ, maxQuantity: maxQ, allowInstructions: p.allowInstructions !== false
     });
@@ -159,7 +159,7 @@ export function viewForBranch(content: SnapshotContent, branchId: string | null,
       const o = itemOverride(i.id);
       if (!i.available || o?.available === false || o?.visible === false) return false;
       if (channel === 'KIOSK' && i.kioskEnabled === false) return false;
-      if (i.salesChannels ? !i.salesChannels.includes(channel) : channel === 'QR' && !i.qrEnabled) return false;
+      if (i.salesChannels && !i.salesChannels.includes(channel) || channel === 'QR' && !i.qrEnabled) return false;
       if (i.branchIds.length > 0 && (!branchId || !i.branchIds.includes(branchId))) return false;
       if (!categoryIds.has(i.categoryId)) return false;
       return i.taxGroupId ? !!content.taxGroups[i.taxGroupId] : true;
@@ -248,7 +248,7 @@ export function explainHidden(content: SnapshotContent, branchId: string | null,
     if (!i.available) reason = 'Marked unavailable';
     else if(channel === 'KIOSK' && i.kioskEnabled === false) reason = 'Dish hidden from kiosk ordering';
     else if (o?.available === false || o?.visible === false) reason = 'Switched off for this branch';
-    else if (i.salesChannels ? !i.salesChannels.includes(channel) : channel === 'QR' && !i.qrEnabled) reason = `Not sold through ${channel} ordering`;
+    else if (i.salesChannels && !i.salesChannels.includes(channel) || channel === 'QR' && !i.qrEnabled) reason = `Not sold through ${channel} ordering`;
     else if (i.branchIds.length > 0 && (!branchId || !i.branchIds.includes(branchId))) reason = 'Not sold in this branch';
     else if (!cat) reason = 'Its category is inactive or missing';
     else if ((channel === 'QR' && !cat.qrVisible) || catOverride(cat.id)?.visible === false) reason = `Its category is hidden from ${channel} ordering`;

@@ -75,7 +75,7 @@ export class ApplicationEntitlementsService {
     const key = feature?.legacyEntitlementKey ?? QR_CAPABILITIES[code];
     const inRollout = feature?.isActive === true && isRestaurantInRollout(restaurantId, feature.rolloutPercent);
     const enabled = base.enabled && inRollout && base.limits[key] === true;
-    return { code, enabled, reason: !base.enabled ? base.reason : !feature?.isActive || !inRollout ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED', planName: base.planName, limits: base.limits };
+    return { code, entitlementKey:key, enabled, reason: !base.enabled ? base.reason : !feature?.isActive || !inRollout ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED', planName: base.planName, limits: base.limits };
   }
 
   async resolveQrCapabilities(tx: TxClient, restaurantId: string, branchId?: string | null) {
@@ -91,7 +91,10 @@ export class ApplicationEntitlementsService {
 
   async assertQrCapability(tx: TxClient, restaurantId: string, code: QrCapability, branchId?: string | null) {
     const capability = await this.resolveQrCapability(tx, restaurantId, code, branchId);
-    if (!capability.enabled) throw new ForbiddenException({ code: 'QR_FEATURE_NOT_LICENSED', feature: code, message: 'This optional QR feature is not included in the current license. Contact your platform administrator.' });
+    if (!capability.enabled) {
+      const message=capability.reason==='PRODUCT_UNAVAILABLE'?'This QR feature is currently unavailable on the platform. Your platform administrator can check its release status.':capability.reason==='NOT_INCLUDED'?'This optional QR feature is not included in the current license. QR Ordering itself is active; ask your platform administrator to review the plan feature and any restaurant or branch restrictions.':'QR Ordering is not active for this restaurant or branch. Ask your platform administrator to check the subscription and branch access.';
+      throw new ForbiddenException({code:'QR_FEATURE_NOT_LICENSED',feature:code,reason:capability.reason,entitlementKey:capability.entitlementKey,planName:capability.planName,message});
+    }
     return capability;
   }
 

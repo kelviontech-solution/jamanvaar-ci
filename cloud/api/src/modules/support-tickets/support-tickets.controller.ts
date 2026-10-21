@@ -7,11 +7,21 @@ import { sendAttachment } from './send-attachment';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+import { QrFeatureRequestsService } from './qr-feature-requests.service';
+import { z } from 'zod';
 
 @Controller('api/v1/support-tickets')
 @UseGuards(PlatformAuthGuard)
 export class SupportTicketsController {
-  constructor(private readonly tickets: SupportTicketsService) {}
+  constructor(private readonly tickets: SupportTicketsService, private readonly features: QrFeatureRequestsService) {}
+
+  @Get(':id/qr-feature')
+  async featurePreview(@Param('id') id: string) { return { request: await this.features.preview(id) }; }
+
+  @Post(':id/qr-feature')
+  grantFeature(@Param('id') id: string, @Body(new ZodValidationPipe(z.object({ featureCode: z.string().min(1).max(60) }).strict())) body: { featureCode: string }, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.features.grant(id, body.featureCode, actor);
+  }
 
   @Get()
   list(

@@ -17,7 +17,7 @@ import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
 import { CreatePaymentOrderDto } from './dto/create-payment-order.dto';
 import { CreateRefundDto } from './dto/create-refund.dto';
-import { getDefaultCommissionBps, splitCommission } from './commission.util';
+import { getDefaultCommissionBps, splitCommission, QR_COMMISSION_BPS } from './commission.util';
 import { buildDayStatement } from './payment-statement.util';
 
 /**
@@ -382,7 +382,8 @@ export class PaymentsService {
           items: (synced.items ?? []) as Prisma.InputJsonValue, subtotal: synced.subtotal, taxAmount: synced.taxAmount, totalAmount: synced.totalAmount, currency: restaurant.currency, status: 'PENDING_PAYMENT' } });
         order = { ...saved, paymentTransactions: [] };
       }
-      const payment = await tx.paymentTransaction.create({ data: { restaurantId, orderId: order.id, provider: 'RAZORPAY', providerOrderId: `qrp_${randomUUID()}`, amount: order.totalAmount, currency: order.currency, status: 'CREATED', commissionBps: 0, platformAmount: 0, restaurantAmount: order.totalAmount } });
+      const split = splitCommission(order.totalAmount, QR_COMMISSION_BPS);
+      const payment = await tx.paymentTransaction.create({ data: { restaurantId, orderId: order.id, provider: 'RAZORPAY', providerOrderId: `qrp_${randomUUID()}`, amount: order.totalAmount, currency: order.currency, status: 'CREATED', commissionBps: QR_COMMISSION_BPS, ...split } });
       return { payment, created: true, synced };
     });
     if (!attempt.created) return this.qrPaymentView(attempt.payment);

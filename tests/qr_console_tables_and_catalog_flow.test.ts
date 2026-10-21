@@ -19,7 +19,7 @@ describe('QrCatalog: opening an editor is not itself "unsaved changes" (false-po
 
   it('every place a dish or category editor opens (Add dish, Add category, Edit, Edit category) captures the baseline before/with setDraft so the comparison has something real to compare against', () => {
     const openers = [...src.matchAll(/(draftOriginal|categoryDraftOriginal)\.current\s*=/g)];
-    expect(openers.length, 'expected a baseline snapshot captured at each of the 4 editor-opening sites').toBeGreaterThanOrEqual(4);
+    expect(openers.length, 'expected a baseline snapshot in both shared editor openers').toBeGreaterThanOrEqual(2);
   });
 });
 

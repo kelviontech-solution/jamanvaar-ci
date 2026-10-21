@@ -3,13 +3,21 @@ import { PlatformUser } from '@prisma/client';
 import { PaymentConnectionsService } from './payment-connections.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+import { QrPaymentActivationService } from './qr-payment-activation.service';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { setCommissionOverrideSchema, SetCommissionOverrideDto, stepUpPasswordSchema, StepUpPasswordDto } from './dto/commission-config.dto';
 
 @Controller()
 @UseGuards(PlatformAuthGuard)
 export class PlatformPaymentConnectionsController {
-  constructor(private readonly connections: PaymentConnectionsService) {}
+  constructor(private readonly connections: PaymentConnectionsService, private readonly qrActivation: QrPaymentActivationService) {}
+
+  @Get('api/v1/support-tickets/:id/qr-payment')
+  async qrPreview(@Param('id') id: string) { return { request: await this.qrActivation.preview(id) }; }
+
+  @Patch('api/v1/support-tickets/:id/qr-payment')
+  @UsePipes(new ZodValidationPipe(stepUpPasswordSchema))
+  approveQr(@Param('id') id: string, @Body() body: StepUpPasswordDto, @CurrentPlatformUser() actor: PlatformUser) { return this.qrActivation.approve(id, actor, body.password); }
 
   @Get('api/v1/payment-connections')
   list() {

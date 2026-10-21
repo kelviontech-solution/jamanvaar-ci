@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { PlatformUser, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { MIN_COMMISSION_BPS, DEFAULT_COMMISSION_BPS, getDefaultCommissionBps } from './commission.util';
+import { MIN_COMMISSION_BPS, DEFAULT_COMMISSION_BPS, getDefaultCommissionBps, QR_COMMISSION_BPS } from './commission.util';
 import { encryptCredential, decryptCredential } from '../../common/security/credential-encryption.util';
 import { requireStepUpPassword } from '../../common/security/step-up.util';
 import { SubmitPaymentConnectionDto, SettlementBankDetailsDto } from './dto/payment-connection.dto';
@@ -154,7 +154,7 @@ export class PaymentConnectionsService {
     const [connection, defaultBps] = await Promise.all([this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } })
     ), getDefaultCommissionBps(this.prisma)]);
-    if (!connection) return { status: 'NOT_CONNECTED' as const, gatewayConfigured: this.gateway.isConfigured(), directSettlementRequested: false, collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING', bankVerificationStatus: 'NOT_ADDED', effectiveCommissionBps: defaultBps };
+    if (!connection) return { status: 'NOT_CONNECTED' as const, gatewayConfigured: this.gateway.isConfigured(), directSettlementRequested: false, collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING', bankVerificationStatus: 'NOT_ADDED', effectiveCommissionBps: defaultBps, qrCommissionBps: QR_COMMISSION_BPS };
     return this.toOwnView(connection, defaultBps);
   }
 
@@ -199,6 +199,7 @@ export class PaymentConnectionsService {
       payoutMode: 'MANUAL',
       routeStatus: 'PENDING',
       effectiveCommissionBps: connection.commissionOverrideBps ?? defaultBps,
+      qrCommissionBps: QR_COMMISSION_BPS,
       bankVerificationStatus: connection.bankVerificationStatus,
       settlementBankName: connection.settlementBankName,
       settlementBankAccountType: connection.settlementBankAccountType,
@@ -386,6 +387,7 @@ export class PaymentConnectionsService {
       // for the same reason as the bank account number and the KYC ids.
       settlementUpiVpaMasked: maskLast4(connection.settlementUpiVpa),
       commissionOverrideBps: connection.commissionOverrideBps,
+      qrCommissionBps: QR_COMMISSION_BPS,
       bankVerificationStatus: connection.bankVerificationStatus,
       directSettlementRequested: connection.directSettlementRequested,
       collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING',

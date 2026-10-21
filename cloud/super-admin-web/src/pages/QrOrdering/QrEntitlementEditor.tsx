@@ -52,7 +52,7 @@ const FEATURE_TOGGLES: ToggleSpec[] = [
   {
     key: 'onlinePayments',
     label: 'Online payments',
-    hint: 'Guests can settle the bill from their own device instead of at the counter.'
+    hint: 'Allows QR online checkout with a 2% Jamanvaar commission. Collection must also be approved in the activation ticket or Payment connections, and the gateway must be configured.'
   }
 ];
 export const QR_CAPABILITY_LABELS: Record<string, string> = {

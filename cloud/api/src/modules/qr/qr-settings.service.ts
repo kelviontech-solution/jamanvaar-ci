@@ -1,7 +1,7 @@
 import { rememberAppearance } from '../operations/appearance-history';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { z } from 'zod';
 import { parseInlineImage, publicImageUrl } from '../menu-publications/menu-snapshot';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -120,6 +120,10 @@ export class QrSettingsService {
     const before = await this.effective(restaurantId, branchId);
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-settings:' + restaurantId}))`;
+      if (changes.allowOnlinePayment === true) {
+        const entitlement = await this.entitlements.resolve(tx, restaurantId, 'QR_ORDERING', branchId);
+        if (!entitlement.enabled || entitlement.limits.qrOnlinePayments === false) throw new ForbiddenException('Online payment is not included for this restaurant or branch. Super Admin must review QR payment access.');
+      }
       if (branchId) {
         const branch = await tx.branch.findFirst({ where: { id: branchId, restaurantId } });
         if (!branch) throw new BadRequestException('Unknown branch');

@@ -160,6 +160,20 @@ describe('Manual restaurant payouts (Route pending)', () => {
     expect(listB.body.rows).toHaveLength(0);
   });
 
+  it('includes QR collections using their frozen 2% split and keeps older zero-fee snapshots intact', async () => {
+    const a = await makeRestaurant('qr-split');
+    await verifyBank(a.rid);
+    const current = await seedPayment(a.rid, { amount: 10000, bps: 200 });
+    const legacy = await seedPayment(a.rid, { amount: 5000, bps: 0 });
+    await prisma.runAsPlatform(tx => tx.order.updateMany({ where: { id: { in: [current.orderId, legacy.orderId] } }, data: { source: 'QR' } }));
+    await authed('post', '/api/v1/payments/payouts/run-eod', platformToken).send({});
+    const list = await authed('get', `/api/v1/payments/payouts?restaurantId=${a.rid}`, platformToken);
+    expect(list.body.rows).toHaveLength(1);
+    expect(list.body.rows[0]).toMatchObject({ grossAmount: 15000, feeAmount: 200, netAmount: 14800, paymentCount: 2 });
+    await authed('post', '/api/v1/payments/payouts/run-eod', platformToken).send({});
+    expect((await authed('get', `/api/v1/payments/payouts?restaurantId=${a.rid}`, platformToken)).body.rows).toHaveLength(1);
+  });
+
   it('running EOD twice the same day creates exactly one payout, not two', async () => {
     const a = await makeRestaurant('dup');
     await verifyBank(a.rid);

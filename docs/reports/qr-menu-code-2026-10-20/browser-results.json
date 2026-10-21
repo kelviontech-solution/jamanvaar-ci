@@ -1,0 +1,42 @@
+[
+  {
+    "width": 390,
+    "existingCodesRecovered": true,
+    "createShowsPreview": true,
+    "modeOffExplained": true,
+    "enableBranchMode": true,
+    "clipboardReadBack": true,
+    "pngQrDecoded": true,
+    "printDocumentCorrect": true,
+    "persistentAfterReload": true,
+    "offOnAndReplacement": true,
+    "pagination": true,
+    "networkFailureKeepsSavedCodes": true,
+    "quotaFailureShown": true,
+    "branchIsolation": true,
+    "horizontalOverflow": false
+  },
+  {
+    "width": 1440,
+    "existingCodesRecovered": true,
+    "createShowsPreview": true,
+    "modeOffExplained": true,
+    "enableBranchMode": true,
+    "clipboardReadBack": true,
+    "pngQrDecoded": true,
+    "printDocumentCorrect": true,
+    "persistentAfterReload": true,
+    "offOnAndReplacement": true,
+    "pagination": true,
+    "networkFailureKeepsSavedCodes": true,
+    "quotaFailureShown": true,
+    "branchIsolation": true,
+    "horizontalOverflow": false
+  },
+  {
+    "missingPublicAddressExplainedAndCreationBlocked": true,
+    "clipboardFailureDoesNotClaimSuccess": true,
+    "printFailureClosesPopupAndShowsError": true,
+    "lateOtherBranchResponseIgnored": true
+  }
+]

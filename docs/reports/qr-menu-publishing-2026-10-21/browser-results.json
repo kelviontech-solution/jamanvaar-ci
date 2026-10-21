@@ -1,0 +1,36 @@
+[
+  {
+    "width": 390,
+    "saveDoesNotSilentlyPublish": true,
+    "threeDraftsTwoLiveExplained": true,
+    "activeTabDisabledAndStyled": true,
+    "unsavedTabSwitchProtected": true,
+    "reviewRequiresConfirmation": true,
+    "staleReviewRejected": true,
+    "reviewPublishMakesThirdDishLive": true,
+    "saveAndReviewOpensWorkingDialog": true,
+    "publishedVsDraftPrices": true,
+    "qrVisibilityHiddenAndRestored": true,
+    "correctBranchPauseAction": true,
+    "realLiveListUsesPublishedDishes": true,
+    "networkErrorClearsSuccessClaims": true,
+    "horizontalOverflow": false
+  },
+  {
+    "width": 1440,
+    "saveDoesNotSilentlyPublish": true,
+    "threeDraftsTwoLiveExplained": true,
+    "activeTabDisabledAndStyled": true,
+    "unsavedTabSwitchProtected": true,
+    "reviewRequiresConfirmation": true,
+    "staleReviewRejected": true,
+    "reviewPublishMakesThirdDishLive": true,
+    "saveAndReviewOpensWorkingDialog": true,
+    "publishedVsDraftPrices": true,
+    "qrVisibilityHiddenAndRestored": true,
+    "correctBranchPauseAction": true,
+    "realLiveListUsesPublishedDishes": true,
+    "networkErrorClearsSuccessClaims": true,
+    "horizontalOverflow": false
+  }
+]

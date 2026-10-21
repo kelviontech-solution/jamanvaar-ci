@@ -1,0 +1,38 @@
+[
+  {
+    "width": 390,
+    "oneWorkflow": true,
+    "unsavedEditProtected": true,
+    "categoryCreatedWithDish": true,
+    "templateDownloadsOnly": true,
+    "csvPreviewAndImport": true,
+    "csvPartialRetrySafe": true,
+    "photoUpload": true,
+    "published": true,
+    "lostResponseRetryNoDuplicate": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "oneWorkflow": true,
+    "unsavedEditProtected": true,
+    "categoryCreatedWithDish": true,
+    "templateDownloadsOnly": true,
+    "csvPreviewAndImport": true,
+    "csvPartialRetrySafe": true,
+    "photoUpload": true,
+    "published": true,
+    "lostResponseRetryNoDuplicate": true,
+    "overflow": false
+  },
+  {
+    "analyticsAccessRetry": true,
+    "staleReportCleared": true,
+    "networkRecovery": true
+  },
+  {
+    "qrCompleteSaved": true,
+    "reselectSameTierPreservesCapabilities": true,
+    "posNotGranted": true
+  }
+]

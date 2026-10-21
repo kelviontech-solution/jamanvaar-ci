@@ -1,7 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { splitCommission, DEFAULT_COMMISSION_BPS } from './commission.util';
+import { splitCommission, DEFAULT_COMMISSION_BPS, QR_COMMISSION_BPS } from './commission.util';
 
 describe('splitCommission (the platform/restaurant fee split, used by every payment and by the manual payout batch)', () => {
+  it('allocates exactly 2% of QR collection without increasing the guest bill or losing paise', () => {
+    expect(splitCommission(10000, QR_COMMISSION_BPS)).toEqual({ platformAmount: 200, restaurantAmount: 9800 });
+    for (const gross of [1, 7, 33, 101, 1001, 12345, 999999]) {
+      const split = splitCommission(gross, QR_COMMISSION_BPS);
+      expect(split.platformAmount).toBe(Math.round(gross * 0.02));
+      expect(split.platformAmount + split.restaurantAmount).toBe(gross);
+    }
+  });
   it('the 3% default always leaves platformAmount + restaurantAmount == grossAmount exactly, for the spec\'s own example table', () => {
     const cases: Array<{ gross: number; fee: number; net: number }> = [
       { gross: 100, fee: 3, net: 97 }, // ₹1
