@@ -11,8 +11,9 @@ import { downloadMenuFile } from '../menu/menuFileDownload';
 import { useConfirm } from '@jamanvaar/ui';
 import { QrMenuChoices } from './QrMenuChoices';
 import { categoryChoiceIds, replaceCategoryChoices, validatedChoices, type ChoiceGroup } from './menuChoiceDrafts';
-const input = 'w-full mt-1 rounded-xl border border-jaman-border px-3 py-2 text-sm';
-const button = 'rounded-xl bg-jaman-navy px-4 py-2 text-sm font-bold text-white disabled:opacity-40';
+import { QR_BUTTON, QR_FIELD } from './qrUi';
+const input = QR_FIELD;
+const button = QR_BUTTON;
 export async function records(type: string) {
   let cursor = 0,
     rows: any[] = [];

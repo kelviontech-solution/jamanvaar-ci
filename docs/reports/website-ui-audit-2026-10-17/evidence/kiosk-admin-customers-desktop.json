@@ -1,0 +1,44 @@
+{
+  "title": "JAMANVAAR | Jamanvaar Apps",
+  "text": "QA-Restaurant-A-1792232615381\n\nRestaurant modules could not be loaded. Check your connection and try again.\n\nRetry\nLog out\nDisplay",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "Retry",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "standard",
+          "text": "Standard"
+        },
+        {
+          "value": "large",
+          "text": "Larger text & touch targets"
+        },
+        {
+          "value": "contrast",
+          "text": "Stronger contrast & large controls"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

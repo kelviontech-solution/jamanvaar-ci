@@ -14,7 +14,14 @@ async function main() {
   const p = await q.open('admin');
   const cancel = p.getByRole('button', { name: 'Cancel', exact: true }).last();
   if (await cancel.isVisible().catch(() => false)) await cancel.click();
-  await p.getByRole('button', { name: 'Menu & Categories', exact: true }).click();
+  const workspace = p.getByLabel('Branch workspace', { exact: true }).first();
+  if (await workspace.inputValue() !== q.state.branchA.id) {
+    await workspace.selectOption(q.state.branchA.id);
+    await p.waitForLoadState('domcontentloaded');
+    await p.waitForTimeout(1500);
+  }
+  await p.goto('http://localhost:5176/restaurant-admin/menu', { waitUntil: 'domcontentloaded' });
+  await p.waitForTimeout(1000);
   await q.test(p, 'Create menu category in UI and verify cloud persistence', async () => {
     const prior = await q.mustApi('GET', '/api/v1/entity-sync/MENU_CATEGORY', undefined, token);
     if (!prior.entities.some(e => e.payload.name === 'QA Pizza')) {
@@ -39,7 +46,8 @@ async function main() {
     return { endpoint: '/api/v1/entity-sync/MENU_ITEM', externalId: e.externalId, price: e.payload.price };
   });
   await q.snap(p, 'admin-menu-populated');
-  await p.getByRole('button', { name: 'Floor / Tables', exact: true }).click();
+  await p.goto('http://localhost:5176/restaurant-admin/tables', { waitUntil: 'domcontentloaded' });
+  await p.waitForTimeout(1000);
   await q.test(p, 'Create table QA01 through owner UI and persist', async () => {
     await p.getByRole('button', { name: 'Add Dining Table', exact: true }).click();
     await p.getByPlaceholder('e.g. 15').fill('QA01');
@@ -50,7 +58,8 @@ async function main() {
     q.state.tableId = e.externalId; q.saveState();
     return { endpoint: '/api/v1/entity-sync/DINING_TABLE', externalId: e.externalId };
   });
-  await p.getByRole('button', { name: 'Staff & Roles (RBAC)', exact: true }).click();
+  await p.goto('http://localhost:5176/restaurant-admin/staff', { waitUntil: 'domcontentloaded' });
+  await p.waitForTimeout(1000);
   q.state.staff = {};
   for (const [role, id] of [['Cashier', 'role-cashier'], ['Captain', 'role-captain'], ['Kitchen', 'role-chef'], ['Manager', 'role-manager']]) {
     await q.test(p, `Create ${role} staff, issue PIN and persist hashed credential`, async () => {

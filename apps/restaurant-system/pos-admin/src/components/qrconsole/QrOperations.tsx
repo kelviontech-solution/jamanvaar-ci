@@ -11,6 +11,7 @@ import { QrServiceInbox } from "@jamanvaar/ui";
 import { CloudApiError, qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi, type QrReservationRow } from "../../cloud/qrAdminClient";
 import { FeatureRequestButton } from "./FeatureRequestButton";
+import { QR_BUTTON, QR_FIELD } from './qrUi';
 const base = "/api/v1/restaurant/qr/operations";
 export const qrRequestsApi = async <T,>(
   path: string,
@@ -22,10 +23,8 @@ export const qrRequestsApi = async <T,>(
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 const box = "rounded-2xl border border-jaman-border bg-white p-5 space-y-4";
-const field =
-  "block w-full rounded-xl border border-jaman-border px-3 py-2.5 mt-1 text-sm";
-const button =
-  "rounded-xl bg-jaman-navy px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40";
+const field = QR_FIELD;
+const button = QR_BUTTON;
 export function QrSetupHealth({
   navigate,
 }: {
@@ -367,7 +366,7 @@ function OperationsSettings({ mode }: { mode: "service" | "pickup" }) {
   );
   return (
     <section className={box}>
-      <h2 className="text-xl font-bold">
+      <h2 className={mode === "service" ? "text-xl font-bold" : "sr-only"}>
         {mode === "service" ? "Service request settings" : "Pickup scheduling"}
       </h2>
       {!licensed && (
@@ -722,7 +721,7 @@ export function QrMenuPerformance() {
   };
   return (
     <section className={box}>
-      <h2 className="text-xl font-bold">Menu performance</h2>
+      <h2 className="sr-only">Menu performance</h2>
       {locked ? (
         <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
           <h3 className="font-bold">Menu Performance access needs attention</h3>

@@ -3,11 +3,10 @@ import { formatINR } from '@jamanvaar/utils';
 import { useEffect, useRef, useState } from "react";
 import { qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi } from "../../cloud/qrAdminClient";
+import { QR_BUTTON, QR_FIELD } from './qrUi';
 const base = "/api/v1/restaurant/qr/advanced/promotions";
-const input =
-    "mt-1 w-full min-w-0 rounded-xl border bg-white px-3 py-2.5 text-sm",
-  button =
-    "rounded-xl bg-jaman-navy px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40";
+const input = QR_FIELD,
+  button = QR_BUTTON;
 type Promotion = {
   report?: {
     acceptedOrders: number;

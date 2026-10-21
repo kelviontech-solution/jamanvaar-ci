@@ -40,6 +40,8 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
     setIsHoldOrdersOpen,
     selectedCategory,
     setSelectedCategory,
+    isMenuNavigationOpen: showNavWhileOnMenu,
+    setIsMenuNavigationOpen: setShowNavWhileOnMenu,
     currentUser
   } = usePosStore();
 
@@ -48,7 +50,6 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
   // ordinary navigation back so the cashier can jump to another screen; picking "Billing / Menu"
   // there returns to categories. Leaving the Menu tab for any other screen resets this, so the
   // categories are always what greets a cashier coming back to billing.
-  const [showNavWhileOnMenu, setShowNavWhileOnMenu] = useState(false);
   const [showMoreTools, setShowMoreTools] = useState(false);
   const manager = isManagerOrAboveRole(currentUser);
   const showCategories = activeTab === 'MENU' && !showNavWhileOnMenu;
@@ -87,14 +88,10 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
   const goToTab = (id: PosTab) => {
     setActiveTab(id);
     onNavigate?.();
-    setShowNavWhileOnMenu(false); // arriving anywhere (including back on Menu) always shows that screen's own content, not the nav overlay
   };
 
   return (
     <aside className={`w-28 sm:w-36 lg:w-52 xl:w-56 bg-white border border-jaman-border rounded-2xl flex flex-col justify-between select-none shrink-0 z-20 shadow-2xs overflow-hidden ${className}`}>
-      <nav aria-label="Everyday tasks" className="grid grid-cols-2 gap-1 p-2 border-b border-jaman-border shrink-0">
-        {([{id:'MENU',label:'Billing',icon:UtensilsCrossed},{id:'ORDERS',label:'Orders',icon:ShoppingBag},{id:'TABLES',label:'Tables',icon:LayoutGrid},{id:'ORDERS',label:'Collect',icon:Receipt}] as const).map(item => <button key={item.label} type="button" onClick={() => { usePosStore.getState().setOrderInboxMode(item.label === 'Collect' ? 'COLLECTIONS' : 'ALL'); goToTab(item.id); }} className="min-h-12 rounded-xl p-2 text-xs font-bold text-jaman-navy hover:bg-jaman-cream flex flex-col items-center justify-center gap-1"><item.icon size={18}/>{t(item.label)}</button>)}
-      </nav>
       {showCategories ? (
         /* ---- CATEGORY RAIL: shown instead of the main nav while billing, so the categories a
            cashier needs most are always one tap away on the left, exactly where the nav usually is. */
@@ -102,7 +99,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
           <button
             type="button"
             onClick={() => setShowNavWhileOnMenu(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy transition-all mb-1.5 cursor-pointer"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy transition-colors mb-1.5 cursor-pointer"
             title="Back to the main menu"
           >
             <ArrowLeft className="w-4 h-4 shrink-0" />
@@ -114,7 +111,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
           <button
             type="button"
             onClick={() => { sound.play('click'); setSelectedCategory('ALL'); onNavigate?.(); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all relative ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-colors relative ${
               selectedCategory === 'ALL'
                 ? 'bg-[#FFF2E8] text-jaman-saffron border border-[#FDBA74]/70'
                 : 'text-jaman-navy bg-jaman-cream hover:bg-white border border-transparent hover:border-jaman-border'
@@ -139,7 +136,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
                 type="button"
                 onClick={() => { sound.play('click'); setSelectedCategory(group.canonicalKey); onNavigate?.(); }}
                 title={group.primaryCategory.name}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all relative ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-colors relative ${
                   isSelected
                     ? 'bg-[#FFF2E8] text-jaman-saffron border border-[#FDBA74]/70'
                     : 'text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy'
@@ -165,7 +162,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
             <button
               type="button"
               onClick={() => setShowNavWhileOnMenu(false)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs text-jaman-saffron bg-[#FFF4ED] hover:bg-[#FFE8D6] transition-all mb-1.5 cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs text-jaman-saffron bg-[#FFF4ED] hover:bg-[#FFE8D6] transition-colors mb-1.5 cursor-pointer"
               title="Back to categories"
             >
               <MenuIcon className="w-4 h-4 shrink-0" />
@@ -180,7 +177,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
               <button
                 key={item.id}
                 onClick={() => goToTab(item.id)}
-                className={`w-full min-h-11 flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-all relative ${
+                className={`w-full min-h-11 flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-colors relative ${
                   isActive
                     ? 'bg-[#FFF2E8] text-jaman-saffron border border-[#FDBA74]/70'
                     : 'text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy'
@@ -212,7 +209,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
             {ai.showButton(db.restaurant?.showJamanAI !== false) && (
         <button
               onClick={() => setIsChatbotOpen(true)}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all relative bg-white hover:bg-[#FFF2E8] border border-[#FDBA74]/70 text-jaman-saffron shadow-2xs group cursor-pointer active:scale-98"
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-[color,background-color,border-color,box-shadow,transform] relative bg-white hover:bg-[#FFF2E8] border border-[#FDBA74]/70 text-jaman-saffron shadow-2xs group cursor-pointer active:scale-98"
               title="JAMAN AI Assistant (Voice & Conversational POS Actions)"
             >
               <Sparkles className="w-4 h-4 text-jaman-saffron shrink-0" />
@@ -230,7 +227,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
 
       {/* Bottom Area: Print Queue Trigger & Held Orders */}
       <div className="p-2.5 border-t border-jaman-border space-y-1.5">
-        <StaffLanguagePicker/>
+        <StaffLanguagePicker variant="sidebar" />
         {/* Hardware Print Queue Trigger */}
         <button
           onClick={() => setIsPrintQueueOpen(true)}
@@ -253,9 +250,10 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
         </button>
 
         {heldCartsCount > 0 && (
-          <div
+          <button
+            type="button"
             onClick={() => setIsHoldOrdersOpen(true)}
-            className="p-2 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between cursor-pointer hover:bg-amber-100 transition-colors"
+            className="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between cursor-pointer hover:bg-amber-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600/60"
           >
             <div className="flex items-center gap-2 text-amber-800 text-xs font-bold">
               <CirclePause className="w-3.5 h-3.5 text-amber-600" />
@@ -264,7 +262,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
             <span className="bg-amber-500 text-white font-bold text-[11px] px-1.5 py-0.2 rounded-full">
               {heldCartsCount}
             </span>
-          </div>
+          </button>
         )}
 
         <div className="hidden lg:block text-[11px] text-slate-500 px-2 py-1 text-center bg-white rounded-lg border border-jaman-border font-semibold">

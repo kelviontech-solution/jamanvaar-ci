@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BrandHeader, sound, useConfirm, StaffLanguagePicker } from '@jamanvaar/ui';
+import { BrandHeader, DisplayButtonSetting, sound, useConfirm, StaffLanguagePicker, JAMANVAAR_LOGOS } from '@jamanvaar/ui';
 import { lanMeshSync, EndpointResolver, connectionLevel, type ConnectionLevel } from '@jamanvaar/sync';
 import { isVibrationOn, setVibrationOn, alertWaiter } from '../../alerts';
 import { useCaptainStore, selectMyTables } from '../../store/captainStore';
@@ -9,6 +9,21 @@ import { MessageSquare, LogOut, Bell, Server, X, ChevronDown } from 'lucide-reac
 interface CaptainHeaderProps {
   onOpenNotifications: () => void;
   onOpenQuickMessage: () => void;
+}
+
+/** True from the given width up; lets one language picker move between the header (wide) and the profile menu (phone) instead of mounting twice. */
+function useMinWidth(px: number): boolean {
+  const query = `(min-width: ${px}px)`;
+  const [matches, setMatches] = useState(() => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(query).matches);
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const media = window.matchMedia(query);
+    const update = () => setMatches(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [query]);
+  return matches;
 }
 
 export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
@@ -25,6 +40,29 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
   const [pendingSyncCount, setPendingSyncCount] = useState(lanMeshSync.getOutboxCount());
   const [soundOn, setSoundOn] = useState(() => sound.getSettings().enabled);
   const [vibrateOn, setVibrateOn] = useState(() => isVibrationOn());
+  const isWide = useMinWidth(640);
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Touch screens have no mouse-leave: tapping anywhere outside the header closes an open menu, and Escape does too.
+  useEffect(() => {
+    if (!isSyncInfoOpen && !isProfileOpen) return;
+    const closeIfOutside = (event: PointerEvent) => {
+      if (headerRef.current && event.target instanceof Node && headerRef.current.contains(event.target)) return;
+      setIsSyncInfoOpen(false);
+      setIsProfileOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setIsSyncInfoOpen(false);
+      setIsProfileOpen(false);
+    };
+    document.addEventListener('pointerdown', closeIfOutside);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeIfOutside);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [isSyncInfoOpen, isProfileOpen]);
 
   useEffect(() => {
     const tick = () => {
@@ -45,11 +83,19 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
 
   return (
     <>
-    <header className="bg-white border-b border-jaman-border px-3 sm:px-5 py-2.5 shadow-2xs">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-3">
-        <StaffLanguagePicker/>
-        {/* Left: Prominent Official Master Brand Header */}
-        <div className="flex items-center gap-3 shrink-0">
+    <header ref={headerRef} className="sticky top-0 z-30 md:static bg-white border-b border-jaman-border px-3 sm:px-5 min-h-14 py-1.5 sm:py-2.5 shadow-2xs">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-x-2 sm:gap-x-3 sm:flex-wrap sm:gap-y-2">
+        {isWide && <StaffLanguagePicker/>}
+        {/* Left: brand. A phone gets the compact mark plus a two-line identity; wider screens keep the full lockup. */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 sm:flex-none sm:shrink-0">
+          <div className="sm:hidden flex items-center gap-2 min-w-0" data-testid="captain-compact-brand">
+            <img src={JAMANVAAR_LOGOS.mark} alt="JAMANVAAR" className="h-8 w-8 shrink-0 object-contain" draggable={false} />
+            <div className="min-w-0 leading-tight">
+              <p className="text-[13px] font-extrabold text-jaman-navy truncate">Captain App</p>
+              <p className="text-[11px] font-semibold text-slate-500 truncate" title={captainDb.restaurant?.name || 'JAMANVAAR'}>{captainDb.restaurant?.name || 'JAMANVAAR'}</p>
+            </div>
+          </div>
+          <div className="hidden sm:block">
           <BrandHeader
             app="CAPTAIN"
             restaurantName="JAMANVAAR"
@@ -59,17 +105,18 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
             badgeSize="sm"
             showContext={false}
           />
+          </div>
 
           <div className="hidden md:block h-6 w-px bg-jaman-border" />
 
           {/* Captain Name & Assigned Zone Lockup */}
-          <div className="hidden sm:flex items-center gap-2 bg-jaman-cream border border-jaman-border px-3 py-1 rounded-full text-xs font-bold text-jaman-navy">
+          <div className="hidden lg:flex items-center gap-2 bg-jaman-cream border border-jaman-border px-3 py-1 rounded-full text-xs font-bold text-jaman-navy">
             <div className="w-5 h-5 rounded-full bg-jaman-saffron text-white flex items-center justify-center text-[11px] font-bold">
               {currentCaptain?.name?.charAt(0) || '?'}
             </div>
             <span className="font-extrabold">{currentCaptain?.name || 'Staff'}</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-500 font-semibold">{captainDb.restaurant?.name || 'Floor'}</span>
+            <span className="hidden xl:inline text-slate-300">•</span>
+            <span className="hidden xl:inline text-slate-500 font-semibold">{captainDb.restaurant?.name || 'Floor'}</span>
           </div>
         </div>
 
@@ -79,10 +126,10 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
           <div className="relative">
             <button
               type="button"
-              onClick={() => setIsSyncInfoOpen((prev) => !prev)}
+              onClick={() => { setIsProfileOpen(false); setIsSyncInfoOpen((prev) => !prev); }}
               data-testid="captain-connection-pill"
               data-level={conn.level}
-              className={`flex items-center gap-1.5 border px-2.5 sm:px-3 min-h-[40px] rounded-full text-[11px] font-bold tracking-wide shadow-2xs transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 border px-2 sm:px-3 min-h-[44px] sm:min-h-[40px] rounded-full text-[11px] font-bold tracking-wide shadow-2xs transition-all cursor-pointer ${
                 conn.level === 'ok'
                   ? 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-200 text-emerald-800'
                   : conn.level === 'slow'
@@ -96,12 +143,12 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
               <span>
                 {conn.level === 'ok' ? (pendingSyncCount > 0 ? `SENDING (${pendingSyncCount})` : 'LIVE') : conn.level === 'slow' ? 'SLOW' : 'OFFLINE'}
               </span>
-              <ChevronDown className="w-3 h-3 opacity-60" />
+              <ChevronDown className="hidden sm:block w-3 h-3 opacity-60" />
             </button>
 
             {isSyncInfoOpen && (
               <div
-                className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-1.5rem)] bg-white border border-jaman-border rounded-2xl shadow-md p-3 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2.5"
+                className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-14 sm:top-auto mt-1 sm:mt-2 sm:w-72 max-h-[calc(100dvh-4.5rem)] overflow-y-auto bg-white border border-jaman-border rounded-2xl shadow-md p-3 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2.5"
                 onMouseLeave={() => setIsSyncInfoOpen(false)}
               >
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -132,6 +179,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                 </div>
 
                 <div className="space-y-1.5 pt-1 border-t border-slate-100">
+                  <DisplayButtonSetting />
                   <button
                     type="button"
                     role="switch"
@@ -165,19 +213,21 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenQuickMessage}
-            className="px-2.5 sm:px-3 py-1.5 min-h-[40px] rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffron font-extrabold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="hidden sm:flex px-2.5 sm:px-3 py-1.5 min-h-[40px] rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffron font-extrabold text-xs items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="Compose quick operational message to Kitchen, POS, or Manager"
+            aria-label="Send message to Kitchen, POS or Manager"
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Send Msg</span>
+            <span className="hidden lg:inline">Send Msg</span>
           </button>
 
           {/* Notifications Trigger */}
           <button
             type="button"
             onClick={onOpenNotifications}
-            className="relative w-10 h-10 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+            className="relative w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] active:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
             title="Floor Notifications & Alerts"
+            aria-label={unreadNotifs > 0 ? `Floor notifications, ${unreadNotifs} unread` : 'Floor notifications'}
           >
             <Bell className="w-4 h-4" />
             {unreadNotifs > 0 && (
@@ -191,24 +241,43 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
           <div className="relative">
             <button
               type="button"
-              onClick={() => setIsProfileOpen((prev) => !prev)}
-              className="flex items-center gap-1.5 min-h-[40px] bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border px-2 py-1 rounded-xl transition-colors shadow-2xs text-jaman-navy cursor-pointer"
+              onClick={() => { setIsSyncInfoOpen(false); setIsProfileOpen((prev) => !prev); }}
+              className="flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[40px] min-w-[44px] bg-jaman-cream hover:bg-[#F5F0E8] active:bg-[#F5F0E8] border border-jaman-border px-2 py-1 rounded-xl transition-colors shadow-2xs text-jaman-navy cursor-pointer"
+              aria-label="Profile and session menu"
+              aria-haspopup="menu"
+              aria-expanded={isProfileOpen}
             >
               <div className="w-6 h-6 rounded-lg bg-jaman-saffron text-white flex items-center justify-center font-bold text-xs">
                 {currentCaptain?.name?.charAt(0) || '?'}
               </div>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+              <ChevronDown className="hidden sm:block w-3 h-3 text-slate-400" />
             </button>
 
             {isProfileOpen && (
               <div
-                className="absolute right-0 mt-2 w-56 bg-white border border-jaman-border rounded-2xl shadow-md p-2 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100"
+                className="fixed sm:absolute right-3 sm:right-0 top-14 sm:top-auto mt-1 sm:mt-2 w-[min(18rem,calc(100vw-1.5rem))] sm:w-56 max-h-[calc(100dvh-4.5rem)] overflow-y-auto bg-white border border-jaman-border rounded-2xl shadow-md p-2 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100"
+                role="menu"
                 onMouseLeave={() => setIsProfileOpen(false)}
               >
                 <div className="p-2.5 border-b border-jaman-border mb-1 bg-jaman-cream rounded-xl">
                   <p className="font-extrabold text-sm text-jaman-navy">{currentCaptain?.name || 'Staff'}</p>
                   <p className="text-[11px] text-slate-500 font-medium">Floor Captain • {captainDb.restaurant?.name || 'Floor'}</p>
                 </div>
+
+                {!isWide && (
+                  <div className="p-1 space-y-1.5 border-b border-slate-100 mb-1">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => { setIsProfileOpen(false); onOpenQuickMessage(); }}
+                      className="w-full min-h-[44px] flex items-center gap-2 px-3 rounded-xl bg-[#FFF4ED] border border-[#FDBA74] text-jaman-saffron font-extrabold text-sm text-left active:scale-[0.98] cursor-pointer"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      <span>Send message</span>
+                    </button>
+                    <StaffLanguagePicker />
+                  </div>
+                )}
 
                 <div className="p-2 space-y-1 text-slate-600 font-medium border-b border-slate-100 mb-1">
                   <div className="flex justify-between">
@@ -229,7 +298,8 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                       if (!logout()) await confirm({title:'Unsent dishes are kept',message:'Return to your order and send or deliberately remove its dishes before signing out.',confirmLabel:'Return to order',cancelLabel:'Stay signed in'});
                     }
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-rose-50 text-rose-600 text-left transition-colors font-bold cursor-pointer"
+                  role="menuitem"
+                  className="w-full min-h-[44px] flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-rose-50 text-rose-600 text-left transition-colors font-bold cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5 text-rose-500" />
                   <span>End Session & Logout</span>

@@ -1,0 +1,1091 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "height": 900,
+      "navCount": 1,
+      "inSidebar": true,
+      "speed": {
+        "x": 244,
+        "y": 97,
+        "width": 729.609375,
+        "height": 62,
+        "right": 973.609375,
+        "bottom": 159
+      },
+      "quick": {
+        "x": 253,
+        "y": 106,
+        "width": 124.96875,
+        "height": 44,
+        "right": 377.96875,
+        "bottom": 150
+      },
+      "repeat": {
+        "x": 385.96875,
+        "y": 106,
+        "width": 129.078125,
+        "height": 44,
+        "right": 515.046875,
+        "bottom": 150
+      },
+      "shortcuts": {
+        "x": 11,
+        "y": 98,
+        "width": 222,
+        "height": 129,
+        "right": 233,
+        "bottom": 227
+      },
+      "buttons": [
+        {
+          "text": "Billing",
+          "rect": {
+            "x": 19,
+            "y": 106,
+            "width": 101,
+            "height": 54,
+            "right": 120,
+            "bottom": 160
+          },
+          "scroll": 101,
+          "client": 101
+        },
+        {
+          "text": "Orders",
+          "rect": {
+            "x": 124,
+            "y": 106,
+            "width": 101,
+            "height": 54,
+            "right": 225,
+            "bottom": 160
+          },
+          "scroll": 101,
+          "client": 101
+        },
+        {
+          "text": "Tables",
+          "rect": {
+            "x": 19,
+            "y": 164,
+            "width": 101,
+            "height": 54,
+            "right": 120,
+            "bottom": 218
+          },
+          "scroll": 101,
+          "client": 101
+        },
+        {
+          "text": "Collect",
+          "rect": {
+            "x": 124,
+            "y": 164,
+            "width": 101,
+            "height": 54,
+            "right": 225,
+            "bottom": 218
+          },
+          "scroll": 101,
+          "client": 101
+        }
+      ],
+      "allPages": {
+        "x": 21,
+        "y": 237,
+        "width": 192,
+        "height": 44,
+        "right": 213,
+        "bottom": 281
+      },
+      "categoryRows": [
+        {
+          "name": "Back to the main menu",
+          "rect": {
+            "x": 21,
+            "y": 237,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 281
+          }
+        },
+        {
+          "name": "Pizza & Pasta",
+          "rect": {
+            "x": 21,
+            "y": 362.5,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 406.5
+          }
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 21,
+            "y": 410.5,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 454.5
+          }
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 21,
+            "y": 458.5,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 502.5
+          }
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 21,
+            "y": 506.5,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 550.5
+          }
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 21,
+            "y": 554.5,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 598.5
+          }
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 21,
+            "y": 602.5,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 646.5
+          }
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 21,
+            "y": 650.5,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 694.5
+          }
+        }
+      ],
+      "visibleCategories": 7,
+      "order": {
+        "x": 983.609375,
+        "y": 97,
+        "width": 446.390625,
+        "height": 743,
+        "right": 1430,
+        "bottom": 840
+      },
+      "orderText": "New Order — Unsaved• QA ManagerDine-InTakeawayDeliveryTokenAttach CustomerChef NotesBilling Counter ReadyTap any dish from the menu to add it to this order.DiscountHold OrderClear AllSubtotal ₹0GST ₹0Total Payable₹0PAY ₹0SEND KOTInstant BillCash • Auto Print",
+      "header": {
+        "x": 10,
+        "y": 10,
+        "width": 1420,
+        "height": 77,
+        "right": 1430,
+        "bottom": 87
+      },
+      "footer": {
+        "x": 10,
+        "y": 850,
+        "width": 1420,
+        "height": 40,
+        "right": 1430,
+        "bottom": 890
+      },
+      "overflow": false
+    },
+    {
+      "width": 1280,
+      "height": 768,
+      "navCount": 1,
+      "inSidebar": true,
+      "speed": {
+        "x": 244,
+        "y": 149.5,
+        "width": 619.203125,
+        "height": 62,
+        "right": 863.203125,
+        "bottom": 211.5
+      },
+      "quick": {
+        "x": 253,
+        "y": 158.5,
+        "width": 124.96875,
+        "height": 44,
+        "right": 377.96875,
+        "bottom": 202.5
+      },
+      "repeat": {
+        "x": 385.96875,
+        "y": 158.5,
+        "width": 129.078125,
+        "height": 44,
+        "right": 515.046875,
+        "bottom": 202.5
+      },
+      "shortcuts": {
+        "x": 11,
+        "y": 150.5,
+        "width": 222,
+        "height": 129,
+        "right": 233,
+        "bottom": 279.5
+      },
+      "buttons": [
+        {
+          "text": "Billing",
+          "rect": {
+            "x": 19,
+            "y": 158.5,
+            "width": 101,
+            "height": 54,
+            "right": 120,
+            "bottom": 212.5
+          },
+          "scroll": 101,
+          "client": 101
+        },
+        {
+          "text": "Orders",
+          "rect": {
+            "x": 124,
+            "y": 158.5,
+            "width": 101,
+            "height": 54,
+            "right": 225,
+            "bottom": 212.5
+          },
+          "scroll": 101,
+          "client": 101
+        },
+        {
+          "text": "Tables",
+          "rect": {
+            "x": 19,
+            "y": 216.5,
+            "width": 101,
+            "height": 54,
+            "right": 120,
+            "bottom": 270.5
+          },
+          "scroll": 101,
+          "client": 101
+        },
+        {
+          "text": "Collect",
+          "rect": {
+            "x": 124,
+            "y": 216.5,
+            "width": 101,
+            "height": 54,
+            "right": 225,
+            "bottom": 270.5
+          },
+          "scroll": 101,
+          "client": 101
+        }
+      ],
+      "allPages": {
+        "x": 21,
+        "y": 289.5,
+        "width": 192,
+        "height": 44,
+        "right": 213,
+        "bottom": 333.5
+      },
+      "categoryRows": [
+        {
+          "name": "Back to the main menu",
+          "rect": {
+            "x": 21,
+            "y": 289.5,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 333.5
+          }
+        },
+        {
+          "name": "Pizza & Pasta",
+          "rect": {
+            "x": 21,
+            "y": 415,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 459
+          }
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 21,
+            "y": 463,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 507
+          }
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 21,
+            "y": 511,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 555
+          }
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 21,
+            "y": 559,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 603
+          }
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 21,
+            "y": 607,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 651
+          }
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 21,
+            "y": 655,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 699
+          }
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 21,
+            "y": 703,
+            "width": 192,
+            "height": 44,
+            "right": 213,
+            "bottom": 747
+          }
+        }
+      ],
+      "visibleCategories": 4,
+      "order": {
+        "x": 873.203125,
+        "y": 149.5,
+        "width": 396.796875,
+        "height": 558.5,
+        "right": 1270,
+        "bottom": 708
+      },
+      "orderText": "New Order — Unsaved• QA ManagerDine-InTakeawayDeliveryTokenAttach CustomerChef NotesBilling Counter ReadyTap any dish from the menu to add it to this order.DiscountHold OrderClear AllSubtotal ₹0GST ₹0Total Payable₹0PAY ₹0SEND KOTInstant BillCash • Auto Print",
+      "header": {
+        "x": 10,
+        "y": 10,
+        "width": 1260,
+        "height": 129.5,
+        "right": 1270,
+        "bottom": 139.5
+      },
+      "footer": {
+        "x": 10,
+        "y": 718,
+        "width": 1260,
+        "height": 40,
+        "right": 1270,
+        "bottom": 758
+      },
+      "overflow": false
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "navCount": 1,
+      "inSidebar": true,
+      "speed": {
+        "x": 10,
+        "y": 248,
+        "width": 1004,
+        "height": 62,
+        "right": 1014,
+        "bottom": 310
+      },
+      "quick": {
+        "x": 19,
+        "y": 257,
+        "width": 124.96875,
+        "height": 44,
+        "right": 143.96875,
+        "bottom": 301
+      },
+      "repeat": {
+        "x": 151.96875,
+        "y": 257,
+        "width": 129.078125,
+        "height": 44,
+        "right": 281.046875,
+        "bottom": 301
+      },
+      "shortcuts": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "buttons": [
+        {
+          "text": "Billing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Orders",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Tables",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Collect",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        }
+      ],
+      "allPages": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "categoryRows": [
+        {
+          "name": "Back to the main menu",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Pizza & Pasta",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        }
+      ],
+      "visibleCategories": 8,
+      "order": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "orderText": "New Order — Unsaved• QA ManagerDine-InTakeawayDeliveryTokenAttach CustomerChef NotesBilling Counter ReadyTap any dish from the menu to add it to this order.DiscountHold OrderClear AllSubtotal ₹0GST ₹0Total Payable₹0PAY ₹0SEND KOTInstant BillCash • Auto Print",
+      "header": {
+        "x": 10,
+        "y": 10,
+        "width": 1004,
+        "height": 122,
+        "right": 1014,
+        "bottom": 132
+      },
+      "footer": {
+        "x": 10,
+        "y": 718,
+        "width": 1004,
+        "height": 40,
+        "right": 1014,
+        "bottom": 758
+      },
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "navCount": 1,
+      "inSidebar": true,
+      "speed": {
+        "x": 10,
+        "y": 203,
+        "width": 748,
+        "height": 62,
+        "right": 758,
+        "bottom": 265
+      },
+      "quick": {
+        "x": 19,
+        "y": 212,
+        "width": 124.96875,
+        "height": 44,
+        "right": 143.96875,
+        "bottom": 256
+      },
+      "repeat": {
+        "x": 151.96875,
+        "y": 212,
+        "width": 129.078125,
+        "height": 44,
+        "right": 281.046875,
+        "bottom": 256
+      },
+      "shortcuts": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "buttons": [
+        {
+          "text": "Billing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Orders",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Tables",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Collect",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        }
+      ],
+      "allPages": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "categoryRows": [
+        {
+          "name": "Back to the main menu",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Pizza & Pasta",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        }
+      ],
+      "visibleCategories": 8,
+      "order": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "orderText": "New Order — Unsaved• QA ManagerDine-InTakeawayDeliveryTokenAttach CustomerChef NotesBilling Counter ReadyTap any dish from the menu to add it to this order.DiscountHold OrderClear AllSubtotal ₹0GST ₹0Total Payable₹0PAY ₹0SEND KOTInstant BillCash • Auto Print",
+      "header": {
+        "x": 10,
+        "y": 10,
+        "width": 748,
+        "height": 77,
+        "right": 758,
+        "bottom": 87
+      },
+      "footer": {
+        "x": 10,
+        "y": 974,
+        "width": 748,
+        "height": 40,
+        "right": 758,
+        "bottom": 1014
+      },
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "navCount": 1,
+      "inSidebar": true,
+      "speed": {
+        "x": 10,
+        "y": 255,
+        "width": 370,
+        "height": 62,
+        "right": 380,
+        "bottom": 317
+      },
+      "quick": {
+        "x": 19,
+        "y": 264,
+        "width": 124.96875,
+        "height": 44,
+        "right": 143.96875,
+        "bottom": 308
+      },
+      "repeat": {
+        "x": 151.96875,
+        "y": 264,
+        "width": 129.078125,
+        "height": 44,
+        "right": 281.046875,
+        "bottom": 308
+      },
+      "shortcuts": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "buttons": [
+        {
+          "text": "Billing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Orders",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Tables",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        },
+        {
+          "text": "Collect",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "scroll": 0,
+          "client": 0
+        }
+      ],
+      "allPages": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "categoryRows": [
+        {
+          "name": "Back to the main menu",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Pizza & Pasta",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        }
+      ],
+      "visibleCategories": 8,
+      "order": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "orderText": "New Order — Unsaved• QA ManagerDine-InTakeawayDeliveryTokenAttach CustomerChef NotesBilling Counter ReadyTap any dish from the menu to add it to this order.DiscountHold OrderClear AllSubtotal ₹0GST ₹0Total Payable₹0PAY ₹0SEND KOTInstant BillCash • Auto Print",
+      "header": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 129,
+        "right": 380,
+        "bottom": 139
+      },
+      "footer": {
+        "x": 10,
+        "y": 794,
+        "width": 370,
+        "height": 40,
+        "right": 380,
+        "bottom": 834
+      },
+      "overflow": false
+    }
+  ],
+  "checks": [],
+  "errors": []
+}

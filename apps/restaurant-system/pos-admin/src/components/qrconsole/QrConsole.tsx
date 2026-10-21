@@ -1,6 +1,7 @@
 import {QrReceiptSettings} from './QrReceiptSettings';
 import {QrRestaurantPage} from './QrRestaurantPage';
 import {QrRestaurantPageQr} from './QrRestaurantPageQr';
+import { DisplayPreferences } from '@jamanvaar/ui';
 import {OperationsConsole} from '../operations/OperationsConsole';
 import {storedAdminBranch} from '../../adminBranchScope';
 import { QrOnboarding } from './QrOnboarding';
@@ -75,6 +76,7 @@ import {
 import { useDialogFocus } from '@jamanvaar/ui';
 import { QrCrm } from './QrCrm';
 import { useConfirm } from '@jamanvaar/ui';
+import { QR_BUTTON } from './qrUi';
 
 type Tab = QrTab;
 
@@ -188,7 +190,7 @@ export function QrConsole({
         <p className="mt-2 text-sm text-slate-600">{state.message}</p>
         <button
           onClick={refresh}
-          className="mt-4 px-4 py-2 rounded-xl bg-jaman-navy text-white text-sm font-bold"
+          className={`${QR_BUTTON} mt-4`}
         >
           Try again
         </button>
@@ -355,7 +357,7 @@ export function QrConsole({
               : ""}
           </span>
         </div>
-        {['MENU','ONBOARDING','BRAND','DESIGN','PAYMENTS','RULES','SETTINGS','ADVANCED'].includes(tab)&&<section aria-label="QR change scope" className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm"><strong>{tab==='MENU'||tab==='ONBOARDING'?'Shared restaurant menu':'QR ordering channel'}</strong><p className="mt-1 text-slate-600">{tab==='MENU'||tab==='ONBOARDING'?'Draft dish, category and price edits are shared with other licensed apps. Preview and publish deliberately; branch availability is a separate override.':tab==='BRAND'||tab==='DESIGN'?'Restaurant-wide QR presentation: this design applies to table QR guests across all branches. Review the live preview before saving. Kiosk welcome designs remain separate.':'Review the branch selector in this editor. Restaurant defaults are inherited until a branch has its own override; changing a branch override leaves other branches unchanged.'}</p></section>}
+        {['MENU','ONBOARDING','BRAND','DESIGN','PAYMENTS','RULES','SETTINGS','ADVANCED'].includes(tab)&&<section aria-label="QR change scope" className="rounded-xl border border-jaman-border border-l-4 border-l-brand/60 bg-white px-4 py-2.5 text-sm"><strong className="text-jaman-navy">{tab==='MENU'||tab==='ONBOARDING'?'Shared restaurant menu':'QR ordering channel'}</strong><p className="mt-0.5 text-xs leading-relaxed text-slate-600">{tab==='MENU'||tab==='ONBOARDING'?'Draft dish, category and price edits are shared with other licensed apps. Preview and publish deliberately; branch availability is a separate override.':tab==='BRAND'||tab==='DESIGN'?'Restaurant-wide QR presentation: this design applies to table QR guests across all branches. Review the live preview before saving. Kiosk welcome designs remain separate.':'Restaurant defaults are inherited until a branch has its own override; other branches are unaffected.'}</p></section>}
         {fromCache && (
           <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
             Showing your last known plan. Connect to the internet to refresh it;
@@ -398,7 +400,7 @@ export function QrConsole({
         {tab === "BRAND" && <QrBrandStudio />}
         {tab === 'RESTAURANT_PAGE' && <QrRestaurantPage onNavigate={(next,scope)=>void navigate(next,'Settings',scope)} />}
         {tab === 'WEBSITE_QR' && <QrRestaurantPageQr onNavigate={(next,scope)=>void navigate(next,'Settings',scope)}/>}
-        {tab === "TABLES" && <><div className="rounded-xl border border-blue-200 bg-blue-50 p-4 my-4 text-sm"><strong>Table Ordering QR → ordering menu for that table</strong><p className="mt-1">Place these cards on dining tables. A fresh scan opens the menu directly and keeps the table number. For a website QR on your entrance or visiting card, use Restaurant Page QR.</p><button type="button" className="qr-btn secondary mt-3" onClick={()=>void navigate('WEBSITE_QR')}>Design Restaurant Page QR</button></div><TablesAndQr showToast={showToast} /></>}
+        {tab === "TABLES" && <><div className="rounded-xl border border-jaman-border border-l-4 border-l-brand/60 bg-white px-4 py-2.5 my-4 text-sm"><strong className="text-jaman-navy">Table Ordering QR → ordering menu for that table</strong><p className="mt-0.5 text-xs leading-relaxed text-slate-600">Place these cards on dining tables. A fresh scan opens the menu directly and keeps the table number. For a website QR on your entrance or visiting card, use Restaurant Page QR.</p><button type="button" className="qr-btn secondary mt-3" onClick={()=>void navigate('WEBSITE_QR')}>Design Restaurant Page QR</button></div><TablesAndQr showToast={showToast} /></>}
         {tab === "MENU" && <QrMenuWorkspace />}
         {tab === "ADVANCED" && (
           <QrCapabilities
@@ -487,7 +489,7 @@ function LockedView({
         )}
         <button
           onClick={onViewPlan}
-          className="mt-5 px-5 py-2.5 rounded-xl bg-jaman-navy text-white text-sm font-bold"
+          className={`${QR_BUTTON} mt-5`}
         >
           View Plan
         </button>
@@ -820,7 +822,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
         )}
         <button
           onClick={() => setAdding((a) => !a)}
-          className="px-3 py-2 rounded-xl bg-jaman-navy text-white text-xs font-bold flex items-center gap-1.5"
+          className={`${QR_BUTTON}`}
         >
           <Plus className="w-3.5 h-3.5" /> Add table
         </button>
@@ -1024,7 +1026,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
                           `QR code created for table ${row.displayNumber}`,
                         )
                       }
-                      className="px-3 py-1.5 rounded-lg bg-jaman-navy text-white text-xs font-bold disabled:opacity-40"
+                      className={`${QR_BUTTON}`}
                     >
                       Generate QR
                     </button>
@@ -1235,7 +1237,7 @@ function QrDialog({
                 showToast(errText(e));
               }
             }}
-            className="px-3 py-1.5 rounded-lg bg-jaman-navy text-white text-xs font-bold flex items-center gap-1"
+            className={`${QR_BUTTON}`}
           >
             <Printer className="w-3.5 h-3.5" /> Print / PDF
           </button>
@@ -1379,6 +1381,7 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
   if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
   return (
     <div className="rounded-2xl border border-jaman-border bg-white divide-y max-w-2xl">
+      <div className="p-4"><DisplayPreferences showButtonSetting={false} /></div>
       <div className="p-4 bg-jaman-ivory rounded-t-2xl" role="status">
         <strong className="block text-sm text-jaman-navy">
           Mobile online payment:{" "}

@@ -48,7 +48,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
     <div
       role="group"
       aria-label={`Dining table ${table.tableNumber}`}
-      className={`rounded-2xl border-2 p-4 sm:p-5 bg-white transition-all shadow-xs flex flex-col justify-between space-y-3.5 hover:shadow-md ${
+      className={`min-w-0 rounded-xl sm:rounded-2xl border-2 p-3 sm:p-5 bg-white transition-all shadow-xs flex flex-col justify-between space-y-2.5 sm:space-y-3.5 hover:shadow-md ${
         isFoodReady
           ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/15'
           : isBillReq
@@ -60,10 +60,10 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
     >
       {/* ── 1. Card Top: Table Number, Section & Status Pill ── */}
       <div className="flex items-start justify-between gap-2">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xl sm:text-2xl font-bold text-jaman-navy tracking-tight">
-              TABLE {table.tableNumber}
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="min-w-0 break-words text-base sm:text-2xl font-bold text-jaman-navy tracking-tight normal-case sm:uppercase">
+              Table {table.tableNumber}
             </span>
             {isFoodReady && (
               <span className="bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse shadow-xs shrink-0">
@@ -72,16 +72,16 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold mt-0.5">
-            <span>{(table as any).section || table.zone || 'Main Dining'}</span>
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold mt-0.5 min-w-0">
+            <span className="truncate" title={(table as any).section || table.zone || 'Main Dining'}>{(table as any).section || table.zone || 'Main Dining'}</span>
             <span className="text-slate-300">•</span>
-            <span>{table.capacity || 4} Seats</span>
+            <span className="shrink-0">{table.capacity || 4} Seats</span>
           </div>
         </div>
 
         {/* Status Pill */}
         <span
-          className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shrink-0 ${
+          className={`text-[11px] font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full uppercase tracking-wide sm:tracking-wider shrink-0 whitespace-nowrap ${
             isBillReq
               ? 'bg-purple-100 text-purple-800 border border-purple-300'
               : isFoodReady
@@ -91,12 +91,12 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
               : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
           }`}
         >
-          {isFoodReady ? 'FOOD READY' : table.status}
+          {isFoodReady ? 'FOOD READY' : table.status.replace(/_/g, ' ')}
         </span>
       </div>
 
       {/* ── 2. Card Middle: Order Details, Guests & Financials ── */}
-      <div className="p-3 rounded-2xl bg-white border border-jaman-border space-y-2">
+      <div className="p-2.5 sm:p-3 rounded-lg sm:rounded-2xl bg-white border border-jaman-border space-y-1.5 sm:space-y-2">
         <div className="flex items-center justify-between text-xs font-bold">
           <div className="flex items-center gap-1.5 text-slate-600">
             <Users className="w-4 h-4 text-slate-400" />
@@ -112,13 +112,13 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
 
         {/* Order Meta / Elapsed Timer */}
         {activeOrder ? (
-          <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-medium text-slate-500">
-            <div className="flex items-center gap-1 font-mono font-bold text-jaman-navy">
+          <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px] font-medium text-slate-500">
+            <div className="min-w-0 flex items-center gap-1 font-mono font-bold text-jaman-navy">
               <span>#{activeOrder.tokenNumber || '—'}</span>
               {captainName && <span className="text-slate-300">•</span>}
-              {captainName && <span className="text-slate-600 font-sans">{captainName}</span>}
+              {captainName && <span className="text-slate-600 font-sans truncate">{captainName}</span>}
             </div>
-            <div className="flex items-center gap-1 font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
+            <div className="shrink-0 flex items-center gap-1 font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
               <Clock className="w-3 h-3 text-amber-600" />
               <span>{elapsedMinutes}m</span>
             </div>
@@ -150,7 +150,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
           <button
             type="button"
             onClick={() => onOpenTableModal(table)}
-            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full min-h-[44px] sm:min-h-[46px] py-2 sm:py-2.5 px-4 rounded-xl sm:rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-[13px] sm:text-sm shadow-md shadow-emerald-600/20 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>OPEN TABLE</span>
@@ -162,7 +162,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             // B2-020: animate-bounce (Tailwind's infinite bounce) never stopped, making the
             // button's own tap target visually move on a real tablet — the emerald color, shadow
             // and flame icon already signal urgency without a moving target.
-            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full min-h-[44px] sm:min-h-[46px] py-2 sm:py-2.5 px-4 rounded-xl sm:rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-[13px] sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
           >
             <Flame className="w-4 h-4 fill-white" />
             <span>DELIVER FOOD ({foodReadyCount})</span>
@@ -171,7 +171,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
           <button
             type="button"
             onClick={() => onOpenWorkspace(table)}
-            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-purple-700/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full min-h-[44px] sm:min-h-[46px] py-2 sm:py-2.5 px-4 rounded-xl sm:rounded-2xl bg-purple-700 hover:bg-purple-800 active:bg-purple-900 text-white font-bold text-[13px] sm:text-sm shadow-md shadow-purple-700/25 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
           >
             <Receipt className="w-4 h-4" />
             <span>VIEW BILL STATUS</span>
@@ -181,7 +181,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             <button
               type="button"
               onClick={() => onOpenWorkspace(table)}
-              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-bold text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex flex-col xl:flex-row items-center justify-center gap-1 text-center leading-tight"
+              className="min-h-[44px] py-2 px-2 rounded-xl sm:rounded-2xl bg-jaman-navy hover:bg-[#163E5E] active:bg-[#163E5E] text-white font-bold text-xs shadow-sm transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 text-center leading-tight"
             >
               <UtensilsCrossed className="w-3.5 h-3.5 text-jaman-saffron" />
               <span>{activeOrder ? 'VIEW ORDER' : 'TAKE ORDER'}</span>
@@ -189,7 +189,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             <button
               type="button"
               onClick={() => onRequestBill(table.tableNumber)}
-              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 hover:border-purple-400 font-bold text-xs shadow-2xs transition-all active:scale-98 cursor-pointer flex flex-col xl:flex-row items-center justify-center gap-1 text-center leading-tight"
+              className="min-h-[44px] py-2 px-2 rounded-xl sm:rounded-2xl bg-white hover:bg-purple-50 active:bg-purple-50 text-purple-700 border border-purple-200 hover:border-purple-400 font-bold text-xs shadow-2xs transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 text-center leading-tight"
             >
               <Receipt className="w-3.5 h-3.5" />
               <span>REQUEST BILL</span>

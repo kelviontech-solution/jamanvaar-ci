@@ -105,39 +105,39 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
       </div>
 
       {/* Split Payment Operational Feature Card */}
-      <div className="p-5 bg-jaman-navy rounded-2xl text-white shadow-md space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+      <div className="p-5 bg-white rounded-2xl border border-jaman-border space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-jaman-border pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-brand flex items-center justify-center text-white shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-brand/10 flex items-center justify-center text-brand">
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold tracking-tight">Understanding Split Multi-Tender Payments</h3>
-              <p className="text-[11px] text-slate-300">How JAMANVAAR POS handles split payment allocations seamlessly</p>
+              <h3 className="text-sm font-bold tracking-tight text-jaman-navy">Understanding Split Multi-Tender Payments</h3>
+              <p className="text-xs text-slate-600">How JAMANVAAR POS handles split payment allocations seamlessly</p>
             </div>
           </div>
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-brand/30 border border-white/10">
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 w-fit">
             Smart Settlement Active
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
-            <span className="text-[11px] font-bold text-brand/30 uppercase block">1. Flexible Allocation</span>
-            <p className="text-slate-300 text-[11px] leading-relaxed">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div className="p-3 bg-jaman-cream rounded-xl border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold tracking-wide text-brand uppercase block">1. Flexible Allocation</span>
+            <p className="text-slate-600 text-xs leading-relaxed">
               For any bill (e.g. ₹756), the cashier can allocate part of the amount to Cash (e.g. ₹500) and the remaining balance to UPI QR (e.g. ₹256).
             </p>
           </div>
-          <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
-            <span className="text-[11px] font-bold text-brand/30 uppercase block">2. Exact Cash Drawer Math</span>
-            <p className="text-slate-300 text-[11px] leading-relaxed">
+          <div className="p-3 bg-jaman-cream rounded-xl border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold tracking-wide text-brand uppercase block">2. Exact Cash Drawer Math</span>
+            <p className="text-slate-600 text-xs leading-relaxed">
               The Cash portion is strictly recorded in the Cash Drawer Shift Ledger, preventing float discrepancies during end-of-day reconciliation.
             </p>
           </div>
-          <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
-            <span className="text-[11px] font-bold text-brand/30 uppercase block">3. Itemized Tax Receipt</span>
-            <p className="text-slate-300 text-[11px] leading-relaxed">
-              The printed 80mm/58mm thermal receipt and WhatsApp e-Bill itemize the breakdown clearly: <span className="tabular-nums text-white">Cash: ₹500 | UPI: ₹256</span>.
+          <div className="p-3 bg-jaman-cream rounded-xl border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold tracking-wide text-brand uppercase block">3. Itemized Tax Receipt</span>
+            <p className="text-slate-600 text-xs leading-relaxed">
+              The printed 80mm/58mm thermal receipt and WhatsApp e-Bill itemize the breakdown clearly: <span className="tabular-nums font-semibold text-jaman-navy">Cash: ₹500 | UPI: ₹256</span>.
             </p>
           </div>
         </div>

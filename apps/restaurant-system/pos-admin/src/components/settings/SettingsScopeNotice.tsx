@@ -42,14 +42,16 @@ export function SettingsScopeNotice({ page, onNavigate }: { page: string; onNavi
   const notice = notices[page];
   if (!notice) return null;
   return (
-    <section aria-label="Change scope" className="mb-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm">
-      <strong className="text-jaman-navy">{notice.scope}</strong>
-      <span className="block text-xs text-slate-600 mt-1">
-        {db.restaurant.name} · {db.outlet.name}
-      </span>
-      <p className="mt-2 text-slate-700">{notice.detail}</p>
+    <section aria-label="Change scope" className="mb-4 rounded-xl border border-jaman-border border-l-4 border-l-brand/60 bg-white px-4 py-2.5 text-sm">
+      <p className="flex flex-wrap items-baseline gap-x-2">
+        <strong className="text-jaman-navy">{notice.scope}</strong>
+        <span className="text-xs text-slate-500">
+          {db.restaurant.name} · {db.outlet.name}
+        </span>
+      </p>
+      <p className="mt-0.5 text-xs leading-relaxed text-slate-600">{notice.detail}</p>
       {notice.preview && onNavigate && (
-        <button type="button" className="min-h-11 underline font-bold" onClick={() => onNavigate(notice.preview!)}>
+        <button type="button" className="min-h-11 underline font-bold text-brand" onClick={() => onNavigate(notice.preview!)}>
           Preview customer screen
         </button>
       )}

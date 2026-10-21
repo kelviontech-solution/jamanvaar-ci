@@ -40,6 +40,8 @@ import {
   JamanAiFloatingButton,
   JAMANVAARStartup,
   SettingsPageHeader,
+  DisplayPreferences,
+  notifyDisplayPreferenceScopeChange,
   Modal,
   NotificationDrawerModal,
   NotificationToastContainer,
@@ -223,6 +225,7 @@ export default function PosAdminApp() {
   const availableProducts = availableAdminProducts(enabledApps);
   const contextReady = isAdminLoggedIn && !entitlementsLoading && !entitlementError;
   const context = useAdminProduct(tenantId, availableProducts, contextReady, enabledApps);
+  useEffect(() => notifyDisplayPreferenceScopeChange(), [context.product, tenantId]);
   useEffect(() => {
     if (contextReady && ownerEntryPath(enabledApps) === '/qr/admin/') window.location.replace('/qr/admin/');
   }, [contextReady, enabledApps.join(',')]);
@@ -373,6 +376,17 @@ export default function PosAdminApp() {
 
   // Global Search State
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
+  useEffect(() => {
+    // The header advertises Ctrl+K; without a handler the browser's own shortcut ran instead.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setIsGlobalSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
   const [globalSearch, setGlobalSearch] = useState('');
 
   // Dashboard Time Filter
@@ -705,12 +719,12 @@ export default function PosAdminApp() {
         )}
         <div className="flex-1 flex overflow-hidden min-h-0">
           {/* Behind the open drawer: tap anywhere outside it to close it */}
-          {navOpen && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setNavOpen(false)} aria-hidden="true" />}
+          {navOpen && <div className="animate-in fade-in duration-200 lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setNavOpen(false)} aria-hidden="true" />}
 
           {/* LEFT ADMIN SIDEBAR (a slide-in drawer below the large breakpoint) */}
           {activeTab !== 'QR_ORDERING' && <aside
             aria-label="Main menu"
-            className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] transition-transform duration-200 ${navOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0 bg-[#FAF8F5] lg:bg-[#FAF8F5]/95 backdrop-blur-md border-r border-[#EAE3D6] flex flex-col justify-between p-3.5 shrink-0 overflow-y-auto min-h-0 shadow-2xl lg:shadow-2xs select-none`}
+            className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] transition-transform duration-200 motion-reduce:transition-none ${navOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0 bg-[#FAF8F5] lg:bg-[#FAF8F5]/95 backdrop-blur-md border-r border-[#EAE3D6] flex flex-col justify-between p-3.5 shrink-0 overflow-y-auto min-h-0 shadow-2xl lg:shadow-2xs select-none`}
           >
             <div className="space-y-4">
               {filterNavSections(productNavSections(product), hasApp).map((grp) => {
@@ -731,11 +745,11 @@ export default function PosAdminApp() {
                       {grp.section}
                     </span>
                     <ChevronDown
-                      className={`w-3 h-3 text-slate-300 group-hover/section:text-slate-500 transition-transform ${isExpanded ? '' : '-rotate-90'}`}
+                      className={`w-3 h-3 text-slate-400 group-hover/section:text-slate-600 transition-transform duration-200 ${isExpanded ? '' : '-rotate-90'}`}
                     />
                   </button>
                   {isExpanded && (
-                  <nav className="space-y-0.5">
+                  <nav aria-label={grp.section} className="jv-nav-reveal space-y-0.5">
                     {grp.items.map((nav) => {
                       const Icon = nav.icon;
                       const isSelected = activeTab === nav.id;
@@ -763,14 +777,15 @@ export default function PosAdminApp() {
                           onClick={() => { setAttentionEntry({id:'',label:'',page:''});setActiveTab(nav.id as PosAdminTab); setNavOpen(false); }}
                           title={isLockedPro ? 'Not included in your current plan — tap to see what it offers' : undefined}
                           aria-current={isSelected ? 'page' : undefined}
-                          className={`group relative w-full min-h-[46px] flex items-center justify-between px-3.5 py-2.5 rounded-2xl border font-medium text-[13px] transition-colors duration-150 cursor-pointer ${
+                          className={`group relative w-full min-h-[46px] flex items-center justify-between px-3.5 py-2.5 rounded-xl border font-medium text-[13px] transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 ${
                             isSelected
-                              ? 'bg-brand/[0.08] border-brand/40 text-brand font-semibold'
+                              ? 'bg-brand/[0.09] border-transparent text-brand font-semibold'
                               : isLockedPro
                               ? 'border-transparent text-[#94A3B8] hover:bg-brand/[0.04]'
                               : 'border-transparent text-slate-700 hover:bg-brand/[0.05] hover:text-jaman-navy'
                           }`}
                         >
+                          {isSelected && <span aria-hidden="true" className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-full bg-brand" />}
                           <div className={`flex items-center gap-3 min-w-0 ${isLockedPro ? 'opacity-60' : ''}`}>
                             <Icon
                               className={`w-5 h-5 shrink-0 transition-colors duration-150 ${
@@ -822,7 +837,7 @@ export default function PosAdminApp() {
 
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
           {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD' && activeTab !== 'QR_ORDERING') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6 max-w-xl"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">{branchScopeReady ? "Orders, tables, staff and devices belong to one branch at a time — pick one below." : 'Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.'}</p>{branchScopeReady && <div className="mt-4 -mx-2"><AdminBranchWorkspace onReady={() => setBranchScopeReady(true)} /></div>}</div></main> :
-          <main key={activeTab} className={`jv-page-enter flex-1 overflow-y-auto ${activeTab === 'QR_ORDERING' ? '' : 'p-3 sm:p-6'} bg-jaman-cream min-h-0 min-w-0`}>
+          <main key={activeTab} className={`jv-page-enter flex-1 overflow-y-auto ${activeTab === 'QR_ORDERING' ? '' : 'jv-page p-3 sm:p-6 pb-24 sm:pb-24'} bg-jaman-cream min-h-0 min-w-0`}>
             <SettingsScopeNotice page={activeTab} onNavigate={page=>setActiveTab(page as PosAdminTab)}/>
             {/* TAB 1: DASHBOARD */}
             {activeTab === 'OPERATIONS_HUB' && branchScopeReady && <OperationsConsole branchId={activeAdminBranch}/>}
@@ -989,9 +1004,9 @@ export default function PosAdminApp() {
               />
             )}
 
-            {activeTab === 'KIOSK_PAYMENTS' && <KioskPaymentSettingsPanel />}
+            {activeTab === 'KIOSK_PAYMENTS' && <div className="space-y-4"><SettingsPageHeader title="Kiosk payment settings" /><KioskPaymentSettingsPanel /></div>}
             {activeTab === 'FEEDBACK' && <FeedbackPanel orders={orders} />}
-            {activeTab === 'TEMPLATES' && <h1 className="text-2xl font-bold">Menu Templates</h1>}
+            {activeTab === 'TEMPLATES' && <SettingsPageHeader title="Menu Templates" description="Choose a starter menu for your restaurant type. Your current menu is retained." />}
             {activeTab === 'KIOSK_EXPERIENCE' && hasApp('KIOSK_ADMIN') && <CustomerExperience branchId={activeAdminBranch || ''} kiosks={kiosks} showToast={showToast} onGoToSettings={()=>setActiveTab('SETTINGS')} />}
             {activeTab === 'KIOSK_DESIGN' && hasApp('KIOSK_ADMIN') && <KioskContentPanel showToast={showToast} />}
             {activeTab === 'KIOSK_WELCOME' && hasApp('KIOSK_ADMIN') && <KioskWelcomeScreenPanel kiosks={kiosks} showToast={showToast} />}
@@ -1149,7 +1164,7 @@ export default function PosAdminApp() {
 
             {/* TAB 15: SETTINGS & BRANDING */}
             {activeTab === 'SETTINGS' && (
-              <div className="space-y-6 max-w-5xl mx-auto">
+              <div className="space-y-6">
                 <SettingsPageHeader
                   title={isKioskAdmin ? 'Kiosk settings' : 'Restaurant settings'}
                   description={isKioskAdmin
@@ -1157,8 +1172,12 @@ export default function PosAdminApp() {
                     : 'Screen size, channels and the identity printed on reports and bills.'}
                   icon={<Settings className="w-6 h-6 text-slate-500" aria-hidden="true" />}
                 />
-                <section aria-label="Settings scope and shortcuts" className="rounded-2xl border border-blue-200 bg-blue-50 p-4 space-y-3"><h2 className="font-bold">{db.restaurant.name} / {db.outlet.name}</h2><p className="text-sm text-slate-600">Restaurant identity and legal information are shared across your restaurant. Menu, operating rules and kiosk defaults use the selected branch. Screen size preferences affect this device; individual kiosk overrides are managed in Welcome Screen and Kiosk Settings.</p><div className="flex flex-wrap gap-2">{([{tab:'MENU_OPTIONS',label:'Tax & customisations'},{tab:product === 'KIOSK_ADMIN' ? 'KIOSK_PAYMENTS' : 'PAYMENTS',label:'Payments'},{tab:'RECEIPTS',label:'Receipts'},{tab:'SYNC',label:'Devices & connections'},{tab:'LICENSE',label:'Licensed products'}] as const).filter(entry=>product && Object.hasOwn(PRODUCT_PAGES[product],entry.tab)).map(entry=><button type="button" key={entry.tab} className="min-h-11 rounded-xl border bg-white px-4 text-sm font-bold" onClick={()=>setActiveTab(entry.tab)}>{entry.label}</button>)}</div></section>
-                <TerminalDisplaySettings showToast={showToast} />
+                <section aria-label="Settings scope and shortcuts" title="Individual kiosk overrides are managed in Welcome Screen and Kiosk Settings." className="rounded-2xl border border-jaman-border bg-white p-4 space-y-3"><h2 className="text-sm font-bold text-jaman-navy">{db.restaurant.name} / {db.outlet.name}</h2><div className="flex flex-wrap gap-2">{([{tab:'MENU_OPTIONS',label:'Tax & customisations'},{tab:product === 'KIOSK_ADMIN' ? 'KIOSK_PAYMENTS' : 'PAYMENTS',label:'Payments'},{tab:'RECEIPTS',label:'Receipts'},{tab:'SYNC',label:'Devices & connections'},{tab:'LICENSE',label:'Licensed products'}] as const).filter(entry=>product && Object.hasOwn(PRODUCT_PAGES[product],entry.tab)).map(entry=><button type="button" key={entry.tab} className="min-h-11 rounded-xl border bg-white px-4 text-sm font-bold" onClick={()=>setActiveTab(entry.tab)}>{entry.label}</button>)}</div></section>
+                {/* The two compact device cards share a row on wide screens instead of leaving the right half empty. */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+                  <TerminalDisplaySettings showToast={showToast} />
+                  <DisplayPreferences showButtonSetting={false} />
+                </div>
                 {!isKioskAdmin && hasApp('WHATSAPP_ORDERING') && <WhatsAppChannelPanel showToast={showToast} />}
                 <ReportBrandingSettings
                   showToast={showToast}

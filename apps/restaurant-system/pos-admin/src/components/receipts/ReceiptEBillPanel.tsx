@@ -136,8 +136,8 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
           <form onSubmit={handleSave} className="space-y-4">
             {publishMessage && <p role="status" className="text-sm">{publishMessage}</p>}
             <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl text-[11px] text-[#4A5568] flex items-center justify-between gap-3">
@@ -152,8 +152,8 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
             <h3 className="font-bold text-base text-jaman-navy pt-1">Thank You & Footer</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-jaman-navy mb-1">Thank You Closing Message</label>
-                <input
+                <label htmlFor="rcpt-field-1" className="block text-xs font-bold text-jaman-navy mb-1">Thank You Closing Message</label>
+                <input id="rcpt-field-1"
                   type="text"
                   value={config.thankYouMessage}
                   onChange={(e) => setConfig({ ...config, thankYouMessage: e.target.value })}
@@ -161,8 +161,8 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-jaman-navy mb-1">Footer Heritage Tagline</label>
-                <input
+                <label htmlFor="rcpt-field-2" className="block text-xs font-bold text-jaman-navy mb-1">Footer Heritage Tagline</label>
+                <input id="rcpt-field-2"
                   type="text"
                   value={config.footerMessage}
                   onChange={(e) => setConfig({ ...config, footerMessage: e.target.value })}
@@ -178,8 +178,8 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div id="settings-upi-vpa">
-                <label className="block text-xs font-bold text-jaman-navy mb-1">Restaurant UPI ID (VPA)</label>
-                <input
+                <label htmlFor="rcpt-field-3" className="block text-xs font-bold text-jaman-navy mb-1">Restaurant UPI ID (VPA)</label>
+                <input id="rcpt-field-3"
                   type="text"
                   value={config.upiId || ''}
                   onChange={(e) => setConfig({ ...config, upiId: e.target.value.trim() })}
@@ -188,8 +188,8 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-jaman-navy mb-1">Payee Name Shown in UPI App</label>
-                <input
+                <label htmlFor="rcpt-field-4" className="block text-xs font-bold text-jaman-navy mb-1">Payee Name Shown in UPI App</label>
+                <input id="rcpt-field-4"
                   type="text"
                   value={config.upiPayeeName || ''}
                   onChange={(e) => setConfig({ ...config, upiPayeeName: e.target.value })}
@@ -252,6 +252,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                   </div>
                   <input
                     type="url"
+                    aria-label="Logo image URL"
                     value={config.logoUrl?.startsWith('data:') ? '' : config.logoUrl || ''}
                     onChange={(e) => setConfig({ ...config, logoUrl: e.target.value || undefined })}
                     placeholder="...or paste a logo image URL"
@@ -319,8 +320,8 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
               </label>
               {config.showCashWatermark === true && (
                 <div className="max-w-xs">
-                  <label className="block text-[11px] font-bold text-jaman-navy mb-1">Watermark word</label>
-                  <input
+                  <label htmlFor="rcpt-watermark" className="block text-[11px] font-bold text-jaman-navy mb-1">Watermark word</label>
+                  <input id="rcpt-watermark"
                     value={config.cashWatermarkText ?? ''}
                     onChange={(e) => setConfig({ ...config, cashWatermarkText: e.target.value.slice(0, 12) })}
                     placeholder="CASH"

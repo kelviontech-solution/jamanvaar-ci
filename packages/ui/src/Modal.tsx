@@ -50,7 +50,7 @@ export const Modal: React.FC<ModalProps> = ({
     // everything behind the dialog, which on kiosk-grade hardware was visible as real cursor/UI
     // lag for as long as any modal stayed open (reported live). A plain tinted overlay reads the
     // same to a user but costs the GPU almost nothing.
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6 bg-black/60 animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain flex items-center justify-center p-4 sm:p-6 bg-black/60 animate-fadeIn">
       {/* Backdrop */}
       <div className="fixed inset-0" aria-hidden="true" onClick={onClose} />
 
@@ -65,7 +65,7 @@ export const Modal: React.FC<ModalProps> = ({
         data-jv-dialog
         aria-modal="true"
         {...(title ? { 'aria-labelledby': titleId } : { 'aria-label': 'Dialog' })}
-        className={`relative w-full ${widthClasses[maxWidth]} max-h-[90dvh] bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden z-10 animate-scaleUp flex flex-col focus:outline-none ${className}`}
+        className={`relative w-full ${widthClasses[maxWidth]} max-h-[90dvh] bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden overscroll-contain z-10 animate-scaleUp flex flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B253A]/60 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -87,7 +87,7 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Body */}
-        <div className={`jv-dialog-body p-4 sm:p-6 overflow-y-auto flex-1 ${bodyClassName}`}>{children}</div>
+        <div className={`jv-dialog-body p-4 sm:p-6 overflow-y-auto overscroll-contain flex-1 ${bodyClassName}`}>{children}</div>
 
         {/* Sticky footer action bar */}
         {footer && (

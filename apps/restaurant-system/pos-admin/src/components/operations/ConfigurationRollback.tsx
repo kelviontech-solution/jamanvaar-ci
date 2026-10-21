@@ -58,6 +58,7 @@ export function ConfigurationRollback({ branch }: { branch: string }) {
           }}
         >
           <fieldset disabled={busy}>
+            <div className="ops-form-row">
             <label>
               Configuration
               <select aria-label="Configuration" value={kind} onChange={(e) => setKind(e.target.value as Input['kind'])}>
@@ -82,7 +83,9 @@ export function ConfigurationRollback({ branch }: { branch: string }) {
                     ))}
               </select>
             </label>
-            <p>Fields to restore</p>
+            </div>
+            <p className="ops-field-label" id="ops-restore-fields">Fields to restore</p>
+            <div className="ops-check-group" role="group" aria-labelledby="ops-restore-fields">
             {(kind === 'MENU'
               ? [
                   ['price', 'Prices'],
@@ -94,15 +97,16 @@ export function ConfigurationRollback({ branch }: { branch: string }) {
                   ['background', 'Background, layout & logo']
                 ]
             ).map(([value, label]) => (
-              <label key={value}>
+              <label key={value} className="ops-check">
                 <input name="field" value={value} type="checkbox" defaultChecked />
                 {label}
               </label>
             ))}
+            </div>
             {kind === 'APPEARANCE' && !versions.appearances.length && (
               <p>Appearance history starts with the next saved change. Earlier versions cannot be reconstructed.</p>
             )}
-            <button type="submit">Preview selected restoration</button>
+            <button type="submit" className="ops-primary">Preview selected restoration</button>
           </fieldset>
         </form>
       )}

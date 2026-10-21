@@ -1,0 +1,374 @@
+{
+  "title": "JAMANVAAR | Restaurant Admin",
+  "text": "Dish created!\nQA-Restaurant-A-1792232615381\nRESTAURANT ADMIN\nQA-Branch-A\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nQA-Restaurant-A-1792232615381 — Main Branch · MAIN\nQA-Branch-A · QAA\nQA-Branch-A2 · QA2\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nQR ORDERING\nREPORTS\nSETUP\nShared restaurant menu\nQA-Restaurant-A-1792232615381 · QA-Branch-A\n\nDish names, prices, categories and photos are shared across licensed apps. Publication updates the guest menu. Use channel availability and branch overrides to limit where a dish is offered.\n\nMenu & Catalog Manager\n1 ITEMS\n\nCreate, edit dishes, adjust pricing, upload device photos, and import templates.\n\nPublish to QR / Kiosk\nAdd Dish\nAdd Category\nLoad Menu Template\nUpload CSV\nDownload CSV Template\nExport Menu CSV\nBulk Price Adjust\nClean Duplicate Items\nChannel Consistency Check\nAll Diets\nVeg\nNon-Veg\nEgg\nJain\nVegan\nAll Categories\n1 dishes\nQA Pizza\n1 dishes\nQA-PIZZA-01\nQA Pizza 01\n₹249\n\nAvailable\nCombos & Meal Deals\n0 COMBOS\n\nBundle dishes into a fixed-price deal with an automatic savings badge.\n\nCreate Combo\nNo Combos Yet\n\nBundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.\n\n+ Create First Combo\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Menu & Catalog Manager",
+    "Combos & Meal Deals",
+    "No Combos Yet"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA-Branch-A",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Publish to QR / Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Load Menu Template",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Upload CSV",
+      "aria": null,
+      "title": "Upload a menu CSV (download the template first if you need the columns)",
+      "disabled": false
+    },
+    {
+      "text": "Download CSV Template",
+      "aria": null,
+      "title": "Download a CSV template (or your current menu, if you have one)",
+      "disabled": false
+    },
+    {
+      "text": "Export Menu CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bulk Price Adjust",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clean Duplicate Items",
+      "aria": null,
+      "title": "Scan, review and explicitly archive confirmed duplicates",
+      "disabled": false
+    },
+    {
+      "text": "Channel Consistency Check",
+      "aria": null,
+      "title": "Check that POS, Kiosk, QR and Captain all show this menu the same way",
+      "disabled": false
+    },
+    {
+      "text": "All Diets",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Non-Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Egg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Vegan",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Categories\n1 dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Pizza\n1 dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹249",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "Available",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "Create Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "+ Create First Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": ":r3:",
+      "options": [
+        {
+          "value": "",
+          "text": "Choose branch"
+        },
+        {
+          "value": "all",
+          "text": "All restaurant · overview"
+        },
+        {
+          "value": "9baca310-c199-4291-8a60-8ae797ca7908",
+          "text": "QA-Restaurant-A-1792232615381 — Main Branch · MAIN"
+        },
+        {
+          "value": "ceb233ff-79f6-425b-b41c-ecad93a0b0e4",
+          "text": "QA-Branch-A · QAA"
+        },
+        {
+          "value": "85c8e797-03f9-4680-8fdd-da53f9818c13",
+          "text": "QA-Branch-A2 · QA2"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish by name, description, SKU or tag...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "standard",
+          "text": "Standard"
+        },
+        {
+          "value": "large",
+          "text": "Larger text & touch targets"
+        },
+        {
+          "value": "contrast",
+          "text": "Stronger contrast & large controls"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

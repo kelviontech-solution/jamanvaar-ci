@@ -3533,3 +3533,25 @@
 {"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5179/"}
 {"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
 {"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5179/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}

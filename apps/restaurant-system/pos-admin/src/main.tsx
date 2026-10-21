@@ -1,5 +1,5 @@
 import {PickupDisplay} from './components/operations/PickupDisplay';
-import {initializeDisplayPreferences,DisplayPreferences} from '@jamanvaar/ui';
+import {initializeDisplayPreferences} from '@jamanvaar/ui';
 import { verifyInstalledUpdate } from '@jamanvaar/ui';
 import { bootDurableStorage } from '@jamanvaar/database';
 import React from 'react';
@@ -8,7 +8,7 @@ import App from './App';
 import { DeviceGateOverlay, PlatformNoticeBanner, CommandActivityToast } from '@jamanvaar/ui';
 import { DeviceGate } from '@jamanvaar/sync';
 import './index.css';
-initializeDisplayPreferences();
+initializeDisplayPreferences({ application: () => location.pathname.startsWith('/kiosk-admin') ? 'kiosk-admin' : 'restaurant-admin', restaurantKey: 'jamanvaar_cloud_restaurant_id', subscribe: listener => DeviceGate.subscribe(listener) });
 import { resetTerminal, startPlatformNoticePolling } from './cloud/cloudClient';
 import { adminBranchStorageApp,storedAdminBranch } from './adminBranchScope';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
@@ -37,7 +37,6 @@ if(new URLSearchParams(location.search).has('pickup')){
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />
-      <DisplayPreferences compact/>
       <PlatformNoticeBanner />
       <CommandActivityToast />
       <DeviceGateOverlay appName="Admin device" />

@@ -29,6 +29,7 @@ import {
 } from "./qrPrint";
 import { formatRestaurantDate } from '@jamanvaar/utils';
 import { useConfirm } from '@jamanvaar/ui';
+import { QR_BUTTON, QR_FIELD } from './qrUi';
 
 const scopedBranch = () =>
   new URLSearchParams(location.search).has('setupBranch')
@@ -45,10 +46,8 @@ const money = (n: number) =>
     currency: "INR",
     maximumFractionDigits: 2,
   }).format(n);
-const input =
-  "mt-1 w-full max-w-full min-w-0 rounded-xl border border-jaman-border px-3 py-2.5 text-sm bg-white";
-const button =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold bg-jaman-navy text-white disabled:opacity-40";
+const input = QR_FIELD;
+const button = QR_BUTTON;
 const box = "rounded-2xl border border-jaman-border bg-white p-5";
 type Props = { showToast: (message: string) => void };
 function useData<T>(key: string, fn: () => Promise<T>, interval?: number) {

@@ -17,14 +17,15 @@ COPY cloud/api/package.json ./cloud/api/package.json
 # Tests, compilers, frontend packages and TS source stay out of the runtime image.
 RUN npm ci --workspace=@jamanvaar/cloud-api --include-workspace-root=false --omit=dev --ignore-scripts
 COPY --from=builder /repo/cloud/api/dist ./cloud/api/dist
-COPY tooling/qa/receipt-pdf-smoke.cjs ./tooling/qa/receipt-pdf-smoke.cjs
-RUN node tooling/qa/receipt-pdf-smoke.cjs
 COPY --from=builder /repo/cloud/api/prisma/schema.prisma ./cloud/api/prisma/schema.prisma
 COPY --from=builder /repo/cloud/api/prisma/migrations ./cloud/api/prisma/migrations
 COPY --from=builder /repo/node_modules/.prisma ./node_modules/.prisma
 # --ignore-scripts intentionally skips engine downloads in the runtime stage. Preserve
 # the builder's platform-matched schema engine so migrations need no runtime download.
 COPY --from=builder /repo/node_modules/@prisma/engines ./node_modules/@prisma/engines
+# Packaging smoke test: runs only after the generated Prisma client above is in place (the QR receipt service imports it).
+COPY tooling/qa/receipt-pdf-smoke.cjs ./tooling/qa/receipt-pdf-smoke.cjs
+RUN node tooling/qa/receipt-pdf-smoke.cjs
 COPY cloud/api/entrypoint.sh ./cloud/api/entrypoint.sh
 # npm may place API-only packages (express, @nestjs/platform-express, multer) under cloud/api/node_modules
 # while @nestjs/core is hoisted to /repo/node_modules; Nest then cannot find its HTTP driver and the

@@ -310,7 +310,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
       <header className="qpb-heading">
         <div>
           <p className="qpb-eyebrow">YOUR RESTAURANT, YOUR WELCOME</p>
-          <h2>Business page studio</h2>
+          <h2 className="sr-only">Business page studio</h2>
           <p>Design a warm first impression. Your menu, table and checkout stay connected.</p>
         </div>
         <label>

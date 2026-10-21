@@ -50,8 +50,9 @@
 /* Customer menu only: size columns from the space left by the category rail. */
 .kiosk-menu-shell {
   --kiosk-rail-width: clamp(96px, 9vw, 132px);
-  --kiosk-cart-height: 4.5rem;
-  --kiosk-cart-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  --kiosk-action-size: 40px;
+  --kiosk-cart-height: 60px;
+  --kiosk-cart-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   --kiosk-cart-clearance: calc(var(--kiosk-cart-height) + var(--kiosk-cart-bottom) + 1rem);
 }
 
@@ -161,98 +162,173 @@
 }
 
 .kiosk-product-actions {
-  min-height: 3.25rem;
-  gap: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--kiosk-action-size);
+  gap: 8px;
 }
 
 /* Product-card actions only: a comfortable pill beside a circular quick-add. */
 .kiosk-product-action {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 3.25rem;
-  min-height: 3.25rem;
+  min-width: var(--kiosk-action-size);
+  min-height: var(--kiosk-action-size);
+  height: var(--kiosk-action-size);
   border-radius: 9999px;
   touch-action: manipulation;
-  transition: background-color 140ms ease, box-shadow 140ms ease, transform 100ms ease;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 140ms ease;
 }
 
 .kiosk-product-action:focus-visible {
-  outline: 3px solid #0b253a;
+  outline: 3px solid var(--jv-ui-navy, #0b253a);
   outline-offset: 3px;
 }
 
 .kiosk-product-add {
-  flex: none;
-  width: 3.25rem;
-  height: 3.25rem;
+  flex: 0 0 var(--kiosk-action-size);
+  width: var(--kiosk-action-size);
   padding: 0;
-  box-shadow: 0 3px 8px rgba(191, 84, 15, 0.2);
 }
 
 .kiosk-product-customize {
   flex: 1;
-  max-width: 12rem;
-  padding: 0 0.875rem;
-  border: 2px solid currentColor;
+  min-width: 0;
+  padding: 0 clamp(6px, 1vw, 12px);
+  border: 1px solid currentColor;
   background: #fff;
   color: var(--jv-ui-action, #bf540f);
+  font-size: 0.875rem;
+  font-weight: 600;
   line-height: 1.25;
+  white-space: nowrap;
+}
+
+.kiosk-product-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Keep the shared touch and accessible-display preferences, with round controls. */
+@media (pointer: coarse) {
+  .kiosk-menu-shell { --kiosk-action-size: 44px; }
+}
+
+html:is([data-jv-display="large"], [data-jv-display="contrast"]) .kiosk-menu-shell {
+  --kiosk-action-size: 48px;
+  --kiosk-cart-height: 64px;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .kiosk-product-customize:hover {
+  .kiosk-product-customize:hover:not(:disabled) {
+    background: #fff7ed;
+    border-color: var(--jv-ui-action-hover, #a9480c);
+  }
+
+  .kiosk-product-add:hover:not(:disabled) {
+    background: var(--jv-ui-action-hover, #a9480c);
+  }
+
+  .kiosk-cart-summary:hover .kiosk-cart-checkout {
     background: #fff7ed;
   }
-
-  .kiosk-product-add:hover {
-    box-shadow: 0 4px 12px rgba(191, 84, 15, 0.28);
-  }
 }
 
-.kiosk-product-customize:active {
+.kiosk-product-customize:active:not(:disabled) {
   background: #ffedd5;
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
-.kiosk-product-add:active {
-  transform: scale(0.94);
-  box-shadow: inset 0 2px 4px rgba(11, 37, 58, 0.2);
+.kiosk-product-add:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .kiosk-product-action {
-    transition: none;
-  }
+.kiosk-cart-summary:active {
+  transform: scale(0.985);
+}
 
-  .kiosk-product-action:active {
-    transform: none;
-  }
+.kiosk-cart-summary:active .kiosk-cart-checkout {
+  background: #ffedd5;
 }
 
 /* The same dimensions position the dock and reserve the end of the menu scroll. */
 .kiosk-cart-dock {
-  left: calc(var(--kiosk-rail-width) + 1rem);
-  right: 1rem;
+  left: 0;
+  right: 0;
+  width: min(520px, calc(100% - 40px));
+  margin-inline: auto;
   bottom: var(--kiosk-cart-bottom);
   container-type: inline-size;
 }
 
 .kiosk-cart-summary {
+  box-sizing: border-box;
   min-height: var(--kiosk-cart-height);
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(11, 37, 58, 0.12), 0 1px 3px rgba(11, 37, 58, 0.08);
+  transform-origin: 50% 100%;
+  transition: transform 140ms ease;
+}
+
+.kiosk-cart-summary:focus-visible {
+  outline: 3px solid var(--jv-ui-navy, #0b253a);
+  outline-offset: 3px;
+}
+
+@keyframes kioskCartEnter {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes kioskCartPulse {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.02); }
+}
+
+@keyframes kioskCartTotalEmphasis {
+  from { opacity: 0.72; }
+  to { opacity: 1; }
+}
+
+.kiosk-cart-enter {
+  animation: kioskCartEnter 340ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.kiosk-cart-pulse {
+  animation: kioskCartPulse 220ms ease-out;
+}
+
+.kiosk-cart-total-emphasis {
+  animation: kioskCartTotalEmphasis 200ms ease-out;
 }
 
 .kiosk-cart-info {
-  padding-block: 0.625rem;
+  flex: 1;
+  gap: 10px;
+  padding: 8px 16px;
 }
 
 .kiosk-cart-count {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   line-height: 1.25;
 }
 
 .kiosk-cart-total {
-  font-size: 1.25rem;
+  font-size: 20px;
+}
+
+.kiosk-cart-checkout {
+  gap: 8px;
+  padding-inline: 14px;
+  font-size: 0.875rem;
+  color: var(--jv-ui-action, #bf540f);
+  transition: background-color 160ms ease;
 }
 
 .kiosk-cart-checkout-full {
@@ -260,23 +336,60 @@
 }
 
 @container (max-width: 22rem) {
-  .kiosk-cart-icon {
-    display: none;
+  .kiosk-cart-info {
+    gap: 6px;
+    padding-inline: 12px;
+  }
+
+  .kiosk-cart-count {
+    font-size: 12px;
+  }
+
+  .kiosk-cart-total {
+    font-size: 18px;
+  }
+
+  .kiosk-cart-checkout {
+    gap: 4px;
+    padding-inline: 12px;
+    font-size: 14px;
   }
 }
 
-@container (min-width: 34rem) {
-  .kiosk-cart-info,
-  .kiosk-cart-checkout {
-    padding-inline: 1.25rem;
-  }
-
+@container (min-width: 28rem) {
   .kiosk-cart-checkout-full {
     display: inline;
   }
 
   .kiosk-cart-checkout-short {
     display: none;
+  }
+}
+
+/* On phones the existing Display launcher would overlap the centered cart.
+   Lift it within the rail, reserving enough scroll space for the final category. */
+@media (max-width: 700px) {
+  #root:has(.kiosk-cart-dock) > .jv-display-control {
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .kiosk-menu-shell:has(.kiosk-cart-dock) .kiosk-category-rail {
+    padding-bottom: calc(var(--kiosk-cart-clearance) + 3rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-product-action,
+  .kiosk-cart-summary,
+  .kiosk-cart-checkout,
+  .kiosk-cart-total {
+    animation: none;
+    transition: none;
+  }
+
+  .kiosk-product-action:active,
+  .kiosk-cart-summary:active {
+    transform: none;
   }
 }
 

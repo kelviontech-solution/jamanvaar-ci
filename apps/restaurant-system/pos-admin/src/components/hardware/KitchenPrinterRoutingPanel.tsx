@@ -47,7 +47,7 @@ export const KitchenPrinterRoutingPanel: React.FC<{ showToast: (msg: string) => 
                     if (updated) showToast(`${label} tickets will now print on: ${updated.name}`);
                   }
                 }}
-                className="flex-1 bg-white border border-jaman-border rounded-xl px-2 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none"
+                aria-label={`${label} printer`} className="flex-1 min-w-0 min-h-9 bg-white border border-jaman-border rounded-xl px-2 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               >
                 <option value="">Unassigned (falls back to default printer)</option>
                 {db.configuredPrinters.map((p) => (

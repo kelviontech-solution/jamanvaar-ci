@@ -19,15 +19,15 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 select-none';
+  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 select-none';
 
   const variants = {
-    primary: 'bg-[#0B253A] text-white hover:bg-[#133E5E] focus:ring-[#0B253A] shadow-sm',
+    primary: 'bg-[#0B253A] text-white hover:bg-[#133E5E] focus-visible:ring-[#0B253A] shadow-sm',
     // Darker than the decorative saffron (#E66817, 3.3:1 with white text): white on #BF540F is 4.7:1, the same brand orange Restaurant Admin already uses for actions.
-    accent: 'bg-[#BF540F] text-white hover:bg-[#A9480C] active:bg-[#933E0A] focus:ring-[#BF540F] shadow-md shadow-[#BF540F]/20',
-    secondary: 'bg-white text-[#0B253A] border border-[#EBE6DD] hover:bg-[#F8F6F0] focus:ring-[#0B253A] shadow-sm',
-    outline: 'bg-transparent text-[#0B253A] border-2 border-[#0B253A] hover:bg-[#0B253A]/5 focus:ring-[#0B253A]',
-    danger: 'bg-[#DC2626] text-white hover:bg-[#B91C1C] focus:ring-[#DC2626]',
+    accent: 'bg-[#BF540F] text-white hover:bg-[#A9480C] active:bg-[#933E0A] focus-visible:ring-[#BF540F] shadow-md shadow-[#BF540F]/20',
+    secondary: 'bg-white text-[#0B253A] border border-[#EBE6DD] hover:bg-[#F8F6F0] focus-visible:ring-[#0B253A] shadow-sm',
+    outline: 'bg-transparent text-[#0B253A] border-2 border-[#0B253A] hover:bg-[#0B253A]/5 focus-visible:ring-[#0B253A]',
+    danger: 'bg-[#DC2626] text-white hover:bg-[#B91C1C] focus-visible:ring-[#DC2626]',
     ghost: 'bg-transparent text-[#4A5568] hover:bg-black/5 hover:text-[#0B253A]'
   };
 
@@ -47,7 +47,7 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {isLoading ? (
-        <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg aria-hidden="true" className="animate-spin -ml-1 mr-2 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>

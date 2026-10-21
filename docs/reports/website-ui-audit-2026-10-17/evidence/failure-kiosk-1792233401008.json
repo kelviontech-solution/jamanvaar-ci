@@ -1,0 +1,64 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "Choose your language\n\nभाषा चुनें · ભાષા પસંદ કરો\n\nEnglish\nEnglish\nहिन्दी\nHindi\nગુજરાતી\nGujarati\n\nYou can change this anytime from the header\n\nDisplay",
+  "headings": [
+    "Choose your language"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Go back",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "English\nEnglish",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "हिन्दी\nHindi",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ગુજરાતી\nGujarati",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Food Assistant",
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "standard",
+          "text": "Standard"
+        },
+        {
+          "value": "large",
+          "text": "Larger text & touch targets"
+        },
+        {
+          "value": "contrast",
+          "text": "Stronger contrast & large controls"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

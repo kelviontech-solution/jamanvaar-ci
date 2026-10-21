@@ -28,3 +28,38 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* ── Handheld layout (phones / small tablets) ─────────────────────────────────
+   Scoped to this app's bundle only. The bottom navigation is fixed below md, so
+   the shared floating Display control and the JAMAN AI button are lifted above it
+   instead of sitting on top of the tabs. */
+:root {
+  --cap-nav-h: calc(3.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 1023.98px) {
+  .jv-display-control {
+    bottom: calc(var(--cap-nav-h) + 8px) !important;
+    left: 8px !important;
+    font-size: 12px !important;
+  }
+  .jv-display-control summary {
+    min-height: 32px !important;
+    padding: 5px 10px !important;
+    opacity: 0.92;
+  }
+}
+
+/* Horizontally scrollable chip rows: smooth, snap to a chip, no page-level overflow. */
+.cap-chip-row {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 0.75rem;
+  -webkit-overflow-scrolling: touch;
+}
+.cap-chip-row > * {
+  scroll-snap-align: start;
+}
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }

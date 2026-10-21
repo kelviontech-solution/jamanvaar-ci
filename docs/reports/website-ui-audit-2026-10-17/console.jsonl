@@ -1,0 +1,744 @@
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5180/login"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/login"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5180/login"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5180/login"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5176/restaurant-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5176/restaurant-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5179/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5179/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5179/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Warning: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://reactjs.org/link/setstate-in-render%s App PosSidebar PosSidebar \n    at PosSidebar (http://localhost:5175/src/components/layout/PosSidebar.tsx:41:30)\n    at div\n    at div\n    at div\n    at JAMANVAARStartup (http://localhost:5175/@fs/D:/jamanvar/kiosk/packages/ui/src/JAMANVAARStartup.tsx:54:3)\n    at App (http://localhost:5175/src/App.tsx:63:47)\n    at ErrorBoundary (http://localhost:5175/src/ErrorBoundary.tsx:8:5)\n    at PosAppWithBoundary","url":"http://localhost:5175/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5179/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5179/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5179/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/kiosk-payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/kiosk-payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/kiosk-payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/billing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/billing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/billing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/live-kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/live-kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/live-kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/reservations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/reservations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/reservations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/inventory"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/inventory"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/inventory"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/purchasing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/purchasing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/purchasing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/customers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/customers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/customers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/shifts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/shifts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/shifts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/restaurant-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/restaurant-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/restaurant-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/kiosk-payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/kiosk-payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/kiosk-payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/billing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/billing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/billing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/billing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/billing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/live-kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/live-kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/live-kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/live-kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/live-kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/reservations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/reservations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/reservations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/reservations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/reservations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/inventory"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/inventory"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/inventory"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/inventory"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/inventory"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/purchasing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/purchasing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/purchasing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/purchasing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/purchasing"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/customers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/customers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/customers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/customers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/customers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/shifts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/shifts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/shifts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/shifts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/shifts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/operations"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/dashboard"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/terminals"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 429 (Too Many Requests)","url":"http://localhost:5176/kiosk-admin/menu"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/templates"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/options"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/customer-experience"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/appearance"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/welcome-screen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/combos"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/coupons"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/orders"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/kitchen"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/tables"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/staff"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/payments"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/feedback"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/reports"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/printers"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/receipts"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/sync"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/settings"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/subscription"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/audit"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/backup"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/support"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/kiosk-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/kiosk-admin/downloads"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurant-health"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/announcements"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/status-history"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/margins"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants/onboard"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants/25a0bc46-04da-4169-9dac-bc370e945488"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/owners"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/branches"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/branches/ceb233ff-79f6-425b-b41c-ecad93a0b0e4"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/saas-management"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/plans"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/plans/seed-plan-pro"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/qr-ordering"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/whatsapp-ordering"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/ai-assistant"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/catalog"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/subscriptions"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/billing"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/entitlements"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/feature-catalog"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/reports"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/applications"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/activation-keys"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/payment-connections"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/platform-payments"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/payouts"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/devices"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/devices/c66d8f15-3278-4b45-8f15-1bd1decbc8e9"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/sync-monitor"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/backups"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/sandboxes"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/offline-policy"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/team"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/support"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/tickets"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/notifications"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/audit-logs"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/system-health"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/settings/platform"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/profile"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5179/"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"owner-admin","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5176/restaurant-admin/qr-ordering"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=PERFORMANCE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=PERFORMANCE"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurant-health"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/announcements"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/status-history"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/margins"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants/onboard"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants/25a0bc46-04da-4169-9dac-bc370e945488"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/owners"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/branches"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/branches/ceb233ff-79f6-425b-b41c-ecad93a0b0e4"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/saas-management"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/plans"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/plans/seed-plan-pro"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/qr-ordering"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/whatsapp-ordering"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/ai-assistant"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/catalog"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/subscriptions"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/billing"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/entitlements"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/feature-catalog"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/reports"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/applications"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/activation-keys"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/payment-connections"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/platform-payments"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/payouts"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/devices"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/devices/c66d8f15-3278-4b45-8f15-1bd1decbc8e9"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/sync-monitor"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/backups"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/sandboxes"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/offline-policy"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/team"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/support"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/tickets"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/notifications"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/audit-logs"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/system-health"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/settings/platform"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/profile"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5179/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Warning: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://reactjs.org/link/setstate-in-render%s NotificationDrawerModal PosAdminApp PosAdminApp \n    at PosAdminApp (http://localhost:5176/src/App.tsx?t=1792233673198:126:14)","url":"http://localhost:5176/restaurant-admin/downloads"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=PERFORMANCE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=PERFORMANCE"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"captain","role":"captain","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5177/"}
+{"app":"kds","role":"kds","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5179/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=PERFORMANCE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=PERFORMANCE"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurant-health"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/announcements"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/status-history"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/margins"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants/onboard"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/restaurants/25a0bc46-04da-4169-9dac-bc370e945488"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/owners"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/owners/2c2b30e5-8d17-46a0-9091-cf1e0fb73134"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/branches"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/branches/ceb233ff-79f6-425b-b41c-ecad93a0b0e4"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/saas-management"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/plans"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/plans/seed-plan-pro"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/qr-ordering"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/whatsapp-ordering"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/ai-assistant"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/catalog"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/subscriptions"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/billing"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/entitlements"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/feature-catalog"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/reports"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/applications"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/activation-keys"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/payment-connections"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/platform-payments"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/payouts"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/devices"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/devices/c66d8f15-3278-4b45-8f15-1bd1decbc8e9"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/sync-monitor"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/backups"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/sandboxes"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/offline-policy"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/team"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/support"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/tickets"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/notifications"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/audit-logs"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/system-health"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/settings/platform"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/profile"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CALENDAR"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=CRM"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=SERVICE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=PERFORMANCE"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","url":"http://localhost:5176/restaurant-admin/qr-ordering?tab=PERFORMANCE"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"kiosk","role":"kiosk","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5174/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5175/"}
+{"app":"super","role":"super","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5180/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"pos","role":"pos","type":"error","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","url":"http://localhost:5175/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}
+{"app":"admin","role":"admin","type":"error","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","url":"http://localhost:5176/"}

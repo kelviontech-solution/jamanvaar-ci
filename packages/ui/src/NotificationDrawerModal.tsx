@@ -60,7 +60,7 @@ export const NotificationDrawerModal: React.FC<NotificationDrawerModalProps> = (
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end animate-in fade-in select-none">
-      <div className="bg-[#FAF7F2] border-l border-[#EBE6DD] w-full max-w-md h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
+      <div role="dialog" aria-modal="true" aria-label="Notifications" className="bg-[#FAF7F2] border-l border-[#EBE6DD] w-full max-w-md h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
         
         {/* Top Header */}
         <div className="p-4 sm:p-5 bg-white border-b border-[#EBE6DD] flex items-center justify-between gap-3 shrink-0">

@@ -10,6 +10,9 @@ export default {
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
       },
+      // A bare `border` used to fall back to Tailwind's cool grey, so cards without an explicit colour looked different
+      // from the ivory-bordered ones. The default now matches `jaman-border`.
+      borderColor: { DEFAULT: '#EBE6DD' },
       colors: {
         // One orange family for the Admin: accent / active text (DEFAULT, 4.7:1 on white),
         // then deeper for hover and pressed. Tints come from opacity (brand/[0.08], brand/40).

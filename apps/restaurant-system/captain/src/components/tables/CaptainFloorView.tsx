@@ -88,22 +88,22 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
   }, [tables, selectedZone, tableFilter, localSearch, myTableIds, activeFoodReady]);
 
   return (
-    <div className="space-y-4 sm:space-y-5">
-      {useCaptainStore.getState().customerRequests.some(request => !request.isResolved) && <button type="button" onClick={() => useCaptainStore.getState().setActiveTab('REQUESTS')} className="min-h-12 rounded-xl border border-amber-200 bg-amber-50 px-4 text-amber-900 font-bold text-sm">Guest requests · {useCaptainStore.getState().customerRequests.filter(request => !request.isResolved).length}</button>}
-      {selectMyTables(tables,currentCaptain).some(table => activeFoodReady.some(food => food.tableNumber === table.tableNumber) || isBillWaiting(captainDb.orders.find(order => order.id === table.currentOrderId))) && <section className="rounded-2xl border border-jaman-border bg-white p-4 space-y-3">
-        <h2 className="font-bold text-jaman-navy">My floor · next actions</h2>
-        <div className="flex flex-wrap gap-2">{selectMyTables(tables,currentCaptain).flatMap(table => {
+    <div className="space-y-3 sm:space-y-5">
+      {useCaptainStore.getState().customerRequests.some(request => !request.isResolved) && <button type="button" onClick={() => useCaptainStore.getState().setActiveTab('REQUESTS')} className="w-full sm:w-auto min-h-12 rounded-xl border border-amber-200 bg-amber-50 px-4 text-left text-amber-900 font-bold text-sm active:bg-amber-100">Guest requests · {useCaptainStore.getState().customerRequests.filter(request => !request.isResolved).length}</button>}
+      {selectMyTables(tables,currentCaptain).some(table => activeFoodReady.some(food => food.tableNumber === table.tableNumber) || isBillWaiting(captainDb.orders.find(order => order.id === table.currentOrderId))) && <section className="rounded-xl sm:rounded-2xl border border-jaman-border bg-white p-3 sm:p-4 space-y-2 sm:space-y-3">
+        <h2 className="text-sm sm:text-base font-bold text-jaman-navy">My floor · next actions</h2>
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">{selectMyTables(tables,currentCaptain).flatMap(table => {
           const ready=activeFoodReady.filter(food => food.tableNumber === table.tableNumber).length;
           const bill=isBillWaiting(captainDb.orders.find(order => order.id === table.currentOrderId));
-          return [ready > 0 ? <button type="button" key={`${table.id}:ready`} onClick={() => onDeliverFood(table)} className="min-h-12 px-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 font-bold text-sm">Table {table.tableNumber} · Deliver {ready} ready dish{ready === 1 ? '' : 'es'}</button> : null,bill ? <button type="button" key={`${table.id}:bill`} onClick={() => {onOpenWorkspace(table);useCaptainStore.getState().setTableWorkspaceTab('BILL');}} className="min-h-12 px-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 font-bold text-sm">Table {table.tableNumber} · Follow up bill</button> : null];
+          return [ready > 0 ? <button type="button" key={`${table.id}:ready`} onClick={() => onDeliverFood(table)} className="w-full sm:w-auto min-h-12 px-3 sm:px-4 py-2 rounded-xl border border-emerald-200 bg-emerald-50 active:bg-emerald-100 text-emerald-900 font-bold text-sm text-left">Table {table.tableNumber} · Deliver {ready} ready dish{ready === 1 ? '' : 'es'}</button> : null,bill ? <button type="button" key={`${table.id}:bill`} onClick={() => {onOpenWorkspace(table);useCaptainStore.getState().setTableWorkspaceTab('BILL');}} className="w-full sm:w-auto min-h-12 px-3 sm:px-4 py-2 rounded-xl border border-amber-200 bg-amber-50 active:bg-amber-100 text-amber-900 font-bold text-sm text-left">Table {table.tableNumber} · Follow up bill</button> : null];
         })}</div>
       </section>}
       {/* ── 1. Dynamic Table Summary Counter Strip ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+      <div className="grid grid-cols-2 min-[600px]:grid-cols-5 gap-2 sm:gap-2.5">
         <button
           type="button"
           onClick={() => setTableFilter('MY_TABLES')}
-          className={`p-3 rounded-2xl border text-left transition-all shadow-2xs cursor-pointer ${
+          className={`min-w-0 px-3 py-1.5 sm:p-3 rounded-xl sm:rounded-2xl border text-left transition-all shadow-2xs cursor-pointer active:scale-[0.98] ${
             tableFilter === 'MY_TABLES'
               ? 'bg-jaman-navy text-white border-jaman-navy'
               : 'bg-white hover:bg-slate-50 border-jaman-border text-jaman-navy'
@@ -112,8 +112,8 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
           <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'MY_TABLES' ? 'text-slate-300' : 'text-slate-400'}`}>
             My Tables
           </span>
-          <div className="flex items-baseline justify-between mt-0.5">
-            <span className="text-xl sm:text-2xl font-bold font-mono">{myAssignedTablesCount}</span>
+          <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
+            <span className="text-lg sm:text-2xl leading-none sm:leading-normal font-bold font-mono">{myAssignedTablesCount}</span>
             <span className={`text-[11px] font-bold ${tableFilter === 'MY_TABLES' ? 'text-jaman-saffron' : 'text-slate-500'}`}>Tables</span>
           </div>
         </button>
@@ -121,7 +121,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         <button
           type="button"
           onClick={() => setTableFilter('OCCUPIED')}
-          className={`p-3 rounded-2xl border text-left transition-all shadow-2xs cursor-pointer ${
+          className={`min-w-0 px-3 py-1.5 sm:p-3 rounded-xl sm:rounded-2xl border text-left transition-all shadow-2xs cursor-pointer active:scale-[0.98] ${
             tableFilter === 'OCCUPIED'
               ? 'bg-jaman-saffron text-white border-jaman-saffron'
               : 'bg-white hover:bg-amber-50/50 border-jaman-border text-jaman-navy'
@@ -130,8 +130,8 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
           <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'OCCUPIED' ? 'text-amber-100' : 'text-slate-400'}`}>
             Seated / Dining
           </span>
-          <div className="flex items-baseline justify-between mt-0.5">
-            <span className="text-xl sm:text-2xl font-bold font-mono">{occupiedCount}</span>
+          <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
+            <span className="text-lg sm:text-2xl leading-none sm:leading-normal font-bold font-mono">{occupiedCount}</span>
             <span className={`text-[11px] font-bold ${tableFilter === 'OCCUPIED' ? 'text-white' : 'text-jaman-saffron'}`}>Active</span>
           </div>
         </button>
@@ -139,7 +139,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         <button
           type="button"
           onClick={() => setTableFilter('FOOD_READY')}
-          className={`p-3 rounded-2xl border text-left transition-all shadow-2xs cursor-pointer ${
+          className={`min-w-0 px-3 py-1.5 sm:p-3 rounded-xl sm:rounded-2xl border text-left transition-all shadow-2xs cursor-pointer active:scale-[0.98] ${
             tableFilter === 'FOOD_READY'
               ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-600/20'
               : 'bg-white hover:bg-emerald-50/50 border-jaman-border text-jaman-navy'
@@ -148,8 +148,8 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
           <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'FOOD_READY' ? 'text-emerald-100' : 'text-slate-400'}`}>
             Food Ready
           </span>
-          <div className="flex items-baseline justify-between mt-0.5">
-            <span className="text-xl sm:text-2xl font-bold font-mono">{foodReadyTablesCount}</span>
+          <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
+            <span className="text-lg sm:text-2xl leading-none sm:leading-normal font-bold font-mono">{foodReadyTablesCount}</span>
             <span className={`text-[11px] font-bold ${tableFilter === 'FOOD_READY' ? 'text-white' : 'text-emerald-600'}`}>Deliver</span>
           </div>
         </button>
@@ -157,7 +157,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         <button
           type="button"
           onClick={() => setTableFilter('BILL_REQUESTED')}
-          className={`p-3 rounded-2xl border text-left transition-all shadow-2xs cursor-pointer ${
+          className={`min-w-0 px-3 py-1.5 sm:p-3 rounded-xl sm:rounded-2xl border text-left transition-all shadow-2xs cursor-pointer active:scale-[0.98] ${
             tableFilter === 'BILL_REQUESTED'
               ? 'bg-purple-700 text-white border-purple-700'
               : 'bg-white hover:bg-purple-50/50 border-jaman-border text-jaman-navy'
@@ -166,8 +166,8 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
           <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'BILL_REQUESTED' ? 'text-purple-100' : 'text-slate-400'}`}>
             Bill Requested
           </span>
-          <div className="flex items-baseline justify-between mt-0.5">
-            <span className="text-xl sm:text-2xl font-bold font-mono">{billRequestedCount}</span>
+          <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
+            <span className="text-lg sm:text-2xl leading-none sm:leading-normal font-bold font-mono">{billRequestedCount}</span>
             <span className={`text-[11px] font-bold ${tableFilter === 'BILL_REQUESTED' ? 'text-white' : 'text-purple-700'}`}>Billing</span>
           </div>
         </button>
@@ -175,7 +175,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         <button
           type="button"
           onClick={() => setTableFilter('ALL_TABLES')}
-          className={`col-span-2 sm:col-span-1 p-3 rounded-2xl border text-left transition-all shadow-2xs cursor-pointer ${
+          className={`col-span-2 min-[600px]:col-span-1 min-w-0 px-3 py-1.5 sm:p-3 rounded-xl sm:rounded-2xl border text-left transition-all shadow-2xs cursor-pointer active:scale-[0.98] ${
             tableFilter === 'ALL_TABLES'
               ? 'bg-slate-800 text-white border-slate-800'
               : 'bg-white hover:bg-slate-50 border-jaman-border text-jaman-navy'
@@ -184,8 +184,8 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
           <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'ALL_TABLES' ? 'text-slate-300' : 'text-slate-400'}`}>
             Available Tables
           </span>
-          <div className="flex items-baseline justify-between mt-0.5">
-            <span className="text-xl sm:text-2xl font-bold font-mono">{availableCount}</span>
+          <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
+            <span className="text-lg sm:text-2xl leading-none sm:leading-normal font-bold font-mono">{availableCount}</span>
             <span className={`text-[11px] font-bold ${tableFilter === 'ALL_TABLES' ? 'text-white' : 'text-slate-500'}`}>
               of {tables.length}
             </span>
@@ -194,10 +194,10 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
       </div>
 
       {/* ── 2. Filter Bar: Zones + Status Pills + Search ── */}
-      <div className="bg-white p-3 rounded-2xl border border-jaman-border space-y-2.5 shadow-2xs">
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
-          {/* Section / Zone Selector */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+      <div className="bg-white p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-jaman-border space-y-2 sm:space-y-2.5 shadow-2xs">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2 sm:gap-2.5">
+          {/* Section / Zone Selector (second row on a phone: the search box comes first) */}
+          <div className="order-2 lg:order-1 min-w-0 flex items-center gap-1.5 cap-chip-row scrollbar-none pb-0.5">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
               Zone:
             </span>
@@ -206,7 +206,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
                 key={zone}
                 type="button"
                 onClick={() => setSelectedZone(zone)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                className={`px-3 min-h-10 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap active:scale-95 ${
                   selectedZone === zone
                     ? 'bg-jaman-navy text-white shadow-2xs'
                     : 'bg-jaman-cream text-slate-600 hover:bg-[#FFF4ED] hover:text-jaman-saffron'
@@ -218,20 +218,22 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
           </div>
 
           {/* Quick Search */}
-          <div className="relative min-w-[200px] max-w-sm">
+          <div className="order-1 lg:order-2 relative w-full lg:w-auto lg:min-w-[200px] lg:max-w-sm">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
               placeholder="Search table, order, dish..."
-              className="w-full pl-9 pr-3 py-1.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs font-medium text-jaman-navy focus:bg-white focus:border-jaman-saffron outline-none transition-all"
+              aria-label="Search tables, orders or dishes"
+              className="w-full h-11 lg:h-9 pl-9 pr-10 bg-jaman-cream border border-jaman-border rounded-xl text-sm lg:text-xs font-medium text-jaman-navy focus:bg-white focus:border-jaman-saffron outline-none transition-all"
             />
             {localSearch && (
               <button
                 type="button"
                 onClick={() => setLocalSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                aria-label="Clear search"
+                className="absolute right-0.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-600 text-xs font-bold"
               >
                 ✕
               </button>
@@ -240,7 +242,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         </div>
 
         {/* Status Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-1 border-t border-slate-100">
+        <div className="flex items-center gap-1.5 cap-chip-row scrollbar-none pt-2 sm:pt-1 border-t border-slate-100">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
             Filter:
           </span>
@@ -255,7 +257,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
               key={flt.id}
               type="button"
               onClick={() => setTableFilter(flt.id as any)}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
+              className={`px-3 min-h-10 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap active:scale-95 ${
                 tableFilter === flt.id
                   ? 'bg-jaman-saffron text-white shadow-xs'
                   : 'bg-jaman-cream text-slate-600 hover:bg-slate-200'
@@ -273,7 +275,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
                 setSelectedZone('ALL');
                 setLocalSearch('');
               }}
-              className="px-2.5 py-1 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-1 shrink-0 transition-colors"
+              className="px-3 min-h-10 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 active:bg-rose-50 flex items-center gap-1 shrink-0 whitespace-nowrap transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Reset</span>
@@ -284,7 +286,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
 
       {/* ── 3. Table Cards Grid or Actionable Empty State ── */}
       {filteredTables.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3.5 sm:gap-4 pb-16 md:pb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2.5 sm:gap-4">
           {filteredTables.map((table) => {
             const activeOrder = table.currentOrderId
               ? captainDb.orders.find((o) => o.id === table.currentOrderId) || null

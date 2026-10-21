@@ -1,0 +1,187 @@
+{
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "text": "KITCHEN DISPLAY (KDS)\nStation:\nAll stations\nJAMAN AI\nAll stations\nMain Kitchen\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nStaff practice\nLIVE\n|\n15:57:34\n0\nCooking\n0\nReady\nSwitch Station\nDisplay & station timing\nACTIVE\n0\nCOOKING\n0\nREADY\n0\nSERVED\n0\nEXPO (PASS)\n0\nPriority, then oldest\nOldest first\nAll Kitchen Orders Cleared\n\nNo tickets currently waiting at this station. New orders from POS, Captain or the kiosk appear here by themselves, no refresh needed.\n\nDisplay",
+  "headings": [
+    "All Kitchen Orders Cleared"
+  ],
+  "buttons": [
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Kitchen Intelligence",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All stations",
+      "aria": "Kitchen station All stations",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": "Kitchen station Main Kitchen",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Staff practice",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Switch Station",
+      "aria": "Switch station or log out",
+      "title": "Switch kitchen station or logout",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Display Button",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACTIVE\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "COOKING\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "READY\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SERVED\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EXPO (PASS)\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "en",
+          "text": "English"
+        },
+        {
+          "value": "gu",
+          "text": "ગુજરાતી"
+        },
+        {
+          "value": "hi",
+          "text": "हिन्दी"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "compact",
+          "text": "Compact"
+        },
+        {
+          "value": "comfortable",
+          "text": "Comfortable / tablet"
+        },
+        {
+          "value": "tv",
+          "text": "Large / TV"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search token, table, KOT or dish…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "PRIORITY",
+          "text": "Priority, then oldest"
+        },
+        {
+          "value": "FIFO",
+          "text": "Oldest first"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "standard",
+          "text": "Standard"
+        },
+        {
+          "value": "large",
+          "text": "Larger text & touch targets"
+        },
+        {
+          "value": "contrast",
+          "text": "Stronger contrast & large controls"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

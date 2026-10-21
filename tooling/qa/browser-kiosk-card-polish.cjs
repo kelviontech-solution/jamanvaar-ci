@@ -9,7 +9,8 @@ const root = path.resolve(__dirname, '../..');
 const app = path.join(root, 'apps/kiosk-system/kiosk-user');
 const phase = process.argv.includes('--before') ? 'before' : 'after';
 const sidebarOnly = process.argv.includes('--sidebar');
-const output = path.join(root, sidebarOnly ? 'docs/reports/kiosk-sidebar-polish-2026-10-15' : 'docs/reports/kiosk-card-polish-2026-10-15');
+const actionsOnly = process.argv.includes('--actions');
+const output = path.join(root, actionsOnly ? 'docs/reports/kiosk-action-polish-2026-10-16' : sidebarOnly ? 'docs/reports/kiosk-sidebar-polish-2026-10-15' : 'docs/reports/kiosk-card-polish-2026-10-15');
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'jamanvaar-card-polish-'));
 const origin = 'http://127.0.0.1:5374';
 const viewports = [[424,755],[480,854],[768,1024],[1080,1920],[1366,768],[1920,1080]];
@@ -163,7 +164,7 @@ async function main() {
   }] });
   await server.listen();
   const executable = path.join(process.env.LOCALAPPDATA, 'ms-playwright/chromium-1243/chrome-win64/chrome.exe');
-  chrome = spawn(executable, ['--headless=new', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--no-first-run', '--disable-background-networking', '--disable-extensions', 'about:blank'], { windowsHide: true, stdio: 'ignore' });
+  chrome = spawn(executable, ['--headless=new', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--no-first-run', '--disable-background-networking', '--disable-extensions', ...(actionsOnly ? ['--no-sandbox', '--disable-gpu'] : []), 'about:blank'], { windowsHide: true, stdio: 'ignore' });
   const portFile = path.join(profile, 'DevToolsActivePort');
   for (let n = 0; n < 150 && !fs.existsSync(portFile); n++) await sleep(100);
   if (!fs.existsSync(portFile)) throw Error('Local Chromium did not start');
@@ -200,6 +201,10 @@ async function main() {
   await until(`document.querySelectorAll('[data-testid="kiosk-menu-card"]').length>4`, 'real menu cards');
   await sleep(1200);
   if(sidebarOnly){await sidebarChecks();return;}
+  if(actionsOnly){
+    await require('./kiosk-action-checks.cjs')({phase,output,root,send,evaluate,until,tap,button,screenshot,check,checks,cartState,inspect,results,errors,sleep});
+    return;
+  }
   for (const [width, height] of viewports) {
     await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
     await sleep(250);

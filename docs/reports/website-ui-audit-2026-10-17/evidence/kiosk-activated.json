@@ -1,0 +1,46 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "Freshly prepared · Served with care\n\nWelcome to\n\nQA-Restaurant-A-1792232615381\n\nAuthentic Flavors, Seamless Dining\n\nStart Order\n\nTouch screen to begin your order\n\nTerminal dfa70e73-f07\nStaff Mode\nDisplay",
+  "headings": [
+    "QA-Restaurant-A-1792232615381"
+  ],
+  "buttons": [
+    {
+      "text": "Start Order",
+      "aria": "Start Order",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff Mode",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "standard",
+          "text": "Standard"
+        },
+        {
+          "value": "large",
+          "text": "Larger text & touch targets"
+        },
+        {
+          "value": "contrast",
+          "text": "Stronger contrast & large controls"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

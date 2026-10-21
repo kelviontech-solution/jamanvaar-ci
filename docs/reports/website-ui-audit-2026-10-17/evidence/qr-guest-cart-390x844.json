@@ -1,0 +1,73 @@
+{
+  "title": "Order",
+  "text": "QA-Restaurant-A-1792232615381\nQA-Branch-A · Table QA01\nTable QA01\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\n← Menu\nYOUR PICKS, PREPARED FRESH\nYour cart\nQA Pizza 01\nChecking price...\nEdit choices / note\n−\n3\n+\nRemove\nCheckout\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "headings": [
+    "Your cart"
+  ],
+  "buttons": [
+    {
+      "text": "← Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "Edit choices / note",
+      "aria": "Edit QA Pizza 01",
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "−",
+      "aria": "Fewer",
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "+",
+      "aria": "More",
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "visible": true
+    },
+    {
+      "text": "Checkout",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "visible": true
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "images": [
+    {
+      "src": "http://localhost:5190/q/assets/branding/jamanvaar-logo.png",
+      "alt": "Jamanvaar by Kelviontech",
+      "width": 1205,
+      "height": 670,
+      "loaded": true,
+      "visible": true
+    },
+    {
+      "src": "http://localhost:5190/q/assets/menu/common/fallback-dish.svg",
+      "alt": "QA Pizza 01",
+      "width": 400,
+      "height": 300,
+      "loaded": true,
+      "visible": true
+    }
+  ],
+  "overflow": false,
+  "unlabelledButtons": 0
+}

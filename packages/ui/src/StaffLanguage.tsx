@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ChevronDown, Languages } from 'lucide-react';
 
 export type StaffLanguage = 'en' | 'gu' | 'hi';
 const KEY = 'jamanvaar_staff_language';
@@ -97,7 +98,17 @@ export function useStaffLanguage() {
   useEffect(() => {const update = () => setLanguage(read());window.addEventListener(EVENT,update);window.addEventListener('storage',update);return () => {window.removeEventListener(EVENT,update);window.removeEventListener('storage',update);};},[]);
   return {language, t: (text: string) => translateStaff(text,language), setLanguage: (value: StaffLanguage) => {try {localStorage.setItem(KEY,value);} catch {} setLanguage(value);window.dispatchEvent(new Event(EVENT));}};
 }
-export function StaffLanguagePicker() {
+export function StaffLanguagePicker({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) {
   const {language,setLanguage} = useStaffLanguage();
-  return <label className="flex items-center gap-1 text-xs font-semibold text-jaman-navy"><span className="sr-only">Staff interface language</span><select aria-label="Staff interface language" value={language} onChange={e => setLanguage(e.target.value as StaffLanguage)} className="min-h-11 max-w-full rounded-xl border border-jaman-border bg-white px-2"><option value="en">English</option><option value="gu">ગુજરાતી</option><option value="hi">हिन्दी</option></select></label>;
+  const sidebar = variant === 'sidebar';
+  return <label className={`${sidebar ? 'relative w-full min-w-0 block' : 'flex items-center gap-1'} text-xs font-semibold text-jaman-navy`}>
+    <span className="sr-only">Staff interface language</span>
+    {sidebar && <Languages size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-jaman-saffron pointer-events-none" />}
+    <select aria-label="Staff interface language" value={language} onChange={e => setLanguage(e.target.value as StaffLanguage)} className={sidebar
+      ? 'min-h-11 w-full min-w-0 appearance-none rounded-xl border border-jaman-border bg-jaman-cream pl-10 pr-9 py-2 text-[13px] font-semibold text-jaman-navy cursor-pointer hover:bg-white hover:border-jaman-saffron/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jaman-navy'
+      : 'min-h-11 max-w-full rounded-xl border border-jaman-border bg-white px-2'}>
+      <option value="en">English</option><option value="gu">ગુજરાતી</option><option value="hi">हिन्दी</option>
+    </select>
+    {sidebar && <ChevronDown size={15} aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />}
+  </label>;
 }

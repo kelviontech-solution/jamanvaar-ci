@@ -7,8 +7,9 @@ import { formatINR } from '@jamanvaar/utils';
 import { qrApi } from '../../cloud/cloudClient';
 import { records, writeMany } from './QrCatalog';
 import { requestQrLeave, useQrUnsavedChanges } from './useQrUnsavedChanges';
-const field = 'mt-1 w-full rounded-xl border p-3 min-h-11',
-  button = 'min-h-11 rounded-xl border px-4 py-2 font-bold disabled:opacity-40',
+import { QR_FIELD, QR_BUTTON_SECONDARY } from './qrUi';
+const field = QR_FIELD,
+  button = QR_BUTTON_SECONDARY,
   box = 'rounded-2xl border bg-white p-5 space-y-4';
 const hash = (s: string) => {
   let h = 2166136261;

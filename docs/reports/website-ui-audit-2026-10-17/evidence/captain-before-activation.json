@@ -1,0 +1,61 @@
+{
+  "title": "JAMANVAAR Captain — Floor Service & Table Ordering",
+  "text": "Local Core: Checking?\nPair\nNetwork: Online\nSat, 17 Oct 2026\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Service\n\nActivate this Tablet\n\nOne-time setup — enter the activation key from your Super Admin Welcome Kit. Nothing else is needed.\n\nActivation Key *\nActivate Tablet\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per tablet and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\nKELVIONTECH ENTERPRISE\nOpening workspace\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nRESTAURANT OPERATIONS PLATFORM\n\nCAPTAIN\nPreparing application\n•\nLocal-first workspace\n•\nLocal-First Mode\nDisplay",
+  "headings": [
+    "Touch-First Restaurant Floor Command Instant KOT",
+    "Floor Captain & Service",
+    "Activate this Tablet"
+  ],
+  "buttons": [
+    {
+      "text": "Pair",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false
+    },
+    {
+      "text": "Activate Tablet",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "[ACTIVATION KEY REDACTED]",
+      "name": "",
+      "id": "captain-activation-key"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "standard",
+          "text": "Standard"
+        },
+        {
+          "value": "large",
+          "text": "Larger text & touch targets"
+        },
+        {
+          "value": "contrast",
+          "text": "Stronger contrast & large controls"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

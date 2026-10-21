@@ -5,8 +5,9 @@ import { formatINR, formatRestaurantDate } from '@jamanvaar/utils';
 import { qrApi } from '../../cloud/cloudClient';
 import { requestQrLeave, useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { FeatureRequestButton } from './FeatureRequestButton';
+import { QR_FIELD } from './qrUi';
 const base = '/api/v1/restaurant/qr/crm';
-const field = 'mt-1 w-full min-h-11 rounded-xl border bg-white px-3 py-2';
+const field = QR_FIELD;
 const button = 'min-h-11 rounded-xl border px-4 py-2 font-bold bg-white disabled:opacity-40';
 const paymentLabels: Record<string, string> = {
   SUCCESS: 'Paid',
@@ -167,7 +168,7 @@ export function QrCrm() {
   return (
     <div className="space-y-5">
       <section className="rounded-2xl border bg-white p-5 space-y-3">
-        <h2 className="text-xl font-bold">Customers & loyalty</h2>
+        <h2 className="sr-only">Customers & loyalty</h2>
         <p>
           Customer profiles and point balances are shared with your restaurant's POS and verified QR checkout. Customer order history below follows the selected
           branch. Points are earned only after confirmed collection; guests verify their phone before using rewards.

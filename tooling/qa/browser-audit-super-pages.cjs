@@ -3,7 +3,9 @@ async function main() {
   const p = await q.open('super');
   const src = q.fs.readFileSync(q.path.join(q.root, 'cloud/super-admin-web/src/app/App.tsx'), 'utf8');
   const routes = [...src.matchAll(/<Route path="([^"]+)"/g)].map(m => m[1]).filter(r => !['/login', '/activate', '*', '/dashboard'].includes(r));
-  const details = { '/restaurants/:id': q.state.restaurantA.id, '/owners/:id': q.state.restaurantA.ownerId, '/branches/:id': q.state.branchA.id, '/plans/:id': 'seed-plan-pro', '/devices/:id': q.state.adminActivation.deviceId };
+  const owners = await q.mustApi('GET', '/api/v1/owners');
+  const owner = owners.find((item) => item.restaurantId === q.state.restaurantA.id) ?? owners[0];
+  const details = { '/restaurants/:id': q.state.restaurantA.id, '/owners/:id': owner?.id, '/branches/:id': q.state.branchA.id, '/plans/:id': 'seed-plan-pro', '/devices/:id': q.state.adminActivation.deviceId };
   const inventory = [];
   for (let route of routes) {
     const actual = route.includes(':id') ? (details[route] ? route.replace(':id', details[route]) : null) : route;

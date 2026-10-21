@@ -241,13 +241,14 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
           <div className="flex items-center gap-2">
             <input
               type="date"
+              aria-label="Schedule date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-brand"
+              className="min-h-9 bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-brand"
             />
             <button
               onClick={() => { setShiftToEdit(null); setIsShiftModalOpen(true); }}
-              className="px-3 py-1.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="min-h-9 px-3 py-1.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Schedule Shift</span>
@@ -337,7 +338,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                       <select
                         value={status || ''}
                         onChange={(e) => handleMarkAttendance(usr, e.target.value as AttendanceStatus)}
-                        className="bg-white border border-jaman-border rounded-lg px-1.5 py-1 text-[11px] font-bold cursor-pointer"
+                        aria-label={`Mark attendance for ${usr.fullName}`} className="min-h-9 bg-white border border-jaman-border rounded-lg px-2 py-1 text-xs font-bold cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
                       >
                         <option value="" disabled>Mark…</option>
                         <option value="PRESENT">Present</option>
@@ -364,7 +365,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
           </div>
           <button
             onClick={() => { setRiderToEdit(null); setIsRiderModalOpen(true); }}
-            className="px-3 py-1.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
+            className="min-h-9 px-3 py-1.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Rider</span>

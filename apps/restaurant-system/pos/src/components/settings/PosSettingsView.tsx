@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StaffPracticePanel } from '@jamanvaar/ui';
+import { DisplayPreferences, StaffPracticePanel } from '@jamanvaar/ui';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { db, PrintQueueRepository, LicenseRepository } from '@jamanvaar/database';
 import { applyLicenseCertificate } from '@jamanvaar/business';
@@ -212,6 +212,7 @@ ESC/POS Command Engine Verified OK
         </div>
       )}
       {activeSettingsTab === 'HARDWARE' && <DisplaySizeCard />}
+      {activeSettingsTab === 'HARDWARE' && <DisplayPreferences />}
 
       {/* ─────────── SOUND SETTINGS CARD (always visible on HARDWARE tab) ─────────── */}
       {activeSettingsTab === 'HARDWARE' && (
@@ -688,6 +689,10 @@ ESC/POS Command Engine Verified OK
                   </span>
                 </div>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-label="Auto-print receipt on settlement"
+                  aria-checked={autoPrintReceipt}
                   onClick={() => setAutoPrintReceipt(!autoPrintReceipt)}
                   className={`w-11 h-6 rounded-full p-1 transition-colors ${
                     autoPrintReceipt ? 'bg-jaman-saffron' : 'bg-slate-300'
@@ -709,6 +714,10 @@ ESC/POS Command Engine Verified OK
                   </span>
                 </div>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-label="Auto-print KOT on order dispatch"
+                  aria-checked={autoPrintKot}
                   onClick={() => setAutoPrintKot(!autoPrintKot)}
                   className={`w-11 h-6 rounded-full p-1 transition-colors ${
                     autoPrintKot ? 'bg-jaman-saffron' : 'bg-slate-300'

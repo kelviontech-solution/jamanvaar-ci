@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { QrAdminApi, type QrBranch } from "../../cloud/qrAdminClient";
 import { qrApi } from "../../cloud/cloudClient";
+import { QR_BUTTON } from './qrUi';
 const base = "/api/v1/restaurant/qr/advanced",
-  button =
-    "rounded-xl bg-jaman-navy px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40";
+  button = QR_BUTTON;
 type Preview = {
   branches: Array<{
     branchId: string;

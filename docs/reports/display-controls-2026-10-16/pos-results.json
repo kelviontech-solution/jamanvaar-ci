@@ -1,0 +1,82 @@
+{
+  "checks": [
+    {
+      "name": "POS 1440: language picker matches sidebar width and touch size",
+      "status": "PASS",
+      "evidence": {
+        "width": 202,
+        "height": 44,
+        "queueWidth": 202,
+        "background": "rgb(250, 247, 242)",
+        "color": "rgb(11, 37, 58)",
+        "overflow": false
+      }
+    },
+    {
+      "name": "POS 1440: no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "POS 1280: language picker matches sidebar width and touch size",
+      "status": "PASS",
+      "evidence": {
+        "width": 202,
+        "height": 44,
+        "queueWidth": 202,
+        "background": "rgb(250, 247, 242)",
+        "color": "rgb(11, 37, 58)",
+        "overflow": false
+      }
+    },
+    {
+      "name": "POS 1280: no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "POS 1024: language picker matches sidebar width and touch size",
+      "status": "PASS",
+      "evidence": {
+        "width": 362,
+        "height": 44,
+        "queueWidth": 362,
+        "background": "rgb(250, 247, 242)",
+        "color": "rgb(11, 37, 58)",
+        "overflow": false
+      }
+    },
+    {
+      "name": "POS 1024: no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "POS language selection retains persistence and options",
+      "status": "PASS"
+    },
+    {
+      "name": "pos: OFF removes launcher",
+      "status": "PASS"
+    },
+    {
+      "name": "pos: OFF persists after reload",
+      "status": "PASS"
+    },
+    {
+      "name": "pos: ON restores launcher",
+      "status": "PASS"
+    },
+    {
+      "name": "pos: existing Display panel still opens",
+      "status": "PASS"
+    },
+    {
+      "name": "pos: existing larger text mode applies",
+      "status": "PASS"
+    },
+    {
+      "name": "pos: no uncaught browser errors",
+      "status": "PASS",
+      "evidence": []
+    }
+  ],
+  "errors": []
+}
