@@ -14,6 +14,11 @@ import { PageComparison, PageContentOptions, PageBranchCopy, PageEngagement, Pag
 import { PAGE_LANGUAGES } from '../../../../../../packages/ui/src/restaurant-page/types';
 import type { QrTab } from './qrNavigation';
 import './restaurant-page-editor.css';
+import { Modal } from '@jamanvaar/ui';
+import { copyText } from '@jamanvaar/utils';
+import { storedAdminBranch } from '../../adminBranchScope';
+import { useQrScope, QrEditingScope } from './QrScope';
+import { QrWebsiteJourney, type WebsiteStep } from './QrWebsiteJourney';
 type Editor = {
   affectedBranches: { id: string; name: string; licensed: boolean }[];
   scope: string;
@@ -32,6 +37,7 @@ type Editor = {
   items: RestaurantPageDish[];
   categories?:RestaurantPageCategory[];
   menuReady: boolean;
+  loyaltyEnabled?: boolean;
   sharePath: string | null;
   shareUrl: string | null;
   orderOnlineUrl?: string | null;
@@ -61,6 +67,12 @@ const label: Record<string, string> = {
 };
 function imageUrl(ref: string) {
   return resolveMenuImage(ref, { apiBase: import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000' }) || '';
+}
+function initialPageScope(account: { role: string; branchId: string | null }) {
+  if (account.role !== 'OWNER') return account.branchId;
+  const requested = new URLSearchParams(location.search).get('setupBranch');
+  const selected = storedAdminBranch();
+  return requested || (selected === 'all' ? 'restaurant' : selected || account.branchId || 'restaurant');
 }
 function BranchPageLinks({ data }: { data: Editor }) {
   const [branch, setBranch] = useState(data.branches[0]?.id || '');
@@ -108,7 +120,7 @@ function BranchPageLinks({ data }: { data: Editor }) {
             <button
               onClick={async () => {
                 try {
-                  await navigator.clipboard.writeText(page.shareUrl!);
+                  await copyText(page.shareUrl!);
                   setMessage('Public business page link copied.');
                 } catch {
                   setMessage('Copy is unavailable in this browser. Open the live page and copy its address.');
@@ -140,7 +152,10 @@ function BranchPageLinks({ data }: { data: Editor }) {
   );
 }
 export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, scope: string) => void } = {}) {
+  const workspaceScope = useQrScope();
   const previewArea = useRef<HTMLDivElement>(null);
+  const firstScope = useRef(true);
+  const handledJourneyLink = useRef(false);
   const [previewRoom, setPreviewRoom] = useState(430);
   const [previewLanguage, setPreviewLanguage] = useState('en'),
     [previewTime, setPreviewTime] = useState('');
@@ -152,7 +167,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
     [error, setError] = useState(''),
     [notice, setNotice] = useState(''),
     [width, setWidth] = useState(390),
-    [mode, setMode] = useState<'EDIT' | 'PREVIEW'>('EDIT'),
+    [mode, setMode] = useState<'EDIT' | 'PREVIEW'>(() => new URLSearchParams(location.search).get('websiteStep') === 'preview' ? 'PREVIEW' : 'EDIT'),
     [ack, setAck] = useState(false),
     [review, setReview] = useState(false);
   const dirty = JSON.stringify(draft) !== saved && !!data;
@@ -178,7 +193,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
     let active = true;
     cloudQrAccount()
       .then((a) => {
-        if (active) setScope(a.role === 'OWNER' ? 'restaurant' : a.branchId);
+        if (active) setScope(workspaceScope.managed ? (a.role === 'OWNER' ? workspaceScope.branchId || 'restaurant' : a.branchId) : initialPageScope(a));
       })
       .catch((e) => setError(e.message));
     return () => {
@@ -192,7 +207,12 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
     setError('');
     request<Editor>(endpoint(scope))
       .then((v) => {
-        if (active) install(v);
+        if (active) {
+          if (!workspaceScope.managed && firstScope.current && scope === 'restaurant' && v.canEditGlobal && v.branches.length === 1 && new URLSearchParams(location.search).get('setupBranch') !== 'restaurant' && storedAdminBranch() !== 'all') {
+            firstScope.current = false; setScope(v.branches[0].id); return;
+          }
+          firstScope.current = false; install(v);
+        }
       })
       .catch((e) => {
         if (active) setError(e.message);
@@ -240,22 +260,34 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
   };
   const saveAndReview = () =>
     void run(async () => {
-      const issue = pageReviewIssue(draft,data!.published);
+      // Publish is an explicit intent to go live. A new/off page should not require
+      // discovering another activation checkbox before it can be reviewed.
+      const publication = !draft.enabled && !data!.published?.enabled
+        ? { ...fillPageDetails(draft, data!.restaurantName, data!.defaultAddress), enabled: true }
+        : draft;
+      const issue = pageReviewIssue(publication,data!.published);
       if (issue) {
-        if(!draft.enabled)requestAnimationFrame(()=>document.getElementById('qpb-enable-page')?.scrollIntoView({behavior:'smooth',block:'center'}));
-        else openStep(issue.startsWith('Opening hours') ? 'qpb-contact' : issue.startsWith('Notice') ? 'qpb-schedule' : 'qpb-first-impression');
+        openStep(issue.startsWith('Opening hours') ? 'qpb-contact' : issue.startsWith('Notice') ? 'qpb-schedule' : 'qpb-first-impression');
         throw new Error(issue);
       }
       // Saving is still a draft-only action. Publication requires the separate review acknowledgement.
-      if (dirty || data?.version === 0) {
-        await request(endpoint(scope!), { method: 'PUT', body: { version: data!.version, content: draft } });
+      if (dirty || data?.version === 0 || publication !== draft) {
+        await request(endpoint(scope!), { method: 'PUT', body: { version: data!.version, content: publication } });
         await reload();
       }
       setReview(true);
       setAck(false);
       setMode('PREVIEW');
-      requestAnimationFrame(() => document.getElementById('qpb-review')?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
     });
+  useEffect(() => {
+    if (!data || handledJourneyLink.current) return;
+    handledJourneyLink.current = true;
+    const url = new URL(location.href), step = url.searchParams.get('websiteStep');
+    if (!step) return;
+    url.searchParams.delete('websiteStep'); history.replaceState(null, '', url);
+    if (step === 'preview') setMode('PREVIEW');
+    if (step === 'publish' && data.capability.enabled) saveAndReview();
+  }, [!!data]);
   async function upload(file: File | undefined, apply: (ref: string) => void) {
     if (!file) return;
     await run(async () => {
@@ -282,7 +314,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   if (scope) await reload();
                   else {
                     const account = await cloudQrAccount();
-                    setScope(account.role === 'OWNER' ? 'restaurant' : account.branchId);
+                    setScope(workspaceScope.managed ? workspaceScope.branchId || 'restaurant' : initialPageScope(account));
                   }
                 })
               }
@@ -305,6 +337,12 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
   };
   const previewItems = data.items.map((item) => ({ ...item, imageUrl: imageUrl(menuDishImage(item.imageUrl, item.name) || '') }));
   const selectedBranch = data.branches.find((b) => b.id === scope);
+  const journey = (step: WebsiteStep) => {
+    if(step === 'design') {setMode('EDIT');openStep('qpb-design');}
+    else if(step === 'preview')setMode('PREVIEW');
+    else if(step === 'publish')saveAndReview();
+    else if(onNavigate){if(step === 'test')try{sessionStorage.setItem('qr_website_open_scan_check','1');}catch{}onNavigate('WEBSITE_QR',scope === 'restaurant' ? data.branches[0]?.id || '' : scope!);}
+  };
   return (
     <section className="qr-page-builder">
       <header className="qpb-heading">
@@ -313,7 +351,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
           <h2 className="sr-only">Business page studio</h2>
           <p>Design a warm first impression. Your menu, table and checkout stay connected.</p>
         </div>
-        <label>
+        {workspaceScope.managed ? <QrEditingScope /> : <label>
           Editing scope
           <select
             aria-label="Editing scope"
@@ -331,8 +369,20 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
               </option>
             ))}
           </select>
-        </label>
+        </label>}
       </header>
+      <QrWebsiteJourney current={review ? 'publish' : mode === 'PREVIEW' ? 'preview' : 'design'} canPublish={!locked} live={!!data.published?.enabled && !locked} onStep={journey} />
+      <div className="qpb-toolbar" role="region" aria-label="Website publishing">
+        <div><strong>{pagePublicationStatus(data.published, draft, !locked)}</strong><span>{dirty ? 'You have unsaved edits' : data.published?.enabled ? 'Your website is live' : 'Your draft is private'}</span></div>
+          <div className="qpb-actions">
+            {data.published?.enabled && onNavigate && <button type="button" onClick={() => journey('qr')}>Download website QR</button>}
+          <button type="button" disabled={busy || locked || !dirty} onClick={() => void run(async () => {
+            await request(endpoint(scope!), { method: 'PUT', body: { version: data.version, content: draft } });
+            await reload(); setNotice('Draft saved. Your live website has not changed.');
+          })}>{busy ? 'Please wait…' : 'Save draft'}</button>
+          <button type="button" className="qpb-primary" disabled={busy || locked} onClick={saveAndReview}>{!draft.enabled && data.published?.enabled ? 'Review switch-off' : data.published?.enabled ? 'Publish changes' : 'Publish website'}</button>
+        </div>
+      </div>
       <div className="qpb-scope">
         <strong>{scope === 'restaurant' ? 'Applies to branches using business defaults' : selectedBranch?.name}</strong>
         <span>
@@ -359,9 +409,9 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
         </div>
       )}
       {!locked && (
-        <details className="qpb-setup" aria-label="Business page setup" open={!data.published}>
+        <details className="qpb-setup" aria-label="Business page setup">
           <summary className="qpb-setup-heading">
-            <strong>Setup guide · 5 steps to your welcome page</strong>
+            <strong>Quick setup guide</strong>
             <span className="qpb-status" role="status">
               {pagePublicationStatus(data.published, draft, !locked)}
             </span>
@@ -437,7 +487,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
       </div>
       <div className={'qpb-workspace qpb-mode-' + mode.toLowerCase()}>
         <div className="qpb-editor">
-          <fieldset disabled={busy || locked}>
+          <fieldset disabled={busy || locked} hidden={locked}>
             <details open id="qpb-design">
               <summary>01 · Choose your design</summary>
               <div className="qpb-fields">
@@ -463,9 +513,9 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                     </button>
                   ))}
                 </div>
-                <label>
-                  <input type="checkbox" checked={draft.enabled} onChange={(e) => update('enabled', e.target.checked)} /> Enable published business page
-                </label>
+                {data.published?.enabled && <label>
+                  <input type="checkbox" checked={draft.enabled} onChange={(e) => update('enabled', e.target.checked)} /> Keep website live after publishing
+                </label>}
                 <div className="qpb-image-note"><strong>Two QR types, two clear destinations</strong><p>Restaurant Page QRs open this website. Table Ordering QRs open the ordering menu directly and keep the table number. Guests can still open About & contact from the menu.</p>{onNavigate&&<button type="button" onClick={()=>onNavigate('WEBSITE_QR',scope!)}>Design & print Restaurant Page QR</button>}</div>
                 <label>
                   Accent colour
@@ -646,8 +696,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   </label>
                 ))}
                 <p className="qpb-help">
-                  Your website shows signature dishes, story, gallery and visit details. The full menu opens from Menu; Order online opens your existing
-                  ordering page. Empty sections are hidden automatically.
+                  Your website shows your story, photos and visit details. Order online opens the ordering menu. Empty sections stay hidden.
                 </p>
               </div>
             </details>
@@ -785,13 +834,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
               onNavigate={(next) => onNavigate?.(next, scope!)}
             />
           )}
-          <section className="qpb-publish">
-            {!draft.enabled&&<div id="qpb-enable-page" className="qpb-enable-page" role="status">
-              <strong>{data.published?.enabled?'This draft will switch your restaurant page off':'Your restaurant page is switched off'}</strong>
-              <p>{data.published?.enabled?'Publishing this draft will hide the website and stop its Restaurant Page QR from working. Keep it enabled if guests should see it.':'Publishing with the page switched off keeps it hidden. Enable the page, review it and publish it live before generating its Restaurant Page QR.'}</p>
-              <button type="button" disabled={busy||locked} onClick={()=>{update('enabled',true);setError('');setNotice('Page enabled in this draft. Review and publish to make the restaurant website and its QR available.');}}>Enable page for publishing</button>
-              <small>Existing table ordering continues independently. This changes the draft only.</small>
-            </div>}
+          <section className="qpb-publish" aria-label="Published website and history">
             <p>
               <strong>{pagePublicationStatus(data.published, draft, !locked)}</strong>
               <small>
@@ -800,26 +843,13 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
               </small>
               {data.publishedAt && <small>Last published {new Date(data.publishedAt).toLocaleString()}</small>}
             </p>
-            <div className="qpb-actions">
-              <button
-                disabled={busy || locked || !dirty}
-                onClick={() =>
-                  void run(async () => {
-                    await request(endpoint(scope!), { method: 'PUT', body: { version: data.version, content: draft } });
-                    await reload();
-                    setNotice('Draft saved. Customers still see the published version.');
-                  })
-                }
-              >
-                Save draft
-              </button>
-              <button disabled={busy || locked || (!draft.enabled&&!data.published?.enabled)} onClick={saveAndReview}>
-                {!draft.enabled&&!data.published?.enabled?'Enable page to continue':dirty ? 'Save & review' : 'Review & publish'}
-              </button>
-            </div>
             {review && (
+              <Modal isOpen onClose={() => { if (!busy) setReview(false); }} title={draft.enabled ? 'Publish restaurant website' : 'Switch off restaurant website'} maxWidth="xl" footer={<div className="qpb-review-footer"><button type="button" disabled={busy} onClick={() => setReview(false)}>Keep editing</button><button type="button" className="qpb-primary" disabled={!ack || busy || locked} onClick={() => void run(async () => {
+                const published = await request<Editor>(endpoint(scope!, '/publish'), { method: 'POST', body: { version: data.version } });
+                install(published);
+                setNotice(published.published?.enabled ? 'Your restaurant website is live. You can now share or print its QR.' : 'Your restaurant website is switched off.');
+              })}>{busy ? 'Publishing…' : draft.enabled ? 'Publish website now' : 'Switch off website'}</button></div>}>
               <div className="qpb-review" id="qpb-review">
-                <h3>Review before publishing</h3>
                 <PageComparison before={data.published} after={draft} />
                 <p>
                   {scope === 'restaurant'
@@ -844,19 +874,9 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 <label>
                   <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} /> I reviewed the design, contact links and affected scope.
                 </label>
-                <button
-                  disabled={!ack || busy || locked || (!draft.enabled&&!data.published?.enabled)}
-                  onClick={() =>
-                    void run(async () => {
-                      const published=await request<Editor>(endpoint(scope!, '/publish'), { method: 'POST', body: { version: data.version } });
-                      install(published);
-                      setNotice(published.published?.enabled?'Business page published. New visitors receive this version.':'Restaurant page switched off. Its website QR is unavailable until the page is enabled and published again.');
-                    })
-                  }
-                >
-                  {draft.enabled?'Publish reviewed page':data.published?.enabled?'Switch off published page':'Enable page to publish it live'}
-                </button>
+                {error && <p role="alert" className="qpb-error">{error}</p>}
               </div>
+              </Modal>
             )}
             {error&&<p className="qpb-error">{error}</p>}
             {scope !== 'restaurant' && !data.inherited && (
@@ -881,7 +901,7 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                 <button
                   onClick={() =>
                     void run(async () => {
-                      await navigator.clipboard.writeText(data.shareUrl!);
+                      await copyText(data.shareUrl!);
                       setNotice('Public business page link copied.');
                     })
                   }
@@ -940,10 +960,10 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
             )}
           </section>
           {!locked && (
-            <div className="qpb-extra-reports">
+            <details className="qpb-extra-reports"><summary>Website activity & branch copying</summary>
               <PageEngagement key={scope! + data.publishedAt} scope={scope!} publication={data.publishedAt} />
               {data.canEditGlobal && <PageBranchCopy key={scope} scope={scope!} version={data.version} dirty={dirty} branches={data.branches} />}
-            </div>
+            </details>
           )}
         </div>
         <aside className="qpb-preview">
@@ -994,11 +1014,13 @@ export function QrRestaurantPage({ onNavigate }: { onNavigate?: (tab: QrTab, sco
                   branchName: data.branchName,
                   table: null,
                   orderOnlineUrl: data.orderOnlineUrl,
-                  currency: data.currency
+                  currency: data.currency,
+                  loyaltyEnabled: data.loyaltyEnabled
                 }}
                 items={previewItems}
                 categories={data.categories}
                 onMenu={() => setNotice('Preview only: this opens the existing menu in the customer flow. No real order or payment is created.')}
+                onAccount={() => setNotice('Preview only: customers sign in with a phone code on your live website. Points come from verified paid orders.')}
                 onDish={() => setNotice('Preview only: dish customization opens in the real menu. No cart was changed.')}
               />
             </div>

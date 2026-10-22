@@ -241,7 +241,7 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
             value={storedAdminBranch() ?? branches[0]?.id ?? ""}
             onChange={async (e) => {
               const branch=e.target.value;if(!(await requestQrLeave()))return;
-              const clean=new URL(location.href);clean.searchParams.delete('branchId');history.replaceState(null,'',clean);
+              const clean=new URL(location.href);clean.searchParams.delete('branchId');clean.searchParams.delete('setupBranch');clean.searchParams.delete('order');history.replaceState(null,'',clean);
               saveAdminBranch(branch);
               location.reload();
             }}

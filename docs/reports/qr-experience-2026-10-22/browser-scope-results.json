@@ -1,0 +1,17 @@
+[
+  {
+    "screen": "website-initial-scope",
+    "query": "branchScope=all",
+    "scope": "restaurant"
+  },
+  {
+    "screen": "website-initial-scope",
+    "query": "branchScope=all&setupBranch=branch-a",
+    "scope": "branch-a"
+  },
+  {
+    "screen": "website-initial-scope",
+    "query": "setupBranch=restaurant",
+    "scope": "restaurant"
+  }
+]

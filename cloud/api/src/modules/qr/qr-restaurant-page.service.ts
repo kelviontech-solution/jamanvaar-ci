@@ -9,6 +9,7 @@ import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { parseInlineImage, publicImageUrl } from '../menu-publications/menu-snapshot';
 import { QrMenuService } from './qr-menu.service';
 import { QrSettingsService } from './qr-settings.service';
+import { QrAdvancedService } from './qr-advanced.service';
 import { restaurantPageSchema, RestaurantPageInput, PageCopyInput, websiteQrPrintDesignSchema, WebsiteQrPrintDesign } from './qr-restaurant-page.schema';
 import { ConfigService } from '@nestjs/config';
 import { restaurantPageHead } from './qr-page-metadata';
@@ -62,7 +63,8 @@ export class QrRestaurantPageService {
     private readonly menus: QrMenuService,
     private readonly config: ConfigService,
     private readonly operations: QrOperationsService,
-    private readonly settings: QrSettingsService
+    private readonly settings: QrSettingsService,
+    private readonly advanced: QrAdvancedService
   ) {}
   private where(rid: string, type: string, key: string) {
     return { restaurantId_entityType_externalId: { restaurantId: rid, entityType: type, externalId: key } };
@@ -161,6 +163,7 @@ export class QrRestaurantPageService {
         items: menu.items,
         categories: menu.categories,
         menuReady: menu.ready,
+        loyaltyEnabled: (await this.access.resolveQrCapability(tx, s.restaurantId, 'QR_LOYALTY', s.branchId)).enabled && (await this.advanced.effectiveIn(tx, s.restaurantId, s.branchId)).loyaltyEnabled,
         history: history.map((r) => ({
           id: r.externalId,
           at: r.createdAt,
@@ -674,15 +677,17 @@ export class QrRestaurantPageService {
     const page = await this.publicPage(resolved.restaurantId, resolved.branchId);
     if (!page) throw new NotFoundException('Business page is unavailable');
     const menu = await this.menus.build(resolved.restaurantId, resolved.branchId);
-    const [reservationsEnabled, locations] = await this.prisma.runAsTenant(resolved.restaurantId, (tx) =>
+    const [reservationsEnabled, locations, loyaltyEnabled] = await this.prisma.runAsTenant(resolved.restaurantId, (tx) =>
       Promise.all([
         this.access.resolveQrCapability(tx, resolved.restaurantId, 'QR_RESERVATIONS', resolved.branchId).then((c) => c.enabled),
-        this.locationsFor(tx, resolved.restaurantId, resolved.branchId)
+        this.locationsFor(tx, resolved.restaurantId, resolved.branchId),
+        this.access.resolveQrCapability(tx, resolved.restaurantId, 'QR_LOYALTY', resolved.branchId).then(async c => c.enabled && (await this.advanced.effectiveIn(tx, resolved.restaurantId, resolved.branchId)).loyaltyEnabled)
       ])
     );
     return {
       ...page,
       reservationsEnabled,
+      loyaltyEnabled,
       locations,
       restaurantName: resolved.restaurantName,
       branchName: resolved.branchName,

@@ -3,6 +3,7 @@ import { Modal } from '@jamanvaar/ui';
 import { CheckCircle2, RefreshCw, Send } from 'lucide-react';
 import { activeAdminBranch } from '../../adminBranchScope';
 import { QrAdminApi, type QrBranch, type QrMenuStatus } from '../../cloud/qrAdminClient';
+import { useQrScope, QrEditingScope } from './QrScope';
 
 export function QrMenuPublication({
   revision,
@@ -17,8 +18,9 @@ export function QrMenuPublication({
   onStatus: (value: QrMenuStatus | null) => void;
   onPublished: (text: string) => void;
 }) {
+  const scope = useQrScope();
   const [branch, setBranch] = useState(
-      () => new URLSearchParams(location.search).get('setupBranch') || (activeAdminBranch !== 'all' ? activeAdminBranch : '') || ''
+      () => scope.managed ? scope.branchId : new URLSearchParams(location.search).get('setupBranch') || (activeAdminBranch !== 'all' ? activeAdminBranch : '') || ''
     ),
     [branches, setBranches] = useState<QrBranch[]>([]),
     [status, setStatus] = useState<QrMenuStatus | null>(null),
@@ -139,11 +141,11 @@ export function QrMenuPublication({
     <section className="qr-menu-publication" aria-label="Draft and live menu status">
       <header>
         <div>
-          <h3>Draft → Review → Live menu</h3>
-          <p>Saving a dish keeps it in the shared draft. Publishing releases the saved menu to customers.</p>
+          <h3>Draft & live menu</h3>
+          <p>Save privately. Review and publish when ready.</p>
         </div>
-        <label>
-          Check branch
+        {scope.managed && scope.branchId ? <QrEditingScope /> : <label>
+          Preview a branch
           <select
             aria-label="Menu status branch"
             value={branch === 'restaurant' ? '' : branch}
@@ -157,7 +159,7 @@ export function QrMenuPublication({
               </option>
             ))}
           </select>
-        </label>
+        </label>}
       </header>
       {status && (
         <>

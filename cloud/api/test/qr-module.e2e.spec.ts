@@ -659,3 +659,34 @@ it('requires owner proof for restaurant receipt defaults and keeps a branch over
  expect((await auth('get',path,adminB)).body.design.footer).toBe('Restaurant default footer');
  expect((await auth('get',path)).body.design).toEqual(originalA);
 });
+
+it('website customer login shares the verified checkout identity, saves contact consent without changing points and signs out safely', async () => {
+ const grant=await prisma.runAsPlatform(tx=>tx.applicationEntitlement.findFirstOrThrow({where:{restaurantId,appCode:'QR_ORDERING',enabled:true}}));
+ await prisma.runAsPlatform(tx=>tx.applicationEntitlement.update({where:{id:grant.id},data:{config:{...grant.config as Prisma.InputJsonObject,qrRestaurantPage:true,qrLoyalty:true}}}));
+ const configuration=(await auth('get',advancedPath)).body;
+ expect((await auth('put',advancedPath).send({version:configuration.version,changes:{loyaltyEnabled:true}})).status).toBe(200);
+ const proof=await ownerDeviceSession(prisma,admin),pagePath='/api/v1/tenant/qr-page?scope='+branch;
+ const initial=(await auth('get',pagePath,proof)).body;
+ const draft=await http().put(pagePath).set('Authorization',`Bearer ${proof}`).send({version:initial.version,content:{...initial.draft,enabled:true,title:'Restaurant account',welcome:'Welcome to our restaurant'}});expect(draft.status,JSON.stringify(draft.body)).toBe(200);
+ const publication=await auth('post','/api/v1/tenant/qr-page/publish?scope='+branch,proof).send({version:draft.body.version});expect(publication.status,JSON.stringify(publication.body)).toBe(201);
+ const slug=publication.body.sharePath.split('/').pop(),site='/api/v1/public/qr/sites/'+slug,accountPath=site+'/loyalty';
+ expect((await http().get(site)).body.loyaltyEnabled).toBe(true);
+ expect((await http().get(accountPath)).status).toBe(403);
+ const sid=await browserSession(),stranger=await browserSession(),notifications=app.get(NotificationGatewayService) as NotificationGatewayService;let otp='';
+ vi.spyOn(notifications,'isQrLoyaltyOtpConfigured').mockReturnValue(true);vi.mocked(notifications.sendQrLoyaltyOtp).mockImplementation(async(_phone:string,code:string)=>{otp=code;return{success:true};});
+ const profile={name:'Website guest',email:'guest@example.invalid',emailOffers:true,whatsappOffers:false};
+ expect((await http().post(accountPath+'/profile').set('x-qr-session',sid).send(profile)).status).toBe(403);
+ expect((await http().post(accountPath+'/send-code').set('x-qr-session',sid).send({phone:'9898989898'})).status).toBe(200);
+ expect((await http().post(accountPath+'/verify').set('x-qr-session',sid).send({code:otp})).body.verified).toBe(true);
+ const saved=await http().post(accountPath+'/profile').set('x-qr-session',sid).send(profile);expect(saved.status,JSON.stringify(saved.body)).toBe(200);expect(saved.body).toMatchObject({verified:true,points:0,profile});
+ expect((await http().post(accountPath+'/profile').set('x-qr-session',sid).send({...profile,points:999,restaurantId})).status).toBe(400);
+ expect((await http().post(accountPath+'/profile').set('x-qr-session',sid).send({...profile,email:''})).status).toBe(400);
+ const other=await http().get(accountPath).set('x-qr-session',stranger);expect(other.body).toMatchObject({verified:false,points:0});expect(other.body.profile).toBeUndefined();
+ const shared=await http().get(`/api/v1/public/qr/${qr}/loyalty`).set('x-qr-session',sid);expect(shared.body).toMatchObject({verified:true,points:0,profile});
+ const persisted=await prisma.runAsPlatform(tx=>tx.syncedEntity.findUniqueOrThrow({where:{restaurantId_entityType_externalId:{restaurantId,entityType:'CUSTOMER',externalId:'9898989898'}}}));expect(persisted.payload).toMatchObject({name:profile.name,email:profile.email,loyaltyPoints:0,marketingConsent:{email:true,whatsapp:false,source:'QR_CUSTOMER_PROFILE'}});
+ const crm=await auth('get','/api/v1/restaurant/qr/crm/customers/9898989898').set('x-owner-authorization',proof);expect(crm.status,JSON.stringify(crm.body)).toBe(200);expect(crm.body).toMatchObject({name:profile.name,email:profile.email});
+ expect((await http().post(accountPath+'/sign-out').set('x-qr-session',sid).send({})).status).toBe(200);
+ expect((await http().get(`/api/v1/public/qr/${qr}/loyalty`).set('x-qr-session',sid)).body.verified).toBe(false);
+ expect((await http().post(accountPath+'/verify').set('x-qr-session',sid).send({code:otp})).status).toBe(400);
+ expect((await http().get('/api/v1/public/qr/sites/not-a-published-page/loyalty').set('x-qr-session',sid)).status).toBe(404);
+});

@@ -6,6 +6,7 @@ import { qrApi } from '../../cloud/cloudClient';
 import { requestQrLeave, useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { FeatureRequestButton } from './FeatureRequestButton';
 import { QR_FIELD } from './qrUi';
+import { QrLoyaltySetup } from './QrLoyaltySetup';
 const base = '/api/v1/restaurant/qr/crm';
 const field = QR_FIELD;
 const button = 'min-h-11 rounded-xl border px-4 py-2 font-bold bg-white disabled:opacity-40';
@@ -169,10 +170,7 @@ export function QrCrm() {
     <div className="space-y-5">
       <section className="rounded-2xl border bg-white p-5 space-y-3">
         <h2 className="sr-only">Customers & loyalty</h2>
-        <p>
-          Customer profiles and point balances are shared with your restaurant's POS and verified QR checkout. Customer order history below follows the selected
-          branch. Points are earned only after confirmed collection; guests verify their phone before using rewards.
-        </p>
+        <p className="text-sm text-slate-600">Saved guest details, earned points and rewards in one place.</p>
         <div className="flex flex-wrap gap-3">
           <button className={button} disabled={locked} onClick={() => edit()}>
             Add customer
@@ -191,25 +189,7 @@ export function QrCrm() {
             {config.canManageProgram ? 'You can manage the restaurant-wide program.' : 'Only the owner changes restaurant-wide rewards and earning rules.'}
           </p>
         )}
-        {config && (
-          <div className="rounded-xl border bg-slate-50 p-4 space-y-2" aria-label="QR loyalty readiness">
-            <p className="font-bold">Guest reward setup</p>
-            <p>Restaurant program: {config.program.enabled ? 'Active' : 'Paused'}</p>
-            <p>QR rewards for this branch: {config.qrChannelEnabled ? 'Enabled' : 'Not enabled'}</p>
-            <p>Phone verification: {config.phoneVerificationReady ? 'Ready' : 'Provider setup required — contact your platform administrator'}</p>
-            {!config.qrChannelEnabled && (
-              <button
-                className={button}
-                onClick={async () => {
-                  if (await requestQrLeave()) window.location.assign('?tab=ADVANCED&feature=Settings');
-                }}
-              >
-                Open branch reward settings
-              </button>
-            )}
-            <p className="text-sm">Guests can redeem when all three checks are ready and an active reward matches their balance.</p>
-          </div>
-        )}
+        {config && <QrLoyaltySetup config={config} canManage={config.canManageProgram} onProgram={() => setProgram({...config.program})} onReward={() => editReward()} onChannel={() => {void requestQrLeave().then(ok => {if(ok)window.location.assign(config.phoneVerificationReady ? '?tab=ADVANCED&feature=Settings' : '?tab=SUPPORT');});}} />}
       </section>
       {error && (
         <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
@@ -251,7 +231,7 @@ export function QrCrm() {
               </select>
             </label>
             {config?.canManageProgram && (
-              <div className="rounded-xl border p-3 space-y-2">
+              <details className="rounded-xl border p-3 space-y-2"><summary className="cursor-pointer font-bold">Export customer contacts</summary>
                 <label>
                   Owner export scope
                   <select aria-label="Owner export scope" className={field} value={exportSegment} onChange={(e) => setExportSegment(e.target.value)}>
@@ -277,7 +257,7 @@ export function QrCrm() {
                 >
                   Export customer CSV
                 </button>
-              </div>
+              </details>
             )}
             <label>
               Find customer by name or phone
@@ -462,7 +442,7 @@ export function QrCrm() {
               </label>
             </fieldset>
             <button className={button} disabled={busy}>
-              Save customer
+              {busy ? 'Saving…' : 'Save customer'}
             </button>
             {error && <p role="alert">{error}</p>}
           </form>
@@ -527,7 +507,7 @@ export function QrCrm() {
               />
             </label>
             <button className={button} disabled={busy}>
-              Save loyalty program
+              {busy ? 'Saving…' : 'Save loyalty program'}
             </button>
             {error && <p role="alert">{error}</p>}
           </form>
@@ -616,7 +596,7 @@ export function QrCrm() {
               />
             </label>
             <button className={button} disabled={busy}>
-              Save reward
+              {busy ? 'Saving…' : 'Save reward'}
             </button>
             {error && <p role="alert">{error}</p>}
           </form>

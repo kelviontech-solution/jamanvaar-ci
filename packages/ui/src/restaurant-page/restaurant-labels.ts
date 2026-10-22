@@ -68,7 +68,7 @@ const keys = [
   'publishedWith',
   'table',
   'viewMap',
-  'loadMap'
+  'loadMap', 'customerLogin', 'rewards', 'guestClub', 'guestClubBody', 'reviewHeading', 'reviewBody', 'instagramFollow', 'socialBody'
 ] as const;
 export type RestaurantLabel = (typeof keys)[number];
 const rows: Record<string, string[]> = {
@@ -650,6 +650,17 @@ const rows: Record<string, string[]> = {
   ]
 };
 export const RESTAURANT_LABEL_LANGUAGES = Object.keys(rows);
+const engagementLabels: Record<string, string[]> = {
+  en: ['Customer login', 'Rewards', 'Make every visit count', 'Sign in to see your points, save your details and unlock restaurant rewards.', 'Enjoyed your visit?', 'Share your experience on Google.', 'Follow on Instagram', 'Food, stories and what is new.'],
+  hi: ['ग्राहक लॉगिन', 'रिवॉर्ड', 'हर मुलाकात खास बनाएं', 'अपने पॉइंट, जानकारी और रिवॉर्ड देखने के लिए लॉगिन करें।', 'आपका अनुभव कैसा रहा?', 'Google पर अपना अनुभव बताएं।', 'Instagram पर फॉलो करें', 'खाना, कहानियां और नई बातें।'],
+  gu: ['ગ્રાહક લૉગિન', 'રિવૉર્ડ', 'દરેક મુલાકાત ખાસ બનાવો', 'તમારા પોઇન્ટ, વિગતો અને રિવૉર્ડ જોવા લૉગિન કરો.', 'તમારી મુલાકાત કેવી રહી?', 'Google પર તમારો અનુભવ જણાવો.', 'Instagram પર ફોલો કરો', 'ભોજન, વાતો અને નવી જાણકારી.'],
+  mr: ['ग्राहक लॉगिन', 'रिवॉर्ड', 'प्रत्येक भेट खास करा', 'पॉइंट, माहिती आणि रिवॉर्ड पाहण्यासाठी लॉगिन करा.', 'तुमची भेट कशी होती?', 'Google वर अनुभव सांगा.', 'Instagram वर फॉलो करा', 'जेवण, गोष्टी आणि नवीन माहिती.'],
+  ta: ['வாடிக்கையாளர் உள்நுழைவு', 'வெகுமதிகள்', 'ஒவ்வொரு வருகையும் சிறப்பு', 'புள்ளிகள், விவரங்கள் மற்றும் வெகுமதிகளைக் காண உள்நுழையவும்.', 'உங்கள் அனுபவம் எப்படி?', 'Google இல் உங்கள் அனுபவத்தைப் பகிரவும்.', 'Instagram இல் தொடரவும்', 'உணவு, கதைகள் மற்றும் புதியவை.'],
+  te: ['కస్టమర్ లాగిన్', 'రివార్డులు', 'ప్రతి సందర్శన ప్రత్యేకం', 'పాయింట్లు, వివరాలు, రివార్డులు చూడటానికి లాగిన్ అవ్వండి.', 'మీ అనుభవం ఎలా ఉంది?', 'Google లో మీ అనుభవాన్ని పంచుకోండి.', 'Instagram లో అనుసరించండి', 'ఆహారం, కథలు, కొత్త విశేషాలు.'],
+  kn: ['ಗ್ರಾಹಕ ಲಾಗಿನ್', 'ಬಹುಮಾನಗಳು', 'ಪ್ರತಿ ಭೇಟಿಯೂ ವಿಶೇಷ', 'ಅಂಕಗಳು, ವಿವರಗಳು ಮತ್ತು ಬಹುಮಾನಗಳನ್ನು ನೋಡಲು ಲಾಗಿನ್ ಮಾಡಿ.', 'ನಿಮ್ಮ ಅನುಭವ ಹೇಗಿತ್ತು?', 'Google ನಲ್ಲಿ ನಿಮ್ಮ ಅನುಭವ ಹಂಚಿಕೊಳ್ಳಿ.', 'Instagram ನಲ್ಲಿ ಅನುಸರಿಸಿ', 'ಊಟ, ಕಥೆಗಳು ಮತ್ತು ಹೊಸ ವಿಷಯಗಳು.'],
+  bn: ['গ্রাহক লগইন', 'পুরস্কার', 'প্রতিটি ভ্রমণ হোক বিশেষ', 'পয়েন্ট, তথ্য ও পুরস্কার দেখতে লগইন করুন।', 'কেমন ছিল আপনার অভিজ্ঞতা?', 'Google এ আপনার অভিজ্ঞতা জানান।', 'Instagram এ অনুসরণ করুন', 'খাবার, গল্প ও নতুন খবর।']
+};
+for (const language of Object.keys(rows)) rows[language].push(...engagementLabels[language]);
 export function restaurantLabel(language: string, key: RestaurantLabel, values: Record<string, string | number> = {}) {
   const index = keys.indexOf(key);
   let value = (rows[language] || rows.en)[index] || rows.en[index];

@@ -100,7 +100,8 @@ describe('shared restaurant page renderer', () => {
     }));
     const view = show({}, { browseMenu: true }, items);
     expect(view.querySelector('#rp-menu')).toBeNull();
-    act(() => view.querySelector<HTMLAnchorElement>('.rp-nav a[href="#rp-menu"]')!.click());
+    expect(view.querySelector('.rp-nav a[href="#rp-menu"]')).toBeNull();
+    act(() => view.querySelector<HTMLButtonElement>('.rp-header-actions .rp-nav-order')!.click());
     const menu = view.querySelector('#rp-menu')!;
     expect(menu.querySelectorAll('.rp-dish')).toHaveLength(8);
     act(() => menu.querySelector<HTMLButtonElement>('.rp-more-menu')!.click());
@@ -132,7 +133,7 @@ describe('shared restaurant page renderer', () => {
   });
   it('opens browse-only menus without inventing an order link and restores document scrolling on close', () => {
     const view = show({}, { browseMenu: true });
-    act(() => view.querySelector<HTMLAnchorElement>('.rp-nav a[href="#rp-menu"]')!.click());
+    act(() => view.querySelector<HTMLButtonElement>('.rp-header-actions .rp-nav-order')!.click());
     expect(view.querySelector('dialog[open]')).not.toBeNull();
     expect(document.body.style.overflow).toBe('hidden');
     expect(view.querySelector('.rp-menu-dialog-order')).toBeNull();

@@ -1,0 +1,43 @@
+.rp-quick-links {display:flex;align-items:center;justify-content:center;gap:10px 26px;flex-wrap:wrap;padding:10px 5%;background:#fffdf9;border-bottom:1px solid var(--rp-line);font-size:12px;font-weight:650;}
+.rp-quick-links a {text-decoration:none;min-height:32px;display:inline-flex;align-items:center;}
+.rp-quick-links button {border:0;background:none;color:inherit;font-size:inherit;font-weight:inherit;min-height:32px;}
+.rp-account-link {display:inline-flex;align-items:center;justify-content:center;min-height:42px;border:1px solid var(--rp-line);background:transparent;border-radius:8px;padding:8px 12px;color:var(--rp-ink);font-size:12px;font-weight:650;white-space:nowrap;}
+.rp-guest-actions {display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:26px 5%;border-bottom:1px solid var(--rp-line);}
+.rp-guest-card {display:flex;align-items:flex-start;gap:14px;background:color-mix(in srgb,var(--rp-bg) 40%,white);border:1px solid var(--rp-line);border-radius:14px;padding:20px;min-width:0;}
+.rp-page .rp-guest-card h2 {font:750 16px/1.3 system-ui,sans-serif;letter-spacing:-.02em;margin-bottom:6px;}
+.rp-guest-card p {font-size:12px;line-height:1.6;color:color-mix(in srgb,var(--rp-ink) 72%,transparent);}
+.rp-card-symbol {font-size:24px;line-height:1;color:var(--rp-accent);flex-shrink:0;}
+.rp-guest-card a,.rp-guest-card button {display:inline-flex;align-items:center;gap:8px;min-height:44px;font:700 12px/1.4 system-ui,sans-serif;color:var(--rp-accent);padding:8px 0;border:0;background:transparent;text-decoration:none;}
+.rp-reward-invite {background:color-mix(in srgb,var(--rp-accent) 6%,var(--rp-bg));}
+.rp-page .rp-section {padding-top:clamp(32px,4vw,58px);padding-bottom:clamp(32px,4vw,58px);}
+@container rp-layout (max-width:600px) {
+ .rp-header {display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:10px 12px;padding:12px 5%;}
+ .rp-wordmark {min-width:0;max-width:none;}
+ .rp-wordmark>span:last-child {font-size:13px;line-height:1.3;overflow-wrap:normal;}
+ .rp-header-actions {grid-row:2;grid-column:1/-1;display:flex;gap:8px;justify-content:stretch;}
+ .rp-header-actions .rp-nav-order,.rp-account-link {flex:1;min-height:40px;justify-content:center;text-align:center;padding:9px 12px;font-size:12px;border-radius:8px;}
+ .rp-nav-toggle {grid-column:2;grid-row:1;}
+ .rp-nav-open {grid-column:1/-1;grid-row:3;}
+ .rp-quick-links {justify-content:flex-start;gap:4px 20px;padding:8px 5%;font-size:11px;}
+ .rp-quick-links a,.rp-quick-links button {min-height:36px;}
+ .rp-hero-copy {padding:26px 6% 30px;gap:14px;}
+ .rp-page h1 {font-size:clamp(32px,10vw,43px);line-height:1.08;letter-spacing:-.04em;}
+ .rp-welcome {font-size:14px;line-height:1.65;}
+ .rp-hero-photo {min-height:220px;height:220px;}
+ .rp-hero-actions {gap:10px;}
+ .rp-guest-actions {grid-template-columns:repeat(2,minmax(0,1fr));padding:20px 5%;gap:10px;}
+ .rp-reward-invite {grid-column:1/-1;}
+ .rp-guest-card {padding:16px 12px;gap:10px;}
+ .rp-page .rp-guest-card h2 {font-size:14px;}
+ .rp-guest-card p {font-size:11px;}
+ .rp-guest-card:not(.rp-reward-invite) .rp-card-symbol {display:none;}
+ .rp-page .rp-section {padding-top:32px;padding-bottom:32px;}
+ .rp-page .rp-section h2 {font-size:28px;}
+ .rp-hero .rp-order {min-height:46px;padding:12px 18px;font-size:14px;}
+ .rp-hero .rp-secondary {font-size:13px;}
+ .rp-page .rp-visit-strip {padding-block:18px;}
+ .rp-indian .rp-hero-photo {min-height:220px;margin:16px 16px 0;}
+ .rp-indian .rp-hero-copy {margin:16px 0 0;border-radius:0;padding:26px 6%;}
+ .rp-modern .rp-hero-copy {min-height:380px;}
+ .rp-cafe .rp-hero-photo {min-height:230px;}
+}

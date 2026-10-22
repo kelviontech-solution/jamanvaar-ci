@@ -22,7 +22,7 @@ import { QrRateLimitInterceptor } from "./qr-rate-limit";
 import { QrPublicService } from "./qr-public.service";
 import { QrAdvancedService, qrAdvancedSchema } from "./qr-advanced.service";
 import { QrPromotionsService, promotionSchema } from "./qr-promotions.service";
-import { QrLoyaltyService } from "./qr-loyalty.service";
+import { QrLoyaltyService, qrGuestProfileSchema } from "./qr-loyalty.service";
 const updateSchema = z
   .object({ changes: qrAdvancedSchema, version: z.number().int().min(0) })
   .strict();
@@ -221,6 +221,19 @@ export class QrAdvancedPublicController {
       body.code,
       req.qrSession,
     );
+  }
+  @Post(':token/loyalty/profile')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(qrGuestProfileSchema))
+  async saveProfile(@Param('token') token: string, @Req() req: { qrSession?: string }, @Body() body: z.infer<typeof qrGuestProfileSchema>) {
+    const ctx = await this.qr.resolve(token);
+    return this.loyalty.saveProfile(ctx.restaurant.id, ctx.branch.id, body, req.qrSession);
+  }
+  @Post(':token/loyalty/sign-out')
+  @HttpCode(200)
+  async signOut(@Param('token') token: string, @Req() req: { qrSession?: string }) {
+    const ctx = await this.qr.resolve(token);
+    return this.loyalty.signOut(ctx.restaurant.id, req.qrSession);
   }
   @Get(":token/history") async history(
     @Param("token") token: string,

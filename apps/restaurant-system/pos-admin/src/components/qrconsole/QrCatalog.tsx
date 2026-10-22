@@ -328,9 +328,8 @@ export function QrCatalog({ view = 'EDIT' }: { view?: 'EDIT' | 'LIVE' }) {
         <p className="text-sm text-slate-600">
           {view === 'LIVE'
             ? 'Check the menu guests see at this branch. New dishes and saved edits appear here after publication.'
-            : 'Add one dish at a time or import a spreadsheet. Review your draft, then publish when it is ready for guests.'}
+            : 'Add dishes, review changes and publish to your live menu.'}
         </p>
-        <QrMenuPublication revision={revision} editing={mode !== 'BROWSE' || busy} reviewRequest={reviewRequest} onStatus={setPublication} onPublished={setNotice} />
         {view === 'LIVE' && (
           <p className="qr-menu-live-intro">
             This list contains the dishes currently visible to QR guests at the selected branch, using their published names, photos and prices. Switch to
@@ -353,6 +352,7 @@ export function QrCatalog({ view = 'EDIT' }: { view?: 'EDIT' | 'LIVE' }) {
             </button>
           </div>
         )}
+        <div hidden={mode !== 'BROWSE'}><QrMenuPublication revision={revision} editing={mode !== 'BROWSE' || busy} reviewRequest={reviewRequest} onStatus={setPublication} onPublished={setNotice} /></div>
         {mode !== 'BROWSE' && (
           <p className="text-sm text-slate-600">Finish or cancel this task before publishing. Saving a draft does not change the live menu.</p>
         )}
@@ -424,6 +424,7 @@ export function QrCatalog({ view = 'EDIT' }: { view?: 'EDIT' | 'LIVE' }) {
               <label>
                 Category name
                 <input
+                    autoFocus
                   className={input}
                   required
                   maxLength={120}
@@ -570,7 +571,7 @@ export function QrCatalog({ view = 'EDIT' }: { view?: 'EDIT' | 'LIVE' }) {
             <fieldset disabled={busy} className="contents">
               <label>
                 Dish name
-                <input className={input} required maxLength={120} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+                  <input autoFocus className={input} required maxLength={120} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               </label>
               <label>
                 Category
@@ -627,15 +628,6 @@ export function QrCatalog({ view = 'EDIT' }: { view?: 'EDIT' | 'LIVE' }) {
                   required
                   value={draft.price}
                   onChange={(e) => setDraft({ ...draft, price: e.target.value })}
-                />
-              </label>
-              <label>
-                Description
-                <input
-                  className={input}
-                  maxLength={1000}
-                  value={draft.description || ''}
-                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
                 />
               </label>
               <div className="qr-dish-photo-upload sm:col-span-2">
@@ -702,17 +694,18 @@ export function QrCatalog({ view = 'EDIT' }: { view?: 'EDIT' | 'LIVE' }) {
                   </button>
                 </div>
               )}
-              <QrMenuChoices
+              <details className="qr-dish-optional sm:col-span-2"><summary>Sizes & add-ons · {(draft.modifierGroupIds || []).length} selected groups</summary><QrMenuChoices
                 scope="dish"
                 selectedIds={draft.modifierGroupIds || []}
                 groups={groups}
                 staged={choiceDrafts}
                 onSelect={(ids) => setDraft({ ...draft, modifierGroupIds: ids })}
                 onStage={stageChoice}
-              />
+              /></details>
               <details className="qr-dish-optional sm:col-span-2">
                 <summary>More options: tax, dietary label, SKU and image link</summary>
                 <div className="grid gap-3 mt-4 sm:grid-cols-2">
+                  <label>Description<input className={input} maxLength={1000} value={draft.description || ''} onChange={event => setDraft({...draft,description:event.target.value})} /></label>
                   <label>
                     Image URL (optional)
                     <input
@@ -895,20 +888,20 @@ export function QrCatalog({ view = 'EDIT' }: { view?: 'EDIT' | 'LIVE' }) {
                             </small>
                           )}
                           {view === 'EDIT' && state && !state.live && state.afterPublishVisible && <p>Ready in draft. Publish to make it visible.</p>}
-                          {publication && (view === 'LIVE' || (state?.canRestoreBranchPause && state?.reason === 'Switched off for this branch')) && (
+                          {publication && (view === 'LIVE' || state?.live || (state?.canRestoreBranchPause && state?.reason === 'Switched off for this branch')) && (
                             <button
                               type="button"
                               disabled={busy}
                               onClick={() =>
                                 void run(
-                                  () => QrAdminApi.branchAvailability(publication.branchId, i.id, view !== 'LIVE'),
-                                  view === 'LIVE'
+                                  () => QrAdminApi.branchAvailability(publication.branchId, i.id, !(view === 'LIVE' || state?.live)),
+                                  view === 'LIVE' || state?.live
                                     ? 'Dish paused at this branch. Review and publish to save the branch menu state.'
                                     : 'Branch pause removed in draft. Review and publish to restore the dish to the live QR menu.'
                                 )
                               }
                             >
-                              {view === 'LIVE' ? 'Pause at this branch' : 'Remove branch pause'}
+                              {view === 'LIVE' || state?.live ? 'Pause at this branch' : 'Remove branch pause'}
                             </button>
                           )}
                         </div>

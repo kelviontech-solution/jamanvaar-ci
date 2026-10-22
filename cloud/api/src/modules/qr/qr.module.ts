@@ -2,7 +2,7 @@ import {QrAttentionService} from './qr-attention.service';
 import { QrMenuStatusService } from './qr-menu-status.service';
 import {QrReceiptService} from './qr-receipt.service';
 import {QrReceiptController} from './qr-receipt.controller';
-import { QrRestaurantPageController } from './qr-restaurant-page.controller';
+import { QrRestaurantPageController, QrSiteLoyaltyController } from './qr-restaurant-page.controller';
 import { QrRestaurantPageService } from './qr-restaurant-page.service';
 import { TenantAuthModule } from '../tenant-auth/tenant-auth.module';
 import { QrWorkflowsService } from './qr-workflows.service';
@@ -48,7 +48,7 @@ import { PlatformNotificationsModule } from '../platform-notifications/platform-
  */
 @Module({
   imports: [TenantAuthModule, PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule, PlatformNotificationsModule],
-  controllers: [QrReceiptController,QrRestaurantPageController,QrWorkflowsController,QrCrmController,QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
+  controllers: [QrReceiptController,QrSiteLoyaltyController,QrRestaurantPageController,QrWorkflowsController,QrCrmController,QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
   providers: [QrMenuStatusService,QrAttentionService,QrReceiptService,QrRestaurantPageService,QrWorkflowsService,QrCrmService,QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, QrReservationsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]
 })

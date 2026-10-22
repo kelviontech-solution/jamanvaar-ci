@@ -8,6 +8,7 @@ import { accentInk, accentText } from './brandContrast';
 import {readGuestSession,saveGuestSession} from './guestSession';
 import { shouldRefreshGuestOrder } from './paymentProgress';
 import { LoyaltyPanel } from './LoyaltyPanel';
+import { GuestAccount } from './GuestAccount';
 import { GroupOrder } from './GroupOrder';
 import { OrderFeedback, GuestHistory } from './AdvancedGuest';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -123,10 +124,12 @@ function GuestRestaurantPage(props:ComponentProps<typeof RestaurantPage>){
 }
 function PublicRestaurantSite({slug}:{slug:string}){
  const [page,setPage]=useState<(RestaurantPageView&{items:RestaurantPageDish[];menuReady:boolean})|null>(null),[error,setError]=useState('');
+ const [accountOpen,setAccountOpen]=useState(false),[accountSession,setAccountSession]=useState('');
+ const openAccount=async()=>{try{setAccountSession(await ensureSession());setAccountOpen(true);}catch(e){setError((e as Error).message);}};
  useEffect(()=>{let alive=true,running=false;const refresh=async()=>{if(running||document.hidden)return;running=true;try{const value=await QrApi.site(slug);if(alive){setPage(value);setError('');}}catch(e){if(alive){setError((e as Error).message);if(e instanceof ApiError&&e.status===404)setPage(null);}}finally{running=false;}};void refresh();const timer=setInterval(()=>void refresh(),15000);return()=>{alive=false;clearInterval(timer);};},[slug]);
  if(!page)return <Message title={error?'Restaurant page unavailable':'Opening the restaurant'} text={error||'Please wait a moment.'}/>;
  // The website presents the restaurant. Menu browsing is on demand; ordering uses the branch's existing QR checkout.
- return <GuestRestaurantPage browseMenu categories={page.categories} page={{...page,content:{...page.content,logoUrl:(imageSrc(page.content.logoUrl)||''),heroUrl:(imageSrc(page.content.heroUrl)||''),gallery:page.content.gallery.map(i=>({...i,url:(imageSrc(i.url)||'')}))}}} items={page.menuReady?page.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)})):[]} menuLabel="Explore the menu" availability={page.menuReady?(page.orderOnlineUrl?'':'Open Menu to browse dishes and prices. Contact the restaurant to place an order.'):'Our menu is not available online yet. Please contact the restaurant.'} onReserve={page.reservationsEnabled?(input)=>QrApi.reservation(slug,input):undefined}/>;
+ return <><GuestRestaurantPage browseMenu categories={page.categories} page={{...page,content:{...page.content,logoUrl:(imageSrc(page.content.logoUrl)||''),heroUrl:(imageSrc(page.content.heroUrl)||''),gallery:page.content.gallery.map(i=>({...i,url:(imageSrc(i.url)||'')}))}}} items={page.menuReady?page.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)})):[]} menuLabel="View menu" availability={page.menuReady?(page.orderOnlineUrl?'':'Online ordering is not available here yet. Browse the menu or contact the restaurant.'):'Our menu is not available online yet. Please contact the restaurant.'} onAccount={()=>void openAccount()} onReserve={page.reservationsEnabled?(input)=>QrApi.reservation(slug,input):undefined}/>{error&&<p role="alert" className="site-connection-notice">{error}</p>}{accountOpen&&accountSession&&<GuestAccount source={{kind:'site',id:slug}} session={accountSession} onClose={()=>setAccountOpen(false)}/>}</>;
 }
 
 function Message({ title, text, action, busy, note }: { title: string; text?: string; action?: { label: string; run: () => void }; busy?: boolean; note?: string }) {
@@ -143,6 +146,7 @@ function Message({ title, text, action, busy, note }: { title: string; text?: st
 }
 
 function Ordering({ token }: { token: string }) {
+  const [accountOpen, setAccountOpen] = useState(false);
   const [info, setInfo] = useState<Describe | null>(null);
   const [menu, setMenu] = useState<Menu | null>(null);
   const [problem, setProblem] = useState<{ title: string; text: string; retry: boolean } | null>(null);
@@ -264,7 +268,7 @@ function Ordering({ token }: { token: string }) {
   const restaurantPage=info.restaurantPage?{...info.restaurantPage,restaurantName:info.restaurant.name,branchName:info.branch.name,table:info.table?.displayNumber,currency:info.currency||'INR',content:{...info.restaurantPage.content,logoUrl:(imageSrc(info.restaurantPage.content.logoUrl)||''),heroUrl:(imageSrc(info.restaurantPage.content.heroUrl)||''),gallery:info.restaurantPage.content.gallery.map(i=>({...i,url:(imageSrc(i.url)||'')}))}}:null;
   const effectiveBrand=restaurantPage?{...info.branding,welcomeTitle:restaurantPage.content.title||info.restaurant.name,welcomeMessage:restaurantPage.content.welcome,logoUrl:restaurantPage.content.logoUrl||info.branding?.logoUrl||null,coverUrl:restaurantPage.content.heroUrl||info.branding?.coverUrl,accentColor:restaurantPage.content.accent,backgroundColor:restaurantPageBackgrounds[restaurantPage.content.template]}:info.branding;
   const menuInfo=effectiveBrand?{...info,branding:{...effectiveBrand,footerMessage:effectiveBrand.footerMessage??null,orderButtonLabel:effectiveBrand.orderButtonLabel??null}}:info;
-  if(screen==='HOME'&&restaurantPage)return <GuestRestaurantPage page={restaurantPage} categories={menu.categories} items={menu.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)}))} onMenu={info.ordering.menuReady?()=>navigate('MENU'):undefined} availability={!info.ordering.menuReady?'Our menu is not available online yet. Please contact the restaurant.':!info.ordering.enabled?info.ordering.availability?.message||'Ordering is currently unavailable. You can still browse the menu.':''} onDish={id=>{setFeaturedDish(id);navigate('MENU');}}/>;
+  if(screen==='HOME'&&restaurantPage)return <><GuestRestaurantPage page={{...restaurantPage,loyaltyEnabled:info.advanced?.loyaltyEnabled}} categories={menu.categories} items={menu.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)}))} onMenu={info.ordering.menuReady?()=>navigate('MENU'):undefined} availability={!info.ordering.menuReady?'Our menu is not available online yet. Please contact the restaurant.':!info.ordering.enabled?info.ordering.availability?.message||'Ordering is currently unavailable. You can still browse the menu.':''} onAccount={()=>setAccountOpen(true)} onDish={id=>{setFeaturedDish(id);navigate('MENU');}}/>{accountOpen&&<GuestAccount source={{kind:'table',id:token}} session={sessionId} onClose={()=>setAccountOpen(false)}/>}</>;
 
   return (
     <div className={`app brand-${effectiveBrand?.layout??'CARDS'}`} style={{'--saffron':effectiveBrand?.accentColor||'#c2570c','--bg':effectiveBrand?.backgroundColor||'#faf7f2','--accent-ink':accentInk(effectiveBrand?.accentColor||'#c2570c'),'--accent-text':accentText(effectiveBrand?.accentColor||'#c2570c')} as React.CSSProperties}>
@@ -274,9 +278,13 @@ function Ordering({ token }: { token: string }) {
           <div className="name">{effectiveBrand?.welcomeTitle || info.restaurant.name}</div>
           <div className="sub">{info.branch.name}{info.table ? ` · Table ${info.table.displayNumber}` : ' · Menu'}</div>
         </div>
-        {restaurantPage&&<button type="button" className="rp-info-link" onClick={()=>navigate('HOME')}>About & contact</button>}
+        <div className="guest-header-links">
+          {restaurantPage&&<button type="button" className="rp-info-link" onClick={()=>navigate('HOME')}>About & contact</button>}
+          {info.advanced?.loyaltyEnabled&&<button type="button" className="rp-info-link" onClick={()=>setAccountOpen(true)}>My rewards</button>}
+        </div>
         <div className="mode"><span className="live-dot" />{info.table ? `Table ${info.table.displayNumber}` : 'Guest menu'}</div>
       </header>
+      {accountOpen&&<GuestAccount source={{kind:'table',id:token}} session={sessionId} onClose={()=>setAccountOpen(false)}/>}
       <ServiceRequests token={token} session={sessionId}/>{screen !== 'MENU' && <nav className="journey" aria-label="Order progress">{(['MENU', 'CART', 'CHECKOUT', 'STATUS'] as Screen[]).map((step, index) => { const current = screen === 'STATUS' && placed?.status === 'PENDING_PAYMENT' ? 'CHECKOUT' : screen; return <span key={step} className={step === current ? 'current' : ''} aria-current={step === current ? 'step' : undefined}><b>{index + 1}</b>{({ HOME: 'Restaurant', MENU: 'Menu', CART: 'Cart', CHECKOUT: 'Checkout', STATUS: 'Your order' })[step]}</span>; })}</nav>}
 
       {screen === 'MENU' && <MenuScreen info={menuInfo} menu={menu} cart={cart} setCart={setCart} onCart={() => navigate('CART')} placed={placed} onStatus={() => navigate('STATUS')} initialDishId={featuredDish} onDishOpened={()=>setFeaturedDish(null)} />}

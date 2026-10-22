@@ -254,6 +254,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .app .item .price,.app .eyebrow{color:var(--accent-text,var(--saffron))}.app .add{color:var(--accent-text,var(--saffron));border-color:var(--accent-text,var(--saffron))}
 .app .primary { background:var(--saffron); color:var(--accent-ink,#fff); }
 
-.rp-info-link{border:1px solid var(--line,#ddd);padding:9px 12px;min-height:44px;border-radius:20px;background:white;color:#163237;font-size:12px;cursor:pointer}@media(max-width:600px){.top:has(.rp-info-link){flex-wrap:wrap}.rp-info-link{margin-left:auto}}
+.rp-info-link{border:1px solid var(--line,#ddd);padding:9px 12px;min-height:44px;border-radius:20px;background:white;color:#163237;font-size:12px;cursor:pointer}
+.guest-header-links{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.guest-header-links:empty{display:none}
+.site-connection-notice{position:fixed;bottom:18px;left:16px;right:16px;max-width:640px;margin:auto;padding:14px 18px;border:1px solid #e8c795;border-radius:14px;background:#fff7e7;color:#59380d;box-shadow:0 4px 20px #0001;z-index:30}
+@media(max-width:600px){.app .top .guest-header-links{grid-column:1 / -1;grid-row:2}.app .top .guest-header-links .rp-info-link{padding:9px 12px;font-size:12px}.app .top .mode{grid-column:1 / -1;grid-row:3}}
 
 @media(max-width:600px){.app .top{display:grid;grid-template-columns:84px minmax(0,1fr);gap:10px 12px;padding:12px 16px}.app .top .logo{width:80px;height:42px}.app .top .restaurant-heading{border:0;padding:0;min-width:0}.app .top .name{font-size:16px;line-height:1.25}.app .top .sub{font-size:11px;line-height:1.5}.app .top .rp-info-link{grid-column:1;grid-row:2;margin:0;padding:7px;font-size:10px}.app .top .mode{grid-column:2;justify-self:start;font-size:11px}.app .rp-footer a{color:inherit}}

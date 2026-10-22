@@ -1,4 +1,7 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, NotFoundException, Param, Post, Put, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
+import { QrRateLimitInterceptor } from './qr-rate-limit';
+import { QrLoyaltyService, qrGuestProfileSchema } from './qr-loyalty.service';
 import { User } from '@prisma/client';
 import { z } from 'zod';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
@@ -64,5 +67,36 @@ export class QrRestaurantPageController {
   }
   @Post('images') image(@CurrentTenantUser() u: User, @Query('scope') scope = 'restaurant', @Body() body: unknown) {
     return this.pages.upload(u, scope, parse(z.object({ image: z.string().max(2000000) }).strict(), body).image);
+  }
+}
+
+/** The website uses the same verified customer identity as table checkout. No guest-supplied tenant IDs. */
+@Controller('api/v1/public/qr/sites/:slug/loyalty')
+@SkipThrottle()
+@UseInterceptors(QrRateLimitInterceptor)
+export class QrSiteLoyaltyController {
+  constructor(private readonly pages: QrRestaurantPageService, private readonly loyalty: QrLoyaltyService) {}
+  private async scope(slug: string) {
+    const scope = await this.pages.resolveSlug(slug);
+    if (!await this.pages.publicPage(scope.restaurantId, scope.branchId)) throw new NotFoundException('Restaurant website is unavailable.');
+    return scope;
+  }
+  @Get() async account(@Param('slug') slug: string, @Req() req: { qrSession?: string }) {
+    const s = await this.scope(slug); return this.loyalty.account(s.restaurantId, s.branchId, req.qrSession);
+  }
+  @Post('send-code') @HttpCode(200) async send(@Param('slug') slug: string, @Req() req: { qrSession?: string }, @Body() body: unknown) {
+    const input = parse(z.object({ phone: z.string().max(20) }).strict(), body), s = await this.scope(slug);
+    return this.loyalty.sendOtp(s.restaurantId, s.branchId, input.phone, req.qrSession);
+  }
+  @Post('verify') @HttpCode(200) async verify(@Param('slug') slug: string, @Req() req: { qrSession?: string }, @Body() body: unknown) {
+    const input = parse(z.object({ code: z.string().regex(/^\d{6}$/) }).strict(), body), s = await this.scope(slug);
+    return this.loyalty.verify(s.restaurantId, s.branchId, input.code, req.qrSession);
+  }
+  @Post('profile') @HttpCode(200) async profile(@Param('slug') slug: string, @Req() req: { qrSession?: string }, @Body() body: unknown) {
+    const input = parse(qrGuestProfileSchema, body), s = await this.scope(slug);
+    return this.loyalty.saveProfile(s.restaurantId, s.branchId, input, req.qrSession);
+  }
+  @Post('sign-out') @HttpCode(200) async logout(@Param('slug') slug: string, @Req() req: { qrSession?: string }) {
+    const s = await this.scope(slug); return this.loyalty.signOut(s.restaurantId, req.qrSession);
   }
 }

@@ -48,7 +48,8 @@ export function QrSetupHealth({
     void load();
   }, []);
   return (
-    <section className="qr-health-card">
+    <details className="qr-health-card" open={!data?.ready}>
+      <summary className="qr-health-summary">Branch setup · {data ? data.ready ? 'Ready' : `${data.total-data.completed} checks need attention` : 'Checking…'}</summary>
       <div className="qr-health-title">
         <div>
           <ClipboardCheck size={24} />
@@ -128,7 +129,7 @@ export function QrSetupHealth({
           </details>
         </>
       )}
-    </section>
+    </details>
   );
 }
 export function QrServiceOperations() {

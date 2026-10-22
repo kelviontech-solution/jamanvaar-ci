@@ -37,6 +37,7 @@ export function QrFeatureRequestAction({ ticketId, onChanged }: { ticketId: stri
         </> : <p>Ask a Super Admin with support and subscription management permission to enable this feature.</p>}
       </>}
       <Link to={`/restaurants/${data.restaurantId}?tab=applications`}>Review restaurant products & branch access</Link>
+      <Link to={`/qr-ordering?restaurantId=${encodeURIComponent(data.restaurantId)}&tab=entitlement`}>Open this restaurant's QR features</Link>
       {data.blockedReason?.includes('platform rollout') && <Link to="/feature-catalog">Review platform feature availability</Link>}
     </> : !error && <p>This ticket has no verified optional QR feature code. Review the request with the owner before changing product access.</p>}
     {error && <p role="alert" style={{ color: 'var(--jv-danger, #b42345)', margin: 0 }}>{error}</p>}

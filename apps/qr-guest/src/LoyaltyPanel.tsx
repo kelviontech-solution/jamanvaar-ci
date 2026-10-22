@@ -4,6 +4,7 @@ export type LoyaltyAccount = {
   verified: boolean;
   verificationAvailable: boolean;
   phoneMasked?: string;
+  profile?: { name: string; email: string; emailOffers: boolean; whatsappOffers: boolean };
   points: number;
   message: string;
   program: { enabled: boolean; earnPoints: number; perRupeesSpent: number };

@@ -6,6 +6,8 @@ import { designSvg, downloadCardPng, downloadDesignSvg, printCards, withLogo } f
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
 import type { QrTab } from './qrNavigation';
 import './restaurant-page-qr.css';
+import { useQrScope, QrEditingScope } from './QrScope';
+import { QrWebsiteJourney } from './QrWebsiteJourney';
 
 type DesignState = { version: number; design: QrPrintDesign };
 type Branch = { id: string; name: string };
@@ -17,6 +19,9 @@ const presets = [
 ] as const;
 /** One published branch website, with artwork separate from the table-ordering cards. */
 export function QrRestaurantPageQr({ onNavigate }: { onNavigate: (tab: QrTab, branch: string) => void }) {
+  const workspaceScope = useQrScope();
+  const [scanCheck, setScanCheck] = useState(() => {try{const requested=sessionStorage.getItem('qr_website_open_scan_check') === '1';sessionStorage.removeItem('qr_website_open_scan_check');return requested;}catch{return false;}});
+  const [outputReady, setOutputReady] = useState(false);
   const [branches, setBranches] = useState<Branch[]>([]),
     [branch, setBranch] = useState('');
   const [saved, setSaved] = useState<DesignState | null>(null),
@@ -34,13 +39,13 @@ export function QrRestaurantPageQr({ onNavigate }: { onNavigate: (tab: QrTab, br
     let active = true;
     void cloudQrAccount()
       .then(async (account) => {
-        const scope = account.role === 'OWNER' ? 'restaurant' : account.branchId;
+        const scope = account.role === 'OWNER' ? workspaceScope.managed && workspaceScope.branchId ? workspaceScope.branchId : 'restaurant' : account.branchId;
         if (!scope) throw Error('Choose an assigned branch to manage its restaurant page QR.');
         const data = await request<{ branches: Branch[] }>('/api/v1/tenant/qr-page?scope=' + encodeURIComponent(scope));
         if (active) {
           setBranches(data.branches);
           const requested = new URLSearchParams(location.search).get('setupBranch');
-          setBranch(data.branches.find((row) => row.id === requested)?.id || data.branches[0]?.id || '');
+          setBranch(workspaceScope.managed && workspaceScope.branchId ? workspaceScope.branchId : data.branches.find((row) => row.id === requested)?.id || data.branches[0]?.id || '');
           if (!data.branches.length) setError('Add an active branch before preparing a restaurant page QR.');
         }
       })
@@ -60,6 +65,7 @@ export function QrRestaurantPageQr({ onNavigate }: { onNavigate: (tab: QrTab, br
     setError('');
     setAvailability('');
     setNotice('');
+    setOutputReady(false);
     void request<DesignState>(endpoint(branch))
       .then((data) => {
         if (active) {
@@ -130,6 +136,7 @@ export function QrRestaurantPageQr({ onNavigate }: { onNavigate: (tab: QrTab, br
       else if (format === 'PNG') await downloadCardPng(fresh, file);
       else downloadDesignSvg(fresh, file);
       setCard(fresh);
+      setOutputReady(true);setScanCheck(true);
       setNotice(
         format === 'PRINT' ? 'Print preview opened. Choose your printer or Save as PDF.' : 'Restaurant page QR downloaded. Test scan it before displaying it.'
       );
@@ -142,6 +149,8 @@ export function QrRestaurantPageQr({ onNavigate }: { onNavigate: (tab: QrTab, br
   }
   return (
     <section className="qr-website-qr" aria-label="Restaurant page QR workspace">
+      <QrWebsiteJourney current={scanCheck ? 'test' : 'qr'} live={!!card} onStep={step => {if(step === 'test'){setScanCheck(true);requestAnimationFrame(()=>document.getElementById('qr-website-scan-check')?.scrollIntoView({behavior:'smooth',block:'center'}));}else if(step === 'qr')setScanCheck(false);else {const url=new URL(location.href);url.searchParams.set('websiteStep',step);history.replaceState(null,'',url);onNavigate('RESTAURANT_PAGE',branch);}}} />
+      {scanCheck && card?.url && <section className="qr-scan-check" id="qr-website-scan-check" aria-label="Website QR test scan"><strong>{outputReady ? 'Your QR output is ready. Test it on your phone.' : 'Test your restaurant website QR'}</strong><ol><li>Open your phone camera and scan the QR in the preview or printed poster.</li><li>Check that your restaurant, review link and Instagram are correct.</li><li>Tap Order online and confirm it opens the right branch menu.</li></ol><a href={card.url} target="_blank" rel="noopener noreferrer">Open live website ↗</a><small>This opens the website for inspection. A successful phone scan is not automatically certified.</small></section>}
       <div className="qr-website-purpose">
         <strong>Restaurant Page QR → your restaurant website</strong>
         <p>
@@ -152,7 +161,7 @@ export function QrRestaurantPageQr({ onNavigate }: { onNavigate: (tab: QrTab, br
           Need table ordering QRs?
         </button>
       </div>
-      <label className="qr-website-branch">
+      {workspaceScope.managed && workspaceScope.branchId ? <QrEditingScope /> : <label className="qr-website-branch">
         Branch to print
         <select aria-label="Branch to print" disabled={busy || !branches.length} value={branch} onChange={(e) => void changeBranch(e.target.value)}>
           {branches.map((row) => (
@@ -161,7 +170,7 @@ export function QrRestaurantPageQr({ onNavigate }: { onNavigate: (tab: QrTab, br
             </option>
           ))}
         </select>
-      </label>
+      </label>}
       {error && (
         <p role="alert" className="qr-website-error">
           {error}

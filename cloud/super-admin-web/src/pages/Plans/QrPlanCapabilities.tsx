@@ -1,4 +1,5 @@
 import type { FeatureRecord } from '../../api/types';
+import './qr-package.css';
 
 export function qrPackageFlags(flags: Record<string, boolean>, features: FeatureRecord[], complete: boolean) {
   return {
@@ -9,6 +10,11 @@ export function qrPackageFlags(flags: Record<string, boolean>, features: Feature
     tableManagement: true,
     foodCustomization: true
   };
+}
+export function qrEngagementPackage(flags: Record<string, boolean>, features: FeatureRecord[]) {
+  const codes = new Set(['QR_RESTAURANT_PAGE','QR_BRANDING','QR_LOYALTY','QR_PROMOTIONS','QR_FEEDBACK','QR_MULTILINGUAL','QR_MENU_ANALYTICS','QR_SERVICE_REQUESTS','QR_ORDER_HISTORY']);
+  const next = qrPackageFlags(flags, features, false);
+  return { ...next, ...Object.fromEntries(features.filter(f => codes.has(f.code) && f.legacyEntitlementKey).map(f => [f.legacyEntitlementKey!, true])) };
 }
 
 export function QrPlanCapabilities({
@@ -42,11 +48,16 @@ export function QrPlanCapabilities({
           <b>QR Essential</b>
           <span>Menu and table ordering. Optional capabilities remain separate.</span>
         </button>
+        <button type="button" disabled={loading || !!error || !features.length} onClick={() => onChange(qrEngagementPackage(flags, features))}>
+          <b>QR Engage · website & returning guests</b>
+          <span>Restaurant website, Google review and Instagram links, loyalty, promotions, languages and guest feedback.</span>
+        </button>
         <button type="button" disabled={loading || !!error || !features.length} onClick={() => onChange(qrPackageFlags(flags, features, true))}>
           <b>QR Complete · include all QR capabilities</b>
           <span>Includes Menu Performance, loyalty, restaurant page and every QR capability listed below.</span>
         </button>
       </div>
+      <div className="qr-package-summary" aria-label="Included QR package features"><strong>Included in this plan</strong><div>{features.filter(feature => flags[feature.legacyEntitlementKey!] === true).map(feature => <span key={feature.id}>✓ {feature.name}</span>)}</div><p>Guests order without a login. When loyalty is configured, Customer login appears on the restaurant website and menu. Google reviews never require login or reward eligibility.</p></div>
       <p className="form-note">
         Save this plan and assign it to the restaurant. Existing feature restrictions for an individual restaurant or branch still apply. Platform-inactive or
         limited-rollout features remain subject to their release controls.

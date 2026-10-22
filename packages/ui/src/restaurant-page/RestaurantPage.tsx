@@ -65,6 +65,7 @@ function structuredHoursText(hours: RestaurantBusinessHours | null | undefined, 
 import './restaurant-page.css';
 import './restaurant-page-layout.css';
 import './restaurant-website.css';
+import './restaurant-experience.css';
 const safe = (v: string) => {
   if (!v.trim()) return '';
   try {
@@ -642,6 +643,7 @@ export function RestaurantPage({
   onLanguageChange,
   onAction,
   onReserve,
+  onAccount,
   now
 }: {
   page: RestaurantPageView;
@@ -658,6 +660,7 @@ export function RestaurantPage({
   onLanguageChange?: (language: string) => void;
   onAction?: (action: PageEngagementAction) => void;
   onReserve?: (input: ReservationInput) => Promise<unknown>;
+  onAccount?: () => void;
   now?: number;
 }) {
   const [selectedLanguage, setSelectedLanguage] = useState(page.content.defaultLanguage || 'en');
@@ -734,7 +737,6 @@ export function RestaurantPage({
   };
   const navLinks = (
     [
-      items.length ? { id: 'rp-menu', label: l('menu') } : null,
       sectionSet.has('ABOUT') && c.about ? { id: 'rp-about', label: l('about') } : null,
       sectionSet.has('GALLERY') && c.gallery.length ? { id: 'rp-gallery', label: l('gallery') } : null,
       sectionSet.has('VISIT') && (c.hours || c.address || c.phone || c.mapsUrl || c.businessHours) ? { id: 'rp-visit', label: l('visit') } : null,
@@ -811,6 +813,7 @@ export function RestaurantPage({
             )}
             <div className="rp-header-actions">
               <span className="rp-place">{page.table ? l('table') + ' ' + page.table : page.branchName}</span>
+              {page.loyaltyEnabled && onAccount && <button type="button" className="rp-account-link" onClick={onAccount}>{l('rewards')}</button>}
               {orderHref ? (
                 <a
                   className="rp-nav-order"
@@ -845,6 +848,11 @@ export function RestaurantPage({
               </button>
             )}
           </header>
+          {(c.reviewUrl || c.instagram || (page.loyaltyEnabled && onAccount)) && <nav className="rp-quick-links" aria-label="Guest quick links">
+            {c.reviewUrl && safe(c.reviewUrl) && <a href={safe(c.reviewUrl)} target="_blank" rel="noopener noreferrer" onClick={() => onAction?.('REVIEW_CLICK')}>☆ {l('googleReview')} ↗</a>}
+            {c.instagram && safe(c.instagram) && <a href={safe(c.instagram)} target="_blank" rel="noopener noreferrer" onClick={() => onAction?.('INSTAGRAM_CLICK')}>◎ Instagram ↗</a>}
+            {page.loyaltyEnabled && onAccount && <button type="button" onClick={onAccount}>{l('customerLogin')} →</button>}
+          </nav>}
           {languages.length > 1 && (
             <nav className="rp-languages" aria-label="Restaurant page language">
               {languages.map((l) => (
@@ -881,11 +889,7 @@ export function RestaurantPage({
                 <p className="rp-welcome">{c.welcome}</p>
                 <div className="rp-hero-actions">
                   {action}
-                  {orderHref ? (
-                    <button type="button" className="rp-secondary" onClick={openMenu}>
-                      {l('exploreMenu')} <span aria-hidden="true">↗</span>
-                    </button>
-                  ) : c.mapsUrl && safe(c.mapsUrl) ? (
+                  {c.mapsUrl && safe(c.mapsUrl) ? (
                     <a className="rp-secondary" href={safe(c.mapsUrl)} target="_blank" rel="noopener noreferrer" onClick={() => onAction?.('DIRECTIONS_CLICK')}>
                       {l('visit')} <span aria-hidden="true">↗</span>
                     </a>
@@ -902,6 +906,11 @@ export function RestaurantPage({
               </div>
             </section>
             <OpeningStatus hours={c.businessHours} now={now ?? clock} />
+            {(c.reviewUrl || c.instagram || (page.loyaltyEnabled && onAccount)) && <section className="rp-guest-actions" aria-label="Reviews, social and customer rewards">
+              {page.loyaltyEnabled && onAccount && <article className="rp-guest-card rp-reward-invite"><span className="rp-card-symbol" aria-hidden="true">✦</span><div><h2>{l('guestClub')}</h2><p>{l('guestClubBody')}</p><button type="button" onClick={onAccount}>{l('customerLogin')} <span aria-hidden="true">→</span></button></div></article>}
+              {c.reviewUrl && safe(c.reviewUrl) && <article className="rp-guest-card"><span className="rp-card-symbol" aria-hidden="true">☆</span><div><h2>{l('reviewHeading')}</h2><p>{l('reviewBody')}</p><a href={safe(c.reviewUrl)} target="_blank" rel="noopener noreferrer" onClick={() => onAction?.('REVIEW_CLICK')}>{l('googleReview')} ↗</a></div></article>}
+              {c.instagram && safe(c.instagram) && <article className="rp-guest-card"><span className="rp-card-symbol" aria-hidden="true">◎</span><div><h2>Instagram</h2><p>{l('socialBody')}</p><a href={safe(c.instagram)} target="_blank" rel="noopener noreferrer" onClick={() => onAction?.('INSTAGRAM_CLICK')}>{l('instagramFollow')} ↗</a></div></article>}
+            </section>}
             {(c.address || c.hours || c.phone || page.table) && (
               <div className="rp-visit-strip" aria-label="At a glance">
                 {page.table ? (
@@ -972,9 +981,9 @@ export function RestaurantPage({
                       <span aria-hidden="true">✦</span>
                     </div>
                     <DishGrid items={featured} currency={page.currency} onDish={onDish} />
-                    <button type="button" className="rp-text-link" onClick={openMenu}>
+                    {orderHref ? <a className="rp-text-link" href={orderHref} onClick={event => { if (preview) { event.preventDefault(); onMenu?.(); } else onAction?.('MENU_OPEN'); }}>{l('orderOnline')} ↗</a> : <button type="button" className="rp-text-link" onClick={openMenu}>
                       {l('exploreMenu')} <span aria-hidden="true">↗</span>
-                    </button>
+                    </button>}
                   </section>
                 );
               if (section === 'ABOUT' && c.about)
@@ -1016,9 +1025,9 @@ export function RestaurantPage({
                   <h2>{l('menuInvitation')}</h2>
                   <p>{l('menuInvitationBody')}</p>
                 </div>
-                <button type="button" className="rp-secondary" onClick={openMenu}>
+                {orderHref ? action : <button type="button" className="rp-secondary" onClick={openMenu}>
                   {l('exploreMenu')} <span aria-hidden="true">↗</span>
-                </button>
+                </button>}
               </section>
             )}
             {sectionSet.has('VISIT') && (c.hours || c.address || c.phone || c.mapsUrl) && (

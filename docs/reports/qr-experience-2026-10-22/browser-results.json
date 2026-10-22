@@ -1,0 +1,586 @@
+[
+  {
+    "screen": "website-publication",
+    "width": 390,
+    "branchScope": true,
+    "offDraftEnabledByReviewedPublish": true,
+    "failedPublishNotSuccess": true,
+    "generatedQrDownloaded": true
+  },
+  {
+    "screen": "qr-admin-OVERVIEW",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-ORDERS",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-SERVICE",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-MENU",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-TABLES",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-DESIGN",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-BRAND",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-PAYMENTS",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-RULES",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-PICKUP",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-SETTINGS",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-CRM",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-ACCEPTANCE",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-RECONCILIATION",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-CALENDAR",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-RESERVATIONS",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-PRINTPACK",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-ANALYTICS",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-PERFORMANCE",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-RECEIPTS",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-ONBOARDING",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-OPERATIONS",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-SUPPORT",
+    "width": 390,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Settings",
+    "width": 390,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Translations",
+    "width": 390,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Promotions",
+    "width": 390,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Feedback",
+    "width": 390,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Alerts",
+    "width": 390,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Collections",
+    "width": 390,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-License",
+    "width": 390,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "super-admin-plan",
+    "width": 390,
+    "engagePresetSetsWebsiteLoyalty": true,
+    "noUnrelatedReservationGrant": true
+  },
+  {
+    "screen": "website-publication",
+    "width": 1440,
+    "branchScope": true,
+    "offDraftEnabledByReviewedPublish": true,
+    "failedPublishNotSuccess": true,
+    "generatedQrDownloaded": true
+  },
+  {
+    "screen": "qr-admin-OVERVIEW",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-ORDERS",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-SERVICE",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-MENU",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-TABLES",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-DESIGN",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-BRAND",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-PAYMENTS",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-RULES",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-PICKUP",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-SETTINGS",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-CRM",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-ACCEPTANCE",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-RECONCILIATION",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-CALENDAR",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-RESERVATIONS",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-PRINTPACK",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-ANALYTICS",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-PERFORMANCE",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-RECEIPTS",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-ONBOARDING",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-OPERATIONS",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-admin-SUPPORT",
+    "width": 1440,
+    "noRuntimeError": true,
+    "noUnexpectedRequests": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Settings",
+    "width": 1440,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Translations",
+    "width": 1440,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Promotions",
+    "width": 1440,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Feedback",
+    "width": 1440,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Alerts",
+    "width": 1440,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-Collections",
+    "width": 1440,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "qr-engagement-License",
+    "width": 1440,
+    "noRuntimeError": true,
+    "horizontalOverflow": false
+  },
+  {
+    "screen": "super-admin-plan",
+    "width": 1440,
+    "engagePresetSetsWebsiteLoyalty": true,
+    "noUnrelatedReservationGrant": true
+  },
+  {
+    "screen": "guest-HERITAGE",
+    "width": 360,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": true
+  },
+  {
+    "screen": "table-ordering-header",
+    "width": 360,
+    "noOverlappingActions": true,
+    "actualMenuDisplayed": true
+  },
+  {
+    "screen": "guest-CAFE",
+    "width": 360,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  },
+  {
+    "screen": "guest-MODERN",
+    "width": 360,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  },
+  {
+    "screen": "guest-INDIAN",
+    "width": 360,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  },
+  {
+    "screen": "guest-HERITAGE",
+    "width": 390,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": true
+  },
+  {
+    "screen": "table-ordering-header",
+    "width": 390,
+    "noOverlappingActions": true,
+    "actualMenuDisplayed": true
+  },
+  {
+    "screen": "guest-CAFE",
+    "width": 390,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  },
+  {
+    "screen": "guest-MODERN",
+    "width": 390,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  },
+  {
+    "screen": "guest-INDIAN",
+    "width": 390,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  },
+  {
+    "screen": "guest-HERITAGE",
+    "width": 1440,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": true
+  },
+  {
+    "screen": "table-ordering-header",
+    "width": 1440,
+    "noOverlappingActions": true,
+    "actualMenuDisplayed": true
+  },
+  {
+    "screen": "guest-CAFE",
+    "width": 1440,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  },
+  {
+    "screen": "guest-MODERN",
+    "width": 1440,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  },
+  {
+    "screen": "guest-INDIAN",
+    "width": 1440,
+    "noMenuNav": true,
+    "orderOnlineUsesActualMenu": true,
+    "socialLinks": true,
+    "noRuntimeError": true,
+    "photosLoaded": true,
+    "horizontalOverflow": false,
+    "customerJourney": false
+  }
+]

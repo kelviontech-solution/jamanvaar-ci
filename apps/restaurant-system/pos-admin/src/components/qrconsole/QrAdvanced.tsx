@@ -1,4 +1,5 @@
 import { QrOnlinePaymentSetup } from './QrOnlinePaymentSetup';
+import { useQrScope } from './QrScope';
 import { QrPayoutBank } from './QrPayoutBank';
 import {QrOrderAttention} from './QrOrderAttention';
 import {QrGuestDetails} from './QrGuestDetails';
@@ -31,14 +32,9 @@ import { formatRestaurantDate } from '@jamanvaar/utils';
 import { useConfirm } from '@jamanvaar/ui';
 import { QR_BUTTON, QR_FIELD } from './qrUi';
 
-const scopedBranch = () =>
+const scopedBranch = () => activeAdminBranch ? (activeAdminBranch === 'all' ? '' : activeAdminBranch) :
   new URLSearchParams(location.search).has('setupBranch')
     ? (new URLSearchParams(location.search).get('setupBranch') === 'restaurant' ? '' : new URLSearchParams(location.search).get('setupBranch') || '')
-    :
-  /^\/qr\//.test(location.pathname) &&
-  activeAdminBranch &&
-  activeAdminBranch !== "all"
-    ? activeAdminBranch
     : "";
 const money = (n: number) =>
   new Intl.NumberFormat("en-IN", {
@@ -100,6 +96,8 @@ function BranchSelect({
   branches: QrBranch[] | null;
   label?: string;
 }) {
+  const scope = useQrScope();
+  if (scope.managed) return null;
   return (
     <label className="text-xs font-bold text-slate-600 max-w-full min-w-0">
       {label}
@@ -619,7 +617,7 @@ export function QrOrderingRules({
               disabled={busy || !dirty}
               onClick={() => void save({ rules })}
             >
-              Save payment instructions
+              {busy ? 'Saving…' : 'Save payment instructions'}
             </button>
           </label>
         )}
@@ -789,14 +787,14 @@ export function QrOrderingRules({
               + Add hours
             </button>
           </fieldset>
-          <div className="flex gap-2">
+          <div className="flex gap-2 qr-rule-save">
             <button
               disabled={busy || !dirty}
               className={button}
               onClick={() => void save({ rules })}
             >
               <Save size={16} />
-              Save ordering rules
+              {busy ? 'Saving…' : 'Save ordering rules'}
             </button>
             {rules.pausedUntil && (
               <button
@@ -820,6 +818,8 @@ export function QrOrderingRules({
 
 const QR_ORDER_SOUND_KEY = "qr_admin_new_order_sound";
 export function QrOperationalOrders({ showToast }: Props) {
+  const [density, setDensity] = useState<'comfortable' | 'compact'>(() => {try{return localStorage.getItem('qr_order_density') === 'compact' ? 'compact' : 'comfortable';}catch{return 'comfortable';}});
+  const [orderLinkError, setOrderLinkError] = useState('');
   const [timeline,setTimeline]=useState<string|null>(null);
   const [view,setView]=useState('OPEN'),[cursor,setCursor]=useState(''),[previous,setPrevious]=useState<string[]>([]),[from,setFrom]=useState(''),[to,setTo]=useState('');
   useEffect(()=>{setCursor('');setPrevious([]);},[view,from,to]);
@@ -860,6 +860,17 @@ export function QrOperationalOrders({ showToast }: Props) {
     seen.current = ids;
   }, [orders.data, sound]);
   const list = orders.data?.rows ?? [];
+  useEffect(() => {
+    const id = new URLSearchParams(location.search).get('order');
+    if (!id) return;
+    let active = true;
+    void QrAdminApi.orderPage({branchId:branch,search:id,view:'ALL'}).then(result => {
+      if (!active) return;
+      const order = result.rows.find(row => row.id === id);
+      if (order) {setDetail(order);setOrderLinkError('');} else setOrderLinkError('This order is unavailable in the selected branch.');
+    }).catch(error => {if(active)setOrderLinkError(error.message);});
+    return () => {active=false;};
+  }, [branch]);
   const action = async (o: QrOrderRow, type: string) => {
     let reason: string | undefined;
     if (type === "CANCELLED") {
@@ -901,20 +912,20 @@ export function QrOperationalOrders({ showToast }: Props) {
   };
   return (
     <>
-    <div className="space-y-4">
-      <QrOrderAttention key={branch} branchId={branch} onOpenOrder={async id=>{
+    <div className={'space-y-4 qr-orders-workspace qr-orders--'+density}>
+      <QrOrderAttention key={branch} branchId={branch} compact={density === 'compact'} onOpenOrder={async id=>{
         const result=await QrAdminApi.orderPage({branchId:branch,search:id,view:'ALL'});
         const order=result.rows.find(row=>row.id===id);
         if(!order)throw new Error('This order is no longer available in this branch. Refresh the orders list.');
         setDetail(order);
       }}/>
-      <div className={box + " flex flex-wrap gap-4 items-end"}>
+      <div className={box + " flex flex-wrap gap-4 items-end qr-order-toolbar"}>
         <BranchSelect
           value={branch}
           onChange={v=>{setBranch(v);setCursor('');setPrevious([]);}}
           branches={branches.data}
         />
-        <label className="text-xs font-bold flex-1 min-w-40">
+        <label className="text-xs font-bold flex-1 min-w-40 qr-order-search">
           Order / table / guest
           <input
             type="search"
@@ -941,7 +952,7 @@ export function QrOperationalOrders({ showToast }: Props) {
             <option key={s} value={s}>{({ALL:'All orders',DRAFT:'Awaiting payment',NEW:'Awaiting acceptance',PREPARING:'In kitchen',READY:'Ready to serve',COMPLETED:'Closed',CANCELLED:'Cancelled'} as Record<string,string>)[s]||s}</option>
           ))}
         </select>
-        <label className="text-sm flex gap-2">
+        <label className="text-sm flex gap-2 qr-order-sound">
           <input
             type="checkbox"
             checked={sound}
@@ -957,16 +968,18 @@ export function QrOperationalOrders({ showToast }: Props) {
           />
           New-order sound
         </label>
-        <button className={button} onClick={orders.reload}>
+        <button className={button + ' qr-order-refresh'} onClick={orders.reload}>
           <RefreshCw size={16} />
           Refresh
         </button>
+        <label className="text-xs font-bold qr-order-density">Order layout<select aria-label="Order layout" className={input} value={density} onChange={event => {const next=event.target.value as typeof density;setDensity(next);try{localStorage.setItem('qr_order_density',next);}catch{}}}><option value="comfortable">Comfortable cards</option><option value="compact">Compact service view</option></select></label>
       </div>
       <Failure error={orders.error} />
+      <Failure error={orderLinkError || null} />
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-        <div className="col-span-full flex flex-wrap gap-3 items-end rounded-2xl border bg-white p-4"><label>Order view<select aria-label="Order view" className={input} value={view} onChange={e=>setView(e.target.value)}><option value="OPEN">Actionable orders</option><option value="DUE">Unpaid accepted bills</option><option value="ALL">All order history</option></select></label><label>From (restaurant date)<input className={input} type="date" value={from} onChange={e=>setFrom(e.target.value)}/></label><label>To (restaurant date)<input className={input} type="date" value={to} onChange={e=>setTo(e.target.value)}/></label><span>{orders.data?.total??0} matching orders. Includes older unpaid bills.</span><button disabled={!previous.length} className={button} onClick={()=>{setCursor(previous.at(-1)||'');setPrevious(p=>p.slice(0,-1));}}>Previous orders</button><button className={button} disabled={!orders.data?.nextCursor} onClick={()=>{setPrevious(p=>[...p,cursor]);setCursor(orders.data?.nextCursor||'');}}>Next orders</button></div>
+        <details className="col-span-full qr-order-filters rounded-2xl border bg-white p-4"><summary>Filter dates &amp; order history</summary><div className="flex flex-wrap gap-3 items-end mt-3"><label>Order view<select aria-label="Order view" className={input} value={view} onChange={e=>setView(e.target.value)}><option value="OPEN">Actionable orders</option><option value="DUE">Unpaid accepted bills</option><option value="ALL">All order history</option></select></label><label>From (restaurant date)<input className={input} type="date" value={from} onChange={e=>setFrom(e.target.value)}/></label><label>To (restaurant date)<input className={input} type="date" value={to} onChange={e=>setTo(e.target.value)}/></label><span>{orders.data?.total??0} matching orders. Includes older unpaid bills.</span><button disabled={!previous.length} className={button} onClick={()=>{setCursor(previous.at(-1)||'');setPrevious(p=>p.slice(0,-1));}}>Previous orders</button><button className={button} disabled={!orders.data?.nextCursor} onClick={()=>{setPrevious(p=>[...p,cursor]);setCursor(orders.data?.nextCursor||'');}}>Next orders</button></div></details>
         {list.map((o) => (
-          <article key={o.id} className={box}>
+          <article key={o.id} className={box+' qr-order-card'}>
             <div className="flex justify-between gap-3">
               <div>
                 <h3 className="text-xl font-bold text-jaman-navy">
@@ -1054,11 +1067,12 @@ export function QrOperationalOrders({ showToast }: Props) {
           </article>
         ))}
       </div>
-      {!list.length && (
+      {!list.length && orders.data && !orders.error && (
         <p className={box + " text-sm text-slate-500"}>
           No matching QR orders. New orders appear here every five seconds.
         </p>
       )}
+      {!orders.data && !orders.error && <p role="status">Loading QR orders…</p>}
       <QrOrderTimeline id={timeline} onClose={()=>setTimeline(null)}/>
       <Modal isOpen={!!detail} onClose={()=>setDetail(null)} title="QR order details">{detail && <div>            <h2 className="text-xl font-bold">
               {detail.orderNumber} · {detail.table}

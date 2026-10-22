@@ -101,6 +101,7 @@ export interface RestaurantBusinessHours {
   exceptions: Array<{ date: string; intervals: RestaurantHoursInterval[] }>;
 }
 export interface RestaurantPageView {
+  loyaltyEnabled?: boolean;
   categories?: RestaurantPageCategory[];
   trackingSlug?: string | null;
   /** Where this branch's own menu-only (tableless) ordering code sends a guest, if one exists --

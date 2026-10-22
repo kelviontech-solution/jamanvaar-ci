@@ -1,4 +1,8 @@
 import {QrReceiptSettings} from './QrReceiptSettings';
+import { QrScopeProvider, useQrScope, QrEditingScope } from './QrScope';
+import { QrOrderAttention } from './QrOrderAttention';
+import { QrPaymentsWorkspace } from './QrPaymentsWorkspace';
+import './qr-owner-flow.css';
 import {QrRestaurantPage} from './QrRestaurantPage';
 import {QrRestaurantPageQr} from './QrRestaurantPageQr';
 import { DisplayPreferences } from '@jamanvaar/ui';
@@ -6,7 +10,7 @@ import {OperationsConsole} from '../operations/OperationsConsole';
 import {storedAdminBranch} from '../../adminBranchScope';
 import { QrOnboarding } from './QrOnboarding';
 import { QrAiAssistant } from './QrAiAssistant';
-import { QrPaymentWizard, QrReconciliation, QrPickupCalendar } from './QrWorkflows';
+import { QrPickupCalendar } from './QrWorkflows';
 import { QrPrintPack } from './QrPrintPack';
 import { QR_BEFORE_NAVIGATE, requestQrLeave } from './useQrUnsavedChanges';
 import { QrMenuWorkspace } from './QrMenuWorkspace';
@@ -24,8 +28,8 @@ import { SupportTicketsModule } from "../support/SupportTicketsModule";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   QR_PAGES,
-  QR_NAVIGATION,
   QR_ADVANCED_SECTIONS,
+  filterQrNavigation,
   currentQrTab,
   currentQrFeature,
   type QrTab,
@@ -47,12 +51,9 @@ import {
   Menu,
   X,
   ArrowUpRight,
-  Users,
   ReceiptText,
   IndianRupee,
   Clock3,
-  ChartNoAxesCombined,
-  ScanLine,
   type LucideIcon,
 } from "lucide-react";
 import { copyText, generateQrDataUrl } from "@jamanvaar/utils";
@@ -93,7 +94,10 @@ const inr = (n: number) =>
  * orders and every number. A restaurant whose plan does not include QR Ordering sees that it exists and why it is
  * locked, and cannot do anything with it: the server refuses each action, not only this screen.
  */
-export function QrConsole({
+export function QrConsole(props: Parameters<typeof QrConsoleContent>[0]) {
+  return <QrScopeProvider managed={props.layout !== undefined && props.layout !== 'embedded'}><QrConsoleContent {...props} /></QrScopeProvider>;
+}
+function QrConsoleContent({
   onViewPlan,
   showToast,
   layout = "embedded",
@@ -108,12 +112,12 @@ export function QrConsole({
   const {confirm:confirmNavigation,confirmDialog:navigationDialog} = useConfirm();
   const [tab, setTab] = useState<Tab>(currentQrTab);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [advancedNavigation, setAdvancedNavigation] = useState(false);
   const [toolSearch, setToolSearch] = useState('');
   const [feature, setFeature] = useState(currentQrFeature);
   const menuTrigger = useRef<HTMLButtonElement>(null);
   const sidebar = useRef<HTMLElement>(null);
   const workspace = layout !== "embedded";
+  const editingScope = useQrScope();
   const navigate = async (next: Tab, section = "Settings", branchScope?:string) => {
     if (next === tab && (next !== 'ADVANCED' || section === feature) && !branchScope) { setMenuOpen(false); return; }
     if (!window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE, {cancelable:true})) && !(await confirmNavigation({title:'Leave without saving?',message:'Your changes on this page have not been saved.',confirmLabel:'Discard & continue',cancelLabel:'Keep editing',tone:'danger'}))) return;
@@ -121,6 +125,9 @@ export function QrConsole({
     setFeature(section);
     const url = new URL(location.href);
     url.searchParams.set("tab", next);
+    if (next !== 'ORDERS' && !(next === 'ADVANCED' && section === 'Collections')) url.searchParams.delete('order');
+    if (next !== 'PAYMENTS') url.searchParams.delete('paymentSection');
+    if (next !== 'RESTAURANT_PAGE') url.searchParams.delete('websiteStep');
     if(branchScope)url.searchParams.set('setupBranch',branchScope);
     if (next === "ADVANCED") url.searchParams.set("feature", section);
     else url.searchParams.delete("feature");
@@ -209,9 +216,8 @@ export function QrConsole({
     );
 
   const page = QR_PAGES.find((p) => p.id === tab)!;
-  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','CRM','RESTAURANT_PAGE','WEBSITE_QR','TABLES','ADVANCED','ANALYTICS']);
   const search = toolSearch.trim().toLowerCase();
-  const visiblePages = QR_NAVIGATION.filter(page => (advancedNavigation || search || basicPages.has(page.id) || page.id === tab) && (!search || `${page.label} ${page.description} ${page.group}`.toLowerCase().includes(search)));
+  const visiblePages = filterQrNavigation(search);
   const tabs: Array<[Tab, string]> = visiblePages.map((p) => [p.id, p.label]);
   return (
     <div
@@ -262,9 +268,7 @@ export function QrConsole({
             </div>
             <nav aria-label="QR administration">
               {onBack && <button type="button" className="qr-btn secondary" onClick={onBack}>← Back to management</button>}
-              <label className="qr-tool-search">Find a tool<input type="search" value={toolSearch} onChange={event=>setToolSearch(event.target.value)} placeholder="Payments, hours, reports…" /></label>
-              <button type="button" aria-expanded={advancedNavigation} onClick={() => {setAdvancedNavigation(value => !value);setToolSearch('');}} className="qr-btn secondary">{advancedNavigation ? 'Show daily tools' : 'All tools & setup'}</button>
-              {!advancedNavigation&&!search&&<p className="qr-nav-hint">Daily tasks first. Payments, design and configuration are in All tools & setup.</p>}
+              <label className="qr-tool-search">Search pages<input type="search" value={toolSearch} onChange={event=>setToolSearch(event.target.value)} placeholder="Menu, website, payments…" /></label>
               {!visiblePages.length&&<p className="qr-nav-hint" role="status">No tools match. Try menu, payments or hours.</p>}
               {[...new Set(visiblePages.map(page => page.group))].map((group) => (
                 <div className="qr-nav-group" key={group}>
@@ -278,12 +282,12 @@ export function QrConsole({
                         <p.icon size={18} />
                         <span>{p.label}</span>
                       </button>
-                      {p.id === "ADVANCED" && tab === "ADVANCED" && (
+                      {p.id === "ADVANCED" && (
                         <div className="qr-nav-subpages">
                           {QR_ADVANCED_SECTIONS.map((s) => (
                             <button
                               key={s}
-                              aria-current={feature === s ? "page" : undefined}
+                              aria-current={tab === 'ADVANCED' && feature === s ? "page" : undefined}
                               onClick={() => navigate("ADVANCED", s)}
                             >
                               {s === "Settings" ? "Feature controls" : s}
@@ -320,9 +324,6 @@ export function QrConsole({
       )}
       <div className={workspace ? "qr-workspace-page" : ""}>
         {!workspace && (
-          <button type="button" className="qr-btn secondary" aria-expanded={advancedNavigation} onClick={()=>setAdvancedNavigation(value=>!value)}>{advancedNavigation?'Show daily tools':'All tools & setup'}</button>
-        )}
-        {!workspace && (
           <p className="text-xs text-slate-600">
             QR Ordering license active
             {entitlement.planName ? ` · ${entitlement.planName}` : ""}
@@ -333,7 +334,7 @@ export function QrConsole({
             reassignment.
           </p>
         )}
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="qr-page-heading">
           <div>
             {workspace && (
               <span className="qr-page-eyebrow">
@@ -349,14 +350,15 @@ export function QrConsole({
                 : "Guests scan the code on their table, order from your menu, and the order reaches your counter and kitchen."}
             </p>
           </div>
-          <QrAiAssistant />
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+          <div className="qr-page-heading-actions"><QrAiAssistant />
+          <span className="qr-access-status inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
             <CheckCircle2 className="w-3.5 h-3.5" /> QR Ordering active{" "}
             {entitlement.source === "MANUAL_OVERRIDE"
               ? " (special access)"
               : ""}
-          </span>
+          </span></div>
         </div>
+        {workspace && <div className="qr-workspace-scope" role="region" aria-label="Current QR editing scope">{tab === 'BRAND' || tab === 'DESIGN' ? <span className="qr-scope-label">Restaurant-wide QR presentation</span> : <QrEditingScope shared={tab === 'MENU' || tab === 'ONBOARDING'} viewing={['OVERVIEW','ORDERS','SERVICE','ANALYTICS','PERFORMANCE','CALENDAR','RESERVATIONS','RECONCILIATION','ACCEPTANCE'].includes(tab)} />}<small>{tab === 'MENU' || tab === 'ONBOARDING' ? `Live visibility: ${editingScope.restaurantWide ? 'choose a branch in the menu preview' : editingScope.name}` : tab === 'BRAND' || tab === 'DESIGN' ? 'This design applies across branches. Your branch selection filters print previews.' : 'Use the branch selector in the main header to change workspace.'}</small></div>}
         {['MENU','ONBOARDING','BRAND','DESIGN','PAYMENTS','RULES','SETTINGS','ADVANCED'].includes(tab)&&<section aria-label="QR change scope" className="rounded-xl border border-jaman-border border-l-4 border-l-brand/60 bg-white px-4 py-2.5 text-sm"><strong className="text-jaman-navy">{tab==='MENU'||tab==='ONBOARDING'?'Shared restaurant menu':'QR ordering channel'}</strong><p className="mt-0.5 text-xs leading-relaxed text-slate-600">{tab==='MENU'||tab==='ONBOARDING'?'Draft dish, category and price edits are shared with other licensed apps. Preview and publish deliberately; branch availability is a separate override.':tab==='BRAND'||tab==='DESIGN'?'Restaurant-wide QR presentation: this design applies to table QR guests across all branches. Review the live preview before saving. Kiosk welcome designs remain separate.':'Restaurant defaults are inherited until a branch has its own override; other branches are unaffected.'}</p></section>}
         {fromCache && (
           <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
@@ -385,8 +387,9 @@ export function QrConsole({
 
         {tab === "OVERVIEW" && (
           <div className="space-y-5">
+            <QrOrderAttention branchId={editingScope.branchId} includeNewOrderSound onOpenOrder={async id => {const url = new URL(location.href);url.searchParams.set('order',id);history.replaceState(null,'',url);await navigate('ORDERS');}} />
             <Overview navigate={navigate} />
-            <section className="rounded-2xl border border-jaman-border bg-white p-5 space-y-3"><h2 className="font-bold text-lg">Set up guest ordering</h2><p className="text-sm text-slate-600">Work through the setup checks below, then open your live table QR to verify the guest experience.</p><div className="flex flex-wrap gap-3">{([['MENU','1. Publish menu'],['TABLES','2. Set up table QR'],['PAYMENTS','3. Check payments'],['BRAND','4. Preview appearance']] as const).map(([id,label]) => <button key={id} type="button" className="min-h-11 rounded-xl border px-4 text-sm font-bold" onClick={() => void navigate(id)}>{label}</button>)}<button type="button" className="min-h-11 rounded-xl border px-4 text-sm font-bold" onClick={() => setAdvancedNavigation(value => !value)}>{advancedNavigation ? 'Show daily tools' : 'All tools & setup'}</button></div></section>
+            <section className="qr-owner-start"><h2>Launch your QR experience</h2><p>Menu → Payments → Website → Print QR → Test</p><div>{([['MENU','1 · Add & publish menu'],['PAYMENTS','2 · Set up payments'],['RESTAURANT_PAGE','3 · Publish website'],['WEBSITE_QR','4 · Print & test QR']] as const).map(([id,label]) => <button key={id} type="button" onClick={() => void navigate(id)}>{label}</button>)}</div></section>
             <QrSetupHealth navigate={(t) => navigate(t as Tab)} />
           </div>
         )}
@@ -412,19 +415,12 @@ export function QrConsole({
           />
         )}
         {tab === 'ONBOARDING' && <QrOnboarding onNavigate={page=>void navigate(page as Tab)}/>}
-        {tab === 'ACCEPTANCE' && <QrPaymentWizard/>}
-        {tab === 'RECONCILIATION' && <QrReconciliation/>}
+        {(tab === 'PAYMENTS' || tab === 'ACCEPTANCE' || tab === 'RECONCILIATION') && <QrPaymentsWorkspace initial={tab === 'ACCEPTANCE' ? 'test' : tab === 'RECONCILIATION' ? 'collections' : 'setup'} showToast={showToast} />}
         {tab === 'CALENDAR' && <QrPickupCalendar/>}
         {tab === 'RESERVATIONS' && <QrReservationsInbox/>}
         {tab === 'PRINTPACK' && <QrPrintPack/>}
         {tab === "DESIGN" && <QrDesignStudio showToast={showToast} />}
         {tab === "ORDERS" && <QrOperationalOrders showToast={showToast} />}
-        {tab === "PAYMENTS" && (
-          <div className="space-y-5">
-            <QrOrderingRules showToast={showToast} payments />
-            <QrAnalyticsView paymentsOnly />
-          </div>
-        )}
         {tab === "RULES" && <QrOrderingRules showToast={showToast} />}
         {tab === "ANALYTICS" && <QrAnalyticsView />}
         {tab === "SETTINGS" && (
@@ -452,6 +448,7 @@ export function QrConsole({
           </div>
         )}
       </div>
+      {workspace && <nav className="qr-mobile-shortcuts" aria-label="Quick QR tasks">{([['OVERVIEW','Today'],['ORDERS','Orders'],['SERVICE','Requests'],['MENU','Menu']] as const).map(([id,label]) => <button key={id} type="button" aria-current={tab === id ? 'page' : undefined} onClick={() => void navigate(id)}>{label}</button>)}</nav>}
       <div className="qr-navigation-confirm">{navigationDialog}</div>
     </div>
   );
@@ -545,111 +542,35 @@ function Tile({
 }
 
 function Overview({ navigate }: { navigate: (t: Tab) => void }) {
-  const { data, error } = useLoad<QrOverview>(QrAdminApi.overview, 30000);
-  if (error) return <div className="text-sm text-rose-700">{error}</div>;
-  if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
-  const t = data.today;
-  const missingCodes = data.tables - data.activeCodes;
-  return (
-    <div className="space-y-5">
-      {(t.ordersPending > 0 || missingCodes > 0) && (
-        <div className="rounded-2xl border border-jaman-saffron/40 bg-jaman-ivory p-4 space-y-2">
-          <div className="font-bold text-jaman-navy">Needs attention today</div>
-          {t.ordersPending > 0 && (
-            <button
-              type="button"
-              className="block w-full text-left text-sm font-bold text-jaman-navy underline"
-              onClick={() => navigate("ORDERS")}
-            >
-              {t.ordersPending} order{t.ordersPending === 1 ? "" : "s"} waiting
-              or in the kitchen — view QR Orders →
-            </button>
-          )}
-          {missingCodes > 0 && (
-            <button
-              type="button"
-              className="block w-full text-left text-sm font-bold text-jaman-navy underline"
-              onClick={() => navigate("TABLES")}
-            >
-              {missingCodes} table{missingCodes === 1 ? "" : "s"} without an
-              active QR code — set up Tables & QR →
-            </button>
-          )}
-        </div>
-      )}
-      <div className="qr-overview-welcome">
-        <div>
-          <small>MAKE EVERY TABLE FEEL WELCOME</small>
-          <h2>A better guest experience starts here.</h2>
-          <p>
-            Keep your menu fresh, respond to guests and follow orders from the
-            first scan to the last plate.
-          </p>
-        </div>
-        <img
-          src={`${/^\/qr\//.test(location.pathname) ? "/qr" : "/restaurant-admin"}/assets/qr-experience/dining.webp`}
-          alt="A guest enjoying a Gujarati meal while ordering on their phone"
-        />
-      </div>
-      {!data.publicBaseUrlConfigured && (
-        <div className="text-sm rounded-2xl border border-rose-200 bg-rose-50 text-rose-800 p-4">
-          The ordering website address has not been set up for this platform
-          yet, so QR links cannot be created. Please contact support.
-        </div>
-      )}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Tile label="Tables" value={data.tables} icon={Users} />
-        <Tile label="Active QR codes" value={data.activeCodes} icon={QrCode} />
-        <Tile label="QR orders today" value={t.ordersPlaced} />
-        <Tile
-          label="Accepted order value today"
-          value={inr(t.sales)}
-          icon={IndianRupee}
-        />
-        <Tile
-          label="Waiting / in kitchen"
-          value={t.ordersPending}
-          icon={Clock3}
-        />
-        <Tile label="Completed" value={t.ordersCompleted} icon={CheckCircle2} />
-        <Tile label="Landing sessions today" value={t.scans} icon={ScanLine} />
-        <Tile
-          label="Average order"
-          value={inr(t.averageOrderValue)}
-          icon={ChartNoAxesCombined}
-        />
-      </div>
-      <div className="rounded-2xl border border-jaman-border bg-white p-4">
-        <div className="font-bold text-jaman-navy mb-2">
-          Orders by table today
-        </div>
-        {t.ordersByTable.length === 0 ? (
-          <div className="text-sm text-slate-500">No QR orders yet today.</div>
-        ) : (
-          <ul className="text-sm divide-y">
-            {t.ordersByTable.map((r) => (
-              <li key={r.table} className="py-1.5 flex justify-between">
-                <span>Table {r.table}</span>
-                <b>{r.orders}</b>
-              </li>
-            ))}
-          </ul>
-        )}
-        <div className="text-[11px] text-slate-500 mt-3">
-          Counted by the server from real orders. Order value excludes unpaid
-          online drafts and cancellations; paid sales include verified online
-          payments and collected counter bills ({inr(t.paidSales)} so far).
-        </div>
-      </div>
+  const { data, error, reload } = useLoad<QrOverview>(QrAdminApi.overview, 30000);
+  if (error) return <p role="alert">{error} <button type="button" onClick={reload}>Try again</button></p>;
+  if (!data) return <p role="status">Loading today's activity…</p>;
+  const t = data.today, missingCodes = Math.max(0, data.tables - data.activeCodes);
+  return <div className="space-y-4">
+    {missingCodes > 0 && <section className="qr-scan-check"><strong>{missingCodes} tables need a QR code</strong><button className="qr-btn secondary" onClick={() => navigate('TABLES')}>Set up Tables & QR</button></section>}
+    {!data.publicBaseUrlConfigured && <p role="alert" className="rounded-xl bg-rose-50 p-4 text-rose-800">The ordering website address needs platform setup before working QR links can be created.</p>}
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <Tile label="QR orders today" value={t.ordersPlaced} />
+      <Tile label="Accepted order value today" value={inr(t.sales)} icon={IndianRupee} />
+      <Tile label="Waiting / in kitchen" value={t.ordersPending} icon={Clock3} />
+      <Tile label="Completed" value={t.ordersCompleted} icon={CheckCircle2} />
     </div>
-  );
+    <details className="rounded-2xl border border-jaman-border bg-white p-4">
+      <summary className="font-bold cursor-pointer">More about today · scans, tables & order value</summary>
+      <div className="qr-today-secondary"><span>{data.activeCodes}/{data.tables} table QRs active</span><span>{t.scans} landing sessions</span><span>{inr(t.averageOrderValue)} average order</span></div>
+      <strong>Orders by table today</strong>
+      {t.ordersByTable.length ? <ul className="text-sm divide-y">{t.ordersByTable.map(row => <li key={row.table} className="py-2 flex justify-between"><span>Table {row.table}</span><b>{row.orders}</b></li>)}</ul> : <p>No QR orders yet today.</p>}
+      <p className="mt-3 text-xs text-slate-500">Accepted order value excludes unpaid online drafts and cancellations. Paid sales include verified online payments and collected counter bills ({inr(t.paidSales)} today).</p>
+    </details>
+  </div>;
 }
 
 function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
+  const scope = useQrScope();
   const { confirm, confirmDialog } = useConfirm();
   const tables = useLoad<QrTableRow[]>(QrAdminApi.tables, 20000);
   const branches = useLoad<QrBranch[]>(QrAdminApi.branches);
-  const [branchId, setBranchId] = useState<string>(()=>{const value=new URLSearchParams(location.search).get('setupBranch');return value&&value!=='restaurant'?value:'';});
+  const [branchId, setBranchId] = useState<string>(()=>{if(scope.managed)return scope.branchId;const value=new URLSearchParams(location.search).get('setupBranch');return value&&value!=='restaurant'?value:'';});
   const [busy, setBusy] = useState<string | null>(null);
   const [viewing, setViewing] = useState<QrTableRow | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -805,7 +726,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
     <>
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        {activeBranches.length > 1 && (
+        {activeBranches.length > 1 && !(scope.managed && scope.branchId) && (
           <select
             value={branchId}
             onChange={(e) => setBranchId(e.target.value)}

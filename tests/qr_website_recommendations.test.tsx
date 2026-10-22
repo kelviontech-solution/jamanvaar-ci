@@ -114,7 +114,7 @@ it('combines translated category filters with search without showing the catalog
     )
   );
   expect(host.querySelector('#rp-menu')).toBeNull();
-  act(() => host.querySelector<HTMLAnchorElement>('.rp-nav a')!.click());
+  act(() => host.querySelector<HTMLButtonElement>('.rp-header-actions .rp-nav-order')!.click());
   const filter = Array.from(host.querySelectorAll('button')).find((b) => b.textContent === 'પીણાં')!;
   act(() => filter.click());
   expect(host.querySelector('#rp-menu')?.textContent).toContain('લસ્સી');

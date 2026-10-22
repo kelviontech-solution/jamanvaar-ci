@@ -20,22 +20,21 @@ import {
 } from "lucide-react";
 
 export const QR_PAGES = [
- {id:'RECEIPTS',label:'Bills & receipts',group:'Guest experience',icon:ReceiptText,description:'Customise guest bills and PDF receipts for this branch.'},
- {id:'RECEIPTS',label:'Bills & receipts',group:'Guest experience',icon:ReceiptText,description:'Customise guest bills and PDF receipts for this branch.'},
- {id:'WEBSITE_QR',label:'Restaurant Page QR',group:'Branding',icon:QrCode,description:'Design and print the QR that opens your restaurant website. Separate from table ordering codes.'},
- {id:'RESTAURANT_PAGE',label:'Business Page',group:'Branding',icon:Paintbrush,description:'Design your business website, branch contacts and mobile welcome page.'},
- {id:'OPERATIONS',label:'Operations Hub',group:'Live operations',icon:LayoutDashboard,description:'Branch service controls, guest follow-up, handovers and acceptance.'},
- {id:'ONBOARDING',label:'Guided Menu Setup',group:'Launch setup',icon:UtensilsCrossed,description:'Load cuisine templates, review pricing and publish your shared guest menu.'},
+ {id:'RECEIPTS',label:'Bills & receipts',group:'Payments',icon:ReceiptText,description:'Customise guest bills and PDF receipts for this branch.'},
+ {id:'WEBSITE_QR',label:'Restaurant Page QR',group:'Website & QR',icon:QrCode,description:'Design and print the QR that opens your restaurant website. Separate from table ordering codes.'},
+ {id:'RESTAURANT_PAGE',label:'Restaurant website',group:'Website & QR',icon:Paintbrush,description:'Design your mobile website, publish it and share your restaurant QR.'},
+ {id:'OPERATIONS',label:'Operations Hub',group:'Orders & service',icon:LayoutDashboard,description:'Branch service controls, guest follow-up, handovers and acceptance.'},
+ {id:'ONBOARDING',label:'Guided Menu Setup',group:'Menu',icon:UtensilsCrossed,description:'Load cuisine templates, review pricing and publish your shared guest menu.'},
  {id:'ACCEPTANCE',label:'Payment Acceptance',group:'Payments',icon:CreditCard,description:'Check configuration and record a real phone checkout against verified payment.'},
- {id:'RECONCILIATION',label:'Collection Reconciliation',group:'Insights',icon:ReceiptText,description:'Close the day using collection-date totals by collector, method and branch.'},
- {id:'CALENDAR',label:'Pickup Calendar',group:'Live operations',icon:CalendarClock,description:'Review booked pickup slots and complete guest handovers.'},
- {id:'RESERVATIONS',label:'Reservations',group:'Live operations',icon:CalendarCheck,description:'Confirm, decline or seat table requests sent from your restaurant website.'},
- {id:'PRINTPACK',label:'QR Print Packs',group:'Branding',icon:QrCode,description:'Download branded cards, print sheets and replacement inventory together.'},
-  {id:"CRM",label:"Customers & Loyalty",group:"Menu & guests",icon:Users,description:"Manage shared customers, point balances, rewards and verified visit history."},
+ {id:'RECONCILIATION',label:'Collection Reconciliation',group:'Payments',icon:ReceiptText,description:'Close the day using collection-date totals by collector, method and branch.'},
+ {id:'CALENDAR',label:'Pickup Calendar',group:'Orders & service',icon:CalendarClock,description:'Review booked pickup slots and complete guest handovers.'},
+ {id:'RESERVATIONS',label:'Reservations',group:'Orders & service',icon:CalendarCheck,description:'Confirm, decline or seat table requests sent from your restaurant website.'},
+ {id:'PRINTPACK',label:'QR Print Packs',group:'Website & QR',icon:QrCode,description:'Download branded cards, print sheets and replacement inventory together.'},
+  {id:"CRM",label:"Customers & Loyalty",group:"Customers",icon:Users,description:"Manage shared customers, point balances, rewards and verified visit history."},
   {
     id: "OVERVIEW",
-    label: "Overview",
-    group: "Live operations",
+    label: "Today",
+    group: "Today",
     icon: LayoutDashboard,
     description:
       "Your branch at a glance. Keep orders moving and your guest experience ready.",
@@ -43,7 +42,7 @@ export const QR_PAGES = [
   {
     id: "ORDERS",
     label: "QR Orders",
-    group: "Live operations",
+    group: "Orders & service",
     icon: ReceiptText,
     description:
       "Follow every guest order, verify payments and manage kitchen progress.",
@@ -51,14 +50,14 @@ export const QR_PAGES = [
   {
     id: "SERVICE",
     label: "Service Requests",
-    group: "Live operations",
+    group: "Orders & service",
     icon: BellRing,
     description: "Respond to table requests and keep your floor team in sync.",
   },
   {
     id: "MENU",
     label: "Menu & Availability",
-    group: "Menu & guests",
+    group: "Menu",
     icon: UtensilsCrossed,
     description:
       "Create dishes, organise categories and publish the menu your guests see.",
@@ -66,28 +65,28 @@ export const QR_PAGES = [
   {
     id: "TABLES",
     label: "Tables & QR",
-    group: "Launch setup",
+    group: "Website & QR",
     icon: QrCode,
     description: "Connect each table to the right menu and manage its QR code.",
   },
   {
     id: "DESIGN",
     label: "Table QR Design",
-    group: "Branding",
+    group: "Website & QR",
     icon: Palette,
     description: "Design cards that open table ordering directly. Restaurant Page QR posters have their own design workspace.",
   },
   {
     id: "BRAND",
     label: "Customer Branding",
-    group: "Branding",
+    group: "Website & QR",
     icon: Paintbrush,
     description:
       "Preview and personalise your customer menu before applying changes.",
   },
   {
     id: "PAYMENTS",
-    label: "Payment Settings",
+    label: "Payments",
     group: "Payments",
     icon: CreditCard,
     description:
@@ -96,7 +95,7 @@ export const QR_PAGES = [
   {
     id: "RULES",
     label: "Ordering Rules",
-    group: "Service rules",
+    group: "Settings",
     icon: Clock3,
     description:
       "Set opening hours, preparation time and the ordering modes you offer.",
@@ -104,7 +103,7 @@ export const QR_PAGES = [
   {
     id: "PICKUP",
     label: "Pickup Scheduling",
-    group: "Service rules",
+    group: "Settings",
     icon: CalendarClock,
     description:
       "Offer takeaway slots that respect your branch hours and kitchen capacity.",
@@ -112,14 +111,14 @@ export const QR_PAGES = [
   {
     id: "SETTINGS",
     label: "QR Settings",
-    group: "Guest experience",
+    group: "Settings",
     icon: Settings2,
     description: "Manage core ordering settings and customer-facing messages.",
   },
   {
     id: "ADVANCED",
-    label: "Advanced Features",
-    group: "Service rules",
+    label: "Guest engagement",
+    group: "Customers",
     icon: Sparkles,
     description:
       "Configure licensed languages, loyalty, promotions and operational tools.",
@@ -127,7 +126,7 @@ export const QR_PAGES = [
   {
     id: "ANALYTICS",
     label: "Analytics",
-    group: "Insights",
+    group: "Today",
     icon: ChartNoAxesCombined,
     description:
       "Understand real orders, verified collections and your ordering funnel.",
@@ -135,7 +134,7 @@ export const QR_PAGES = [
   {
     id: "PERFORMANCE",
     label: "Menu Performance",
-    group: "Insights",
+    group: "Menu",
     icon: ChartColumnIncreasing,
     description:
       "See which dishes turn browsing into orders using actual sales data.",
@@ -143,7 +142,7 @@ export const QR_PAGES = [
   {
     id: "SUPPORT",
     label: "Help & Support",
-    group: "Help",
+    group: "Settings",
     icon: LifeBuoy,
     description:
       "Raise a problem or feature request and follow the JAMANVAAR team's replies by ticket number.",
@@ -162,10 +161,10 @@ export type QrTab = (typeof QR_PAGES)[number]["id"];
 // and the rest now sit under the three groups the audit asked for: Guest experience, Payments,
 // Service rules. "Restaurant default vs. branch override" is already called out per-page by the
 // scope banner in QrConsole.tsx (see the tab list there) — unaffected by this reshuffle.
-const GROUP_ORDER = ['Live operations', 'Launch setup', 'Guest experience', 'Menu & guests', 'Payments', 'Service rules', 'Branding', 'Insights', 'Help'];
-const TASK_ORDER: QrTab[] = ['OVERVIEW','OPERATIONS','ORDERS','SERVICE','CALENDAR','RESERVATIONS','MENU','CRM','ONBOARDING','TABLES','PAYMENTS','RECEIPTS','ACCEPTANCE','RULES','BRAND','RESTAURANT_PAGE','WEBSITE_QR','DESIGN','PRINTPACK','ANALYTICS','RECONCILIATION','PERFORMANCE','PICKUP','SETTINGS','ADVANCED','SUPPORT'];
+export const QR_GROUP_ORDER = ['Today', 'Orders & service', 'Menu', 'Website & QR', 'Customers', 'Payments', 'Settings'];
+const TASK_ORDER: QrTab[] = ['OVERVIEW','ANALYTICS','ORDERS','SERVICE','CALENDAR','RESERVATIONS','OPERATIONS','MENU','ONBOARDING','PERFORMANCE','RESTAURANT_PAGE','WEBSITE_QR','TABLES','DESIGN','PRINTPACK','BRAND','CRM','ADVANCED','PAYMENTS','ACCEPTANCE','RECONCILIATION','RECEIPTS','RULES','PICKUP','SETTINGS','SUPPORT'];
 export const QR_NAVIGATION = [...QR_PAGES].sort((a,b) => {
-  const rank = (group: string) => {const index = GROUP_ORDER.indexOf(group);return index < 0 ? GROUP_ORDER.length : index;};
+  const rank = (group: string) => {const index = QR_GROUP_ORDER.indexOf(group);return index < 0 ? QR_GROUP_ORDER.length : index;};
   return rank(a.group) - rank(b.group) || TASK_ORDER.indexOf(a.id) - TASK_ORDER.indexOf(b.id);
 });
 export const QR_ADVANCED_SECTIONS = [
@@ -180,6 +179,10 @@ export const QR_ADVANCED_SECTIONS = [
 export function currentQrFeature(): string {
   const value = new URLSearchParams(location.search).get("feature");
   return QR_ADVANCED_SECTIONS.find((s) => s === value) ?? "Settings";
+}
+export function filterQrNavigation(query: string) {
+  const search = query.trim().toLowerCase();
+  return QR_NAVIGATION.filter(page => !search || `${page.label} ${page.description} ${page.group} ${page.id === 'ADVANCED' ? QR_ADVANCED_SECTIONS.join(' ') : ''}`.toLowerCase().includes(search));
 }
 export function currentQrTab(): QrTab {
   const value = new URLSearchParams(location.search).get("tab");

@@ -1,6 +1,6 @@
 import {expect,it} from 'vitest';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {QrPlanCapabilities,qrPackageFlags} from '../cloud/super-admin-web/src/pages/Plans/QrPlanCapabilities';
+import {QrPlanCapabilities,qrPackageFlags,qrEngagementPackage} from '../cloud/super-admin-web/src/pages/Plans/QrPlanCapabilities';
 import type {FeatureRecord} from '../cloud/super-admin-web/src/api/types';
 const features=[{id:'base',code:'QR_ORDERING',legacyEntitlementKey:'qrTableOrdering',isActive:true,rolloutPercent:100,name:'QR Ordering'},{id:'analytics',code:'QR_MENU_ANALYTICS',legacyEntitlementKey:'qrMenuAnalytics',isActive:true,rolloutPercent:100,name:'Menu Performance'},{id:'page',code:'QR_RESTAURANT_PAGE',legacyEntitlementKey:'qrRestaurantPage',isActive:true,rolloutPercent:100,name:'Restaurant page'},{id:'future',code:'QR_NEW',legacyEntitlementKey:'qrFuture',isActive:false,rolloutPercent:0,name:'Future QR feature'}] as FeatureRecord[];
 it('Complete includes analytics and catalogue additions and retains other purchased products',()=>{
@@ -15,5 +15,8 @@ it('does not invent access from the price or tier and explains platform controls
 });
 it('cannot apply a package when the catalogue failed to load',()=>{
  const html=renderToStaticMarkup(<QrPlanCapabilities features={[]} flags={{}} loading={false} error="Catalogue unavailable" onChange={()=>{}}/>);
- expect(html).toContain('role="alert"');expect(html.match(/disabled=""/g)).toHaveLength(2);
+ expect(html).toContain('role="alert"');expect(html.match(/disabled=""/g)).toHaveLength(3);
+});
+it('Engage includes website capabilities without silently granting every future capability',()=>{
+ expect(qrEngagementPackage({posTerminal:false},features)).toMatchObject({qrRestaurantPage:true,qrMenuAnalytics:true,qrFuture:false,qrTableOrdering:true});
 });

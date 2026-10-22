@@ -31,7 +31,7 @@ interface AttentionFeed {
 }
 const base = '/api/v1/restaurant/qr/operations',
   soundKey = 'qr_admin_attention_sound';
-export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; onOpenOrder: (id: string) => Promise<void> }) {
+export function QrOrderAttention({ branchId, onOpenOrder, compact = false, includeNewOrderSound = false }: { branchId: string; onOpenOrder: (id: string) => Promise<void>; compact?: boolean; includeNewOrderSound?: boolean }) {
   const [feed, setFeed] = useState<AttentionFeed | null>(null),
     [error, setError] = useState(''),
     [actionError, setActionError] = useState(''),
@@ -104,7 +104,7 @@ export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; 
     try {
       const next = await qrApi<AttentionFeed>(base + '/attention' + (branchId ? '?branchId=' + encodeURIComponent(branchId) : ''));
       if (!alive.current) return;
-      const audible = next.items.filter((item) => item.kind !== 'NEW_ORDER' && !item.quietNow),
+      const audible = next.items.filter((item) => (includeNewOrderSound || item.kind !== 'NEW_ORDER') && !item.quietNow),
         ids = new Map(audible.map((item) => [item.id, item.priority]));
       const incoming = seen.current && audible.some((item) => !seen.current!.has(item.id) || seen.current!.get(item.id) !== item.priority);
       if (soundOn.current && incoming) void chime();
@@ -122,7 +122,7 @@ export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; 
         void load();
       }
     }
-  }, [branchId, chime]);
+  }, [branchId, chime, includeNewOrderSound]);
   useEffect(() => {
     alive.current = true;
     void load();
@@ -188,13 +188,14 @@ export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; 
       if (alive.current) setBusy('');
     }
   }
+  const collapsed = compact && !expanded && !feed?.urgent;
   const count = feed?.total ?? 0,
     items = feed?.items ?? [],
-    shown = expanded ? items : items.slice(0, 3);
+    shown = collapsed ? [] : expanded ? items : items.slice(0, 3);
   return (
     <>
       <section
-        className={`qr-order-attention ${feed?.urgent ? 'has-urgent' : count ? 'has-tasks' : ''}`}
+        className={`qr-order-attention ${compact ? 'is-compact' : ''} ${feed?.urgent ? 'has-urgent' : count ? 'has-tasks' : ''}`}
         aria-label="Live attention centre"
         style={stickyTop ? ({ '--qr-attention-top': `${stickyTop}px` } as CSSProperties) : undefined}
       >
@@ -208,7 +209,7 @@ export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; 
               <p>{!feed ? 'Checking live requests and orders…' : `${feed.servicePending} service requests · ${feed.urgent} urgent issues`}</p>
             </div>
           </div>
-          <div className="qr-attention-controls">
+          {!collapsed && <div className="qr-attention-controls">
             <label>
               <input
                 type="checkbox"
@@ -234,7 +235,8 @@ export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; 
             <button type="button" onClick={() => void load()} aria-label="Refresh attention">
               <RefreshCw size={16} />
             </button>
-          </div>
+          </div>}
+          {compact && !feed?.urgent && <button type="button" aria-expanded={!collapsed} onClick={() => setExpanded(value => !value)}>{expanded ? 'Hide alert details' : 'Show alert details'}</button>}
         </header>
         <p className="sr-only" role="status" aria-live="polite">
           {feed ? `${count} tasks need attention. ${feed.servicePending} pending service requests. ${feed.urgent} urgent issues.` : 'Checking attention tasks.'}
@@ -255,7 +257,7 @@ export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; 
             {soundError} Visual alerts remain active.
           </p>
         )}
-        {feed && !count && !error && <p className="qr-attention-clear">No pending attention tasks. Requests and orders are checked every 5 seconds.</p>}
+        {feed && !count && !error && !collapsed && <p className="qr-attention-clear">No pending attention tasks. Requests and orders are checked every 5 seconds.</p>}
         {!!shown.length && (
           <ul className="qr-attention-list">
             {shown.map((item) => (
@@ -292,7 +294,7 @@ export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; 
             ))}
           </ul>
         )}
-        <footer>
+        {!collapsed && <footer>
           {items.length > 3 && (
             <button type="button" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>
               {expanded ? 'Show fewer' : `View all ${count} tasks`}
@@ -304,7 +306,7 @@ export function QrOrderAttention({ branchId, onOpenOrder }: { branchId: string; 
             </button>
           )}
           <small>{feed ? `Last checked ${new Date(feed.checkedAt).toLocaleTimeString()}` : 'Waiting for live status'}</small>
-        </footer>
+        </footer>}
       </section>
       <Modal
         isOpen={inbox}

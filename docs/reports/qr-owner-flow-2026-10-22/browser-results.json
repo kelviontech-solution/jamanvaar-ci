@@ -1,0 +1,484 @@
+[
+  {
+    "screen": "today-and-orders",
+    "width": 390,
+    "liveActions": true,
+    "failedAcknowledgementRetried": true,
+    "orderOpensWithContact": true,
+    "compactMode": true
+  },
+  {
+    "screen": "menu",
+    "width": 390,
+    "quickPause": true,
+    "photoUploadVisible": true,
+    "failedDraftPreserved": true,
+    "publicationRequiresReview": true,
+    "failedPublicationRetried": true
+  },
+  {
+    "screen": "payments",
+    "width": 390,
+    "sectionsConnected": true,
+    "scopeFixed": true,
+    "unsavedProtected": true,
+    "failedSavePreservesEdits": true
+  },
+  {
+    "screen": "customers",
+    "width": 390,
+    "noFalseReadyWithoutReward": true,
+    "createReward": true,
+    "previewUsesActualReward": true,
+    "previewDoesNotWritePoints": true
+  },
+  {
+    "screen": "website-launch",
+    "width": 390,
+    "publishToQrConnected": true,
+    "qrDownload": true,
+    "testScanInstructionsVisible": true,
+    "returnToPreview": true,
+    "returnToPublishRequiresConfirmation": true
+  },
+  {
+    "screen": "branch-scope",
+    "width": 390,
+    "staleSetupLinkCannotChangeScope": true,
+    "headerChangesScope": true,
+    "allBranchesMeansDefaults": true
+  },
+  {
+    "screen": "today-and-orders",
+    "width": 1440,
+    "liveActions": true,
+    "failedAcknowledgementRetried": true,
+    "orderOpensWithContact": true,
+    "compactMode": true
+  },
+  {
+    "screen": "menu",
+    "width": 1440,
+    "quickPause": true,
+    "photoUploadVisible": true,
+    "failedDraftPreserved": true,
+    "publicationRequiresReview": true,
+    "failedPublicationRetried": true
+  },
+  {
+    "screen": "payments",
+    "width": 1440,
+    "sectionsConnected": true,
+    "scopeFixed": true,
+    "unsavedProtected": true,
+    "failedSavePreservesEdits": true
+  },
+  {
+    "screen": "customers",
+    "width": 1440,
+    "noFalseReadyWithoutReward": true,
+    "createReward": true,
+    "previewUsesActualReward": true,
+    "previewDoesNotWritePoints": true
+  },
+  {
+    "screen": "website-launch",
+    "width": 1440,
+    "publishToQrConnected": true,
+    "qrDownload": true,
+    "testScanInstructionsVisible": true,
+    "returnToPreview": true,
+    "returnToPublishRequiresConfirmation": true
+  },
+  {
+    "screen": "branch-scope",
+    "width": 1440,
+    "staleSetupLinkCannotChangeScope": true,
+    "headerChangesScope": true,
+    "allBranchesMeansDefaults": true
+  },
+  {
+    "screen": "render-OVERVIEW",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ORDERS",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-SERVICE",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-MENU",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-TABLES",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-DESIGN",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-BRAND",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-PAYMENTS",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RULES",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-PICKUP",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-SETTINGS",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-CRM",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ACCEPTANCE",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RECONCILIATION",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-CALENDAR",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RESERVATIONS",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-PRINTPACK",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ANALYTICS",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-PERFORMANCE",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RECEIPTS",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ONBOARDING",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-OPERATIONS",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-SUPPORT",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RESTAURANT_PAGE",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-WEBSITE_QR",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ADVANCED",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Translations",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Promotions",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Feedback",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Alerts",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Collections",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-License",
+    "width": 390,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-OVERVIEW",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ORDERS",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-SERVICE",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-MENU",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-TABLES",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-DESIGN",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-BRAND",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-PAYMENTS",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RULES",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-PICKUP",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-SETTINGS",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-CRM",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ACCEPTANCE",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RECONCILIATION",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-CALENDAR",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RESERVATIONS",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-PRINTPACK",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ANALYTICS",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-PERFORMANCE",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RECEIPTS",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ONBOARDING",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-OPERATIONS",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-SUPPORT",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-RESTAURANT_PAGE",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-WEBSITE_QR",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-ADVANCED",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Translations",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Promotions",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Feedback",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Alerts",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-Collections",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  },
+  {
+    "screen": "render-engagement-License",
+    "width": 1440,
+    "noRuntimeErrors": true,
+    "noOverflow": true
+  }
+]

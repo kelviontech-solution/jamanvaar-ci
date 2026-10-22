@@ -8,6 +8,7 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { z } from 'zod';
 import { Prisma } from "@prisma/client";
 import {
   createHmac,
@@ -24,6 +25,12 @@ import {
   refreshLoyaltyBalance,
 } from "../entity-sync/customer-loyalty-merge";
 type Tx = Prisma.TransactionClient;
+export const qrGuestProfileSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  email: z.union([z.literal(''), z.string().trim().email().max(254)]).default(''),
+  emailOffers: z.boolean(),
+  whatsappOffers: z.boolean()
+}).strict().refine(value => !value.emailOffers || !!value.email, 'Add an email address before choosing email offers.');
 export class QrLoyaltyIdentityUnavailable extends ServiceUnavailableException {
   constructor() {
     super(
@@ -111,6 +118,7 @@ export class QrLoyaltyService {
         verified: !!phone,
         verificationAvailable: this.notifications.isQrLoyaltyOtpConfigured(),
         phoneMasked: phone ? "******" + phone.slice(-4) : undefined,
+        profile: phone ? { name: customer?.name ?? '', email: customer?.email ?? '', emailOffers: customer?.marketingConsent?.email === true, whatsappOffers: customer?.marketingConsent?.whatsapp === true } : undefined,
         points: customer?.loyaltyPoints ?? 0,
         program: {
           enabled: program?.enabled === true,
@@ -130,6 +138,30 @@ export class QrLoyaltyService {
           : "Phone verification is not configured. Continue as a guest or ask a member of staff.",
       };
     });
+  }
+  async saveProfile(restaurantId: string, branchId: string, input: z.infer<typeof qrGuestProfileSchema>, rawSession?: string) {
+    const session = this.assertSession(rawSession);
+    await this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + restaurantId}))`;
+      await this.enabledIn(tx, restaurantId, branchId);
+      const phone = await this.identityIn(tx, restaurantId, session);
+      if (!phone) throw new ForbiddenException('Verify your phone before saving your details.');
+      const row = await tx.syncedEntity.findUniqueOrThrow({ where: this.where(restaurantId, 'CUSTOMER', phone) });
+      const current = row.payload as Record<string, any>;
+      if (current.deleted) throw new ConflictException('This customer account is unavailable. Please contact the restaurant.');
+      const now = new Date().toISOString();
+      const payload = { ...current, name: input.name, email: input.email, updatedAt: now, marketingConsent: { email: input.emailOffers, whatsapp: input.whatsappOffers, source: 'QR_CUSTOMER_PROFILE', at: now } };
+      await tx.syncedEntity.update({ where: { id: row.id }, data: { payload, syncVersion: { increment: 1 }, seq: await nextSyncSequence(tx, restaurantId) } });
+    });
+    return this.account(restaurantId, branchId, session);
+  }
+  async signOut(restaurantId: string, rawSession?: string) {
+    const session = this.assertSession(rawSession);
+    await this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + restaurantId}))`;
+      await tx.syncedEntity.deleteMany({ where: { restaurantId, externalId: session, entityType: { in: ['QR_CUSTOMER_IDENTITY', 'QR_CUSTOMER_OTP'] } } });
+    });
+    return { signedOut: true };
   }
   async sendOtp(
     restaurantId: string,
