@@ -102,7 +102,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
-              Inventory & Recipe Bill of Materials (BOM)
+              Inventory & Recipes
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
               LIVE TRACKING
@@ -132,13 +132,13 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
 
       {/* 4 Inventory KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4.5 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Raw Ingredients</span>
           <div className="text-2xl font-bold text-jaman-navy tabular-nums">{inventoryItems.length} Items</div>
           <span className="text-[11px] text-slate-500 font-bold block">In Warehouse Master</span>
         </div>
 
-        <div className="bg-white p-4.5 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Stock Valuation</span>
           <div className="text-2xl font-bold text-emerald-700 font-mono">
             {formatINR(
@@ -149,7 +149,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         </div>
 
         <div
-          className={`p-4.5 rounded-2xl border shadow-2xs space-y-1 ${
+          className={`p-4 rounded-2xl border shadow-2xs space-y-1 ${
             lowStockCount > 0 ? 'bg-amber-50/70 border-amber-200' : 'bg-white border-jaman-border'
           }`}
         >
@@ -165,7 +165,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
           </span>
         </div>
 
-        <div className="bg-white p-4.5 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">BOM Dish Formulas</span>
           <div className="text-2xl font-bold text-jaman-navy tabular-nums">{recipes.length} Formulas</div>
           <span className="text-[11px] text-blue-700 font-bold block">Auto-Deduct on Order Sale</span>

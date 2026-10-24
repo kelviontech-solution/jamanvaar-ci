@@ -124,7 +124,7 @@ export const PosCustomizationModal: React.FC = () => {
               <div className="text-xs text-slate-300 flex items-center gap-2 mt-0.5">
                 <span>Base: ₹{customizingItem.price}</span>
                 <span>•</span>
-                <span className="text-jaman-saffron font-semibold">{customizingItem.kitchenStation || 'Kitchen'}</span>
+                <span className="text-jaman-saffronText font-semibold">{customizingItem.kitchenStation || 'Kitchen'}</span>
               </div>
             </div>
           </div>
@@ -146,7 +146,7 @@ export const PosCustomizationModal: React.FC = () => {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h3 className="font-bold text-sm text-jaman-navy">{group.name}</h3>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     {group.isRequired || group.minSelections > 0 ? `Required: choose ${Math.max(1, group.minSelections)} to ${Math.max(1, group.maxSelections)}` : `Optional: up to ${Math.max(1, group.maxSelections)}`}
                     {group.options.length === 0 && ' — no options available; ask staff'}
                   </span>
@@ -198,7 +198,7 @@ export const PosCustomizationModal: React.FC = () => {
           {/* Quick Cooking Instructions */}
           <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-jaman-saffron" />
+              <Sparkles className="w-4 h-4 text-jaman-saffronText" />
               <h3 className="font-bold text-sm text-jaman-navy">Kitchen Instructions</h3>
             </div>
 
@@ -228,7 +228,7 @@ export const PosCustomizationModal: React.FC = () => {
                 value={specialInstructions}
                 onChange={(e) => setSpecialInstructions(e.target.value)}
                 placeholder="Custom instruction for kitchen chef..."
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-jaman-navy placeholder:text-slate-500 focus:outline-none focus:border-jaman-saffron"
               />
             </div>
           </div>

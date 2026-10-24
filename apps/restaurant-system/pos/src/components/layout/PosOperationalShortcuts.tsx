@@ -20,7 +20,7 @@ export function PosOperationalShortcuts() {
             setOrderInboxMode(item.label === 'Collect' ? 'COLLECTIONS' : 'ALL');
             setActiveTab(item.id);
           }}
-          className="min-h-11 rounded-lg border border-jaman-border bg-white px-2 text-xs font-bold text-jaman-navy hover:bg-jaman-cream flex items-center justify-center gap-1 whitespace-nowrap"
+          className="min-h-10 rounded-xl px-2.5 text-xs font-bold text-slate-600 hover:bg-white hover:text-jaman-navy flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors"
         >
           <item.icon size={18} className="shrink-0" aria-hidden="true" />
           {t(item.label)}

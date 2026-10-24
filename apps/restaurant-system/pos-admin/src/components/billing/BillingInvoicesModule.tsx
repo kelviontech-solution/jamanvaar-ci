@@ -422,10 +422,10 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
           <button
             onClick={handleExportPdf}
-            className="min-h-11 px-3.5 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all active:scale-95"
+            className="min-h-11 px-3.5 py-2 rounded-xl bg-white border border-jaman-border hover:bg-[#F8F6F0] text-jaman-navy text-xs font-bold flex items-center gap-1.5 transition-colors active:scale-95"
             title="Download / Print Invoices Ledger as PDF"
           >
-            <FileText className="w-3.5 h-3.5 text-white" />
+            <FileText className="w-3.5 h-3.5 text-rose-700" />
             <span>Export PDF</span>
           </button>
 
@@ -521,7 +521,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 <DollarSign className="w-4 h-4" />
               </div>
             </div>
-            <div data-testid="billing-order-value" className="text-2xl sm:text-3xl font-bold text-jaman-navy font-mono mt-2">
+            <div data-testid="billing-order-value" className="text-2xl font-bold tabular-nums text-jaman-navy mt-2">
               {formatBillingMoney(ledgerMetrics.orderValue)}
             </div>
           </div>
@@ -705,15 +705,15 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5" aria-label="Collection summary">
         <div className="bg-white rounded-2xl border border-jaman-border p-4">
-          <div className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Collected revenue</div>
+          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Collected revenue</div>
           <div data-testid="billing-collected" className="text-2xl font-bold text-jaman-navy mt-2">{formatBillingMoney(ledgerMetrics.collected)}</div>
           <p className="text-xs text-slate-500 mt-2">Payments received, after refunds.</p>
         </div>
         <button type="button" onClick={() => { setCollectionFilter(collectionFilter === 'PENDING' ? 'ALL' : 'PENDING'); setCurrentPage(1); }}
-          className={`text-left rounded-2xl border p-4 ${collectionFilter === 'PENDING' ? 'border-amber-500 bg-amber-50' : 'border-amber-200 bg-amber-50/40'}`}>
-          <div className="text-xs font-bold text-amber-800 uppercase tracking-wide">Pending collection</div>
+          className={`text-left rounded-2xl border p-4 ${collectionFilter === 'PENDING' ? 'border-amber-500 bg-amber-50' : 'border-jaman-border bg-white hover:border-[#D8D1C3]'}`}>
+          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Pending collection</div>
           <div data-testid="billing-pending" className="text-2xl font-bold text-jaman-navy mt-2">{formatBillingMoney(ledgerMetrics.pending)}</div>
-          <p className="text-xs text-amber-800 mt-2">{ledgerMetrics.pendingCount} orders awaiting payment. Settle kiosk cash orders in POS.</p>
+          <p className="text-xs text-slate-500 mt-2">{ledgerMetrics.pendingCount} orders awaiting payment. Settle kiosk cash orders in POS.</p>
         </button>
       </div>
       {/* 5. SEARCH & SECONDARY DROPDOWN FILTERS */}

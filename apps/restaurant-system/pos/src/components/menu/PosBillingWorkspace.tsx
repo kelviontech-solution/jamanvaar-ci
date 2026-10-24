@@ -13,7 +13,7 @@ export function PosBillingWorkspace() {
   return <section className="pos-billing-workspace flex-1 min-w-0 min-h-0 flex flex-col" data-cart-open={cartOpen}>
     <div className="pos-mobile-cart-bar flex items-center justify-between gap-3 mb-2 shrink-0">
       {cartOpen ? <button type="button" onClick={() => setCartOpen(false)} className="min-h-11 px-3 rounded-xl bg-white border border-jaman-border font-bold text-sm flex items-center gap-2"><ArrowLeft size={18} />Back to dishes</button> : <span className="text-sm font-bold text-jaman-navy">Choose your dishes</span>}
-      <button type="button" aria-expanded={cartOpen} aria-controls="pos-order-pane" onClick={() => setCartOpen(!cartOpen)} className="min-h-11 px-3 rounded-xl bg-jaman-navy text-white font-bold text-sm flex items-center gap-2"><ShoppingBag size={18} />Order ({quantity}) · {formatINR(cart.totalPayable)}</button>
+      <button type="button" aria-expanded={cartOpen} aria-controls="pos-order-pane" onClick={() => setCartOpen(!cartOpen)} className="min-h-11 px-4 rounded-xl bg-jaman-saffron hover:bg-[#C95A12] text-white font-bold text-sm flex items-center gap-2"><ShoppingBag size={18} />Order ({quantity}) · {formatINR(cart.totalPayable)}</button>
     </div>
     <div className="flex flex-1 gap-2.5 min-w-0 min-h-0 overflow-hidden">
       <div className="pos-catalog-pane flex flex-1 min-w-0 min-h-0"><PosCatalog /></div>

@@ -76,7 +76,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
         {/* Top Header */}
         <div className="p-4 sm:p-5 bg-white border-b border-jaman-border flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-jaman-saffron">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-jaman-saffronText">
               <ShoppingBag className="w-5 h-5" />
             </div>
             <div>
@@ -84,7 +84,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                 <h2 className="text-base sm:text-lg font-black text-jaman-navy">
                   All Orders for {businessDay.displayDate}
                 </h2>
-                <span className="font-mono text-xs text-slate-400">({businessDay.id})</span>
+                <span className="font-mono text-xs text-slate-500">({businessDay.id})</span>
               </div>
               <p className="text-xs text-slate-500">
                 Permanent archived database records for this business day. Showing {filteredOrders.length} of {dayOrders.length} orders.
@@ -95,7 +95,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
+            className="p-2 text-slate-500 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -105,13 +105,13 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
         <div className="p-3 bg-jaman-cream border-b border-jaman-border flex flex-wrap items-center justify-between gap-3 shrink-0">
           {/* Search */}
           <div className="relative min-w-[240px] flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by Order #, Token #, Customer, Dish..."
-              className="w-full bg-white border border-jaman-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-jaman-navy font-bold placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-white border border-jaman-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-jaman-navy font-bold placeholder:text-slate-500 focus:outline-none focus:border-jaman-saffron"
             />
           </div>
 
@@ -219,7 +219,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                       {o.customerName && <span>• {o.customerName}</span>}
                     </div>
 
-                    <div className={`text-[11px] truncate ${isSelected ? 'text-slate-400' : 'text-slate-400'}`}>
+                    <div className={`text-[11px] truncate ${isSelected ? 'text-slate-500' : 'text-slate-500'}`}>
                       {o.items.map((it) => `${it.quantity}x ${it.name}`).join(', ')}
                     </div>
                   </div>
@@ -270,7 +270,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
 
                 {/* Items Breakdown */}
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+                  <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">
                     Ordered Dishes ({selectedOrder.items.length})
                   </span>
                   <div className="space-y-1.5">
@@ -310,7 +310,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                   </div>
                   <div className="flex justify-between pt-1.5 border-t border-slate-200 font-black text-sm text-jaman-navy">
                     <span>Grand Total:</span>
-                    <span className="font-mono text-jaman-saffron">{formatINR(selectedOrder.totalAmount)}</span>
+                    <span className="font-mono text-jaman-saffronText">{formatINR(selectedOrder.totalAmount)}</span>
                   </div>
                 </div>
 
@@ -331,7 +331,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-slate-400 text-center p-6 space-y-2">
+              <div className="h-full flex flex-col items-center justify-center text-slate-500 text-center p-6 space-y-2">
                 <Receipt className="w-10 h-10 opacity-30" />
                 <div className="font-bold text-xs">Select an order from the left</div>
                 <p className="text-[11px]">View full line item charges, taxes, modifiers, and audit logs.</p>

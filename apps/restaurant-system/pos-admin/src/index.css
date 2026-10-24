@@ -260,6 +260,87 @@ details.jv-disclosure[open] > *:not(summary) {
   .jv-page h1[class] { font-size: 1.25rem; line-height: 1.75rem; }
 }
 
+/* ---------------------------------------------------------------------------------------------------------------
+   Enterprise consistency layer. Presentation only: every rule below restyles an existing element, none adds one.
+   --------------------------------------------------------------------------------------------------------------- */
+
+/* One primary-action colour. Pages mixed navy- and orange-filled action buttons in the same toolbar (Menu showed both
+   side by side). Filled navy on a button, link or file label is an action, so it takes the brand orange used by the
+   sidebar and the other primary actions; navy panels, headers and badges are not touched. */
+button.bg-jaman-navy.text-white,
+a.bg-jaman-navy.text-white,
+label.bg-jaman-navy.text-white {
+  background-color: var(--jv-brand);
+  border-color: transparent;
+}
+button.bg-jaman-navy.text-white:hover:not(:disabled),
+a.bg-jaman-navy.text-white:hover,
+label.bg-jaman-navy.text-white:hover {
+  background-color: #a9480c;
+}
+button.bg-jaman-navy.text-white:active:not(:disabled) { background-color: #933e0a; }
+button.bg-jaman-navy.text-white:focus-visible,
+a.bg-jaman-navy.text-white:focus-visible { outline: 2px solid rgb(191 84 15 / 0.55); outline-offset: 2px; }
+
+/* Key figures in cards are set in the interface font with fixed-width digits, not in a monospace face that made
+   "0 Tickets" / "0 Busy" read like terminal output. Codes, timestamps and receipts keep their monospace. */
+.jv-page :is(.text-xl, .text-2xl, .text-3xl, .text-4xl).font-mono {
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Informational callouts share one neutral treatment instead of a one-off blue per page. */
+.jv-page :is(div, section, p).bg-blue-50:is(.border-blue-100, .border-blue-200, .border) {
+  background-color: #fff;
+  border-color: var(--jv-border);
+  border-left: 4px solid rgb(191 84 15 / 0.6);
+  color: #0b253a;
+}
+
+/* One card. Every content card in the admin shares a 16px radius, the warm border and no drop shadow; the older
+   "premium" card classes (20px radius, a different border, lifted shadows) and per-page shadow utilities now agree. */
+.card-luxury, .card-metric-premium, .card-status-premium, .card-summary-premium, .card-data-premium,
+.card-action-premium, .dash-hero-card, .dash-subtle-card {
+  border: 1px solid var(--jv-border);
+  border-radius: 1rem;
+  box-shadow: none;
+}
+.card-metric-premium, .card-summary-premium { padding: 1rem; }
+.card-metric-premium :is(.text-3xl, .text-4xl), .card-summary-premium :is(.text-3xl, .text-4xl) { font-size: 1.5rem; line-height: 2rem; font-weight: 700; }
+.card-luxury:hover, .card-metric-premium:hover, .card-status-premium:hover, .card-summary-premium:hover,
+.card-data-premium:hover, .dash-hero-card:hover, .dash-subtle-card:hover { box-shadow: none; transform: none; }
+.jv-page :is(div, section, article, form, details)[class~="border"]:is([class*="rounded-2xl"], [class*="rounded-3xl"]) {
+  border-radius: 1rem;
+  box-shadow: none;
+}
+
+/* Key figures in cards: one size and weight (24px / 700) whatever the page originally chose (30px/800, 30px/900...). */
+.jv-page :is(div, section, article)[class~="border"]:is([class*="rounded-2xl"], [class*="rounded-3xl"]) :is(.text-3xl, .text-4xl):not(h1):not(h2):not(h3) {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+}
+.jv-page :is(div, section, article)[class~="border"]:is([class*="rounded-2xl"], [class*="rounded-3xl"]) :is(.text-2xl, .text-xl).font-extrabold,
+.jv-page :is(div, section, article)[class~="border"]:is([class*="rounded-2xl"], [class*="rounded-3xl"]) :is(.text-2xl, .text-xl).font-black {
+  font-weight: 700;
+}
+
+/* Form primitives used by the password, device-login, WhatsApp and subscription forms. They were referenced but never
+   defined in this app, so those inputs rendered as unstyled (nearly invisible) fields. */
+.form-grid { display: grid; gap: 12px 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > label { font-size: 12px; font-weight: 700; color: #0b253a; }
+.field :is(input, select, textarea) {
+  width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--jv-border); border-radius: 12px;
+  background: #fff; color: #0b253a; font-size: 14px; line-height: 1.4;
+  transition: border-color var(--jv-dur-base) var(--jv-ease-out), box-shadow var(--jv-dur-base) var(--jv-ease-out);
+}
+.field :is(input, select, textarea):hover { border-color: #d8d1c3; }
+.field :is(input, select, textarea):focus { outline: none; border-color: var(--jv-brand); box-shadow: 0 0 0 3px rgb(191 84 15 / 0.15); }
+.field :is(input, select, textarea)::placeholder { color: #64748b; }
+.form-error { border-left: 3px solid #ce4263; background: #fff4f6; color: #a51c36; padding: 8px 12px; border-radius: 10px; font-size: 13px; }
+
 /* A navigation group opening reveals its items rather than snapping in. */
 .jv-nav-reveal { animation: jv-fade-up var(--jv-dur-base) var(--jv-ease-out) backwards; }
 

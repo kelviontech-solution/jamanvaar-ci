@@ -15,7 +15,7 @@ describe('Restaurant Admin UI audit fixes', () => {
 
   it('gives the header-opened overlays dialog semantics and an accessible name', () => {
     expect(admin('components/EodReportModal.tsx')).toMatch(/role="dialog" aria-modal="true" aria-label="End of day report"/);
-    expect(admin('components/reports/FinancialReconciliationModal.tsx')).toMatch(/role="dialog" aria-modal="true" aria-label="Financial reconciliation"/);
+    expect(admin('components/reports/FinancialReconciliationModal.tsx')).toContain('<ModalBackdrop'); // the shared backdrop supplies the dialog role and name
     expect(read('packages/ui/src/NotificationDrawerModal.tsx')).toMatch(/role="dialog" aria-modal="true" aria-label="Notifications"/);
   });
 

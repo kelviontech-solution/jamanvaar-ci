@@ -40,7 +40,7 @@ export const CaptainAttentionStrip: React.FC<CaptainAttentionStripProps> = ({
     <section className="bg-[#FFF8F0] border-b border-[#FDBA74]/40 px-3 sm:px-5 py-1.5 sm:py-2 select-none shadow-2xs" aria-label="Priority actions">
       <div className="max-w-7xl mx-auto flex items-center gap-1.5 sm:gap-2 cap-chip-row scrollbar-none -mx-3 px-3 sm:mx-auto sm:px-0">
         {/* Label: icon only on a phone (the chips explain themselves), full text from sm up */}
-        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-jaman-saffron shrink-0 sm:mr-1">
+        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-jaman-saffronText shrink-0 sm:mr-1">
           <Sparkles className="w-4 h-4 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
           <span className="sr-only sm:not-sr-only">Priority Actions:</span>
         </div>
@@ -119,7 +119,7 @@ export const CaptainAttentionStrip: React.FC<CaptainAttentionStripProps> = ({
           }`}
           title="Staff and Kitchen communications"
         >
-          <MessageSquare className={`w-3.5 h-3.5 ${unreadMessagesCount > 0 ? 'text-jaman-saffron' : 'text-slate-400'}`} />
+          <MessageSquare className={`w-3.5 h-3.5 ${unreadMessagesCount > 0 ? 'text-jaman-saffronText' : 'text-slate-500'}`} />
           <span>Messages ({unreadMessagesCount})</span>
         </button>
       </div>

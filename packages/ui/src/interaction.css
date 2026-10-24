@@ -27,12 +27,20 @@
   :where([data-jv-workspace], [data-jv-dialog]) :is(.bg-jaman-saffron, .bg-jaman-orange, .bg-brand).text-white:active {
     background-color: var(--jv-ui-action-pressed);
   }
+  /* Filled green buttons with white text: one step deeper so the label clears 4.5:1 (3.8:1 before). */
+  :where([data-jv-workspace], [data-jv-dialog]) .bg-emerald-600.text-white { background-color: #047857; }
+  :where([data-jv-workspace], [data-jv-dialog]) .bg-emerald-600.text-white:hover { background-color: #065f46; }
   [data-jv-workspace] :is(.text-\[10px\], .text-\[11px\]) { font-size: 0.8125rem; }
   [data-jv-workspace] :is(.text-\[8px\], .text-\[9px\]) { font-size: 0.75rem; }
 }
 
 @media screen and (pointer: coarse) {
-  :where([data-jv-workspace], [data-jv-dialog]) :where(button, [role="button"]) {
+  :where([data-jv-dialog]) :where(button, [role="button"]) {
+    min-height: var(--jv-ui-touch);
+    min-width: var(--jv-ui-touch);
+  }
+  /* `[class]` lifts specificity above utilities such as min-h-[40px], which otherwise kept touch targets under 44px. */
+  [data-jv-workspace] :is(button, [role="button"])[class] {
     min-height: var(--jv-ui-touch);
     min-width: var(--jv-ui-touch);
   }

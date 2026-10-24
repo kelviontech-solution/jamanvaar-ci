@@ -62,7 +62,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
         {/* Header */}
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <User className="w-5 h-5 text-jaman-saffron" />
+            <User className="w-5 h-5 text-jaman-saffronText" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Customer / CRM Search</h2>
               <span className="text-xs text-slate-300">Fast phone lookup & loyalty lookup</span>
@@ -80,14 +80,14 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
         {/* Search Input Bar */}
         <div className="p-4 bg-white border-b border-jaman-border space-y-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="tel"
               autoFocus
               placeholder="Search by 10-digit mobile number or customer name..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-mono text-jaman-navy placeholder:font-sans placeholder:text-slate-400 focus:outline-hidden focus:border-jaman-saffron focus:bg-white transition-all"
+              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-mono text-jaman-navy placeholder:font-sans placeholder:text-slate-500 focus:outline-hidden focus:border-jaman-saffron focus:bg-white transition-all"
             />
           </div>
 
@@ -182,7 +182,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
 
                     <div className="flex items-center gap-3 text-xs text-slate-500">
                       <span className="font-mono flex items-center gap-1">
-                        <Phone className="w-3 h-3 text-slate-400" />
+                        <Phone className="w-3 h-3 text-slate-500" />
                         {customer.phone}
                       </span>
                       <span className="flex items-center gap-1 font-bold text-amber-600">
@@ -199,7 +199,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
               );
             })
           ) : (
-            <div className="h-40 flex flex-col items-center justify-center text-center text-slate-400">
+            <div className="h-40 flex flex-col items-center justify-center text-center text-slate-500">
               <User className="w-8 h-8 text-slate-300 mb-1" />
               <p className="text-xs">No customers matched "{query}"</p>
               <button
@@ -207,7 +207,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
                   setIsCreating(true);
                   setNewPhone(query.replace(/\D/g, ''));
                 }}
-                className="mt-2 text-xs font-bold text-jaman-saffron hover:underline"
+                className="mt-2 text-xs font-bold text-jaman-saffronText hover:underline"
               >
                 + Register this phone number
               </button>
@@ -228,7 +228,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
               Detach Customer (Guest Checkout)
             </button>
           ) : (
-            <span className="text-xs text-slate-400">Guest checkout is active</span>
+            <span className="text-xs text-slate-500">Guest checkout is active</span>
           )}
 
           <button

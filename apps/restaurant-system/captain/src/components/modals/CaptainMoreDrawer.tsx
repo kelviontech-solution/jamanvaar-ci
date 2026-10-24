@@ -110,11 +110,11 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
                 <span className="text-[11px] text-slate-500 font-medium">Ask floor, kitchen & bill questions</span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-jaman-saffron" />
+            <ChevronRight className="w-4 h-4 text-jaman-saffronText" />
           </button>
           )}
 
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block px-1 pt-2">
+          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block px-1 pt-2">
             Floor Operations:
           </span>
 
@@ -131,12 +131,12 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
                 className="w-full p-3.5 rounded-2xl bg-white border border-jaman-border hover:border-jaman-saffron text-left transition-all shadow-2xs flex items-center justify-between gap-3 group cursor-pointer"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-jaman-cream group-hover:bg-[#FFF4ED] text-slate-600 group-hover:text-jaman-saffron flex items-center justify-center transition-colors mt-0.5">
+                  <div className="w-8 h-8 rounded-xl bg-jaman-cream group-hover:bg-[#FFF4ED] text-slate-600 group-hover:text-jaman-saffronText flex items-center justify-center transition-colors mt-0.5">
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron transition-colors">
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffronText transition-colors">
                         {item.label}
                       </span>
                       {item.count !== null && item.count > 0 && (
@@ -145,12 +145,12 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-400 font-medium mt-0.5 line-clamp-1">
+                    <p className="text-[11px] text-slate-500 font-medium mt-0.5 line-clamp-1">
                       {item.description}
                     </p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-jaman-saffron transition-colors shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-jaman-saffronText transition-colors shrink-0" />
               </button>
             );
           })}

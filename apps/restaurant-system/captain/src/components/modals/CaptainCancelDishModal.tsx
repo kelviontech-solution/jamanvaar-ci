@@ -66,7 +66,7 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
             <p className="text-sm font-bold text-slate-700 mt-1 break-words">{dish.quantity}× {dish.name}</p>
             <p className="text-xs text-slate-500 mt-0.5">It is taken off the bill and the kitchen is told to stop.</p>
           </div>
-          <button type="button" onClick={close} disabled={busy} aria-label="Close" className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 cursor-pointer shrink-0">
+          <button type="button" onClick={close} disabled={busy} aria-label="Close" className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 cursor-pointer shrink-0">
             <X className="w-5 h-5" />
           </button>
         </div>

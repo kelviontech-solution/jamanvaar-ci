@@ -181,7 +181,7 @@ ESC/POS Command Engine Verified OK
         <SettingsPageHeader
           title="POS System & License Settings"
           description="Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses."
-          icon={<Settings className="w-6 h-6 text-jaman-saffron" aria-hidden="true" />}
+          icon={<Settings className="w-6 h-6 text-jaman-saffronText" aria-hidden="true" />}
         />
         <SettingsTabs
           ariaLabel="POS settings sections"
@@ -219,7 +219,7 @@ ESC/POS Command Engine Verified OK
         <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              {soundEnabled ? <Volume2 className="w-5 h-5 text-jaman-saffron" /> : <VolumeX className="w-5 h-5 text-slate-400" />}
+              {soundEnabled ? <Volume2 className="w-5 h-5 text-jaman-saffronText" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
               <h3 className="font-bold text-sm text-jaman-navy">Sound Effects</h3>
             </div>
             <span className="text-[10px] font-black bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full">
@@ -319,7 +319,7 @@ ESC/POS Command Engine Verified OK
           <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-jaman-saffron" />
+                <FileText className="w-5 h-5 text-jaman-saffronText" />
                 <h3 className="font-bold text-sm text-jaman-navy">Default Report Template & Layout</h3>
               </div>
               <span className="text-[10px] font-black bg-blue-100 text-blue-900 px-2 py-0.5 rounded-full">
@@ -378,7 +378,7 @@ ESC/POS Command Engine Verified OK
                     <option value="06:00 AM">06:00 AM (Breakfast Cutoff)</option>
                   </select>
                 </div>
-                <span className="text-[11px] text-slate-400 block">
+                <span className="text-[11px] text-slate-500 block">
                   Orders billed before this cutoff belong to the previous operating date.
                 </span>
               </div>
@@ -389,10 +389,10 @@ ESC/POS Command Engine Verified OK
           <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Building className="w-5 h-5 text-jaman-saffron" />
+                <Building className="w-5 h-5 text-jaman-saffronText" />
                 <h3 className="font-bold text-sm text-jaman-navy">Report Output & Branding Inclusions</h3>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">PDF & EXPORT</span>
+              <span className="text-[10px] font-mono text-slate-500">PDF & EXPORT</span>
             </div>
 
             <div className="space-y-2.5 text-xs">
@@ -447,7 +447,7 @@ ESC/POS Command Engine Verified OK
           <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-jaman-saffron" />
+                <Zap className="w-5 h-5 text-jaman-saffronText" />
                 <h3 className="font-bold text-sm text-jaman-navy">Instant Bill / Quick Checkout</h3>
               </div>
               <span className="text-[10px] font-black bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-200">
@@ -460,7 +460,7 @@ ESC/POS Command Engine Verified OK
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
                   <strong className="text-jaman-navy block">Enable Instant Bill Shortcut</strong>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     Bypasses payment allocation overview and settles immediately
                   </span>
                 </div>
@@ -518,7 +518,7 @@ ESC/POS Command Engine Verified OK
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
                   <strong className="text-jaman-navy block">Auto-Print Thermal Bill After Settle</strong>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     Immediately send receipt to 80mm thermal hardware queue
                   </span>
                 </div>
@@ -545,7 +545,7 @@ ESC/POS Command Engine Verified OK
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
                   <strong className="text-jaman-navy block">Ask For 1-Tap Confirmation Dialog</strong>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     Display compact modal to confirm total before firing printer (Recommended: OFF for max speed)
                   </span>
                 </div>
@@ -572,7 +572,7 @@ ESC/POS Command Engine Verified OK
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
                   <strong className="text-jaman-navy block">Send KOT Ticket to Kitchen Stations</strong>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     Automatically route KOT to kitchen displays / printers alongside customer bill
                   </span>
                 </div>
@@ -604,7 +604,7 @@ ESC/POS Command Engine Verified OK
                 <FileText className="w-5 h-5 text-jaman-navy" />
                 <h3 className="font-bold text-sm text-jaman-navy">Live Configuration Preview</h3>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">STATUS PREVIEW</span>
+              <span className="text-[10px] font-mono text-slate-500">STATUS PREVIEW</span>
             </div>
 
             <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border space-y-3 text-xs">
@@ -657,7 +657,7 @@ ESC/POS Command Engine Verified OK
                 <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
                 <span>Test Instant Bill Print (Safe Simulation)</span>
               </button>
-              <span className="text-[10px] text-slate-400 text-center block mt-1.5">
+              <span className="text-[10px] text-slate-500 text-center block mt-1.5">
                 Safe hardware simulation: queues test ticket without creating real accounting invoices.
               </span>
             </div>
@@ -672,7 +672,7 @@ ESC/POS Command Engine Verified OK
           <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-jaman-saffron" />
+                <Sliders className="w-5 h-5 text-jaman-saffronText" />
                 <h3 className="font-bold text-sm text-jaman-navy">Printing & Automation Rules</h3>
               </div>
               <span className="text-[10px] font-bold bg-jaman-saffron/10 text-jaman-saffron px-2 py-0.5 rounded-full">
@@ -684,7 +684,7 @@ ESC/POS Command Engine Verified OK
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
                   <strong className="text-jaman-navy block">Auto-Print Receipt on Settlement</strong>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     Automatically queue thermal receipt upon successful payment
                   </span>
                 </div>
@@ -709,7 +709,7 @@ ESC/POS Command Engine Verified OK
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
                   <strong className="text-jaman-navy block">Auto-Print KOT on Order Dispatch</strong>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     Send kitchen tickets to station printers automatically
                   </span>
                 </div>
@@ -734,7 +734,7 @@ ESC/POS Command Engine Verified OK
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
                   <strong className="text-jaman-navy block">Default Paper Width</strong>
-                  <span className="text-[11px] text-slate-400">Standard counter roll dimension</span>
+                  <span className="text-[11px] text-slate-500">Standard counter roll dimension</span>
                 </div>
                 <div className="flex gap-1.5">
                   <button
@@ -774,10 +774,10 @@ ESC/POS Command Engine Verified OK
           <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Printer className="w-5 h-5 text-jaman-saffron" />
+                <Printer className="w-5 h-5 text-jaman-saffronText" />
                 <div>
                   <h3 className="font-bold text-sm text-jaman-navy">Printers & Hardware Devices</h3>
-                  <span className="text-[10px] text-slate-400">Auto-detected Windows, USB & LAN Thermal Printers</span>
+                  <span className="text-[10px] text-slate-500">Auto-detected Windows, USB & LAN Thermal Printers</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -785,7 +785,7 @@ ESC/POS Command Engine Verified OK
                   type="button"
                   onClick={handleScanPrinters}
                   disabled={isScanningPrinters}
-                  className="px-2.5 py-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffron border border-[#FDBA74] rounded-xl font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                  className="px-2.5 py-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffronText border border-[#FDBA74] rounded-xl font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
                   title="Scan for connected physical & network printers"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isScanningPrinters ? 'animate-spin' : ''}`} />
@@ -793,7 +793,7 @@ ESC/POS Command Engine Verified OK
                 </button>
                 <button
                   onClick={() => setIsPrintQueueOpen(true)}
-                  className="text-[11px] font-bold text-jaman-navy hover:text-jaman-saffron hover:underline"
+                  className="text-[11px] font-bold text-jaman-navy hover:text-jaman-saffronText hover:underline"
                 >
                   Print Queue
                 </button>
@@ -853,7 +853,7 @@ ESC/POS Command Engine Verified OK
                     <button
                       type="button"
                       onClick={() => handleTestPrint(pr.name, pr.paperSize as any, pr.id)}
-                      className="px-3 py-1.5 bg-white border border-slate-300 hover:border-jaman-saffron hover:text-jaman-saffron rounded-xl font-black text-xs transition-all active:scale-95 shadow-2xs cursor-pointer"
+                      className="px-3 py-1.5 bg-white border border-slate-300 hover:border-jaman-saffron hover:text-jaman-saffronText rounded-xl font-black text-xs transition-all active:scale-95 shadow-2xs cursor-pointer"
                     >
                       Test Print
                     </button>
@@ -872,7 +872,7 @@ ESC/POS Command Engine Verified OK
           <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Database className="w-5 h-5 text-emerald-600" />
+                <Database className="w-5 h-5 text-emerald-700" />
                 <h3 className="font-bold text-sm text-jaman-navy">Local Storage Health</h3>
               </div>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${storageStatus.ok && storageStatus.mode === 'SQLITE' && storageStatus.commitState === 'COMMITTED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>
@@ -933,7 +933,7 @@ ESC/POS Command Engine Verified OK
                   : 'bg-emerald-50 text-emerald-900 border-emerald-300 hover:bg-emerald-100'
               }`}
             >
-              {isOnline ? <WifiOff className="w-4 h-4 text-amber-600" /> : <Wifi className="w-4 h-4 text-emerald-600" />}
+              {isOnline ? <WifiOff className="w-4 h-4 text-amber-600" /> : <Wifi className="w-4 h-4 text-emerald-700" />}
               <span>{isOnline ? 'Simulate Offline Mode' : 'Restore Online Mode'}</span>
             </button>
           </div>
@@ -947,7 +947,7 @@ ESC/POS Command Engine Verified OK
           <div className="bg-white border border-jaman-border rounded-3xl p-6 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] text-jaman-saffron flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] text-jaman-saffronText flex items-center justify-center shadow-xs">
                   <Award className="w-6 h-6" />
                 </div>
                 <div>
@@ -966,7 +966,7 @@ ESC/POS Command Engine Verified OK
               </div>
 
               <div className="text-right font-mono">
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-sans">
+                <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-sans">
                   Active Price Tier
                 </span>
                 <span className="text-xl font-black text-jaman-navy">
@@ -978,7 +978,7 @@ ESC/POS Command Engine Verified OK
             {/* License Metadata Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
                   License Key
                 </span>
                 <strong className="font-mono text-jaman-navy text-xs block truncate mt-0.5">
@@ -987,7 +987,7 @@ ESC/POS Command Engine Verified OK
               </div>
 
               <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
                   Terminal ID
                 </span>
                 <strong className="font-mono text-jaman-navy text-xs block mt-0.5">
@@ -996,7 +996,7 @@ ESC/POS Command Engine Verified OK
               </div>
 
               <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
                   Allowed Terminals
                 </span>
                 <strong className="font-mono text-jaman-navy text-xs block mt-0.5">
@@ -1005,7 +1005,7 @@ ESC/POS Command Engine Verified OK
               </div>
 
               <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
                   Valid Until
                 </span>
                 <strong className="font-mono text-jaman-navy text-xs block mt-0.5">
@@ -1050,7 +1050,7 @@ ESC/POS Command Engine Verified OK
                   {/* Card Header */}
                   <div className="flex items-start justify-between border-b border-slate-100 pb-4">
                     <div>
-                      <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block">
+                      <span className="text-[10px] font-black tracking-wider uppercase text-slate-500 block">
                         FOUNDATION EDITION
                       </span>
                       <h4 className="text-xl sm:text-2xl font-black text-jaman-navy">JAMANVAAR CORE</h4>
@@ -1060,7 +1060,7 @@ ESC/POS Command Engine Verified OK
                     </div>
                     <div className="text-right shrink-0">
                       <span className="text-2xl sm:text-3xl font-black text-jaman-navy font-mono">₹5,000</span>
-                      <span className="text-[10px] text-slate-400 block">per license</span>
+                      <span className="text-[10px] text-slate-500 block">per license</span>
                     </div>
                   </div>
 
@@ -1072,7 +1072,7 @@ ESC/POS Command Engine Verified OK
                   {/* CORE Feature Modules Accordion */}
                   <div className="space-y-2 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+                      <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">
                         INCLUDED MODULES & CAPABILITIES (183 FEATURES):
                       </span>
                       <button
@@ -1350,10 +1350,10 @@ ESC/POS Command Engine Verified OK
                             className="w-full px-3.5 py-2.5 bg-jaman-cream hover:bg-slate-100 flex items-center justify-between font-bold text-xs text-jaman-navy cursor-pointer transition-colors"
                           >
                             <div className="flex items-center gap-2">
-                              <Check className="w-4 h-4 text-emerald-600 shrink-0 stroke-[2.5]" />
+                              <Check className="w-4 h-4 text-emerald-700 shrink-0 stroke-[2.5]" />
                               <span>{group.title}</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-slate-400">
+                            <div className="flex items-center gap-1.5 text-slate-500">
                               <span className="text-[10px] font-mono font-bold text-slate-600 bg-white px-2 py-0.5 rounded-full border border-slate-200">
                                 {group.features.length} features
                               </span>
@@ -1365,7 +1365,7 @@ ESC/POS Command Engine Verified OK
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
                                 {group.features.map((feat, fIdx) => (
                                   <div key={fIdx} className="flex items-start gap-1.5 leading-snug">
-                                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5 stroke-[2.5]" />
+                                    <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5 stroke-[2.5]" />
                                     <span>{feat}</span>
                                   </div>
                                 ))}
@@ -1381,13 +1381,13 @@ ESC/POS Command Engine Verified OK
                 {/* Card Bottom / CTA */}
                 <div className="pt-6 border-t border-slate-100 mt-4 space-y-2">
                   <div className="text-[10px] font-black tracking-wider uppercase text-emerald-700 text-center flex items-center justify-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
                     <span>COMPLETE RESTAURANT MANAGEMENT</span>
                   </div>
 
                   {currentTier === 'CORE' ? (
                     <div className="w-full py-3 rounded-2xl bg-slate-100 border border-slate-300 text-slate-700 font-bold text-xs text-center flex items-center justify-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                       <span>Current Active Edition</span>
                     </div>
                   ) : (
@@ -1419,7 +1419,7 @@ ESC/POS Command Engine Verified OK
                   {/* Header */}
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 border-b border-amber-200/60 pb-4">
                     <div>
-                      <span className="text-[10px] font-black tracking-widest uppercase text-jaman-saffron block">
+                      <span className="text-[10px] font-black tracking-widest uppercase text-jaman-saffronText block">
                         FLAGSHIP CONNECTED RESTAURANT ECOSYSTEM
                       </span>
                       <h4 className="text-2xl sm:text-3xl font-black text-jaman-navy flex items-center gap-2">
@@ -1434,7 +1434,7 @@ ESC/POS Command Engine Verified OK
                       <div className="flex items-baseline gap-1 sm:justify-end">
                         <span className="text-3xl sm:text-4xl font-black text-jaman-navy font-mono">₹7,000</span>
                       </div>
-                      <span className="text-[10px] text-slate-400 block font-sans">per license</span>
+                      <span className="text-[10px] text-slate-500 block font-sans">per license</span>
                     </div>
                   </div>
 
@@ -1446,16 +1446,16 @@ ESC/POS Command Engine Verified OK
                   {/* Top Prominent Value Badges */}
                   <div className="space-y-2">
                     <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-xs font-black text-emerald-900 flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>EVERYTHING IN CORE IS INCLUDED (183 Base Features)</span>
                     </div>
 
                     <div className="p-2.5 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 rounded-xl border border-amber-300 text-xs text-jaman-navy flex items-center justify-between gap-2 font-black">
-                      <div className="flex items-center gap-1.5 text-jaman-saffron">
-                        <Sparkles className="w-4 h-4 text-jaman-saffron shrink-0" />
+                      <div className="flex items-center gap-1.5 text-jaman-saffronText">
+                        <Sparkles className="w-4 h-4 text-jaman-saffronText shrink-0" />
                         <span>ONLY ₹2,000 MORE THAN CORE</span>
                       </div>
-                      <span className="text-[11px] font-bold text-jaman-saffron bg-white px-2.5 py-0.5 rounded-full shadow-2xs border border-amber-200">
+                      <span className="text-[11px] font-bold text-jaman-saffronText bg-white px-2.5 py-0.5 rounded-full shadow-2xs border border-amber-200">
                         RECOMMENDED • BEST VALUE
                       </span>
                     </div>
@@ -1464,13 +1464,13 @@ ESC/POS Command Engine Verified OK
                   {/* PRO Feature Modules Accordion */}
                   <div className="space-y-2.5 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase text-jaman-saffron tracking-wider block">
+                      <span className="text-[10px] font-black uppercase text-jaman-saffronText tracking-wider block">
                         PRO CONNECTED MODULES (173 EXCLUSIVE CAPABILITIES):
                       </span>
                       <button
                         type="button"
                         onClick={() => setShowAllProFeatures(!showAllProFeatures)}
-                        className="text-[10px] font-bold text-jaman-saffron hover:text-[#EA580C] underline cursor-pointer"
+                        className="text-[10px] font-bold text-jaman-saffronText hover:text-[#EA580C] underline cursor-pointer"
                       >
                         {showAllProFeatures ? 'Collapse All PRO' : 'Expand All PRO'}
                       </button>
@@ -1724,16 +1724,16 @@ ESC/POS Command Engine Verified OK
                             }`}
                           >
                             <div className="flex items-center gap-2.5 text-left">
-                              <div className="w-6 h-6 rounded-lg bg-orange-100 text-jaman-saffron flex items-center justify-center shrink-0">
+                              <div className="w-6 h-6 rounded-lg bg-orange-100 text-jaman-saffronText flex items-center justify-center shrink-0">
                                 <Icon className="w-3.5 h-3.5" />
                               </div>
                               <span className="tracking-tight">{group.title}</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-slate-400 shrink-0">
-                              <span className="text-[10px] font-mono font-bold text-jaman-saffron bg-[#FFF4EB] border border-[#FED7AA] px-2 py-0.5 rounded-full">
+                            <div className="flex items-center gap-1.5 text-slate-500 shrink-0">
+                              <span className="text-[10px] font-mono font-bold text-jaman-saffronText bg-[#FFF4EB] border border-[#FED7AA] px-2 py-0.5 rounded-full">
                                 {group.features.length} features
                               </span>
-                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-jaman-saffron" /> : <ChevronDown className="w-3.5 h-3.5 text-jaman-saffron" />}
+                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-jaman-saffronText" /> : <ChevronDown className="w-3.5 h-3.5 text-jaman-saffronText" />}
                             </div>
                           </button>
 
@@ -1742,7 +1742,7 @@ ESC/POS Command Engine Verified OK
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5">
                                 {group.features.map((feat, fIdx) => (
                                   <div key={fIdx} className="flex items-start gap-1.5 leading-snug">
-                                    <Check className="w-3.5 h-3.5 text-jaman-saffron shrink-0 mt-0.5 stroke-[2.5]" />
+                                    <Check className="w-3.5 h-3.5 text-jaman-saffronText shrink-0 mt-0.5 stroke-[2.5]" />
                                     <span className="font-medium text-slate-700">{feat}</span>
                                   </div>
                                 ))}
@@ -1787,14 +1787,14 @@ ESC/POS Command Engine Verified OK
 
                 {/* Card Bottom / Primary CTA */}
                 <div className="pt-5 border-t border-amber-200/80 mt-4 space-y-2">
-                  <div className="text-[10px] font-black tracking-wider uppercase text-jaman-saffron text-center flex items-center justify-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
+                  <div className="text-[10px] font-black tracking-wider uppercase text-jaman-saffronText text-center flex items-center justify-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-jaman-saffronText" />
                     <span>RUN + CONNECT + GROW YOUR RESTAURANT</span>
                   </div>
 
                   {currentTier === 'PRO' ? (
                     <div className="w-full py-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 font-black text-xs text-center flex items-center justify-center gap-2 shadow-xs">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                      <CheckCircle2 className="w-5 h-5 text-emerald-700" />
                       <span className="text-sm">Active License: JAMANVAAR PRO Edition</span>
                     </div>
                   ) : (
@@ -1818,7 +1818,7 @@ ESC/POS Command Engine Verified OK
             {/* SECTION 2: WHY RESTAURANTS UPGRADE TO PRO (4 Pillars) */}
             <div className="bg-white rounded-3xl p-6 border border-jaman-border shadow-2xs space-y-4">
               <div>
-                <span className="text-[10px] font-black uppercase text-jaman-saffron tracking-widest block">
+                <span className="text-[10px] font-black uppercase text-jaman-saffronText tracking-widest block">
                   COMMERCIAL ADVANTAGE
                 </span>
                 <h4 className="text-base font-black text-jaman-navy">Why Restaurants Upgrade to JAMANVAAR PRO</h4>
@@ -1826,7 +1826,7 @@ ESC/POS Command Engine Verified OK
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
-                  <div className="w-8 h-8 rounded-xl bg-orange-100 text-jaman-saffron flex items-center justify-center font-black text-xs">
+                  <div className="w-8 h-8 rounded-xl bg-orange-100 text-jaman-saffronText flex items-center justify-center font-black text-xs">
                     01
                   </div>
                   <strong className="text-xs font-black text-jaman-navy block">
@@ -1882,16 +1882,16 @@ ESC/POS Command Engine Verified OK
                   <h4 className="text-sm font-black text-jaman-navy">CORE vs PRO — Feature Comparison Matrix</h4>
                   <span className="text-[11px] text-slate-500">Every feature is backed by production-grade offline-first code.</span>
                 </div>
-                <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">OFFICIAL FEATURE MATRIX</span>
+                <span className="text-[10px] font-mono text-slate-500 hidden sm:inline">OFFICIAL FEATURE MATRIX</span>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-jaman-border text-slate-400 font-bold text-[10px] uppercase">
+                    <tr className="border-b border-jaman-border text-slate-500 font-bold text-[10px] uppercase">
                       <th className="py-2.5 px-3">Software Capability</th>
                       <th className="py-2.5 px-3 text-center w-36">CORE (₹5,000)</th>
-                      <th className="py-2.5 px-3 text-center w-48 bg-amber-50/60 text-jaman-saffron">PRO (₹7,000)</th>
+                      <th className="py-2.5 px-3 text-center w-48 bg-amber-50/60 text-jaman-saffronText">PRO (₹7,000)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1917,7 +1917,7 @@ ESC/POS Command Engine Verified OK
                       <tr key={idx} className="hover:bg-slate-50/80">
                         <td className="py-2.5 px-3 font-bold text-jaman-navy">{row.cap}</td>
                         <td className="py-2.5 px-3 text-center text-slate-700 font-mono text-[11px]">{row.core}</td>
-                        <td className="py-2.5 px-3 text-center font-bold text-jaman-saffron bg-amber-50/30 font-mono text-[11px]">
+                        <td className="py-2.5 px-3 text-center font-bold text-jaman-saffronText bg-amber-50/30 font-mono text-[11px]">
                           {row.pro}
                         </td>
                       </tr>
@@ -1930,7 +1930,7 @@ ESC/POS Command Engine Verified OK
             {/* Offline License Certificate Activation */}
             <div className="bg-white border border-jaman-border rounded-3xl p-6 shadow-2xs space-y-3">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <KeyRound className="w-5 h-5 text-jaman-saffron" />
+                <KeyRound className="w-5 h-5 text-jaman-saffronText" />
                 <div>
                   <h4 className="text-sm font-bold text-jaman-navy">Offline License Certificate</h4>
                   <p className="text-[11px] text-slate-500">
@@ -1946,7 +1946,7 @@ ESC/POS Command Engine Verified OK
                   value={dealerKeyInput}
                   onChange={(e) => setDealerKeyInput(e.target.value)}
                   placeholder="Paste the License Certificate from Super Admin..."
-                  className="w-full sm:flex-1 bg-jaman-cream border border-jaman-border rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
+                  className="w-full sm:flex-1 bg-jaman-cream border border-jaman-border rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-jaman-navy placeholder:text-slate-500 focus:outline-none focus:border-jaman-saffron"
                 />
 
                 <button

@@ -154,7 +154,7 @@ export const CaptainSignInScreen: React.FC<{
               className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-100 disabled:bg-[#5F6F80] disabled:shadow-none disabled:cursor-not-allowed text-white font-bold text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
             >
               <span>Unlock Captain Terminal</span>
-              <ArrowRight className="w-4 h-4 text-jaman-saffron" />
+              <ArrowRight className="w-4 h-4 text-jaman-saffronText" />
             </button>
           </form>
         </div>

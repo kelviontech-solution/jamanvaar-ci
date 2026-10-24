@@ -255,7 +255,7 @@ export const GlobalSearchModal: React.FC = () => {
         {/* Search Header Input (Large 52px+ touch area) */}
         <div className="p-3.5 sm:p-4 border-b border-jaman-border flex items-center gap-3 bg-jaman-cream shrink-0">
           <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FED7AA] flex items-center justify-center shrink-0">
-            <Search className="w-5 h-5 text-jaman-saffron" />
+            <Search className="w-5 h-5 text-jaman-saffronText" />
           </div>
 
           <div className="flex-1 flex flex-col">
@@ -268,9 +268,9 @@ export const GlobalSearchModal: React.FC = () => {
                 setSelectedIndex(0);
               }}
               placeholder="Search dish, SKU, table, token, bill #, customer..."
-              className="w-full text-base sm:text-lg font-bold text-jaman-navy placeholder:text-slate-400 bg-transparent focus:outline-none"
+              className="w-full text-base sm:text-lg font-bold text-jaman-navy placeholder:text-slate-500 bg-transparent focus:outline-none"
             />
-            <span className="text-[10px] text-slate-400 font-medium hidden sm:block">
+            <span className="text-[10px] text-slate-500 font-medium hidden sm:block">
               Type anything to search across Menu, Tables, Orders, Invoices & CRM
             </span>
           </div>
@@ -282,7 +282,7 @@ export const GlobalSearchModal: React.FC = () => {
                 setQuery('');
                 inputRef.current?.focus();
               }}
-              className="p-2 rounded-xl text-slate-400 hover:text-jaman-navy hover:bg-slate-200 transition-colors"
+              className="p-2 rounded-xl text-slate-500 hover:text-jaman-navy hover:bg-slate-200 transition-colors"
               title="Clear search query"
             >
               <X className="w-4 h-4" />
@@ -309,11 +309,11 @@ export const GlobalSearchModal: React.FC = () => {
                 {results.items.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-1.5 px-1">
-                      <span className="text-[11px] font-black uppercase text-jaman-saffron tracking-wider flex items-center gap-1.5">
+                      <span className="text-[11px] font-black uppercase text-jaman-saffronText tracking-wider flex items-center gap-1.5">
                         <Utensils className="w-3.5 h-3.5" />
                         <span>Menu & Dishes ({results.items.length})</span>
                       </span>
-                      <span className="text-[10px] text-slate-400">Tap to add to active order</span>
+                      <span className="text-[10px] text-slate-500">Tap to add to active order</span>
                     </div>
 
                     <div className="space-y-1.5">
@@ -332,10 +332,10 @@ export const GlobalSearchModal: React.FC = () => {
                               />
                             </div>
                             <div className="truncate">
-                              <div className="font-extrabold text-sm text-jaman-navy group-hover:text-jaman-saffron transition-colors truncate">
+                              <div className="font-extrabold text-sm text-jaman-navy group-hover:text-jaman-saffronText transition-colors truncate">
                                 {it.name}
                               </div>
-                              <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
+                              <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
                                 <span>SKU: {it.sku}</span>
                                 {it.kitchenStation && <span>• {it.kitchenStation}</span>}
                               </div>
@@ -385,7 +385,7 @@ export const GlobalSearchModal: React.FC = () => {
                               <strong className="text-sm font-bold text-jaman-navy block">
                                 Table {tbl.tableNumber}
                               </strong>
-                              <span className="text-[10px] text-slate-400">
+                              <span className="text-[10px] text-slate-500">
                                 {tbl.zone || 'Main Dining'} • {tbl.capacity} Seats
                               </span>
                             </div>
@@ -431,7 +431,7 @@ export const GlobalSearchModal: React.FC = () => {
                             </div>
                             <div>
                               <strong className="text-sm font-bold text-jaman-navy block">{c.name}</strong>
-                              <span className="text-[11px] text-slate-400 font-mono">{c.phone}</span>
+                              <span className="text-[11px] text-slate-500 font-mono">{c.phone}</span>
                             </div>
                           </div>
 
@@ -451,7 +451,7 @@ export const GlobalSearchModal: React.FC = () => {
                 {results.orders.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-1.5 px-1">
-                      <span className="text-[11px] font-black uppercase text-emerald-600 tracking-wider flex items-center gap-1.5">
+                      <span className="text-[11px] font-black uppercase text-emerald-700 tracking-wider flex items-center gap-1.5">
                         <Receipt className="w-3.5 h-3.5" />
                         <span>Orders & Bills ({results.orders.length})</span>
                       </span>
@@ -479,7 +479,7 @@ export const GlobalSearchModal: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              <span className="text-[10px] text-slate-400">
+                              <span className="text-[10px] text-slate-500">
                                 {ord.orderType} • {ord.paymentMethod || 'CASH'}
                               </span>
                             </div>
@@ -500,10 +500,10 @@ export const GlobalSearchModal: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="py-12 text-center text-slate-400 space-y-2">
+              <div className="py-12 text-center text-slate-500 space-y-2">
                 <AlertCircle className="w-8 h-8 text-slate-300 mx-auto" />
                 <h4 className="font-bold text-sm text-jaman-navy">No matches for "{query}"</h4>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   Try searching by dish name, 2-letter SKU (e.g. PT-04), table number, order #, or customer phone.
                 </p>
               </div>
@@ -513,8 +513,8 @@ export const GlobalSearchModal: React.FC = () => {
             <div className="space-y-4">
               {/* Frequently Ordered Dishes */}
               <div>
-                <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider block mb-2 px-1 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
+                <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2 px-1 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-jaman-saffronText" />
                   <span>Popular Dishes (1-Tap Add)</span>
                 </span>
 
@@ -526,7 +526,7 @@ export const GlobalSearchModal: React.FC = () => {
                       className="p-2.5 rounded-2xl border border-jaman-border hover:border-jaman-saffron hover:bg-[#FFFDFB] flex items-center justify-between cursor-pointer transition-all active:scale-[0.99] shadow-2xs"
                     >
                       <div className="flex items-center gap-2 truncate">
-                        <Utensils className="w-3.5 h-3.5 text-jaman-saffron shrink-0" />
+                        <Utensils className="w-3.5 h-3.5 text-jaman-saffronText shrink-0" />
                         <span className="font-bold text-xs text-jaman-navy truncate">{it.name}</span>
                       </div>
                       <span className="font-mono font-bold text-xs text-jaman-navy shrink-0 ml-2">
@@ -540,7 +540,7 @@ export const GlobalSearchModal: React.FC = () => {
               {/* Active Floor Tables */}
               {occupiedTables.length > 0 && (
                 <div>
-                  <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider block mb-2 px-1 flex items-center gap-1.5">
+                  <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2 px-1 flex items-center gap-1.5">
                     <LayoutGrid className="w-3.5 h-3.5 text-blue-600" />
                     <span>Active Occupied Tables</span>
                   </span>
@@ -570,8 +570,8 @@ export const GlobalSearchModal: React.FC = () => {
               {/* Recent Invoices */}
               {recentInvoices.length > 0 && (
                 <div>
-                  <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider block mb-2 px-1 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2 px-1 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-emerald-700" />
                     <span>Recent Completed Invoices</span>
                   </span>
 
@@ -583,9 +583,9 @@ export const GlobalSearchModal: React.FC = () => {
                         className="p-2.5 rounded-2xl border border-jaman-border hover:border-emerald-500 hover:bg-emerald-50/30 flex items-center justify-between cursor-pointer transition-all active:scale-[0.99]"
                       >
                         <div className="flex items-center gap-2">
-                          <Receipt className="w-3.5 h-3.5 text-emerald-600" />
+                          <Receipt className="w-3.5 h-3.5 text-emerald-700" />
                           <span className="font-bold text-xs text-jaman-navy">#{inv.orderNumber}</span>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-[10px] text-slate-500 font-mono">
                             ({inv.paymentMethod || 'CASH'})
                           </span>
                         </div>

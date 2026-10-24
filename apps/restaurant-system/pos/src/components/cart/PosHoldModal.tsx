@@ -53,7 +53,7 @@ export const PosHoldModal: React.FC = () => {
                   </div>
 
                   <div className="text-xs text-slate-500 flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-slate-400" />
+                    <Clock className="w-3 h-3 text-slate-500" />
                     <span>Held at {new Date(h.heldAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     <span>•</span>
                     <span>{h.itemCount} items</span>
@@ -79,7 +79,7 @@ export const PosHoldModal: React.FC = () => {
 
                   <button
                     onClick={() => HeldOrderRepository.deleteHeldOrder(h.id)}
-                    className="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-slate-200 transition-colors"
+                    className="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -87,10 +87,10 @@ export const PosHoldModal: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="h-48 flex flex-col items-center justify-center text-center text-slate-400 my-auto">
+            <div className="h-48 flex flex-col items-center justify-center text-center text-slate-500 my-auto">
               <ShoppingBag className="w-10 h-10 text-slate-300 mb-2 stroke-1" />
               <span className="text-sm font-bold text-slate-600">No active held carts</span>
-              <span className="text-xs text-slate-400 mt-0.5">Click 'Hold' in the cart to pause an active order</span>
+              <span className="text-xs text-slate-500 mt-0.5">Click 'Hold' in the cart to pause an active order</span>
             </div>
           )}
         </div>

@@ -184,7 +184,7 @@ export const PosInventoryView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
-              <Package className="w-4 h-4 text-jaman-saffron" />
+              <Package className="w-4 h-4 text-jaman-saffronText" />
             </div>
             <div>
               <h1 className="text-base sm:text-lg font-black text-jaman-navy leading-tight">
@@ -201,7 +201,7 @@ export const PosInventoryView: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 shrink-0">
           {/* Total Dishes */}
           <div className="bg-jaman-cream border border-jaman-border px-3 py-1.5 rounded-xl text-left">
-            <span className="text-slate-400 block text-[9px] uppercase font-black tracking-wider">
+            <span className="text-slate-500 block text-[9px] uppercase font-black tracking-wider">
               TOTAL DISHES
             </span>
             <strong className="text-sm font-black font-mono text-jaman-navy">{totalCount}</strong>
@@ -237,18 +237,18 @@ export const PosInventoryView: React.FC = () => {
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 shrink-0">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by dish name, SKU, or station..."
-            className="w-full bg-white border border-jaman-border focus:border-jaman-saffron rounded-xl pl-9 pr-3 py-2 text-xs font-semibold text-jaman-navy placeholder:text-slate-400 focus:outline-none shadow-2xs transition-colors"
+            className="w-full bg-white border border-jaman-border focus:border-jaman-saffron rounded-xl pl-9 pr-3 py-2 text-xs font-semibold text-jaman-navy placeholder:text-slate-500 focus:outline-none shadow-2xs transition-colors"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-600"
             >
               <X className="w-4 h-4" />
             </button>
@@ -290,8 +290,8 @@ export const PosInventoryView: React.FC = () => {
 
         {/* Dynamic Station Selector Dropdown */}
         <div className="flex items-center gap-1.5 shrink-0 bg-white border border-jaman-border px-2.5 py-1 rounded-xl shadow-2xs text-xs">
-          <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-          <span className="text-slate-400 text-[11px] font-semibold">Station:</span>
+          <Filter className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+          <span className="text-slate-500 text-[11px] font-semibold">Station:</span>
           <select
             value={selectedStation}
             onChange={(e) => setSelectedStation(e.target.value)}
@@ -353,14 +353,14 @@ export const PosInventoryView: React.FC = () => {
       <div className="flex-1 bg-white border border-jaman-border rounded-2xl shadow-2xs overflow-hidden flex flex-col">
         <div className="overflow-y-auto flex-1">
           <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-jaman-cream border-b border-jaman-border text-slate-400 font-bold sticky top-0 z-10 uppercase text-[10px] tracking-wider">
+            <thead className="bg-jaman-cream border-b border-jaman-border text-slate-500 font-bold sticky top-0 z-10 uppercase text-[10px] tracking-wider">
               <tr>
                 <th className="p-3 w-10 text-center">
                   <input
                     type="checkbox"
                     checked={selectedItemIds.length > 0 && selectedItemIds.length === filteredItems.length}
                     onChange={handleSelectAll}
-                    className="rounded text-jaman-saffron focus:ring-0 cursor-pointer"
+                    className="rounded text-jaman-saffronText focus:ring-0 cursor-pointer"
                   />
                 </th>
                 <th className="p-3 w-[35%]">DISH / SKU</th>
@@ -402,7 +402,7 @@ export const PosInventoryView: React.FC = () => {
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => handleToggleSelectRow(item.id)}
-                          className="rounded text-jaman-saffron focus:ring-0 cursor-pointer"
+                          className="rounded text-jaman-saffronText focus:ring-0 cursor-pointer"
                         />
                       </td>
 
@@ -445,7 +445,7 @@ export const PosInventoryView: React.FC = () => {
                             <strong className="text-xs font-extrabold text-jaman-navy block truncate">
                               {item.name}
                             </strong>
-                            <span className="text-[10px] text-slate-400 font-mono">
+                            <span className="text-[10px] text-slate-500 font-mono">
                               SKU: {item.sku}
                             </span>
                           </div>
@@ -532,10 +532,10 @@ export const PosInventoryView: React.FC = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400">
+                  <td colSpan={7} className="p-8 text-center text-slate-500">
                     <Utensils className="w-8 h-8 mx-auto text-slate-300 mb-2" />
                     <p className="font-bold text-sm text-jaman-navy">No dishes match your filters</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Try clearing your search query or status filter.</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Try clearing your search query or status filter.</p>
                   </td>
                 </tr>
               )}
@@ -551,7 +551,7 @@ export const PosInventoryView: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 {pendingItemAction.targetAvailability ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  <CheckCircle2 className="w-5 h-5 text-emerald-700" />
                 ) : (
                   <AlertCircle className="w-5 h-5 text-rose-600" />
                 )}
@@ -563,7 +563,7 @@ export const PosInventoryView: React.FC = () => {
               </div>
               <button
                 onClick={() => setPendingItemAction(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg text-slate-500 hover:text-slate-600"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -578,7 +578,7 @@ export const PosInventoryView: React.FC = () => {
             {/* Optional Reason for Unavailable */}
             {!pendingItemAction.targetAvailability && (
               <div className="space-y-2 pt-1">
-                <span className="text-xs font-black text-slate-400 uppercase tracking-wider block">
+                <span className="text-xs font-black text-slate-500 uppercase tracking-wider block">
                   Select Reason (Optional):
                 </span>
                 <div className="space-y-1.5">
@@ -598,7 +598,7 @@ export const PosInventoryView: React.FC = () => {
                         name="unavailableReason"
                         checked={selectedReason === r}
                         onChange={() => setSelectedReason(r)}
-                        className="text-jaman-saffron focus:ring-0"
+                        className="text-jaman-saffronText focus:ring-0"
                       />
                     </label>
                   ))}
@@ -644,7 +644,7 @@ export const PosInventoryView: React.FC = () => {
               </h3>
               <button
                 onClick={() => setIsBulkModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg text-slate-500 hover:text-slate-600"
               >
                 <X className="w-4 h-4" />
               </button>

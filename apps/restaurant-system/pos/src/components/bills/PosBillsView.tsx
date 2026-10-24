@@ -500,7 +500,7 @@ export const PosBillsView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <Receipt className="w-6 h-6 text-jaman-saffron" />
+            <Receipt className="w-6 h-6 text-jaman-saffronText" />
             <h1 className="text-xl sm:text-2xl font-black text-jaman-navy">Bills & Invoices</h1>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -521,7 +521,7 @@ export const PosBillsView: React.FC = () => {
             onClick={handleExportCsv}
             className="px-3 py-2 bg-white hover:bg-slate-50 border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
             <span>Export CSV</span>
           </button>
 
@@ -589,7 +589,7 @@ export const PosBillsView: React.FC = () => {
               className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-1.5 font-mono font-bold text-jaman-navy"
             />
           </div>
-          <span className="text-[11px] font-bold text-slate-400">
+          <span className="text-[11px] font-bold text-slate-500">
             Showing filtered ledger between selected dates
           </span>
         </div>
@@ -598,7 +598,7 @@ export const PosBillsView: React.FC = () => {
       {/* 3. Dynamic Period Financial Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 text-xs">
         <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs">
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
             Total Invoices
           </span>
           <strong className="text-xl font-black font-mono text-jaman-navy block mt-0.5">
@@ -610,7 +610,7 @@ export const PosBillsView: React.FC = () => {
         </div>
 
         <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs">
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
             Total Sales
           </span>
           <strong className="text-xl font-black font-mono text-emerald-700 block mt-0.5">
@@ -622,7 +622,7 @@ export const PosBillsView: React.FC = () => {
         </div>
 
         <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs">
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
             Cash Collection
           </span>
           <strong className="text-xl font-black font-mono text-amber-700 block mt-0.5">
@@ -634,7 +634,7 @@ export const PosBillsView: React.FC = () => {
         </div>
 
         <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs">
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
             UPI + Card POS
           </span>
           <strong className="text-xl font-black font-mono text-blue-700 block mt-0.5">
@@ -654,9 +654,9 @@ export const PosBillsView: React.FC = () => {
             onClick={() => setSelectedPeriod('TODAY')}
             className="p-3 bg-white hover:bg-amber-50/60 border border-jaman-border rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
           >
-            <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
               <span>TODAY</span>
-              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffron group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffronText group-hover:translate-x-1 transition-transform" />
             </div>
             <strong className="text-base font-black text-jaman-navy block mt-1">
               {formatINR(periodOverview.today.sales)}
@@ -669,9 +669,9 @@ export const PosBillsView: React.FC = () => {
             onClick={() => setSelectedPeriod('YESTERDAY')}
             className="p-3 bg-white hover:bg-amber-50/60 border border-jaman-border rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
           >
-            <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
               <span>YESTERDAY</span>
-              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffron group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffronText group-hover:translate-x-1 transition-transform" />
             </div>
             <strong className="text-base font-black text-jaman-navy block mt-1">
               {formatINR(periodOverview.yesterday.sales)}
@@ -684,9 +684,9 @@ export const PosBillsView: React.FC = () => {
             onClick={() => setSelectedPeriod('THIS_WEEK')}
             className="p-3 bg-white hover:bg-amber-50/60 border border-jaman-border rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
           >
-            <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
               <span>THIS WEEK</span>
-              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffron group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffronText group-hover:translate-x-1 transition-transform" />
             </div>
             <strong className="text-base font-black text-jaman-navy block mt-1">
               {formatINR(periodOverview.week.sales)}
@@ -699,9 +699,9 @@ export const PosBillsView: React.FC = () => {
             onClick={() => setSelectedPeriod('THIS_MONTH')}
             className="p-3 bg-white hover:bg-amber-50/60 border border-jaman-border rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
           >
-            <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
               <span>THIS MONTH</span>
-              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffron group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffronText group-hover:translate-x-1 transition-transform" />
             </div>
             <strong className="text-base font-black text-jaman-navy block mt-1">
               {formatINR(periodOverview.month.sales)}
@@ -745,19 +745,19 @@ export const PosBillsView: React.FC = () => {
       {/* 5. Search Bar & Filter Controls */}
       <div className="flex items-center gap-2 shrink-0">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search invoice #, token #, customer phone, cashier, transaction ID..."
-            className="w-full bg-white border border-jaman-border rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron shadow-2xs"
+            aria-label="Search bills" placeholder="Search invoice #, token #, customer phone, cashier, transaction ID..."
+            className="w-full bg-white border border-jaman-border rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-jaman-navy placeholder:text-slate-500 focus:outline-none focus:border-jaman-saffron shadow-2xs"
           />
           {search && (
             <button
               type="button"
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
             >
               <X className="w-4 h-4" />
             </button>
@@ -786,7 +786,7 @@ export const PosBillsView: React.FC = () => {
       {isFilterOpen && (
         <div className="p-3.5 bg-white border border-jaman-border rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 animate-in fade-in text-xs">
           <div>
-            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">
+            <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">
               Order Type
             </label>
             <select
@@ -802,7 +802,7 @@ export const PosBillsView: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">
+            <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">
               Payment Method
             </label>
             <select
@@ -819,7 +819,7 @@ export const PosBillsView: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">
+            <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">
               Invoice Status
             </label>
             <select
@@ -835,7 +835,7 @@ export const PosBillsView: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">
+            <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">
               Cashier / Staff
             </label>
             <select
@@ -868,7 +868,7 @@ export const PosBillsView: React.FC = () => {
                   className="w-full px-4 py-2.5 bg-jaman-cream hover:bg-[#F5F0E8] border-b border-jaman-border flex items-center justify-between transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 text-jaman-saffron" />
+                    <Clock className="w-3.5 h-3.5 text-jaman-saffronText" />
                     <span className="font-black text-xs text-jaman-navy">{group.label}</span>
                     <span className="bg-white border border-jaman-border text-slate-600 text-[10px] font-bold px-2 py-0.2 rounded-full">
                       {group.bills.length} {group.bills.length === 1 ? 'bill' : 'bills'}
@@ -879,7 +879,7 @@ export const PosBillsView: React.FC = () => {
                     <strong className="font-mono font-black text-xs text-jaman-navy">
                       {formatINR(group.totalAmount)}
                     </strong>
-                    {isCollapsed ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronUp className="w-4 h-4 text-slate-400" />}
+                    {isCollapsed ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronUp className="w-4 h-4 text-slate-500" />}
                   </div>
                 </button>
 
@@ -919,7 +919,7 @@ export const PosBillsView: React.FC = () => {
               <div className="p-12 text-center bg-white border border-jaman-border rounded-3xl space-y-3">
                 <Receipt className="w-12 h-12 text-slate-300 mx-auto" />
                 <h3 className="font-black text-sm text-jaman-navy">No invoices found</h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   No billing transactions matched the selected period or filters.
                 </p>
                 {(search || selectedOrderType !== 'ALL' || selectedPaymentMethod !== 'ALL' || selectedStatus !== 'ALL') && (
@@ -962,7 +962,7 @@ export const PosBillsView: React.FC = () => {
                       Token #{detailModalBill.tokenNumber}
                     </span>
                   </div>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-slate-500">
                     {new Date(detailModalBill.createdAt).toLocaleString('en-IN')}
                   </span>
                 </div>
@@ -975,13 +975,13 @@ export const PosBillsView: React.FC = () => {
                   onClick={() => handleReprint(detailModalBill)}
                   className="px-3 py-1.5 bg-jaman-cream hover:bg-slate-100 border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy flex items-center gap-1"
                 >
-                  <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
+                  <Printer className="w-3.5 h-3.5 text-jaman-saffronText" />
                   <span>Reprint</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setDetailModalBill(null)}
-                  className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
+                  className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -993,19 +993,19 @@ export const PosBillsView: React.FC = () => {
               {/* Order Meta Strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-white p-3.5 rounded-2xl border border-jaman-border">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Order Type</span>
+                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Order Type</span>
                   <strong className="text-jaman-navy block">{detailModalBill.orderType}</strong>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Table / Guest</span>
+                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Table / Guest</span>
                   <strong className="text-jaman-navy block">{detailModalBill.tableNumber || detailModalBill.customerName || 'Walk-in'}</strong>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Payment Method</span>
+                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Payment Method</span>
                   <strong className="text-jaman-navy block">{detailModalBill.paymentMethod}</strong>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Cashier</span>
+                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Cashier</span>
                   <strong className="text-jaman-navy block">{detailModalBill.cashierName || 'Cashier'}</strong>
                 </div>
               </div>
@@ -1020,7 +1020,7 @@ export const PosBillsView: React.FC = () => {
                     <div key={idx} className="p-3 flex justify-between items-start">
                       <div>
                         <strong className="text-jaman-navy block">{it.name}</strong>
-                        <span className="text-[11px] text-slate-400 font-mono">
+                        <span className="text-[11px] text-slate-500 font-mono">
                           {it.quantity} × {formatINR(it.unitPrice)}
                         </span>
                         {it.modifiers && it.modifiers.length > 0 && (
@@ -1060,7 +1060,7 @@ export const PosBillsView: React.FC = () => {
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-black text-jaman-navy">
                   <span>Total Amount Paid:</span>
-                  <span className="font-mono text-jaman-saffron">{formatINR(detailModalBill.totalAmount)}</span>
+                  <span className="font-mono text-jaman-saffronText">{formatINR(detailModalBill.totalAmount)}</span>
                 </div>
               </div>
 
@@ -1107,13 +1107,13 @@ export const PosBillsView: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-jaman-navy">Process Invoice Refund</h3>
-                  <span className="text-[10px] text-slate-400">Invoice #{refundModalBill.orderNumber}</span>
+                  <span className="text-[10px] text-slate-500">Invoice #{refundModalBill.orderNumber}</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setRefundModalBill(null)}
-                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
+                className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1207,13 +1207,13 @@ export const PosBillsView: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-jaman-navy">Reopen Completed Invoice</h3>
-                  <span className="text-[10px] text-slate-400">Invoice #{reopenModalBill.orderNumber}</span>
+                  <span className="text-[10px] text-slate-500">Invoice #{reopenModalBill.orderNumber}</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setReopenModalBill(null)}
-                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
+                className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1318,7 +1318,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
         </div>
 
         <div className="text-slate-500 flex items-center gap-2 text-[11px] flex-wrap">
-          <div className="flex items-center gap-1 text-slate-400">
+          <div className="flex items-center gap-1 text-slate-500">
             <Clock className="w-3.5 h-3.5" />
             <span>{new Date(bill.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
@@ -1335,7 +1335,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
           <strong className="text-base font-black font-mono text-jaman-navy block">
             {formatINR(bill.totalAmount)}
           </strong>
-          <span className="text-[10px] text-slate-400 block font-mono">
+          <span className="text-[10px] text-slate-500 block font-mono">
             Tax: {formatINR(bill.taxAmount ?? 0)}
           </span>
         </div>
@@ -1357,7 +1357,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             className="px-3 py-2 bg-slate-100 hover:bg-jaman-cream text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-2xs min-h-[38px] flex items-center gap-1"
             title="Reprint Tax Receipt"
           >
-            <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
+            <Printer className="w-3.5 h-3.5 text-jaman-saffronText" />
             <span className="hidden md:inline">Reprint</span>
           </button>
 

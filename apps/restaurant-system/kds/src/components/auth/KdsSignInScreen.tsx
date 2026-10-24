@@ -97,7 +97,7 @@ export const KdsSignInScreen: React.FC<{
             <p id="kds-station-label" className="block text-xs font-bold text-jaman-navy uppercase tracking-wider">Kitchen Station</p>
             {assignedStation ? (
               <div className="p-3.5 rounded-2xl bg-[#FDFBF7] border border-jaman-border text-xs font-bold text-jaman-navy">
-                This screen is assigned to <span className="text-jaman-saffron">{assignedStation}</span> by your restaurant admin.
+                This screen is assigned to <span className="text-jaman-saffronText">{assignedStation}</span> by your restaurant admin.
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">

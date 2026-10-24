@@ -613,15 +613,15 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           {/* Daily Reconciled Financials & Metrics Ribbon */}
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
-              <span className="text-[11px] font-bold uppercase text-slate-500 block">GROSS SALES</span>
-              <span className="text-xl font-bold font-mono text-jaman-navy">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">GROSS SALES</span>
+              <span className="mt-1 block text-2xl font-bold tabular-nums text-jaman-navy">
                 {formatINR(currentDaySummary.grossSales)}
               </span>
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
-              <span className="text-[11px] font-bold uppercase text-sky-600 block">OPEN (UNPAID) BILLS</span>
-              <span className="text-xl font-bold font-mono text-sky-700">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">OPEN (UNPAID) BILLS</span>
+              <span className="mt-1 block text-2xl font-bold tabular-nums text-jaman-navy">
                 {formatINR(currentDaySummary.openBills)}
               </span>
               {currentDaySummary.openBills > 0 && (
@@ -630,29 +630,29 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
-              <span className="text-[11px] font-bold uppercase text-rose-500 block">DISCOUNTS GIVEN</span>
-              <span className="text-xl font-bold font-mono text-rose-600">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">DISCOUNTS GIVEN</span>
+              <span className="mt-1 block text-2xl font-bold tabular-nums text-jaman-navy">
                 -{formatINR(currentDaySummary.discounts)}
               </span>
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
-              <span className="text-[11px] font-bold uppercase text-amber-500 block">REFUNDS ISSUED</span>
-              <span className="text-xl font-bold font-mono text-amber-600">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">REFUNDS ISSUED</span>
+              <span className="mt-1 block text-2xl font-bold tabular-nums text-jaman-navy">
                 -{formatINR(currentDaySummary.refunds)}
               </span>
             </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-emerald-200 bg-emerald-50/40 shadow-2xs">
-              <span className="text-[11px] font-bold uppercase text-emerald-800 block">TOTAL BILLED (INCL. GST)</span>
-              <span className="text-xl font-bold font-mono text-emerald-950">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">TOTAL BILLED (INCL. GST)</span>
+              <span className="mt-1 block text-2xl font-bold tabular-nums text-jaman-navy">
                 {formatINR(currentDaySummary.netSales)}
               </span>
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs col-span-2 sm:col-span-1">
-              <span className="text-[11px] font-bold uppercase text-brand block">GST TAX (5%)</span>
-              <span className="text-xl font-bold font-mono text-brand">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">GST TAX (5%)</span>
+              <span className="mt-1 block text-2xl font-bold tabular-nums text-jaman-navy">
                 {formatINR(currentDaySummary.tax)}
               </span>
             </div>

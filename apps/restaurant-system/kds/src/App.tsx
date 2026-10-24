@@ -481,6 +481,7 @@ export const App: React.FC = () => {
   return (
     <JAMANVAARStartup appName="Kitchen Display (KDS)" appType="KDS" subtitle="Kitchen Production & Expediter System">
       <div data-jv-workspace="kds" className="h-dvh bg-jaman-cream text-jaman-navy flex flex-col select-none font-sans overflow-hidden">
+      <h1 className="sr-only">Kitchen display: tickets</h1>
         {/* CONNECTION BAR: shown only when this screen has stopped hearing from the server */}
         {conn.level !== 'ok' && (
           <div
@@ -507,13 +508,13 @@ export const App: React.FC = () => {
         <header className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 sm:py-3 flex flex-wrap items-center gap-x-3 gap-y-2 shadow-xs shrink-0 z-10">
           <div className="flex items-center gap-3 min-w-0">
             <BrandHeader app="KDS" logoHeight={narrow ? 32 : 46} badgeSize="sm" showContext={false} />
-            <div className="hidden xl:flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffron">
+            <div className="hidden xl:flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffronText">
               <span>Station:</span>
               <span className="font-black text-jaman-navy">{stationName}</span>
             </div>
           </div>
 
-          {ai.showButton(db.restaurant?.showJamanAI !== false) && <button type="button" aria-label="Open JAMAN AI Kitchen Intelligence" onClick={() => setAssistantOpen(true)} className="flex items-center gap-1 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-bold text-jaman-saffron"><Sparkles className="h-4 w-4" /> JAMAN AI</button>}
+          {ai.showButton(db.restaurant?.showJamanAI !== false) && <button type="button" aria-label="Open JAMAN AI Kitchen Intelligence" onClick={() => setAssistantOpen(true)} className="flex items-center gap-1 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-bold text-jaman-saffronText"><Sparkles className="h-4 w-4" /> JAMAN AI</button>}
           {/* Station pills: their own row on small screens, scrolling sideways */}
           <nav aria-label="Kitchen station" className="order-last xl:order-none w-full xl:w-auto xl:flex-1 min-w-0 flex xl:justify-center">
             <div className="flex items-center gap-1.5 bg-jaman-cream p-1 rounded-2xl border border-jaman-border overflow-x-auto max-w-full">
@@ -549,14 +550,14 @@ export const App: React.FC = () => {
               <span className="hidden md:inline">{currentTime}</span>
             </div>
 
-            <div className="bg-[#FFF4ED] border border-[#FDBA74] px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffron flex items-center gap-1.5 shadow-2xs" title="Tickets cooking">
-              <Flame className="w-4 h-4 text-jaman-saffron" />
+            <div className="bg-[#FFF4ED] border border-[#FDBA74] px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffronText flex items-center gap-1.5 shadow-2xs" title="Tickets cooking">
+              <Flame className="w-4 h-4 text-jaman-saffronText" />
               <span className="font-mono font-black">{activePreparingCount}</span>
               <span className="hidden lg:inline font-bold text-[11px]">Cooking</span>
             </div>
 
             <div className="bg-emerald-50 border border-emerald-200 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-700 flex items-center gap-1.5 shadow-2xs" title="Tickets ready">
-              <Bell className="w-4 h-4 text-emerald-600" />
+              <Bell className="w-4 h-4 text-emerald-700" />
               <span className="font-mono font-black">{readyPickupCount}</span>
               <span className="hidden lg:inline font-bold text-[11px]">Ready</span>
             </div>
@@ -603,7 +604,7 @@ export const App: React.FC = () => {
                   <tab.icon className="w-4 h-4 hidden sm:block" />
                   <span className="sm:hidden">{tab.short}</span>
                   <span className="hidden sm:inline">{staffText(tab.label)}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-mono font-black ${isSelected ? 'bg-white text-jaman-saffron' : 'bg-white border border-jaman-border text-slate-600'}`}>{tab.count}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-mono font-black ${isSelected ? 'bg-white text-jaman-saffronText' : 'bg-white border border-jaman-border text-slate-600'}`}>{tab.count}</span>
                 </button>
               );
             })}

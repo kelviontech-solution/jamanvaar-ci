@@ -98,7 +98,7 @@ export const SupportTicketsModule: React.FC<Props> = ({ showToast }) => {
 
   if (!cloudReady) {
     return (
-      <div className="max-w-3xl mx-auto space-y-3">
+      <div className="max-w-3xl space-y-3">
         <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Help & Support</h1>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
           Support tickets go to the JAMANVAAR team over the internet. {cloudSetupHint()}
@@ -136,7 +136,7 @@ export const SupportTicketsModule: React.FC<Props> = ({ showToast }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5">
+    <div className="max-w-4xl space-y-5">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Help & Support</h1>
@@ -316,7 +316,7 @@ export function TicketView({ ticket, onBack, onChanged, showToast, backLabel = '
   const closed = ticket.status === 'CLOSED';
 
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
+    <div className="max-w-3xl space-y-4">
       <button type="button" onClick={onBack} className="inline-flex items-center gap-1 text-xs font-bold text-slate-600">
         <ArrowLeft className="w-3.5 h-3.5" /> {backLabel}
       </button>

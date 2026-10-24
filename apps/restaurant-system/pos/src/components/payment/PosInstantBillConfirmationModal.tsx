@@ -47,7 +47,7 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-amber-100 text-amber-900 rounded-xl flex items-center justify-center">
-              <Zap className="w-4 h-4 text-jaman-saffron fill-jaman-saffron" />
+              <Zap className="w-4 h-4 text-jaman-saffronText fill-jaman-saffron" />
             </div>
             <div>
               <h3 className="text-sm font-black text-jaman-navy uppercase tracking-wide">Instant Bill</h3>
@@ -57,7 +57,7 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
 
           <button
             onClick={() => setIsInstantBillConfirmationOpen(false)}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+            className="p-1 text-slate-500 hover:text-slate-600 rounded-lg"
           >
             <X className="w-4 h-4" />
           </button>
@@ -65,7 +65,7 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
 
         {/* Summary Details */}
         <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border space-y-2 text-center">
-          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+          <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">
             TOTAL PAYABLE
           </span>
           <div className="text-3xl font-black font-mono text-jaman-navy">
@@ -73,7 +73,7 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
           </div>
           <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-600 pt-1 border-t border-slate-200/80">
             <span>Payment: <strong className="text-emerald-700 font-black">{paymentLabel}</strong></span>
-            {cfg.autoPrint && <span className="text-slate-400">• Auto Print: ON</span>}
+            {cfg.autoPrint && <span className="text-slate-500">• Auto Print: ON</span>}
           </div>
         </div>
 

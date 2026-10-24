@@ -144,7 +144,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
         </div>
       ) : (
         <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
-          <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+          <CheckCircle2 className="w-12 h-12 text-emerald-700 mx-auto" />
           <h3 className="text-lg font-bold text-jaman-navy"> {t("All Guest Requests Completed!")} </h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto"> {t("No pending diner requests on your floor right now.")} </p>
         </div>
@@ -162,7 +162,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600"
+                className="p-1 text-slate-500 hover:text-slate-600"
               >
                 <X className="w-5 h-5" />
               </button>

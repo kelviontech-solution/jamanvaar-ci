@@ -95,12 +95,12 @@ Dispatched to ${printer.name}
         {/* Top Modal Action Bar */}
         <div className="p-4 bg-white border-b border-jaman-border flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-jaman-saffron" />
+            <FileText className="w-5 h-5 text-jaman-saffronText" />
             <div>
               <h2 className="font-extrabold text-sm text-jaman-navy">
                 Report Preview & Export Studio
               </h2>
-              <span className="text-[10px] text-slate-400">
+              <span className="text-[10px] text-slate-500">
                 {reportData.title} • {reportData.periodLabel}
               </span>
             </div>
@@ -142,7 +142,7 @@ Dispatched to ${printer.name}
               onClick={handlePrintReport}
               className="px-3 py-1.5 bg-jaman-cream hover:bg-[#F0EBE1] border border-jaman-border text-jaman-navy rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer active:scale-95"
             >
-              <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
+              <Printer className="w-3.5 h-3.5 text-jaman-saffronText" />
               <span className="hidden sm:inline">Print Report</span>
             </button>
 
@@ -177,7 +177,7 @@ Dispatched to ${printer.name}
         {/* Design Template Selector Ribbon */}
         <div className="px-4 py-2 bg-jaman-cream border-b border-jaman-border flex items-center justify-between gap-2 overflow-x-auto shrink-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-black uppercase text-slate-400 mr-1 hidden sm:inline">
+            <span className="text-[10px] font-black uppercase text-slate-500 mr-1 hidden sm:inline">
               Design Template:
             </span>
             {designs.map((d) => (
@@ -196,7 +196,7 @@ Dispatched to ${printer.name}
             ))}
           </div>
 
-          <span className="text-[10px] text-slate-400 font-mono hidden md:inline">
+          <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
             A4 Standard Vector Document
           </span>
         </div>

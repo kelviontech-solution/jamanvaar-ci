@@ -71,7 +71,7 @@ export const PosSplitByGuestModal: React.FC<Props> = ({ isOpen, onClose, lines, 
     <div className="fixed inset-0 z-[60] bg-black/65 flex items-center justify-center p-3 sm:p-4 font-sans" role="dialog" aria-label="Split the bill by guest">
       <div className="bg-white border border-jaman-border rounded-3xl max-w-3xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
         <div className="bg-jaman-cream border-b border-jaman-border p-4 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2"><Users className="w-5 h-5 text-jaman-saffron" /><h2 className="text-lg font-black text-jaman-navy">Split the bill by guest</h2></div>
+          <div className="flex items-center gap-2"><Users className="w-5 h-5 text-jaman-saffronText" /><h2 className="text-lg font-black text-jaman-navy">Split the bill by guest</h2></div>
           <button type="button" onClick={onClose} aria-label="Close" className="p-2 rounded-xl hover:bg-white cursor-pointer"><X className="w-5 h-5" /></button>
         </div>
 

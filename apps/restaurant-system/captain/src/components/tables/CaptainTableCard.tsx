@@ -87,7 +87,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
               : isFoodReady
               ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
               : isOccupied
-              ? 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]'
+              ? 'bg-[#FFF4ED] text-jaman-saffronText border border-[#FDBA74]'
               : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
           }`}
         >
@@ -99,11 +99,11 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
       <div className="p-2.5 sm:p-3 rounded-lg sm:rounded-2xl bg-white border border-jaman-border space-y-1.5 sm:space-y-2">
         <div className="flex items-center justify-between text-xs font-bold">
           <div className="flex items-center gap-1.5 text-slate-600">
-            <Users className="w-4 h-4 text-slate-400" />
+            <Users className="w-4 h-4 text-slate-500" />
             <span>{table.currentGuests || 2} Guests</span>
           </div>
           <div className="text-right">
-            <span className="text-[11px] text-slate-400 uppercase block font-bold">Order Value</span>
+            <span className="text-[11px] text-slate-500 uppercase block font-bold">Order Value</span>
             <span className="text-sm font-bold font-mono text-jaman-navy">
               {activeOrder ? formatINR(activeOrder.totalAmount) : '—'}
             </span>
@@ -183,7 +183,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
               onClick={() => onOpenWorkspace(table)}
               className="min-h-[44px] py-2 px-2 rounded-xl sm:rounded-2xl bg-jaman-navy hover:bg-[#163E5E] active:bg-[#163E5E] text-white font-bold text-xs shadow-sm transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 text-center leading-tight"
             >
-              <UtensilsCrossed className="w-3.5 h-3.5 text-jaman-saffron" />
+              <UtensilsCrossed className="w-3.5 h-3.5 text-jaman-saffronText" />
               <span>{activeOrder ? 'VIEW ORDER' : 'TAKE ORDER'}</span>
             </button>
             <button

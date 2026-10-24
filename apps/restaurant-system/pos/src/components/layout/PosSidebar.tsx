@@ -106,25 +106,25 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
             <span className="text-left tracking-tight text-xs">All pages</span>
           </button>
 
-          <div className="hidden lg:block px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">Categories</div>
+          <div className="hidden lg:block px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">Categories</div>
 
           <button
             type="button"
             onClick={() => { sound.play('click'); setSelectedCategory('ALL'); onNavigate?.(); }}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-colors relative ${
               selectedCategory === 'ALL'
-                ? 'bg-[#FFF2E8] text-jaman-saffron border border-[#FDBA74]/70'
+                ? 'bg-[#FFF2E8] text-jaman-saffronText border border-[#FDBA74]/70'
                 : 'text-jaman-navy bg-jaman-cream hover:bg-white border border-transparent hover:border-jaman-border'
             }`}
           >
-            <Sparkles className={`w-4 h-4 shrink-0 ${'text-jaman-saffron'}`} />
+            <Sparkles className={`w-4 h-4 shrink-0 ${'text-jaman-saffronText'}`} />
             <span className="text-left tracking-tight text-xs flex-1">{t('All Menu')}</span>
             <span
               className={`hidden lg:inline-block text-[11px] font-mono font-bold px-1.5 py-0.2 rounded-md shrink-0 ${
-                selectedCategory === 'ALL' ? 'bg-white text-jaman-saffron border border-[#FDBA74]/70' : 'bg-white text-slate-600 border border-jaman-border'
+                selectedCategory === 'ALL' ? 'bg-white text-jaman-saffronText border border-[#FDBA74]/70' : 'bg-white text-slate-600 border border-jaman-border'
               }`}
             >
-              {db.menuItems.filter((i) => !i.archivedAt).length}
+              {db.menuItems.filter((i) => !i.archivedAt && (!i.salesChannels || i.salesChannels.includes('POS'))).length}
             </span>
           </button>
 
@@ -138,7 +138,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
                 title={group.primaryCategory.name}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-colors relative ${
                   isSelected
-                    ? 'bg-[#FFF2E8] text-jaman-saffron border border-[#FDBA74]/70'
+                    ? 'bg-[#FFF2E8] text-jaman-saffronText border border-[#FDBA74]/70'
                     : 'text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy'
                 }`}
               >
@@ -146,7 +146,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
                 <span className="lg:hidden text-xs font-bold break-words w-full text-left">{group.displayLabel}</span>
                 <span
                   className={`hidden lg:inline-block text-[11px] font-mono font-bold px-1.5 py-0.2 rounded-md shrink-0 ${
-                    isSelected ? 'bg-white text-jaman-saffron border border-[#FDBA74]/70' : 'bg-white text-slate-600 border border-jaman-border'
+                    isSelected ? 'bg-white text-jaman-saffronText border border-[#FDBA74]/70' : 'bg-white text-slate-600 border border-jaman-border'
                   }`}
                 >
                   {group.totalDishCount}
@@ -162,7 +162,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
             <button
               type="button"
               onClick={() => setShowNavWhileOnMenu(false)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs text-jaman-saffron bg-[#FFF4ED] hover:bg-[#FFE8D6] transition-colors mb-1.5 cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs text-jaman-saffronText bg-[#FFF4ED] hover:bg-[#FFE8D6] transition-colors mb-1.5 cursor-pointer"
               title="Back to categories"
             >
               <MenuIcon className="w-4 h-4 shrink-0" />
@@ -179,11 +179,11 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
                 onClick={() => goToTab(item.id)}
                 className={`w-full min-h-11 flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-colors relative ${
                   isActive
-                    ? 'bg-[#FFF2E8] text-jaman-saffron border border-[#FDBA74]/70'
+                    ? 'bg-[#FFF2E8] text-jaman-saffronText border border-[#FDBA74]/70'
                     : 'text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy'
                 }`}
               >
-                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-jaman-saffron' : 'text-slate-500'}`} />
+                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-jaman-saffronText' : 'text-slate-500'}`} />
                 <span className="text-left tracking-tight break-words text-xs">
                   {t(item.label)}
                 </span>
@@ -209,10 +209,10 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
             {ai.showButton(db.restaurant?.showJamanAI !== false) && (
         <button
               onClick={() => setIsChatbotOpen(true)}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-[color,background-color,border-color,box-shadow,transform] relative bg-white hover:bg-[#FFF2E8] border border-[#FDBA74]/70 text-jaman-saffron shadow-2xs group cursor-pointer active:scale-98"
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-[color,background-color,border-color,box-shadow,transform] relative bg-white hover:bg-[#FFF2E8] border border-[#FDBA74]/70 text-jaman-saffronText shadow-2xs group cursor-pointer active:scale-98"
               title="JAMAN AI Assistant (Voice & Conversational POS Actions)"
             >
-              <Sparkles className="w-4 h-4 text-jaman-saffron shrink-0" />
+              <Sparkles className="w-4 h-4 text-jaman-saffronText shrink-0" />
               <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap font-bold">
                 JAMAN AI Assistant
               </span>
@@ -239,7 +239,7 @@ export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string 
           title="Print Queue"
         >
           <div className="flex items-center gap-2">
-            <Printer className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <Printer className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
             <span className="hidden lg:inline truncate text-[11px]">Print Queue</span>
           </div>
           {failedPrintsCount > 0 && (

@@ -37,7 +37,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
         {/* Header */}
         <div className="p-4 bg-jaman-navy text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-jaman-saffron" />
+            <Bell className="w-5 h-5 text-jaman-saffronText" />
             <h3 className="font-extrabold text-sm">Floor Notification Alerts</h3>
           </div>
           <button
@@ -73,7 +73,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
                     <span className="font-bold text-xs text-jaman-navy leading-tight">
                       {notif.title}
                     </span>
-                    <span className="text-[11px] text-slate-400 font-bold shrink-0">
+                    <span className="text-[11px] text-slate-500 font-bold shrink-0">
                       {elapsedMins}m ago
                     </span>
                   </div>
@@ -83,7 +83,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
                   </p>
 
                   {notif.tableNumber && (
-                    <div className="pt-1 flex items-center justify-between text-[11px] font-bold text-jaman-saffron">
+                    <div className="pt-1 flex items-center justify-between text-[11px] font-bold text-jaman-saffronText">
                       <span>Table {notif.tableNumber}</span>
                       <span className="text-xs underline">Open Table ➔</span>
                     </div>
@@ -92,7 +92,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
               );
             })
           ) : (
-            <div className="p-12 text-center text-slate-400 space-y-2">
+            <div className="p-12 text-center text-slate-500 space-y-2">
               <Bell className="w-10 h-10 mx-auto text-slate-300" />
               <p className="text-xs font-bold">No notifications right now</p>
             </div>

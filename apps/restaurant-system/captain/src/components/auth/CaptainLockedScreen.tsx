@@ -9,7 +9,7 @@ export const CaptainLockedScreen: React.FC<{ entitlement: ReturnType<typeof Enti
         👑
       </div>
       <div className="space-y-2">
-        <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-jaman-saffron bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
+        <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-jaman-saffronText bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
           JAMANVAAR PRO (₹7,000) Exclusive
         </span>
         <h1 className="text-2xl font-bold text-jaman-navy tracking-tight">Captain App Locked</h1>

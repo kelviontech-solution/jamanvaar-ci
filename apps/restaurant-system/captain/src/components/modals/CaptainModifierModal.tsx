@@ -86,14 +86,14 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
               <h3 className="text-lg font-bold text-jaman-navy">{item.name}</h3>
               {!!item.allergens?.length && <p className="text-sm text-amber-900">Declared allergens: {item.allergens.join(', ')}</p>}
             </div>
-            <span className="text-xs text-jaman-saffron font-bold font-mono block mt-0.5">
+            <span className="text-xs text-jaman-saffronText font-bold font-mono block mt-0.5">
               Base Price: {formatINR(item.price)}
             </span>
           </div>
           <button
             type="button"
             aria-label="Close dish customization" onClick={onClose}
-            className="p-1 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            className="p-1 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-600 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -108,7 +108,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
             <div key={g.id} className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                 <span>{g.name}{g.isRequired ? ' *' : ''}</span>
-                {max > 1 && <span className="text-[11px] normal-case font-semibold text-slate-400">choose up to {max}</span>}
+                {max > 1 && <span className="text-[11px] normal-case font-semibold text-slate-500">choose up to {max}</span>}
               </label>
               <div className="space-y-1.5">
                 {g.options.filter(o=>chosen.includes(o.id) || o.name.toLowerCase().includes(query.toLowerCase())).map((o) => {

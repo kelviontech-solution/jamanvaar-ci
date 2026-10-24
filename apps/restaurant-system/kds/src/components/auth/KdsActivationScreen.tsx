@@ -45,7 +45,7 @@ export const KdsActivationScreen: React.FC<{
             placeholder="JMV-XXXX-XXXX-XXXX"
             required
             autoFocus
-            className="w-full bg-white border border-jaman-border focus:border-jaman-saffron focus:ring-2 focus:ring-jaman-saffron/20 rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors uppercase placeholder:text-slate-400"
+            className="w-full bg-white border border-jaman-border focus:border-jaman-saffron focus:ring-2 focus:ring-jaman-saffron/20 rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors uppercase placeholder:text-slate-500"
           />
         </div>
         {activationError && (

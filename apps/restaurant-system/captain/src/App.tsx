@@ -223,6 +223,7 @@ export const App: React.FC = () => {
   return (
     <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN">
       <div data-jv-workspace="captain" className="min-h-dvh bg-[#FBF8F2] flex flex-col select-none text-jaman-navy">
+      <h1 className="sr-only">Captain app: floor service</h1>
         {/* Below md only the header sticks (the priority chips scroll away with the content, so a phone keeps its
             height for the tables); from md up the whole header / chips / nav block sticks together. `contents`
             lets the children take part in the outer column on a phone without a wrapper box. */}
@@ -308,7 +309,7 @@ export const App: React.FC = () => {
           title="JAMAN AI Floor Intelligence Assistant"
           aria-label="Open JAMAN AI Floor Intelligence Assistant"
         >
-          <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 text-jaman-saffron fill-jaman-saffron group-hover:rotate-12 transition-transform" />
+          <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 text-jaman-saffronText fill-jaman-saffron group-hover:rotate-12 transition-transform" />
           <span className="sr-only">JAMAN AI</span>
         </button>
         )}

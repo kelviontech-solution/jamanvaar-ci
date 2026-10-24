@@ -147,7 +147,7 @@ export const PosLogin: React.FC = () => {
                   <div className="font-extrabold text-xs text-jaman-navy truncate leading-tight">
                     {user.fullName}
                   </div>
-                  <div className="text-[10px] text-slate-400 font-medium truncate capitalize mt-0.5">
+                  <div className="text-[10px] text-slate-500 font-medium truncate capitalize mt-0.5">
                     {user.roleId.replace('role-', '').replace('-', ' ')}
                   </div>
                 </div>
@@ -228,7 +228,7 @@ export const PosLogin: React.FC = () => {
         className={`w-full py-3.5 sm:py-4 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md mt-1 ${
           pin.length === 4 && !isVerifying
             ? 'bg-jaman-saffron hover:bg-[#EA580C] text-white shadow-orange-500/25 cursor-pointer active:scale-[0.99]'
-            : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+            : 'bg-slate-200 text-slate-500 cursor-not-allowed'
         }`}
       >
         <Unlock className="w-4 h-4" />

@@ -72,3 +72,8 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #E66817;
 }
+
+/* Touch-target floor (WCAG 2.5.5): this is a touch-first app, so every control is at least 44px, on any pointer type.
+   `[class]` lifts specificity above utilities such as min-h-[40px]. */
+[data-jv-workspace] :is(button, select, input:not([type="checkbox"]):not([type="radio"]))[class] { min-height: 44px; }
+[data-jv-workspace] button[class] { min-width: 44px; }

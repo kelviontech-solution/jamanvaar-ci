@@ -80,12 +80,12 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
                       ? 'bg-jaman-navy text-white shadow-md'
                       : tab.isUrgent
                       ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 animate-pulse hover:bg-emerald-100'
-                      : 'bg-jaman-cream text-slate-600 hover:text-jaman-saffron hover:bg-[#FFF4ED] border border-jaman-border'
+                      : 'bg-jaman-cream text-slate-600 hover:text-jaman-saffronText hover:bg-[#FFF4ED] border border-jaman-border'
                   }`}
                 >
                   <Icon
                     className={`w-4 h-4 ${
-                      isActive ? 'text-jaman-saffron' : tab.isUrgent ? 'text-emerald-600 fill-emerald-600' : 'text-slate-500'
+                      isActive ? 'text-jaman-saffronText' : tab.isUrgent ? 'text-emerald-700 fill-emerald-600' : 'text-slate-500'
                     }`}
                   />
                   <span>{t(tab.label)}</span>
@@ -114,7 +114,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
             className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer min-h-[44px] ${
               activeTab === 'KOTS' || activeTab === 'REQUESTS' || activeTab === 'SHIFT'
                 ? 'bg-jaman-navy text-white shadow-md'
-                : 'bg-jaman-cream text-slate-600 hover:text-jaman-saffron hover:bg-[#FFF4ED] border border-jaman-border'
+                : 'bg-jaman-cream text-slate-600 hover:text-jaman-saffronText hover:bg-[#FFF4ED] border border-jaman-border'
             }`}
             title="Open More Tools: Live KOTs, Guest Requests, Diners CRM, Shift Stats, Settings"
           >
@@ -157,8 +157,8 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
               >
                 <div className="relative">
                   <Icon
-                    className={`w-4.5 h-4.5 ${
-                      isActive ? 'text-jaman-saffron' : tab.isUrgent ? 'text-emerald-600 fill-emerald-600' : 'text-slate-500'
+                    className={`w-6 h-6 ${
+                      isActive ? 'text-jaman-saffronText' : tab.isUrgent ? 'text-emerald-700 fill-emerald-600' : 'text-slate-500'
                     }`}
                   />
                   {tab.count > 0 && (
@@ -193,7 +193,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
             }`}
           >
             <div className="relative">
-              <MoreHorizontal className={`w-4.5 h-4.5 ${activeTab === 'KOTS' || activeTab === 'REQUESTS' || activeTab === 'SHIFT' ? 'text-jaman-saffron' : 'text-slate-500'}`} />
+              <MoreHorizontal className={`w-6 h-6 ${activeTab === 'KOTS' || activeTab === 'REQUESTS' || activeTab === 'SHIFT' ? 'text-jaman-saffronText' : 'text-slate-500'}`} />
               {pendingRequestsCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               )}

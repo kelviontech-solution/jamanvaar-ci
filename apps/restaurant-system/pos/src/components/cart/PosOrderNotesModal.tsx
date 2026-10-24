@@ -69,7 +69,7 @@ export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, 
         {/* Header */}
         <div className="bg-jaman-navy text-white p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-jaman-saffron" />
+            <MessageSquare className="w-4 h-4 text-jaman-saffronText" />
             <h3 className="text-sm font-bold text-white">Kitchen & Chef Instructions</h3>
           </div>
           <button onClick={onClose} className="text-slate-300 hover:text-white">

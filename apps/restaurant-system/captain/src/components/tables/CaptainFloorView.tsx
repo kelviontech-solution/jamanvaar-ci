@@ -109,12 +109,12 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
               : 'bg-white hover:bg-slate-50 border-jaman-border text-jaman-navy'
           }`}
         >
-          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'MY_TABLES' ? 'text-slate-300' : 'text-slate-400'}`}>
+          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'MY_TABLES' ? 'text-slate-300' : 'text-slate-500'}`}>
             My Tables
           </span>
           <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
             <span className="text-lg sm:text-2xl leading-none sm:leading-normal font-bold font-mono">{myAssignedTablesCount}</span>
-            <span className={`text-[11px] font-bold ${tableFilter === 'MY_TABLES' ? 'text-jaman-saffron' : 'text-slate-500'}`}>Tables</span>
+            <span className={`text-[11px] font-bold ${tableFilter === 'MY_TABLES' ? 'text-jaman-saffronText' : 'text-slate-500'}`}>Tables</span>
           </div>
         </button>
 
@@ -127,7 +127,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
               : 'bg-white hover:bg-amber-50/50 border-jaman-border text-jaman-navy'
           }`}
         >
-          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'OCCUPIED' ? 'text-amber-100' : 'text-slate-400'}`}>
+          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'OCCUPIED' ? 'text-amber-100' : 'text-slate-500'}`}>
             Seated / Dining
           </span>
           <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
@@ -145,7 +145,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
               : 'bg-white hover:bg-emerald-50/50 border-jaman-border text-jaman-navy'
           }`}
         >
-          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'FOOD_READY' ? 'text-emerald-100' : 'text-slate-400'}`}>
+          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'FOOD_READY' ? 'text-emerald-100' : 'text-slate-500'}`}>
             Food Ready
           </span>
           <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
@@ -163,7 +163,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
               : 'bg-white hover:bg-purple-50/50 border-jaman-border text-jaman-navy'
           }`}
         >
-          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'BILL_REQUESTED' ? 'text-purple-100' : 'text-slate-400'}`}>
+          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'BILL_REQUESTED' ? 'text-purple-100' : 'text-slate-500'}`}>
             Bill Requested
           </span>
           <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
@@ -181,7 +181,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
               : 'bg-white hover:bg-slate-50 border-jaman-border text-jaman-navy'
           }`}
         >
-          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'ALL_TABLES' ? 'text-slate-300' : 'text-slate-400'}`}>
+          <span className={`text-[11px] font-bold uppercase tracking-wider block ${tableFilter === 'ALL_TABLES' ? 'text-slate-300' : 'text-slate-500'}`}>
             Available Tables
           </span>
           <div className="flex items-baseline justify-between mt-1 sm:mt-0.5">
@@ -198,7 +198,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2 sm:gap-2.5">
           {/* Section / Zone Selector (second row on a phone: the search box comes first) */}
           <div className="order-2 lg:order-1 min-w-0 flex items-center gap-1.5 cap-chip-row scrollbar-none pb-0.5">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1 shrink-0">
               Zone:
             </span>
             {zones.map((zone) => (
@@ -209,7 +209,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
                 className={`px-3 min-h-10 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap active:scale-95 ${
                   selectedZone === zone
                     ? 'bg-jaman-navy text-white shadow-2xs'
-                    : 'bg-jaman-cream text-slate-600 hover:bg-[#FFF4ED] hover:text-jaman-saffron'
+                    : 'bg-jaman-cream text-slate-600 hover:bg-[#FFF4ED] hover:text-jaman-saffronText'
                 }`}
               >
                 {zone === 'ALL' ? 'All Sections' : zone}
@@ -219,7 +219,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
 
           {/* Quick Search */}
           <div className="order-1 lg:order-2 relative w-full lg:w-auto lg:min-w-[200px] lg:max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={localSearch}
@@ -233,7 +233,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
                 type="button"
                 onClick={() => setLocalSearch('')}
                 aria-label="Clear search"
-                className="absolute right-0.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-600 text-xs font-bold"
+                className="absolute right-0.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-600 text-xs font-bold"
               >
                 ✕
               </button>
@@ -243,7 +243,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
 
         {/* Status Pills */}
         <div className="flex items-center gap-1.5 cap-chip-row scrollbar-none pt-2 sm:pt-1 border-t border-slate-100">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
+          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1 shrink-0">
             Filter:
           </span>
           {[

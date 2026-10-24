@@ -66,7 +66,7 @@ export const PosKotView: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4 shrink-0">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
-            <ChefHat className="w-6 h-6 text-jaman-saffron" />
+            <ChefHat className="w-6 h-6 text-jaman-saffronText" />
             <span>Kitchen Orders & KOT Tickets</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -176,7 +176,7 @@ export const PosKotView: React.FC = () => {
                       <span className="font-extrabold text-base text-jaman-navy font-mono">
                         {kot.tableNumber ? `T-${kot.tableNumber}` : `Token #${kot.tokenNumber}`}
                       </span>
-                      <div className="text-[10px] text-slate-400 font-bold uppercase">{kot.orderType}</div>
+                      <div className="text-[10px] text-slate-500 font-bold uppercase">{kot.orderType}</div>
                     </div>
                   </div>
 
@@ -256,10 +256,10 @@ export const PosKotView: React.FC = () => {
             })}
           </div>
         ) : (
-          <div className="h-64 flex flex-col items-center justify-center text-center text-slate-400 my-auto bg-white/50 border-2 border-dashed border-slate-200 rounded-3xl p-6">
+          <div className="h-64 flex flex-col items-center justify-center text-center text-slate-500 my-auto bg-white/50 border-2 border-dashed border-slate-200 rounded-3xl p-6">
             <ChefHat className="w-12 h-12 text-slate-300 mb-2 stroke-1" />
             <h4 className="font-bold text-sm text-jaman-navy">No active KOTs</h4>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Newly created orders and dispatched KOTs will stream here in real time.
             </p>
           </div>

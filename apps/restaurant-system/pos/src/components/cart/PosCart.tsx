@@ -158,217 +158,186 @@ export const PosCart: React.FC = () => {
   const activeOrder = activeOrderId ? db.orders.find(order => order.id === activeOrderId) : undefined;
   const canSendKot = hasItems && unsentCount > 0 && !isSendingKot;
   const kotLabel = kotSentState && unsentCount === 0
-    ? 'SAVED ? WAITING TO SYNC'
+    ? 'SAVED · WAITING TO SYNC'
     : hasSentItems && unsentCount === 0
       ? 'SAVED ON THIS DEVICE'
       : hasSentItems
         ? `SEND KOT (${unsentCount} NEW)`
         : 'SEND KOT';
 
-  // Quick favorite dishes for 1-click cart start (only available items)
-  const quickFavorites = db.menuItems.filter((i) => i.isAvailable !== false).slice(0, 4);
+  const itemCount = cart.items.reduce((n, ci) => n + ci.quantity, 0);
+  const paymentHint = db.restaurant?.instantBillConfig?.paymentMethod === 'UPI_QR'
+    ? 'UPI / QR'
+    : db.restaurant?.instantBillConfig?.paymentMethod === 'CARD'
+      ? 'Card'
+      : 'Cash';
+  const instantBillOn = db.restaurant?.instantBillConfig?.enabled !== false;
+  const quiet = 'h-8 px-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer';
 
   return (
-    <fieldset disabled={isCancellingSent} aria-busy={isCancellingSent} className="pos-cart bg-white border border-jaman-border rounded-2xl flex flex-col h-full min-h-0 min-w-0 select-none shadow-xs z-10 overflow-hidden p-0">
+    <fieldset disabled={isCancellingSent} aria-busy={isCancellingSent} className="pos-cart bg-white border border-jaman-border rounded-2xl flex flex-col h-full min-h-0 min-w-0 select-none shadow-xs">
       {isCancellingSent && <p role="status" className="px-4 py-2 text-sm text-jaman-navy">Saving cancellation on this device…</p>}
-      {/* Active Order Header */}
-      <div className="px-3 pt-2 pb-2 border-b border-jaman-border bg-white shrink-0 space-y-1.5">
-        {/* Order Identifier & Clear Button */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="font-bold text-[13px] text-jaman-deepNavy uppercase tracking-wide">
-              {activeOrder ? `${activeOrder.orderNumber} · ${unsentCount > 0 ? 'New dishes not sent' : 'Saved on this device'}` : 'New Order — Unsaved'}
-            </span>
-            <span className="text-[11px] text-slate-400 font-medium">
-              • {currentUser?.fullName || 'Cashier'}
-            </span>
-          </div>
 
+      {/* Header: what this order is, how it is served, and who it is for. */}
+      <div className="px-4 pt-2.5 pb-2.5 border-b border-jaman-border shrink-0 space-y-2">
+        <div className="flex items-baseline justify-between gap-2">
+          <h2 className="text-base font-bold text-jaman-navy">Order{hasItems && <span className="ml-2 text-xs font-semibold text-slate-500">{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>}</h2>
+          <span className="text-xs text-slate-500 truncate">
+            {activeOrder ? `${activeOrder.orderNumber} · ${unsentCount > 0 ? 'New dishes not sent' : 'Saved on this device'}` : 'New Order — Unsaved'}
+            {currentUser?.fullName ? ` · ${currentUser.fullName}` : ''}
+          </span>
         </div>
 
-        {/* Order Type Switcher: one compact row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        <div role="group" aria-label="Order type" className="grid grid-cols-4 gap-0.5 p-0.5 rounded-xl bg-jaman-cream border border-jaman-border">
           {orderTypes.map((t) => {
             const active = orderType === t.id;
             return (
               <button
                 key={t.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => setOrderType(t.id)}
-                className={`h-9 px-1 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
-                  active
-                    ? 'bg-jaman-saffron text-white shadow-sm shadow-jaman-saffron/25'
-                    : 'bg-jaman-cream border border-jaman-border text-slate-700 hover:text-jaman-navy hover:border-jaman-saffron/40'
+                className={`h-8 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors min-w-0 ${
+                  active ? 'bg-white text-jaman-saffronText shadow-sm ring-1 ring-jaman-border' : 'text-slate-600 hover:text-jaman-navy'
                 }`}
               >
-                <t.icon className="w-4 h-4 shrink-0" />
-                <span className="text-[11px] truncate font-bold tracking-tight uppercase">{t.label}</span>
+                <t.icon className="w-4 h-4 shrink-0 hidden xl:block" aria-hidden="true" />
+                <span className="truncate">{t.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Table + Customer + Chef Notes: a single row */}
-        <div className={`grid gap-1.5 ${orderType === 'DINE_IN' ? 'grid-cols-[1.15fr_1fr_1fr]' : 'grid-cols-2'}`}>
+        <div className="flex flex-wrap items-center gap-1.5">
           {orderType === 'DINE_IN' && (
-            <div className="flex items-center justify-between gap-1 bg-white border border-jaman-border pl-2.5 pr-1.5 h-9 rounded-xl text-xs min-w-0">
-              <button
-                type="button"
-                onClick={() => setTablePickerOpen(true)}
-                className="flex items-center gap-1.5 text-jaman-deepNavy font-bold hover:text-jaman-saffron transition-colors truncate cursor-pointer min-w-0 flex-1 h-full"
-              >
-                <Utensils className="w-3.5 h-3.5 text-jaman-saffron shrink-0" />
-                <span className="truncate text-xs">
-                  {selectedTable ? `Table #${selectedTable.tableNumber}` : 'Select Table'}
-                </span>
-                {!selectedTable && <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />}
+            <div className="flex items-center gap-1 h-9 rounded-lg border border-jaman-border pl-2.5 pr-1.5 text-xs min-w-0">
+              <button type="button" onClick={() => setTablePickerOpen(true)} className="flex items-center gap-1.5 font-semibold text-jaman-navy hover:text-jaman-saffronText cursor-pointer min-w-0 h-full">
+                <Utensils className="w-3.5 h-3.5 text-slate-500 shrink-0" aria-hidden="true" />
+                <span className="truncate">{selectedTable ? `Table #${selectedTable.tableNumber}` : 'Select Table'}</span>
               </button>
-
               {selectedTable && (
                 <select
                   value={guestCount}
                   onChange={(e) => setGuestCount(Number(e.target.value))}
                   title="Guests"
                   aria-label="Guests"
-                  className="bg-slate-100 border border-slate-200 rounded-md px-1 h-6 font-bold text-xs text-jaman-deepNavy cursor-pointer shrink-0"
+                  className="bg-jaman-cream rounded-md px-1 h-6 font-semibold text-xs text-jaman-navy cursor-pointer shrink-0"
                 >
                   {guestCountOptions(selectedTable.capacity).map((n) => (
-                    <option key={n} value={n}>
-                      {n}
-                    </option>
+                    <option key={n} value={n}>{n}</option>
                   ))}
                 </select>
               )}
             </div>
           )}
-
-          <button
-            onClick={() => setCustomerDrawerOpen(true)}
-            className="flex items-center gap-1.5 bg-white border border-jaman-border hover:border-slate-400 px-2.5 h-9 rounded-xl text-xs text-left truncate transition-colors cursor-pointer min-w-0"
-          >
-            <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="truncate font-semibold text-slate-700 text-xs">
-              {selectedCustomer ? selectedCustomer.name : 'Attach Customer'}
-            </span>
+          <button type="button" onClick={() => setCustomerDrawerOpen(true)} className={`${quiet} border border-jaman-border text-slate-700 hover:border-slate-300 min-w-0`}>
+            <User className="w-3.5 h-3.5 text-slate-500 shrink-0" aria-hidden="true" />
+            <span className="truncate max-w-[130px]">{selectedCustomer ? selectedCustomer.name : 'Attach Customer'}</span>
           </button>
-
           <PosLoyaltyRewards />
-
           <button
+            type="button"
             onClick={() => setNotesModalOpen(true)}
-            className={`flex items-center gap-1.5 border px-2.5 h-9 rounded-xl text-xs text-left truncate transition-colors cursor-pointer min-w-0 ${
-              orderNotes
-                ? 'bg-amber-50 border-amber-300 text-amber-800'
-                : 'bg-white border-jaman-border hover:border-slate-400 text-slate-700'
-            }`}
+            className={`${quiet} border min-w-0 ${orderNotes ? 'bg-amber-50 border-amber-300 text-amber-800' : 'border-jaman-border text-slate-700 hover:border-slate-300'}`}
           >
-            <MessageSquare className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            <span className="truncate font-semibold text-xs">
-              {orderNotes ? orderNotes : 'Chef Notes'}
-            </span>
+            <MessageSquare className="w-3.5 h-3.5 text-slate-500 shrink-0" aria-hidden="true" />
+            <span className="truncate max-w-[130px]">{orderNotes ? orderNotes : 'Chef Notes'}</span>
           </button>
         </div>
       </div>
 
-      {/* Cart Items List or Rich Functional Empty State */}
-      <div className="flex-1 min-h-[110px] overflow-y-auto overscroll-contain px-3 py-1 space-y-0 bg-white [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5">
+      {/* Dishes: name and quantity only. Prices live in the single total below. */}
+      <div className="flex-1 min-h-[110px] overflow-y-auto overscroll-contain px-4 bg-white [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5">
         {hasItems ? (
           <>
             {stockShortages.length > 0 && (
-              <div role="alert" className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 text-[11px] font-bold text-amber-900">
+              <div role="alert" className="mt-3 bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 text-xs font-semibold text-amber-900">
                 Low stock: {stockShortages.map((sh) => `${sh.itemName} (need ${Math.round(sh.needed * 100) / 100} ${sh.unit}, have ${Math.round(sh.available * 100) / 100})`).join(', ')}
               </div>
             )}
-            {cart.items.map((ci) => {
-              const sentQty = ci.kotSentQty || 0;
-              const isSent = sentQty > 0;
-              // Any decrement/removal that would cut into the sent portion must go through the
-              // cancel-reason flow instead of silently shrinking a ticket already at the kitchen.
-              const atSentFloor = ci.quantity <= sentQty;
-              return (
-              <div
-                key={ci.cartItemId}
-                className="py-0.5 border-b border-[#ECE8E2] last:border-b-0"
-              >
-                <div className="flex items-start gap-2.5">
-                  <div className="flex-1 min-w-0">
-                    {/* Line 1: dietary mark, name, line total, delete */}
-                    <div className="flex items-start gap-2">
-                      <div
-                        className={`w-4 h-4 mt-0.5 rounded-[4px] border bg-white flex items-center justify-center shrink-0 ${
-                          ci.item.dietaryType === 'NON_VEG' ? 'border-rose-600' : 'border-emerald-600'
-                        }`}
+            <ul className="divide-y divide-[#F0ECE5] -my-px">
+              {cart.items.map((ci) => {
+                const sentQty = ci.kotSentQty || 0;
+                const isSent = sentQty > 0;
+                // Any decrement/removal that would cut into the sent portion must go through the
+                // cancel-reason flow instead of silently shrinking a ticket already at the kitchen.
+                const atSentFloor = ci.quantity <= sentQty;
+                const detail = [
+                  ...(ci.selectedModifiers || []).map((m) => m.optionName),
+                  ci.specialInstructions ? `Note: ${ci.specialInstructions}` : ''
+                ].filter(Boolean).join(' · ');
+                return (
+                  <li key={ci.cartItemId} className="py-1">
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        className={`w-4 h-4 rounded-[4px] border bg-white flex items-center justify-center shrink-0 ${ci.item.dietaryType === 'NON_VEG' ? 'border-rose-600' : 'border-emerald-600'}`}
+                        aria-hidden="true"
                       >
-                        <div className={`w-2 h-2 rounded-full ${ci.item.dietaryType === 'NON_VEG' ? 'bg-rose-600' : 'bg-emerald-600'}`} />
+                        <span className={`w-2 h-2 rounded-full ${ci.item.dietaryType === 'NON_VEG' ? 'bg-rose-600' : 'bg-emerald-600'}`} />
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <h3 title={detail ? `${ci.item.name} · ${detail}` : ci.item.name} className="font-semibold text-sm text-jaman-navy leading-tight line-clamp-2">
+                          {ci.item.name}
+                          {detail && <span className="ml-1.5 text-xs font-normal text-slate-500">{detail}</span>}
+                        </h3>
+                        {isSent && (
+                          <p className="text-[11px] font-semibold text-slate-500 leading-tight">
+                            {sentQty < ci.quantity ? `${sentQty} sent to kitchen · ${ci.quantity - sentQty} new` : 'Sent to kitchen'}
+                          </p>
+                        )}
                       </div>
-                      <h4 title={ci.item.name} className="flex-1 min-w-0 font-semibold text-sm text-jaman-deepNavy leading-tight line-clamp-1">
-                        {ci.item.name}
-                      </h4>
-                      <span className="font-bold text-base text-jaman-deepNavy leading-tight shrink-0 tabular-nums">₹{ci.itemTotal}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (isSent) { void handleCancelSentItem(ci.cartItemId); return; }
-                          sound.play('remove'); removeItemFromCart(ci.cartItemId);
-                        }}
-                        className="w-7 h-7 -mt-1 -mr-1 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                        title={isSent ? 'Cancel this dish (already sent to kitchen)' : 'Remove item'}
-                        aria-label={isSent ? `Cancel ${ci.item.name} (sent to kitchen)` : `Remove ${ci.item.name}`}
-                      >
-                        <Trash2 className="w-[18px] h-[18px]" />
-                      </button>
-                    </div>
 
-                    {isSent && (
-                      <div className="mt-0.5 inline-flex items-center gap-1 rounded-md bg-jaman-navy/10 px-1.5 py-0.5 text-[10px] font-bold text-jaman-navy">
-                        {sentQty < ci.quantity ? `${sentQty} sent to kitchen · ${ci.quantity - sentQty} new` : 'Sent to kitchen'}
-                      </div>
-                    )}
-
-                    {/* Line 2: quantity stepper, SKU / unit price, inline Add note (kept on one line so ~5 rows fit) */}
-                    <div className="flex items-center gap-2">
-                      <div className="inline-flex items-center bg-jaman-cream border border-jaman-border rounded-xl shrink-0">
+                      <div className="inline-flex items-center rounded-xl border border-jaman-border bg-white shrink-0">
                         <button
                           type="button"
                           onClick={() => {
                             if (atSentFloor) { void handleCancelSentItem(ci.cartItemId); return; }
                             sound.play('remove'); updateItemQuantity(ci.cartItemId, -1);
                           }}
-                          className="w-7 h-8 rounded-l-xl hover:bg-slate-200 text-slate-700 flex items-center justify-center active:scale-95 cursor-pointer"
+                          className="w-8 h-8 rounded-l-xl hover:bg-jaman-cream text-slate-700 flex items-center justify-center active:scale-95 cursor-pointer"
                           title={atSentFloor ? 'Cancel this dish (already sent to kitchen)' : 'Decrease quantity'}
+                          aria-label={`Decrease ${ci.item.name}`}
                         >
                           <Minus className="w-4 h-4 stroke-[2.5]" />
                         </button>
-                        <span className="font-bold text-sm text-jaman-deepNavy min-w-[28px] h-8 leading-8 text-center bg-white border-x border-jaman-border">
-                          {ci.quantity}
-                        </span>
+                        <span className="min-w-[28px] text-center text-sm font-bold text-jaman-navy tabular-nums" aria-label={`${ci.quantity} of ${ci.item.name}`}>{ci.quantity}</span>
                         <button
                           type="button"
                           onClick={() => { sound.play('click'); updateItemQuantity(ci.cartItemId, 1); }}
-                          className="w-7 h-8 rounded-r-xl hover:bg-orange-100 text-jaman-saffron flex items-center justify-center active:scale-95 cursor-pointer"
+                          className="w-8 h-8 rounded-r-xl hover:bg-orange-50 text-jaman-saffronText flex items-center justify-center active:scale-95 cursor-pointer"
                           title="Increase quantity"
+                          aria-label={`Increase ${ci.item.name}`}
                         >
                           <Plus className="w-4 h-4 stroke-[3]" />
                         </button>
                       </div>
 
-                      <span className="flex-1 min-w-0 truncate text-[11px] text-slate-500 leading-tight">
-                        {ci.item.sku ? `${ci.item.sku} • ` : ''}@ ₹{ci.unitPrice}
-                      </span>
-
-                      {/* Quick Note toggle (same state + handlers as before) */}
                       <button
                         type="button"
                         onClick={() => toggleNotesFor(ci.cartItemId)}
-                        className="text-[11px] font-semibold text-slate-500 hover:text-jaman-saffron flex items-center gap-1 cursor-pointer min-h-8 shrink-0"
+                        aria-expanded={notesExpandedFor.has(ci.cartItemId)}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer shrink-0 ${notesExpandedFor.has(ci.cartItemId) || ci.specialInstructions ? 'text-jaman-saffronText bg-orange-50' : 'text-slate-500 hover:text-jaman-saffronText hover:bg-jaman-cream'}`}
+                        title={notesExpandedFor.has(ci.cartItemId) ? 'Close note' : 'Add note'}
+                        aria-label={`${notesExpandedFor.has(ci.cartItemId) ? 'Close note for' : 'Add note to'} ${ci.item.name}`}
                       >
-                        <MessageSquare className="w-3.5 h-3.5 text-jaman-saffron" />
-                        <span>{notesExpandedFor.has(ci.cartItemId) ? 'Done' : 'Add note'}</span>
+                        <MessageSquare className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isSent) { void handleCancelSentItem(ci.cartItemId); return; }
+                          sound.play('remove'); removeItemFromCart(ci.cartItemId);
+                        }}
+                        className="w-9 h-9 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                        title={isSent ? 'Cancel this dish (already sent to kitchen)' : 'Remove item'}
+                        aria-label={isSent ? `Cancel ${ci.item.name} (sent to kitchen)` : `Remove ${ci.item.name}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
 
                     {notesExpandedFor.has(ci.cartItemId) && (
-                      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-1.5">
+                      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-2 pl-[26px]">
                         {['Less Spicy', 'No Onion', 'Extra Cheese', 'No Garlic'].map((preset) => (
                           <button
                             key={preset}
@@ -378,83 +347,35 @@ export const PosCart: React.FC = () => {
                               usePosStore.getState().updateItemSpecialInstructions(ci.cartItemId, `${existing}${preset}`);
                               toggleNotesFor(ci.cartItemId);
                             }}
-                            className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-600 text-[11px] font-semibold transition-colors shrink-0 cursor-pointer"
+                            className="h-8 px-2.5 rounded-lg bg-jaman-cream hover:bg-amber-100 hover:text-amber-900 text-slate-600 text-xs font-semibold transition-colors shrink-0 cursor-pointer"
                           >
                             +{preset}
                           </button>
                         ))}
                       </div>
                     )}
-
-                    {/* Modifiers summary */}
-                    {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
-                      <div className="text-[11px] text-slate-500 pt-1 space-y-0.5">
-                        {ci.selectedModifiers.map((m, idx) => (
-                          <div key={idx}>
-                            + {m.optionName} {m.priceDelta > 0 ? `(+₹${m.priceDelta})` : ''}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {ci.specialInstructions && (
-                      <div className="text-[11px] text-amber-700 pt-1 font-medium">
-                        Note: {ci.specialInstructions}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              );
-            })}
-
-            {/* Smart Suggestions: Often Ordered Together (compact horizontal strip) */}
-            <div className="mt-1.5 pt-2 border-t border-[#ECE8E2]">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide flex items-center gap-1 mb-1.5">
-                <Sparkles className="w-3 h-3 text-jaman-saffron" />
-                <span>Frequently Paired Together</span>
-              </span>
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
-                {db.menuItems.slice(0, 3).map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => { sound.play('add'); addItemToCart(item); }}
-                    className="h-8 px-2.5 rounded-full bg-jaman-cream hover:bg-[#FFF4ED] border border-jaman-border hover:border-[#FDBA74] text-xs font-bold text-jaman-deepNavy flex items-center gap-1 transition-colors shrink-0 whitespace-nowrap cursor-pointer"
-                  >
-                    <Plus className="w-3 h-3 text-jaman-saffron" />
-                    <span className="max-w-[120px] truncate">{item.name}</span>
-                    <span className="text-slate-400 text-[11px]">₹{item.price}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+                  </li>
+                );
+              })}
+            </ul>
           </>
         ) : (
-          /* Clean Minimal Empty Cart State */
-          <div className="h-full min-h-[120px] flex flex-col items-center justify-center p-3 text-center space-y-2">
-            <div className="w-16 h-16 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-center justify-center shadow-xs p-2.5">
-              <CachedImg
-                src={JAMANVAAR_LOGOS.mark}
-                alt="JAMANVAAR"
-                className="w-full h-full object-contain drop-shadow-xs"
-              />
+          <div className="h-full min-h-[120px] flex flex-col items-center justify-center p-3 text-center gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center p-2.5">
+              <CachedImg src={JAMANVAAR_LOGOS.mark} alt="JAMANVAAR" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-jaman-deepNavy">Billing Counter Ready</h4>
-              <p className="text-xs text-slate-400 max-w-[200px] mx-auto mt-1 leading-relaxed">
-                Tap any dish from the menu to add it to this order.
-              </p>
+              <h3 className="font-bold text-sm text-jaman-navy">Billing Counter Ready</h3>
+              <p className="text-xs text-slate-500 mt-1">Tap a dish to start the order.</p>
             </div>
-
-            {/* ↻ Repeat Last Order Fast Action */}
             {db.orders.length > 0 && (
               <button
                 type="button"
                 onClick={() => setRepeatModalOpen(true)}
-                className="w-full py-2.5 px-3 bg-[#FFFDFB] hover:bg-[#FFF4ED] border border-jaman-border hover:border-[#FDBA74] text-jaman-deepNavy hover:text-jaman-saffron rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs mt-2 cursor-pointer active:scale-98"
+                className="h-10 px-4 rounded-xl border border-jaman-border text-jaman-navy hover:text-jaman-saffronText hover:border-[#FDBA74] text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 title="Repeat previous order"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-jaman-saffron" />
+                <RotateCcw className="w-3.5 h-3.5 text-jaman-saffronText" aria-hidden="true" />
                 <span>↻ Repeat Last Order</span>
               </button>
             )}
@@ -462,42 +383,100 @@ export const PosCart: React.FC = () => {
         )}
       </div>
 
-      {/* Bottom Financials & Settle Panel */}
-      <div className="px-3 pt-1.5 pb-2 bg-white border-t border-jaman-border shrink-0 space-y-1">
-        {/* Quick Discounts & Hold Order Button */}
-        <div className="grid grid-cols-3 gap-1.5">
+      {/* Footer: one total, one dominant action. */}
+      <div className="px-4 pt-2.5 pb-2 border-t border-jaman-border shrink-0 space-y-2 bg-white rounded-b-2xl">
+        {cart.discountAmount > 0 && (
+          <div className="flex items-center justify-end gap-2 text-xs text-slate-500">
+            {(
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 pl-2.5 pr-1 py-0.5 font-semibold text-emerald-800">
+                <span>{cart.discountReason || (billDiscountPercent > 0 ? `${billDiscountPercent}% off` : 'Discount')} · −₹{cart.discountAmount}</span>
+                <button type="button" onClick={() => setIsDiscountModalOpen(true)} className="underline px-1 cursor-pointer" title="Edit discount">Edit</button>
+                <button
+                  type="button"
+                  onClick={() => usePosStore.getState().removeDiscount()}
+                  className="w-5 h-5 rounded-full hover:bg-rose-100 hover:text-rose-700 flex items-center justify-center cursor-pointer"
+                  title="Remove discount"
+                  aria-label="Remove discount"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+
+        {kotSentState && (
+          <div role="status" className="p-2 bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs rounded-xl font-bold text-center flex items-center justify-center gap-1.5">
+            <Check className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />
+            <span>KOT Sent to Kitchen Stations!</span>
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setIsPaymentOpen(true)}
+          disabled={!hasItems}
+          className={`w-full h-12 rounded-xl font-bold text-base tracking-wide flex items-center justify-center gap-2.5 transition-all duration-150 ${
+            hasItems
+              ? 'bg-jaman-saffron hover:bg-[#C95A12] text-white shadow-md shadow-jaman-saffron/25 active:scale-[0.99] cursor-pointer'
+              : 'bg-slate-100 border border-slate-200 text-slate-500 cursor-not-allowed'
+          }`}
+        >
+          <CreditCard className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
+          <span className="tabular-nums">PAY ₹{cart.totalPayable}</span>
+          <ArrowRight className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
+        </button>
+
+        <div className={`grid gap-2 ${instantBillOn ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <button
+            type="button"
+            onClick={handleSendKot}
+            disabled={!canSendKot}
+            className={`h-10 px-2 rounded-xl font-bold text-xs tracking-wide flex items-center justify-center gap-1.5 transition-colors ${
+              canSendKot ? 'bg-jaman-cream hover:bg-[#F1ECE3] text-jaman-navy border border-jaman-border cursor-pointer active:scale-[0.99]' : 'bg-slate-50 border border-slate-200 text-slate-500 cursor-not-allowed'
+            }`}
+          >
+            {kotSentState || (hasSentItems && unsentCount === 0)
+              ? <Check className="w-4 h-4 shrink-0 text-emerald-700" aria-hidden="true" />
+              : <Flame className={`w-4 h-4 shrink-0 ${canSendKot ? 'text-jaman-saffronText' : 'text-slate-300'}`} aria-hidden="true" />}
+            <span className="truncate">{kotLabel}</span>
+          </button>
+
+          {instantBillOn && (
+            <button
+              type="button"
+              onClick={() => executeInstantBill()}
+              disabled={!hasItems || isInstantBillProcessing}
+              title={`${paymentHint} • ${db.restaurant?.instantBillConfig?.autoPrint !== false ? 'Auto Print' : 'Manual Print'}`}
+              className={`h-10 px-2 rounded-xl font-bold text-xs tracking-wide flex items-center justify-center gap-1.5 border transition-colors min-w-0 ${
+                hasItems && !isInstantBillProcessing ? 'bg-white hover:bg-amber-50 text-jaman-navy border-jaman-border cursor-pointer active:scale-[0.99]' : 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
+              }`}
+            >
+              <Zap className={`w-4 h-4 shrink-0 ${hasItems && !isInstantBillProcessing ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} aria-hidden="true" />
+              <span className="truncate">{isInstantBillProcessing ? 'Processing...' : 'Instant Bill'}</span>
+            </button>
+          )}
+        </div>
+
+        {/* Quiet secondary actions */}
+        <div className="flex items-center justify-center gap-1">
           <button
             type="button"
             onClick={() => setIsDiscountModalOpen(true)}
             disabled={!hasItems}
-            className={`px-2 h-8 rounded-lg border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              cart.discountAmount > 0
-                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-2xs'
-                : hasItems
-                ? 'bg-jaman-cream border-jaman-border text-slate-700 hover:border-jaman-saffron/40 hover:text-jaman-navy'
-                : 'bg-jaman-cream border-jaman-border text-slate-400 cursor-not-allowed opacity-75'
-            }`}
+            className={`${quiet} ${hasItems ? 'text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy' : 'text-slate-300 cursor-not-allowed'}`}
           >
-            <Tag className={`w-3.5 h-3.5 ${cart.discountAmount > 0 ? 'text-emerald-600' : 'text-jaman-saffron'}`} />
-            <span>
-              {cart.discountAmount > 0
-                ? `${billDiscountPercent > 0 ? `${billDiscountPercent}% Off` : `-₹${cart.discountAmount}`}`
-                : 'Discount'}
-            </span>
+            <Tag className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Discount</span>
           </button>
-
           <button
             type="button"
             onClick={() => holdCurrentOrder()}
             disabled={!hasItems}
-            className={`px-2 h-8 rounded-lg border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-              hasItems
-                ? 'border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 cursor-pointer shadow-2xs'
-                : 'bg-jaman-cream border-jaman-border text-slate-400 cursor-not-allowed opacity-75'
-            }`}
             title="Save this order for later"
+            className={`${quiet} ${hasItems ? 'text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy' : 'text-slate-300 cursor-not-allowed'}`}
           >
-            <CirclePause className={`w-3.5 h-3.5 ${hasItems ? 'text-amber-600' : 'text-slate-300'}`} />
+            <CirclePause className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Hold Order</span>
           </button>
           {!clearConfirmOpen ? (
@@ -505,167 +484,18 @@ export const PosCart: React.FC = () => {
               type="button"
               onClick={() => setClearConfirmOpen(true)}
               disabled={!hasItems}
-              className={`px-2 h-8 rounded-lg border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-                hasItems
-                  ? 'bg-rose-50 border-rose-100 text-rose-600 hover:bg-rose-100 cursor-pointer'
-                  : 'bg-jaman-cream border-jaman-border text-slate-400 cursor-not-allowed opacity-75'
-              }`}
               title="Clear Cart"
+              className={`${quiet} ${hasItems ? 'text-rose-600 hover:bg-rose-50' : 'text-slate-300 cursor-not-allowed'}`}
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Clear All</span>
             </button>
           ) : (
-            <div className="flex items-center justify-center gap-1 bg-rose-50 border border-rose-200 px-2 h-8 rounded-lg animate-in fade-in">
-              <span className="text-[11px] font-bold text-rose-700">Clear?</span>
-              <button
-                type="button"
-                onClick={() => {
-                  clearCart();
-                  setClearConfirmOpen(false);
-                }}
-                className="text-[11px] font-bold text-rose-700 hover:underline px-1 cursor-pointer"
-              >
-                Yes
-              </button>
-              <button
-                type="button"
-                onClick={() => setClearConfirmOpen(false)}
-                className="text-[11px] font-bold text-slate-500 hover:text-slate-700 px-1 cursor-pointer"
-              >
-                No
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Authoritative Tax Calculation Summary: one inline row (same values, same sources) */}
-        <div className="text-xs text-slate-600 font-medium leading-tight space-y-1">
-          <div className="flex items-center justify-between gap-2 px-0.5 whitespace-nowrap">
-            <span>
-              Subtotal <strong className="tabular-nums font-bold text-jaman-deepNavy">₹{cart.subtotal}</strong>
+            <span className="flex items-center gap-1 bg-rose-50 border border-rose-200 px-2 h-9 rounded-lg">
+              <span className="text-xs font-bold text-rose-700">Clear?</span>
+              <button type="button" onClick={() => { clearCart(); setClearConfirmOpen(false); }} className="text-xs font-bold text-rose-700 hover:underline px-1.5 cursor-pointer">Yes</button>
+              <button type="button" onClick={() => setClearConfirmOpen(false)} className="text-xs font-bold text-slate-500 hover:text-slate-700 px-1.5 cursor-pointer">No</button>
             </span>
-            <span title="GST (CGST + SGST)">
-              GST <span className="tabular-nums text-slate-500">₹{cart.taxAmount}</span>
-            </span>
-            {cart.roundOffAmount !== 0 && (
-              <span className="text-slate-400">
-                Round Off{' '}
-                <span className="tabular-nums">
-                  {cart.roundOffAmount > 0 ? `+₹${cart.roundOffAmount}` : `-₹${Math.abs(cart.roundOffAmount)}`}
-                </span>
-              </span>
-            )}
-          </div>
-
-          {cart.discountAmount > 0 && (
-            <div className="flex justify-between items-center text-emerald-600 font-bold bg-emerald-50/70 px-2 py-0.5 rounded-lg border border-emerald-200/60">
-              <div className="flex items-center gap-1">
-                <span>Discount ({cart.discountReason || (billDiscountPercent > 0 ? `${billDiscountPercent}%` : `Flat`)})</span>
-                <button
-                  type="button"
-                  onClick={() => setIsDiscountModalOpen(true)}
-                  className="text-emerald-800 hover:text-emerald-950 font-bold ml-1 text-[11px] underline cursor-pointer"
-                  title="Edit discount"
-                >
-                  Edit
-                </button>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="tabular-nums">-₹{cart.discountAmount}</span>
-                <button
-                  type="button"
-                  onClick={() => usePosStore.getState().removeDiscount()}
-                  className="w-4 h-4 rounded-full bg-emerald-200/80 hover:bg-rose-100 hover:text-rose-700 text-emerald-800 flex items-center justify-center text-[11px] ml-1 transition-colors cursor-pointer"
-                  title="Remove discount"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* KOT Status Badge / Toast */}
-        {kotSentState && (
-          <div className="p-2 bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs rounded-xl font-bold text-center flex items-center justify-center gap-1.5 animate-in fade-in">
-            <Check className="w-3.5 h-3.5 text-emerald-600" />
-            <span>KOT Sent to Kitchen Stations!</span>
-          </div>
-        )}
-
-        {/* Total Payable + PAY side by side */}
-        <div className="grid grid-cols-[1fr_1fr] gap-1.5">
-          <div className="flex flex-col justify-center px-3 h-11 rounded-xl bg-[#FFF2E8] text-jaman-deepNavy leading-none">
-            <span className="text-[11px] font-bold text-slate-500">Total Payable</span>
-            <span className="text-xl font-bold mt-0.5">₹{cart.totalPayable}</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsPaymentOpen(true)}
-            disabled={!hasItems}
-            className={`h-11 px-3 rounded-xl font-bold text-[13px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all duration-150 ${
-              hasItems
-                ? 'bg-jaman-saffron hover:bg-[#C95A12] text-white shadow-md shadow-jaman-saffron/25 active:scale-[0.98] cursor-pointer'
-                : 'bg-orange-50 border border-orange-100 text-orange-800/50 cursor-not-allowed opacity-80'
-            }`}
-          >
-            <CreditCard className={`w-4 h-4 shrink-0 ${hasItems ? 'text-white' : 'text-orange-400/60'}`} />
-            <span className="truncate">PAY ₹{cart.totalPayable}</span>
-            <ArrowRight className="w-4 h-4 shrink-0" />
-          </button>
-        </div>
-
-        {/* SEND KOT + INSTANT BILL side by side */}
-        <div className="grid grid-cols-2 gap-1.5">
-          <button
-            type="button"
-            onClick={handleSendKot}
-            disabled={!canSendKot}
-            className={`h-11 px-2 rounded-xl font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5 transition-all duration-150 ${
-              (db.restaurant?.instantBillConfig?.enabled !== false) ? '' : 'col-span-2'
-            } ${
-              canSendKot
-                ? 'bg-jaman-cream hover:bg-[#F1ECE3] text-jaman-navy border border-jaman-border active:scale-[0.98] cursor-pointer'
-                : 'bg-slate-100/90 border border-slate-200 text-slate-400 cursor-not-allowed opacity-80'
-            }`}
-          >
-            {kotSentState || (hasSentItems && unsentCount === 0)
-              ? <Check className="w-4 h-4 shrink-0 text-emerald-600" />
-              : <Flame className={`w-4 h-4 shrink-0 ${canSendKot ? 'text-jaman-saffron' : 'text-slate-400'}`} />}
-            <span className="truncate">{kotLabel}</span>
-          </button>
-
-          {/* INSTANT BILL */}
-          {(db.restaurant?.instantBillConfig?.enabled !== false) && (
-            <button
-              type="button"
-              onClick={() => executeInstantBill()}
-              disabled={!hasItems || isInstantBillProcessing}
-              className={`h-11 px-2 rounded-xl flex items-center justify-between gap-1 transition-all duration-150 select-none border min-w-0 ${
-                hasItems && !isInstantBillProcessing
-                  ? 'bg-[#FFFAEB] hover:bg-[#FFF3D6] text-jaman-navy border-amber-300 active:scale-[0.99] cursor-pointer'
-                  : 'bg-amber-50/60 border-amber-200/80 text-amber-900/50 cursor-not-allowed opacity-85'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 text-left min-w-0">
-                <Zap className="w-4 h-4 fill-amber-500 text-amber-500 shrink-0" />
-                <div className="min-w-0">
-                  <div className={`font-bold text-xs uppercase tracking-wide leading-tight truncate ${hasItems ? 'text-jaman-navy' : 'text-amber-950/60'}`}>
-                    {isInstantBillProcessing ? 'Processing...' : 'Instant Bill'}
-                  </div>
-                  <span className={`text-[11px] leading-tight font-semibold block truncate ${hasItems ? 'text-slate-500' : 'text-amber-800/50'}`}>
-                    {db.restaurant?.instantBillConfig?.paymentMethod === 'UPI_QR'
-                      ? 'UPI / QR'
-                      : db.restaurant?.instantBillConfig?.paymentMethod === 'CARD'
-                      ? 'Card'
-                      : 'Cash'} • {db.restaurant?.instantBillConfig?.autoPrint !== false ? 'Auto Print' : 'Manual Print'}
-                  </span>
-                </div>
-              </div>
-              <ArrowRight className={`w-4 h-4 shrink-0 ${hasItems ? 'text-amber-600' : 'text-amber-300'}`} />
-            </button>
           )}
         </div>
       </div>

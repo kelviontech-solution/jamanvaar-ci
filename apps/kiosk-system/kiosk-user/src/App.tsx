@@ -967,7 +967,7 @@ export default function KioskUserApp() {
         ? 'bg-white border-jaman-saffron text-jaman-navy shadow-sm'
         : 'bg-white/90 border-jaman-border text-[#4A5568] hover:bg-white hover:border-jaman-saffron/30'
     }`;
-  const kioskCategoryMediaClass = 'kiosk-category-media rounded-lg bg-jaman-ivory flex items-center justify-center text-jaman-saffron';
+  const kioskCategoryMediaClass = 'kiosk-category-media rounded-lg bg-jaman-ivory flex items-center justify-center text-jaman-saffronText';
 
   // Read live so a Kiosk Admin toggling a language takes effect on the next
   // render without requiring the terminal to be restarted.
@@ -1915,7 +1915,7 @@ export default function KioskUserApp() {
           <JamanvaarLogo variant="horizontal" size="xl" imgStyle={{ height: '80px', width: 'auto' }} />
         </div>
         <div className="mt-8 p-8 max-w-md bg-white rounded-3xl border border-jaman-border shadow-xl">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600 mb-4">
+          <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-700 mb-4">
             <CheckCircle2 className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-black text-jaman-navy">Kiosk Connected!</h2>
@@ -1970,7 +1970,7 @@ export default function KioskUserApp() {
           <form onSubmit={handleActivate} className="space-y-4">
             <div>
               <label htmlFor="kiosk-restaurant-code" className="text-xs font-extrabold text-jaman-navy flex items-center gap-1.5 mb-1.5">
-                <Store className="w-3.5 h-3.5 text-jaman-saffron" />
+                <Store className="w-3.5 h-3.5 text-jaman-saffronText" />
                 Restaurant ID *
               </label>
               <input
@@ -1982,19 +1982,19 @@ export default function KioskUserApp() {
                 required
                 autoFocus
                 inputMode="text"
-                className="w-full bg-[#FFFCF8] border-[1.5px] border-[#E5D7C8] focus:border-[#F97316] focus:shadow-[0_0_0_4px_rgba(249,115,22,0.10)] rounded-2xl px-5 py-4 text-lg text-center font-mono text-jaman-navy font-bold focus:outline-hidden transition-all uppercase tracking-wider placeholder:text-slate-400"
+                className="w-full bg-[#FFFCF8] border-[1.5px] border-[#E5D7C8] focus:border-[#F97316] focus:shadow-[0_0_0_4px_rgba(249,115,22,0.10)] rounded-2xl px-5 py-4 text-lg text-center font-mono text-jaman-navy font-bold focus:outline-hidden transition-all uppercase tracking-wider placeholder:text-slate-500"
               />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label htmlFor="kiosk-activation-key" className="text-xs font-extrabold text-jaman-navy flex items-center gap-1.5">
-                  <KeyRound className="w-3.5 h-3.5 text-jaman-saffron" />
+                  <KeyRound className="w-3.5 h-3.5 text-jaman-saffronText" />
                   Activation Key *
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowKeyHint((v) => !v)}
-                  className="text-xs font-bold text-jaman-navy/80 hover:text-jaman-saffron flex items-center gap-1 cursor-pointer min-h-11 -my-3.5"
+                  className="text-xs font-bold text-jaman-navy/80 hover:text-jaman-saffronText flex items-center gap-1 cursor-pointer min-h-11 -my-3.5"
                   aria-expanded={showKeyHint}
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
@@ -2015,7 +2015,7 @@ export default function KioskUserApp() {
                 required
                 inputMode="text"
                 aria-describedby={activationError ? 'kiosk-activation-error' : undefined}
-                className="w-full bg-[#FFFCF8] border-[1.5px] border-[#E5D7C8] focus:border-[#F97316] focus:shadow-[0_0_0_4px_rgba(249,115,22,0.10)] rounded-2xl px-5 py-4 text-lg text-center font-mono text-jaman-navy font-bold focus:outline-hidden transition-all uppercase tracking-wider placeholder:text-slate-400"
+                className="w-full bg-[#FFFCF8] border-[1.5px] border-[#E5D7C8] focus:border-[#F97316] focus:shadow-[0_0_0_4px_rgba(249,115,22,0.10)] rounded-2xl px-5 py-4 text-lg text-center font-mono text-jaman-navy font-bold focus:outline-hidden transition-all uppercase tracking-wider placeholder:text-slate-500"
               />
               {activationCode.length > 0 && !ACTIVATION_KEY_PATTERN.test(activationCode) && (
                 <p className="text-[11px] text-amber-700 font-semibold mt-1.5 text-center">
@@ -2063,7 +2063,7 @@ export default function KioskUserApp() {
           <JamanvaarLogo variant="horizontal" size="xl" imgStyle={{ height: '80px', width: 'auto' }} />
         </div>
         <div className="mt-8 p-8 max-w-md bg-white rounded-3xl border border-jaman-border shadow-xl">
-          <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-jaman-saffron mb-4">
+          <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-jaman-saffronText mb-4">
             <UtensilsCrossed className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-black text-jaman-navy">KIOSK TEMPORARILY UNAVAILABLE</h2>
@@ -2096,7 +2096,7 @@ export default function KioskUserApp() {
           the JS side that flips these on and off. */}
       <style>{`
         .bg-brand, .bg-jaman-saffron { background-color: var(--kiosk-accent); }
-        .text-brand, .text-jaman-saffron { color: var(--kiosk-accent); }
+        .text-brand, .text-jaman-saffronText { color: var(--kiosk-accent); }
         .border-brand { border-color: var(--kiosk-accent); }
         @keyframes kioskStartOrderTap {
           0% { transform: scale(1); }
@@ -2261,7 +2261,7 @@ export default function KioskUserApp() {
               the login prompt itself moved into "More" below. */}
           {loggedInAccount && (
             <div className="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-800">
-              <Award className="w-4 h-4 text-emerald-600" />
+              <Award className="w-4 h-4 text-emerald-700" />
               <span>{loggedInAccount.loyaltyPoints}{kioskCopy("screen_pts__f501d5", "Pts (₹")}{loggedInAccount.loyaltyPoints})</span>
             </div>
           )}
@@ -2288,7 +2288,7 @@ export default function KioskUserApp() {
             onClick={handleCallStaff}
             className="flex items-center gap-2 h-11 px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 font-bold text-sm hover:bg-amber-100 active:scale-95 transition-all shadow-sm"
           >
-            <Bell className="w-4 h-4 text-jaman-saffron" />
+            <Bell className="w-4 h-4 text-jaman-saffronText" />
             <span className="hidden sm:inline">{t('callStaff')}</span>
           </button>
 
@@ -2374,7 +2374,7 @@ export default function KioskUserApp() {
                     aria-pressed={isHighContrast && isLargeText}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-jaman-navy hover:bg-jaman-ivory text-left"
                   >
-                    <Eye className="w-4 h-4 text-jaman-saffron" />
+                    <Eye className="w-4 h-4 text-jaman-saffronText" />
                     {isHighContrast && isLargeText ? 'Turn off larger text & contrast' : 'Larger text & higher contrast'}
                   </button>
 
@@ -2386,11 +2386,11 @@ export default function KioskUserApp() {
                     }}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-jaman-navy hover:bg-jaman-ivory text-left"
                   >
-                    <Smartphone className="w-4 h-4 text-jaman-saffron" />{kioskCopy("screen_order_on_phone_a6b0af", "Order on Phone")}</button>
+                    <Smartphone className="w-4 h-4 text-jaman-saffronText" />{kioskCopy("screen_order_on_phone_a6b0af", "Order on Phone")}</button>
 
                   {loggedInAccount ? (
                     <div className="sm:hidden flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-emerald-800">
-                      <Award className="w-4 h-4 text-emerald-600" />
+                      <Award className="w-4 h-4 text-emerald-700" />
                       {loggedInAccount.loyaltyPoints}{kioskCopy("screen_loyalty_points_d9d154", "Loyalty Points")}</div>
                   ) : (
                     <button
@@ -2401,7 +2401,7 @@ export default function KioskUserApp() {
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-jaman-navy hover:bg-jaman-ivory text-left"
                     >
-                      <UserCheck className="w-4 h-4 text-jaman-saffron" />{kioskCopy("screen_loyalty_login_eceb65", "Loyalty / Login")}</button>
+                      <UserCheck className="w-4 h-4 text-jaman-saffronText" />{kioskCopy("screen_loyalty_login_eceb65", "Loyalty / Login")}</button>
                   )}
                 </div>
               </>
@@ -2419,7 +2419,7 @@ export default function KioskUserApp() {
             >
               <ShoppingBag className="w-4 h-4 stroke-[2.5]" />
               <span>{t('cart')}</span>
-              <span className="bg-white text-jaman-saffron px-2 py-0.5 rounded-full text-xs font-black">
+              <span className="bg-white text-jaman-saffronText px-2 py-0.5 rounded-full text-xs font-black">
                 {cartItems.reduce((sum, it) => sum + it.quantity, 0)}
               </span>
               <span className="border-l border-white/30 pl-2">
@@ -2486,11 +2486,11 @@ export default function KioskUserApp() {
               }}
               className="bg-white p-8 rounded-3xl border-2 border-jaman-border hover:border-jaman-saffron shadow-lg hover:shadow-xl flex flex-col items-center text-center space-y-4 transition-all duration-200 active:scale-95 group"
             >
-              <div className="w-24 h-24 rounded-3xl bg-jaman-ivory border border-jaman-border group-hover:bg-[#FFF4ED] group-hover:border-jaman-saffron/30 flex items-center justify-center text-jaman-navy group-hover:text-jaman-saffron transition-colors">
+              <div className="w-24 h-24 rounded-3xl bg-jaman-ivory border border-jaman-border group-hover:bg-[#FFF4ED] group-hover:border-jaman-saffron/30 flex items-center justify-center text-jaman-navy group-hover:text-jaman-saffronText transition-colors">
                 <UtensilsCrossed className="w-12 h-12 stroke-[2]" />
               </div>
               <div>
-                <h3 className="text-2xl font-black text-jaman-navy group-hover:text-jaman-saffron transition-colors">
+                <h3 className="text-2xl font-black text-jaman-navy group-hover:text-jaman-saffronText transition-colors">
                   {t('dineIn')}
                 </h3>
                 <p className="text-sm text-[#4A5568] mt-1">
@@ -2509,11 +2509,11 @@ export default function KioskUserApp() {
               }}
               className="bg-white p-8 rounded-3xl border-2 border-jaman-border hover:border-jaman-saffron shadow-lg hover:shadow-xl flex flex-col items-center text-center space-y-4 transition-all duration-200 active:scale-95 group"
             >
-              <div className="w-24 h-24 rounded-3xl bg-jaman-ivory border border-jaman-border group-hover:bg-[#FFF4ED] group-hover:border-jaman-saffron/30 flex items-center justify-center text-jaman-navy group-hover:text-jaman-saffron transition-colors">
+              <div className="w-24 h-24 rounded-3xl bg-jaman-ivory border border-jaman-border group-hover:bg-[#FFF4ED] group-hover:border-jaman-saffron/30 flex items-center justify-center text-jaman-navy group-hover:text-jaman-saffronText transition-colors">
                 <ShoppingBag className="w-12 h-12 stroke-[2]" />
               </div>
               <div>
-                <h3 className="text-2xl font-black text-jaman-navy group-hover:text-jaman-saffron transition-colors">
+                <h3 className="text-2xl font-black text-jaman-navy group-hover:text-jaman-saffronText transition-colors">
                   {t('takeaway')}
                 </h3>
                 <p className="text-sm text-[#4A5568] mt-1">
@@ -2770,7 +2770,7 @@ export default function KioskUserApp() {
                               className="w-11 h-11 rounded-xl object-cover shrink-0"
                             />
                             <div>
-                              <span className="block text-xs sm:text-sm font-black text-jaman-saffron whitespace-nowrap">{biryaniCombo.name}</span>
+                              <span className="block text-xs sm:text-sm font-black text-jaman-saffronText whitespace-nowrap">{biryaniCombo.name}</span>
                               <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">
                                 ₹{biryaniCombo.basePrice}
                                 {biryaniCombo.savingsAmount ? ` · Save ₹${biryaniCombo.savingsAmount}` : ''}
@@ -2857,11 +2857,11 @@ export default function KioskUserApp() {
                             <span className="kiosk-product-subcategory" aria-hidden="true" />
                             <p className="kiosk-product-description text-[#4A5568] line-clamp-2">{localizedDescription(combo, lang)}</p>
                             <div className="kiosk-product-price mt-auto min-w-0">
-                              <div data-kiosk-price className="flex flex-wrap items-baseline gap-x-1 text-xl font-black text-jaman-saffron leading-tight tabular-nums">
+                              <div data-kiosk-price className="flex flex-wrap items-baseline gap-x-1 text-xl font-black text-jaman-saffronText leading-tight tabular-nums">
                                 ₹{combo.basePrice}
                                 <span className="text-sm line-through text-[#52677A] font-medium">₹{combo.originalPrice}</span>
                               </div>
-                              <span className="kiosk-product-note block text-xs font-bold text-emerald-600">{kioskCopy("screen_save__2eaea5", "Save ₹")}{combo.savingsAmount}</span>
+                              <span className="kiosk-product-note block text-xs font-bold text-emerald-700">{kioskCopy("screen_save__2eaea5", "Save ₹")}{combo.savingsAmount}</span>
                             </div>
                             <div className="kiosk-product-actions">
                               <button
@@ -2925,7 +2925,7 @@ export default function KioskUserApp() {
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex items-center gap-2">
                       <h2 className="min-w-0 text-xl font-black text-jaman-navy flex items-center gap-2 leading-tight">
-                        <ShoppingBag className="w-5 h-5 text-jaman-saffron" />
+                        <ShoppingBag className="w-5 h-5 text-jaman-saffronText" />
                         <span className="truncate">{t('orderSummary')}</span>
                       </h2>
                       <span className="shrink-0 bg-jaman-saffron/10 border border-jaman-saffron/30 text-jaman-saffron text-xs font-black px-2.5 py-1 rounded-lg">
@@ -2983,7 +2983,7 @@ export default function KioskUserApp() {
                               </div>
                             )}
                             <div className="flex items-center justify-between gap-3 mt-2">
-                              <span className="font-black text-base text-jaman-saffron tabular-nums">
+                              <span className="font-black text-base text-jaman-saffronText tabular-nums">
                                 {formatINR(ci.itemTotal)}
                               </span>
                               <div className="flex items-center gap-1.5 bg-jaman-ivory border border-jaman-border p-1 rounded-xl shrink-0">
@@ -3015,7 +3015,7 @@ export default function KioskUserApp() {
                     <div className="pt-3 mt-1 border-t border-jaman-border space-y-2.5">
                       <div className="flex items-center text-[#4A5568] px-1">
                         <span className="text-sm font-bold flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-jaman-saffron" />{kioskCopy("screen_add_ons_suggested__fa91bb", "Add-ons (Suggested)")}</span>
+                          <Plus className="w-4 h-4 text-jaman-saffronText" />{kioskCopy("screen_add_ons_suggested__fa91bb", "Add-ons (Suggested)")}</span>
                       </div>
                       <div className="space-y-2">
                         {intelligentRecommendations.map((rec) => (
@@ -3024,7 +3024,7 @@ export default function KioskUserApp() {
                               <CachedImg src={rec.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=60'} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0 border border-[#F3EFE6]" />
                               <div className="min-w-0">
                                 <h5 className="font-bold text-sm text-jaman-navy leading-snug line-clamp-2">{localizedName(rec.item, lang)}</h5>
-                                <span className="text-sm font-black text-jaman-saffron block tabular-nums">{formatINR(rec.item.price)}</span>
+                                <span className="text-sm font-black text-jaman-saffronText block tabular-nums">{formatINR(rec.item.price)}</span>
                               </div>
                             </div>
                             <button
@@ -3120,13 +3120,13 @@ export default function KioskUserApp() {
                       <span className={kioskAmountClass}>{formatINR(rawCalculated.subtotal)}</span>
                     </div>
                     {rawCalculated.discountAmount > 0 && (
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-sm text-emerald-600 font-bold">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-sm text-emerald-700 font-bold">
                         <span>{t('discount')} ({appliedCoupon?.code})</span>
                         <span className={kioskAmountClass}>-{formatINR(rawCalculated.discountAmount)}</span>
                       </div>
                     )}
                     {loyaltyDiscountAmount > 0 && (
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-sm text-emerald-600 font-bold">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-sm text-emerald-700 font-bold">
                         <span>{selectedReward?.name ?? kioskCopy("screen_loyalty_reward_points_fe7dc0", "Loyalty Reward Points")}</span>
                         <span className={kioskAmountClass}>-{formatINR(loyaltyDiscountAmount)}</span>
                       </div>
@@ -3148,7 +3148,7 @@ export default function KioskUserApp() {
                     </div>
                     <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 items-end text-base font-black text-jaman-navy pt-2 mt-1 border-t border-jaman-border">
                       <span>{t('totalPayable')}</span>
-                      <span className="text-jaman-saffron text-2xl font-black leading-none text-right tabular-nums whitespace-nowrap">{formatINR(netTotalPayable)}</span>
+                      <span className="text-jaman-saffronText text-2xl font-black leading-none text-right tabular-nums whitespace-nowrap">{formatINR(netTotalPayable)}</span>
                     </div>
                   </div>
 
@@ -3190,7 +3190,7 @@ export default function KioskUserApp() {
                     <span ref={cartTotalRef} className="kiosk-cart-total block font-bold leading-tight tabular-nums whitespace-nowrap">{formatINR(netTotalPayable)}</span>
                   </span>
                 </span>
-                <span className="kiosk-cart-checkout bg-white/95 text-jaman-saffron flex items-center font-semibold whitespace-nowrap border-l border-jaman-saffron/15 shrink-0">
+                <span className="kiosk-cart-checkout bg-white/95 text-jaman-saffronText flex items-center font-semibold whitespace-nowrap border-l border-jaman-saffron/15 shrink-0">
                   <span className="kiosk-cart-checkout-full">{kioskCopy("screen_view_cart_checkout_2d62d4", "View Cart & Checkout")}</span>
                   <span className="kiosk-cart-checkout-short">{kioskCopy("screen_checkout_8b785d", "Checkout")}</span>
                   <ArrowRight size={18} className="shrink-0" aria-hidden="true" />
@@ -3206,7 +3206,7 @@ export default function KioskUserApp() {
         <div className="flex-1 flex flex-col p-6 md:p-10 max-w-5xl mx-auto w-full space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black text-jaman-navy">{t('paymentTitle')}</h2>
-            <p className="text-sm text-[#4A5568]">{kioskCopy("screen_total_payable__6577c8", "Total Payable:")}<span className="font-black text-jaman-saffron text-lg">{formatINR(netTotalPayable)}</span>
+            <p className="text-sm text-[#4A5568]">{kioskCopy("screen_total_payable__6577c8", "Total Payable:")}<span className="font-black text-jaman-saffronText text-lg">{formatINR(netTotalPayable)}</span>
             </p>
             {/* F: explain the final price — a guest reaching the payment tiles should not have to
                 navigate back to the cart to see what the total is actually made of, and must be
@@ -3270,7 +3270,7 @@ export default function KioskUserApp() {
               } ${networkState === 'OFFLINE' || onlinePaymentUnavailable ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center">
+                <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffronText flex items-center justify-center">
                   <QrCode className="w-8 h-8" />
                 </div>
                 {/* B2-023: previously this tile stayed fully selectable even when Razorpay had
@@ -3302,7 +3302,7 @@ export default function KioskUserApp() {
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center">
+                <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffronText flex items-center justify-center">
                   <Coins className="w-8 h-8" />
                 </div>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">{kioskCopy("screen_offline_online_99d685", "Offline & Online")}</span>
@@ -3344,13 +3344,13 @@ export default function KioskUserApp() {
               <div className="space-y-4">
                 {qrImageSrc ? (
                   <>
-                    <p className="text-sm font-semibold text-[#4A5568]">{kioskCopy("screen_scan_with_any_upi_app_to_pay_ca123c", "Scan with any UPI app to pay")}<span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
+                    <p className="text-sm font-semibold text-[#4A5568]">{kioskCopy("screen_scan_with_any_upi_app_to_pay_ca123c", "Scan with any UPI app to pay")}<span className="font-black text-jaman-saffronText">{formatINR(netTotalPayable)}</span>
                     </p>
                     <div className="mx-auto w-[min(88vw,520px)] h-[min(88vw,520px)] bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
                       <img src={qrImageSrc} alt="UPI payment QR code" className="w-full h-full object-contain" />
                     </div>
                     <div className="text-xs text-[#52677A] font-medium flex items-center justify-center gap-1.5">
-                      <Clock className="w-4 h-4 text-jaman-saffron" />
+                      <Clock className="w-4 h-4 text-jaman-saffronText" />
                       <span>{t('paymentExpiresIn')}: <strong className="text-jaman-navy font-mono">{Math.floor(qrSecondsLeft / 60)}:{String(qrSecondsLeft % 60).padStart(2, '0')}</strong></span>
                     </div>
                     <p className="text-xs text-[#4A5568]">{kioskCopy("screen_waiting_for_your_payment_your_token_prints_automaticall_2a6f9b", "Waiting for your payment… your token prints automatically once it is received.")}</p>
@@ -3364,7 +3364,7 @@ export default function KioskUserApp() {
 
             {paymentMethod === 'UPI' && onlinePaymentUnavailable && (
               <div className="py-8 space-y-4">
-                <Coins className="w-16 h-16 text-jaman-saffron mx-auto" />
+                <Coins className="w-16 h-16 text-jaman-saffronText mx-auto" />
                 <h3 className="text-xl font-black text-jaman-navy">
                   {onlinePaymentsPending ? 'Online payment is being set up' : onlinePaymentConnectionIssue ? 'Could not reach online payment' : 'Online Payment Unavailable'}
                 </h3>
@@ -3396,7 +3396,7 @@ export default function KioskUserApp() {
 
             {paymentMethod === 'CASH_AT_COUNTER' && (
               <div className="py-8 space-y-4">
-                <Coins className="w-16 h-16 text-jaman-saffron mx-auto" />
+                <Coins className="w-16 h-16 text-jaman-saffronText mx-auto" />
                 <h3 className="text-xl font-black text-jaman-navy">{kioskCopy("screen_pay_at_pickup_counter_c8a1db", "Pay at Pickup Counter")}</h3>
                 <p className="text-sm text-[#4A5568]">{kioskCopy("screen_you_will_receive_your_token_now_please_pay_at_counter_1_df2bd4", "You will receive your token now. Please pay at Counter 1.")}</p>
               </div>
@@ -3474,7 +3474,7 @@ export default function KioskUserApp() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <section className="rounded-[28px] bg-white border-2 border-jaman-border shadow-xl p-6 sm:p-8 text-center flex flex-col items-center justify-center gap-2">
                 <span className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-[#52677A]">{t('token')}</span>
-                <div className="text-7xl sm:text-8xl font-black text-jaman-saffron font-mono tracking-tight leading-none">#{placedOrder.tokenNumber}</div>
+                <div className="text-7xl sm:text-8xl font-black text-jaman-saffronText font-mono tracking-tight leading-none">#{placedOrder.tokenNumber}</div>
               </section>
               <section className="rounded-[28px] bg-white border border-jaman-border shadow-md p-6 sm:p-8 flex flex-col justify-center gap-4">
                 <div className="flex items-center justify-between gap-3">
@@ -3520,7 +3520,7 @@ export default function KioskUserApp() {
                       <article key={kot.id} className="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-4 space-y-3">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div>
-                            <p className="text-xs font-black uppercase tracking-wider text-jaman-saffron">{kot.station || 'Main Kitchen'}</p>
+                            <p className="text-xs font-black uppercase tracking-wider text-jaman-saffronText">{kot.station || 'Main Kitchen'}</p>
                             <p className="text-sm font-bold font-mono text-jaman-navy">KOT {kot.kotNumber}</p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-bold border ${pill(status === 'printed' ? 'printed' : status === 'failed' ? 'failed' : 'printing')}`}>
@@ -3569,12 +3569,12 @@ export default function KioskUserApp() {
                   }}
                   className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-jaman-saffron flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform"
                 >
-                  <Printer className="w-7 h-7 text-jaman-saffron" />
+                  <Printer className="w-7 h-7 text-jaman-saffronText" />
                   <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_print_receipt_98bad4', 'Print Receipt')}</span>
                 </button>
                 {receiptConfig.enableEmail && (
                   <button type="button" onClick={() => openReceiptDelivery('EMAIL')} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-emerald-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
-                    <Mail className="w-7 h-7 text-emerald-600" />
+                    <Mail className="w-7 h-7 text-emerald-700" />
                     <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_email_bill_64ee94', 'Email Bill')}</span>
                   </button>
                 )}
@@ -3739,7 +3739,7 @@ export default function KioskUserApp() {
                   no need to repeat it here. */}
               <p className="text-xs text-[#4A5568]">{localizedDescription(customizingItem, lang)}</p>
               {!!customizingItem.allergens?.length && <p className="text-sm font-semibold text-amber-900 mt-2">Declared allergens: {customizingItem.allergens.join(', ')}. Ask staff about cross-contact.</p>}
-              <div className="text-lg font-black text-jaman-saffron mt-1.5">
+              <div className="text-lg font-black text-jaman-saffronText mt-1.5">
                 {formatINR(calculateItemUnitPrice(customizingItem.price, selectedModifiers))}
               </div>
             </div>
@@ -3809,7 +3809,7 @@ export default function KioskUserApp() {
                       >
                         <span className="font-bold text-sm">{opt.name}</span>
                         {opt.priceDelta > 0 ? (
-                          <span className={`text-xs font-semibold mt-1 ${isSelected ? 'text-[#FED7AA]' : 'text-jaman-saffron'}`}>
+                          <span className={`text-xs font-semibold mt-1 ${isSelected ? 'text-[#FED7AA]' : 'text-jaman-saffronText'}`}>
                             +{formatINR(opt.priceDelta)}
                           </span>
                         ) : (
@@ -3973,7 +3973,7 @@ export default function KioskUserApp() {
                                 )}
                               </div>
                               <h5 className="font-bold text-xs text-jaman-navy truncate mt-0.5">{localizedName(item, lang)}</h5>
-                              <span className="text-xs font-black text-jaman-saffron">{formatINR(item.price)}</span>
+                              <span className="text-xs font-black text-jaman-saffronText">{formatINR(item.price)}</span>
                             </div>
                           </div>
 
@@ -4003,7 +4003,7 @@ export default function KioskUserApp() {
                             <h5 className="font-bold text-xs text-jaman-navy mt-1">{localizedName(combo, lang)}</h5>
                             <p className="text-[10px] text-[#4A5568] line-clamp-1 mt-0.5">{localizedDescription(combo, lang)}</p>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs font-black text-jaman-saffron">{formatINR(combo.basePrice)}</span>
+                              <span className="text-xs font-black text-jaman-saffronText">{formatINR(combo.basePrice)}</span>
                               <span className="text-[10px] text-[#52677A] line-through">{formatINR(combo.originalPrice)}</span>
                             </div>
                           </div>
@@ -4077,7 +4077,7 @@ export default function KioskUserApp() {
             <div className="p-3.5 sm:p-4 border-t border-jaman-border bg-white space-y-2 select-none">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-black uppercase text-[#52677A] tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />{kioskCopy("screen_tap_any_preloaded_option_below__a407c3", "Tap Any Preloaded Option Below:")}</span>
+                  <Sparkles className="w-3.5 h-3.5 text-jaman-saffronText" />{kioskCopy("screen_tap_any_preloaded_option_below__a407c3", "Tap Any Preloaded Option Below:")}</span>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">{kioskCopy("screen_1_tap_instant_response_55bf08", "1-Tap Instant Response")}</span>
               </div>
 
@@ -4247,6 +4247,7 @@ export default function KioskUserApp() {
             maxLength={4}
             value={staffPin}
             onChange={(e) => setStaffPin(e.target.value)}
+            aria-label="Staff PIN"
             placeholder="••••"
             className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-jaman-navy"
           />
@@ -4365,7 +4366,7 @@ export default function KioskUserApp() {
         title={t('staffAssistance')}
       >
         <div className="text-center space-y-4 py-4">
-          <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 text-jaman-saffron flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 text-jaman-saffronText flex items-center justify-center mx-auto">
             <Bell className="w-8 h-8" />
           </div>
           {staffCallDelivered === null ? (
@@ -4395,7 +4396,7 @@ export default function KioskUserApp() {
       {showIdleWarning && (
         <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-6 bg-black/80 animate-fadeIn select-none">
           <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl border-2 border-amber-400 animate-scaleUp">
-            <div className="w-20 h-20 rounded-full bg-amber-50 text-jaman-saffron flex items-center justify-center mx-auto">
+            <div className="w-20 h-20 rounded-full bg-amber-50 text-jaman-saffronText flex items-center justify-center mx-auto">
               <Clock className="w-10 h-10 animate-spin" />
             </div>
 

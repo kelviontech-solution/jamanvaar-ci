@@ -182,8 +182,8 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
         <h3 className="text-sm font-bold text-jaman-navy">Account Recovery</h3>
       </div>
       <p className="text-[11px] text-slate-500">
-        A verified alternate mailbox that can receive a password-reset code if your main login email is ever unreachable. Any active Manager or
-        Accountant login below is already an alternate authorized contact — they can sign in on their own credentials without ever knowing yours.
+        A verified alternate mailbox receives the password-reset code if your main login email is unreachable. Active Manager and Accountant logins
+        below are already alternate contacts and sign in with their own credentials.
       </p>
 
       {account?.recoveryEmail ? (

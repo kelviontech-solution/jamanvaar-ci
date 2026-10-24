@@ -80,7 +80,7 @@ export const PosPrintQueueModal: React.FC = () => {
         {/* Header */}
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <Printer className="w-5 h-5 text-jaman-saffron" />
+            <Printer className="w-5 h-5 text-jaman-saffronText" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Hardware Print Queue</h2>
               <span className="text-xs text-slate-300">
@@ -179,10 +179,10 @@ export const PosPrintQueueModal: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="h-48 flex flex-col items-center justify-center text-center text-slate-400 my-auto">
+            <div className="h-48 flex flex-col items-center justify-center text-center text-slate-500 my-auto">
               <Printer className="w-10 h-10 text-slate-300 mb-2 stroke-1" />
               <h4 className="font-bold text-sm text-jaman-navy">Print Queue Empty</h4>
-              <p className="text-xs text-slate-400 mt-0.5">Dispatched receipt and KOT tickets will appear here.</p>
+              <p className="text-xs text-slate-500 mt-0.5">Dispatched receipt and KOT tickets will appear here.</p>
             </div>
           )}
         </div>
@@ -193,7 +193,7 @@ export const PosPrintQueueModal: React.FC = () => {
             <div className="bg-white rounded-2xl max-w-lg w-full p-5 space-y-3">
               <div className="flex items-center justify-between border-b pb-2">
                 <h3 className="text-sm font-bold text-jaman-navy">Raw ESC/POS Thermal Payload</h3>
-                <button onClick={() => setSelectedJob(null)} className="text-slate-400 hover:text-slate-600" aria-label="Close"><X className="w-4 h-4" /></button>
+                <button onClick={() => setSelectedJob(null)} className="text-slate-500 hover:text-slate-600" aria-label="Close"><X className="w-4 h-4" /></button>
               </div>
 
               <pre className="bg-slate-900 text-emerald-400 font-mono text-[11px] p-4 rounded-xl max-h-72 overflow-y-auto whitespace-pre-wrap leading-tight">

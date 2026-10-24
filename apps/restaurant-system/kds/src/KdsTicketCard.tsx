@@ -113,7 +113,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
               }`}
               title={`Usually about ${age.prep} minutes`}
             >
-              {age.level === 'late' ? <AlertTriangle className="w-3 h-3" /> : <Clock className="w-3 h-3 text-slate-400" />}
+              {age.level === 'late' ? <AlertTriangle className="w-3 h-3" /> : <Clock className="w-3 h-3 text-slate-500" />}
               {age.level === 'late' ? `Late ${age.mins}m` : age.timeStr}
             </span>
           )}
@@ -173,7 +173,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline gap-1.5">
-                      <span className="shrink-0 font-mono font-black text-lg text-jaman-saffron leading-none">{it.quantity}×</span>
+                      <span className="shrink-0 font-mono font-black text-lg text-jaman-saffronText leading-none">{it.quantity}×</span>
                       <span className={`min-w-0 flex-1 kds-dish-name font-extrabold text-jaman-navy leading-snug break-words ${gone ? 'line-through text-rose-700' : ''}`}>{it.name}</span>
                       {showCourses && it.course && !gone && (
                         <span className="text-[10px] font-black uppercase bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">{COURSE_LABEL[it.course] ?? it.course}</span>
@@ -208,7 +208,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
       <div className="kds-ticket-footer p-3 sm:p-4 bg-jaman-cream border-t border-jaman-border space-y-2.5">
         <div className="flex items-center justify-between text-xs text-slate-600 font-bold gap-2">
           <span className="truncate">{takenBy ?? ''}</span>
-          <span className="font-mono text-slate-400 shrink-0">#{kot.id.slice(-5)}</span>
+          <span className="font-mono text-slate-500 shrink-0">#{kot.id.slice(-5)}</span>
         </div>
 
         {cancelled && (
@@ -250,7 +250,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
         {isServed && (
           <div className="flex items-center gap-2">
             <div className="flex-1 min-h-[44px] rounded-2xl bg-slate-100 text-slate-500 font-bold text-xs flex items-center justify-center gap-1.5">
-              <Check className="w-4 h-4 text-emerald-600" /> {t('Served')}
+              <Check className="w-4 h-4 text-emerald-700" /> {t('Served')}
             </div>
             <button type="button" onClick={() => onRecall(kot)} className={`${BTN} !w-auto shrink-0 whitespace-nowrap px-4 bg-white text-slate-700 border border-jaman-border hover:bg-slate-50`} title="Served by mistake? Bring the ticket back">
               <RotateCcw className="w-4 h-4" /> {t("Recall")} </button>
