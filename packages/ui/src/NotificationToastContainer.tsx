@@ -45,7 +45,7 @@ export const NotificationToastContainer: React.FC<NotificationToastContainerProp
     setActiveToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  if (activeToasts.length === 0) return null;
+  // The live region stays mounted even when empty: assistive tech only announces changes to a region that already exists.
 
   return (
     <aside aria-label="System Notifications" role="status" aria-live="polite" className="fixed right-4 z-40 flex flex-col gap-2.5 pointer-events-none select-none" style={{ width: 'min(384px, calc(100vw - 32px))', bottom: 'calc(var(--jv-notification-bottom, 5rem) + env(safe-area-inset-bottom))', maxHeight: 'min(60dvh, 500px)', overflowY: 'auto' }}>

@@ -343,7 +343,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
         <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col items-center justify-between">
           <div className="w-full">
             <h3 className="font-bold text-sm text-jaman-navy mb-3 text-center">Live Receipt Preview ({config.paperSize})</h3>
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center">
               {db.orders.length === 0 && (
                 <p className="mb-3 w-full text-center text-[11px] font-semibold text-slate-500">
                   Sample receipt: a real order appears here once a guest has ordered.

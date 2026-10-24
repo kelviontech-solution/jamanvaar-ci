@@ -458,7 +458,7 @@ export const PosMenuManagerModal: React.FC<{
         {/* MODAL HEADER */}
         <div className="bg-white border-b border-jaman-border px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-center text-jaman-saffron shadow-2xs">
+            <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-center text-jaman-saffronText shadow-2xs">
               <Utensils className="w-5 h-5" />
             </div>
             <div>
@@ -492,7 +492,7 @@ export const PosMenuManagerModal: React.FC<{
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-jaman-navy transition-colors"
+              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-jaman-navy transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -503,10 +503,10 @@ export const PosMenuManagerModal: React.FC<{
         {feedback && (
           <div className="bg-emerald-50 border-b border-emerald-200 px-6 py-2 flex items-center justify-between text-xs text-emerald-800 font-bold animate-in slide-in-from-top">
             <span className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
               {feedback}
             </span>
-            <button onClick={() => setFeedback('')} className="text-emerald-600 hover:text-emerald-900 font-black">
+            <button onClick={() => setFeedback('')} className="text-emerald-700 hover:text-emerald-900 font-black">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -559,7 +559,7 @@ export const PosMenuManagerModal: React.FC<{
               className={`px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'PRESETS'
                   ? 'bg-jaman-saffron text-white shadow-xs'
-                  : 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74] hover:bg-[#FFE8D6]'
+                  : 'bg-[#FFF4ED] text-jaman-saffronText border border-[#FDBA74] hover:bg-[#FFE8D6]'
               }`}
             >
               <Sparkles className="w-4 h-4" />
@@ -606,13 +606,13 @@ export const PosMenuManagerModal: React.FC<{
             <div className="flex flex-wrap items-center justify-between gap-3 shrink-0">
               <div className="flex items-center gap-3 flex-1 min-w-[280px]">
                 <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search dish name, SKU..."
-                    className="w-full pl-9 pr-4 py-2 bg-white border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-hidden focus:border-jaman-saffron"
+                    className="w-full pl-9 pr-4 py-2 bg-white border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-500 focus:outline-hidden focus:border-jaman-saffron"
                   />
                 </div>
 
@@ -687,7 +687,7 @@ export const PosMenuManagerModal: React.FC<{
                                   }}
                                 />
                               ) : (
-                                <Utensils className="w-6 h-6 text-slate-400" />
+                                <Utensils className="w-6 h-6 text-slate-500" />
                               )}
                             </div>
 
@@ -706,7 +706,7 @@ export const PosMenuManagerModal: React.FC<{
                                   {item.name}
                                 </h4>
                               </div>
-                              <span className="text-[10px] text-slate-400 font-mono block mt-0.5">
+                              <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
                                 {item.sku || 'NO-SKU'} • {cat?.name || 'Unassigned'}
                               </span>
                               <div className="flex items-center gap-2 mt-1">
@@ -760,7 +760,7 @@ export const PosMenuManagerModal: React.FC<{
                                 setReviewingDish(item);
                                 setIsReviewModalOpen(true);
                               }}
-                              className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-jaman-saffron transition-colors"
+                              className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-jaman-saffronText transition-colors"
                               title="Inspect Image Quality & License"
                             >
                               <Camera className="w-3.5 h-3.5" />
@@ -777,7 +777,7 @@ export const PosMenuManagerModal: React.FC<{
                             </button>
                             <button
                               onClick={() => handleDeleteItem(item.id, item.name)}
-                              className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                              className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors"
                               title="Delete Dish"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -829,7 +829,7 @@ export const PosMenuManagerModal: React.FC<{
                       className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex items-center justify-between"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-jaman-cream border border-jaman-border flex items-center justify-center text-jaman-saffron overflow-hidden">
+                        <div className="w-12 h-12 rounded-xl bg-jaman-cream border border-jaman-border flex items-center justify-center text-jaman-saffronText overflow-hidden">
                           {cat.imageUrl ? (
                             <CachedImg src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover" />
                           ) : (
@@ -838,7 +838,7 @@ export const PosMenuManagerModal: React.FC<{
                         </div>
                         <div>
                           <h4 className="font-extrabold text-sm text-jaman-navy">{cat.name}</h4>
-                          <span className="text-xs text-slate-400 font-medium">{itemsCount} Dishes</span>
+                          <span className="text-xs text-slate-500 font-medium">{itemsCount} Dishes</span>
                         </div>
                       </div>
 
@@ -854,7 +854,7 @@ export const PosMenuManagerModal: React.FC<{
                         </button>
                         <button
                           onClick={() => handleDeleteCategory(cat.id, cat.name)}
-                          className="p-2 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                          className="p-2 rounded-xl hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -878,7 +878,7 @@ export const PosMenuManagerModal: React.FC<{
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <h3 className="text-sm font-extrabold text-jaman-navy flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-jaman-saffron" />
+                        <Sparkles className="w-4 h-4 text-jaman-saffronText" />
                         <span>Preloaded Restaurant Starter Library</span>
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
@@ -928,13 +928,13 @@ export const PosMenuManagerModal: React.FC<{
                     </div>
 
                     <div className="relative w-64">
-                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         value={templateSearchQuery}
                         onChange={(e) => setTemplateSearchQuery(e.target.value)}
                         placeholder="Search restaurant type..."
-                        className="w-full pl-8 pr-3 py-1.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-hidden focus:border-jaman-saffron"
+                        className="w-full pl-8 pr-3 py-1.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-500 focus:outline-hidden focus:border-jaman-saffron"
                       />
                     </div>
                   </div>
@@ -988,7 +988,7 @@ export const PosMenuManagerModal: React.FC<{
                                   </span>
                                 )}
                                 {tpl.badge && (
-                                  <span className="bg-[#FFF4ED] text-jaman-saffron text-[10px] font-black px-2 py-0.5 rounded-full border border-[#FDBA74]">
+                                  <span className="bg-[#FFF4ED] text-jaman-saffronText text-[10px] font-black px-2 py-0.5 rounded-full border border-[#FDBA74]">
                                     {tpl.badge}
                                   </span>
                                 )}
@@ -997,7 +997,7 @@ export const PosMenuManagerModal: React.FC<{
 
                             <div>
                               <h4 className="text-base font-black text-jaman-navy leading-tight">{tpl.name}</h4>
-                              <span className="text-xs text-jaman-saffron font-bold block mt-0.5">{tpl.cuisine}</span>
+                              <span className="text-xs text-jaman-saffronText font-bold block mt-0.5">{tpl.cuisine}</span>
                             </div>
 
                             <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{tpl.description}</p>
@@ -1055,7 +1055,7 @@ export const PosMenuManagerModal: React.FC<{
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="text-base font-black text-jaman-navy">{selectedTemplate.name}</h3>
-                        <span className="text-xs text-jaman-saffron font-bold">• {selectedTemplate.cuisine}</span>
+                        <span className="text-xs text-jaman-saffronText font-bold">• {selectedTemplate.cuisine}</span>
                       </div>
                       <p className="text-xs text-slate-500">{selectedTemplate.description}</p>
                     </div>
@@ -1067,9 +1067,9 @@ export const PosMenuManagerModal: React.FC<{
                       className="px-3 py-2 rounded-xl bg-jaman-cream border border-jaman-border hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
                     >
                       {selectedDishKeys.size > 0 ? (
-                        <CheckSquare className="w-4 h-4 text-jaman-saffron" />
+                        <CheckSquare className="w-4 h-4 text-jaman-saffronText" />
                       ) : (
-                        <Square className="w-4 h-4 text-slate-400" />
+                        <Square className="w-4 h-4 text-slate-500" />
                       )}
                       <span>
                         {selectedDishKeys.size > 0 ? `Deselect All (${selectedDishKeys.size})` : 'Select All Dishes'}
@@ -1117,13 +1117,13 @@ export const PosMenuManagerModal: React.FC<{
                   </div>
 
                   <div className="relative w-60">
-                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       value={previewDishSearch}
                       onChange={(e) => setPreviewDishSearch(e.target.value)}
                       placeholder="Search within preview..."
-                      className="w-full pl-8 pr-3 py-1.5 bg-white border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-hidden"
+                      className="w-full pl-8 pr-3 py-1.5 bg-white border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-500 focus:outline-hidden"
                     />
                   </div>
                 </div>
@@ -1150,12 +1150,12 @@ export const PosMenuManagerModal: React.FC<{
                           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div className="flex items-center gap-2.5">
                               <h4 className="text-sm font-black text-jaman-navy">{cat.name}</h4>
-                              <span className="text-xs text-slate-400 font-medium">({filteredCatItems.length} Dishes)</span>
+                              <span className="text-xs text-slate-500 font-medium">({filteredCatItems.length} Dishes)</span>
                             </div>
 
                             <button
                               onClick={() => handleToggleCategoryDishes(selectedTemplate, cat)}
-                              className="text-xs font-bold text-jaman-saffron hover:underline flex items-center gap-1 cursor-pointer"
+                              className="text-xs font-bold text-jaman-saffronText hover:underline flex items-center gap-1 cursor-pointer"
                             >
                               Toggle Category Selection
                             </button>
@@ -1190,7 +1190,7 @@ export const PosMenuManagerModal: React.FC<{
                                             }}
                                           />
                                         ) : (
-                                          <Utensils className="w-6 h-6 text-slate-400" />
+                                          <Utensils className="w-6 h-6 text-slate-500" />
                                         )}
                                       </div>
 
@@ -1214,11 +1214,11 @@ export const PosMenuManagerModal: React.FC<{
                                             type="checkbox"
                                             checked={isSelected}
                                             onChange={() => {}} // Handled by parent container click
-                                            className="w-4 h-4 text-jaman-saffron rounded border-slate-300 cursor-pointer shrink-0 ml-1"
+                                            className="w-4 h-4 text-jaman-saffronText rounded border-slate-300 cursor-pointer shrink-0 ml-1"
                                           />
                                         </div>
 
-                                        <span className="text-[10px] text-slate-400 font-mono block mt-0.5">
+                                        <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
                                           {item.sku}
                                         </span>
 
@@ -1240,13 +1240,13 @@ export const PosMenuManagerModal: React.FC<{
                                     </p>
                                   </div>
 
-                                  <div className="pt-2 mt-2 border-t border-slate-100/80 flex items-center justify-between text-[10px] text-slate-400">
+                                  <div className="pt-2 mt-2 border-t border-slate-100/80 flex items-center justify-between text-[10px] text-slate-500">
                                     <span className="flex items-center gap-1">
                                       <Clock className="w-3 h-3" />
                                       {item.prepTimeMinutes}m prep
                                     </span>
                                     {item.tags && item.tags.length > 0 && (
-                                      <span className="font-bold text-jaman-saffron">{item.tags[0]}</span>
+                                      <span className="font-bold text-jaman-saffronText">{item.tags[0]}</span>
                                     )}
                                   </div>
                                 </div>
@@ -1302,7 +1302,7 @@ export const PosMenuManagerModal: React.FC<{
                   {/* Category Mapping Card */}
                   <div className="bg-white border border-jaman-border rounded-3xl p-5 space-y-3">
                     <h4 className="text-sm font-black text-jaman-navy flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-jaman-saffron" />
+                      <Layers className="w-4 h-4 text-jaman-saffronText" />
                       <span>Category Mapping & Creation</span>
                     </h4>
                     <p className="text-xs text-slate-500">
@@ -1370,7 +1370,7 @@ export const PosMenuManagerModal: React.FC<{
 
                     {analysisResult.dishConflicts.length === 0 ? (
                       <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 font-bold flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                         <span>Zero conflicts! All selected dishes are unique and will be added cleanly.</span>
                       </div>
                     ) : (
@@ -1384,7 +1384,7 @@ export const PosMenuManagerModal: React.FC<{
                                 <div className="text-[11px] text-slate-500 flex items-center gap-3">
                                   <span>Current: <b className="text-slate-800">₹{c.existingPrice}</b> ({c.existingCategoryName})</span>
                                   <span>•</span>
-                                  <span>Template: <b className="text-jaman-saffron">₹{c.importedPrice}</b></span>
+                                  <span>Template: <b className="text-jaman-saffronText">₹{c.importedPrice}</b></span>
                                 </div>
                               </div>
 
@@ -1419,7 +1419,7 @@ export const PosMenuManagerModal: React.FC<{
             {presetWizardStep === 'SUMMARY' && lastImportResult && selectedTemplate && (
               <div className="flex-1 p-8 overflow-y-auto flex items-center justify-center">
                 <div className="bg-white border border-jaman-border rounded-3xl p-8 max-w-xl w-full text-center space-y-6 shadow-xl animate-in zoom-in-95 duration-150">
-                  <div className="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-2xs">
+                  <div className="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-2xs">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
 
@@ -1430,20 +1430,20 @@ export const PosMenuManagerModal: React.FC<{
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
                     <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Dishes Added</span>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Dishes Added</span>
                       <strong className="text-base font-black text-jaman-navy block">+{lastImportResult.importedItemsCount}</strong>
                     </div>
                     <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">New Categories</span>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">New Categories</span>
                       <strong className="text-base font-black text-jaman-navy block">+{lastImportResult.importedCategoriesCount}</strong>
                     </div>
                     <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Cat Matched</span>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Cat Matched</span>
                       <strong className="text-base font-black text-emerald-700 block">{lastImportResult.matchedCategoriesCount}</strong>
                     </div>
                     <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Stations Set</span>
-                      <strong className="text-base font-black text-jaman-saffron block">{lastImportResult.stationsAssignedCount}</strong>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Stations Set</span>
+                      <strong className="text-base font-black text-jaman-saffronText block">{lastImportResult.stationsAssignedCount}</strong>
                     </div>
                   </div>
 
@@ -1556,7 +1556,7 @@ export const PosMenuManagerModal: React.FC<{
               <h3 className="font-extrabold text-base text-jaman-navy">
                 {editingItem.id ? 'Edit Dish' : 'Create New Dish'}
               </h3>
-              <button onClick={() => setIsItemFormOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+              <button onClick={() => setIsItemFormOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-500">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1676,15 +1676,15 @@ export const PosMenuManagerModal: React.FC<{
               <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3.5 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="font-bold text-slate-700 flex items-center gap-1.5 text-xs">
-                    <Sliders className="w-3.5 h-3.5 text-jaman-saffron" />
+                    <Sliders className="w-3.5 h-3.5 text-jaman-saffronText" />
                     <span>Customization & Modifier Groups</span>
                   </label>
-                  <span className="text-[10px] text-slate-400 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                  <span className="text-[10px] text-slate-500 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
                     {(editingItem.modifierGroupIds || []).length} Attached
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  Select which customization options are available for this dish (enables the <strong className="text-jaman-saffron">MOD</strong> button on the POS card).
+                  Select which customization options are available for this dish (enables the <strong className="text-jaman-saffronText">MOD</strong> button on the POS card).
                 </p>
 
                 <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
@@ -1711,7 +1711,7 @@ export const PosMenuManagerModal: React.FC<{
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => {}}
-                            className="w-4 h-4 rounded text-jaman-saffron focus:ring-jaman-saffron cursor-pointer"
+                            className="w-4 h-4 rounded text-jaman-saffronText focus:ring-jaman-saffron cursor-pointer"
                           />
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
@@ -1722,7 +1722,7 @@ export const PosMenuManagerModal: React.FC<{
                                 </span>
                               )}
                             </div>
-                            <p className="text-[10px] text-slate-400 truncate">
+                            <p className="text-[10px] text-slate-500 truncate">
                               {group.options.map((o) => `${o.name}${o.priceDelta ? ` (+₹${o.priceDelta})` : ''}`).join(', ')}
                             </p>
                           </div>
@@ -1742,7 +1742,7 @@ export const PosMenuManagerModal: React.FC<{
               <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3.5 space-y-2.5">
                 <label className="font-bold text-slate-700 flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1.5">
-                    <Camera className="w-3.5 h-3.5 text-jaman-saffron" />
+                    <Camera className="w-3.5 h-3.5 text-jaman-saffronText" />
                     <span>Dish Photo</span>
                   </span>
                   {editingItem.imageUrl && (
@@ -1769,7 +1769,7 @@ export const PosMenuManagerModal: React.FC<{
                     {editingItem.imageUrl ? (
                       <CachedImg src={editingItem.imageUrl} alt="Dish" className="w-full h-full object-cover" />
                     ) : (
-                      <ImageIcon className="w-6 h-6 text-slate-400" />
+                      <ImageIcon className="w-6 h-6 text-slate-500" />
                     )}
                   </div>
 
@@ -1807,7 +1807,7 @@ export const PosMenuManagerModal: React.FC<{
 
                 {showDishPresets && (
                   <div className="bg-white border border-jaman-border rounded-xl p-2.5 space-y-1.5">
-                    <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">
                       Tap a Dish Photo Preset:
                     </span>
                     <div className="grid grid-cols-3 gap-1.5">
@@ -1871,7 +1871,7 @@ export const PosMenuManagerModal: React.FC<{
               <h3 className="font-extrabold text-base text-jaman-navy">
                 {editingCategory.id ? 'Edit Category' : 'New Category'}
               </h3>
-              <button onClick={() => setIsCategoryFormOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+              <button onClick={() => setIsCategoryFormOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-500">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1892,7 +1892,7 @@ export const PosMenuManagerModal: React.FC<{
               {/* Category Photo Upload */}
               <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3 space-y-2">
                 <label className="font-bold text-slate-700 flex items-center gap-1.5 text-xs">
-                  <Camera className="w-3.5 h-3.5 text-jaman-saffron" />
+                  <Camera className="w-3.5 h-3.5 text-jaman-saffronText" />
                   <span>Category Icon / Image</span>
                 </label>
 
@@ -1909,7 +1909,7 @@ export const PosMenuManagerModal: React.FC<{
                     {editingCategory.imageUrl ? (
                       <CachedImg src={editingCategory.imageUrl} alt="Category" className="w-full h-full object-cover" />
                     ) : (
-                      <ImageIcon className="w-5 h-5 text-slate-400" />
+                      <ImageIcon className="w-5 h-5 text-slate-500" />
                     )}
                   </div>
 
@@ -1961,7 +1961,7 @@ export const PosMenuManagerModal: React.FC<{
           <div className="bg-white border border-jaman-border rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-jaman-saffron">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-jaman-saffronText">
                   <Camera className="w-4 h-4" />
                 </div>
                 <div>
@@ -1971,7 +1971,7 @@ export const PosMenuManagerModal: React.FC<{
               </div>
               <button
                 onClick={() => setIsReviewModalOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-jaman-navy cursor-pointer"
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-jaman-navy cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2027,7 +2027,7 @@ export const PosMenuManagerModal: React.FC<{
                     }}
                   />
                 ) : (
-                  <div className="text-center text-slate-400 space-y-2">
+                  <div className="text-center text-slate-500 space-y-2">
                     <Utensils className="w-10 h-10 mx-auto opacity-50" />
                     <p className="text-xs">No food photo assigned</p>
                   </div>
@@ -2054,16 +2054,16 @@ export const PosMenuManagerModal: React.FC<{
             {/* Source & Legal License Details */}
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
                 <span>Commercial License & Legal Source</span>
               </span>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <span className="text-[10px] text-slate-400 block font-bold">Source:</span>
+                  <span className="text-[10px] text-slate-500 block font-bold">Source:</span>
                   <span className="font-bold text-slate-700">{reviewingDish.imageSource || 'Offline Verified Asset'}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 block font-bold">License:</span>
+                  <span className="text-[10px] text-slate-500 block font-bold">License:</span>
                   <span className="font-bold text-emerald-700">{reviewingDish.imageLicense || 'Commercial Free / Legally Reusable'}</span>
                 </div>
               </div>
@@ -2085,7 +2085,7 @@ export const PosMenuManagerModal: React.FC<{
 
             {/* Quick Replace with Verified Library */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+              <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
                 Quick Replace with Verified Real Food Library:
               </label>
               <div className="grid grid-cols-4 gap-2 max-h-28 overflow-y-auto pr-1">

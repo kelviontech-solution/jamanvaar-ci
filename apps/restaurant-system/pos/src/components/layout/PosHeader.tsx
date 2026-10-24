@@ -203,7 +203,7 @@ export const PosHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setNewOrderDropdownOpen((prev) => !prev)}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-jaman-saffron hover:bg-[#C95A12] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-jaman-saffron/20 transition-all active:scale-95 cursor-pointer shrink-0"
+            className="min-h-11 px-2.5 sm:px-3 py-1.5 rounded-xl bg-jaman-saffron hover:bg-[#C95A12] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-jaman-saffron/20 transition-all active:scale-95 cursor-pointer shrink-0"
             title="Start fresh order"
           >
             <PlusCircle className="w-3.5 h-3.5" />
@@ -218,7 +218,7 @@ export const PosHeader: React.FC = () => {
                 onClick={() => handleStartNewOrder('DINE_IN')}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-jaman-navy cursor-pointer"
               >
-                <UtensilsCrossed className="w-4 h-4 text-jaman-saffron" />
+                <UtensilsCrossed className="w-4 h-4 text-jaman-saffronText" />
                 <span>Dine-In (Floor Table)</span>
               </button>
               <button
@@ -226,7 +226,7 @@ export const PosHeader: React.FC = () => {
                 onClick={() => handleStartNewOrder('TAKEAWAY')}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-jaman-navy cursor-pointer"
               >
-                <ShoppingBag className="w-4 h-4 text-emerald-600" />
+                <ShoppingBag className="w-4 h-4 text-emerald-700" />
                 <span>Quick Takeaway</span>
               </button>
               <button
@@ -251,7 +251,7 @@ export const PosHeader: React.FC = () => {
           title="Search dishes, SKU, tables, bills, customers"
         >
           <div className="flex items-center gap-2 truncate">
-            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-jaman-saffron transition-colors shrink-0" />
+            <Search className="w-3.5 h-3.5 text-slate-500 group-hover:text-jaman-saffronText transition-colors shrink-0" />
             <span className="truncate text-xs font-medium">Search dishes, SKU, tables, bills, customers...</span>
           </div>
         </button>
@@ -268,7 +268,7 @@ export const PosHeader: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsBillRequestsOpen((v) => !v)}
-              className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100 animate-pulse"
+              className="min-h-11 flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100 animate-pulse"
               title="Bills requested by Captain / QR tables, waiting to be settled"
             >
               <CircleDollarSign className="w-3.5 h-3.5 text-amber-700" />
@@ -304,7 +304,7 @@ export const PosHeader: React.FC = () => {
                         </span>
                         <span className="block text-[10px] text-slate-500">#{order.orderNumber} · requested {Math.max(0, Math.round((Date.now() - new Date(order.billRequestedAt!).getTime()) / 60000))} min ago</span>
                       </span>
-                      <span className="text-xs font-extrabold text-jaman-saffron shrink-0">{formatINR(order.totalAmount)}</span>
+                      <span className="text-xs font-extrabold text-jaman-saffronText shrink-0">{formatINR(order.totalAmount)}</span>
                     </button>
                   ))}
                 </div>
@@ -316,7 +316,7 @@ export const PosHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsPrintQueueOpen(true)}
-            className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100"
+            className="min-h-11 flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100"
             title="Thermal Print Queue & Spooler — printer needs attention"
           >
             <Printer className="w-3.5 h-3.5 text-rose-600" />
@@ -334,7 +334,7 @@ export const PosHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsBusinessDayPanelOpen((prev) => !prev)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-bold transition-colors cursor-pointer shadow-2xs ${
+            className={`min-h-11 flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-bold transition-colors cursor-pointer shadow-2xs ${
               daySummary.status === 'OPEN'
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
                 : 'bg-rose-50 border-rose-300 text-rose-800 hover:bg-rose-100'
@@ -347,7 +347,7 @@ export const PosHeader: React.FC = () => {
             <span className="font-bold">
               {daySummary.status === 'OPEN' ? 'DAY OPEN' : 'DAY CLOSED'}
             </span>
-            <span className="text-slate-400 font-bold">•</span>
+            <span className="text-slate-500 font-bold">•</span>
             <span className="font-mono text-xs">
               {activeShift ? formatINR(activeShift.totalSales ?? 0) : 'No Shift'}
             </span>
@@ -359,9 +359,9 @@ export const PosHeader: React.FC = () => {
             <div className="absolute right-0 mt-2 w-80 bg-white border border-jaman-border rounded-2xl shadow-2xl p-4 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div>
-                  <p className="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Accounting Business Day</p>
+                  <p className="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Accounting Business Day</p>
                   <p className="font-bold text-sm text-jaman-navy">{daySummary.display_date}</p>
-                  <span className="text-[11px] font-mono text-slate-400">{daySummary.business_day_id}</span>
+                  <span className="text-[11px] font-mono text-slate-500">{daySummary.business_day_id}</span>
                 </div>
                 <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                   daySummary.status === 'OPEN'
@@ -389,7 +389,7 @@ export const PosHeader: React.FC = () => {
                 <div className="flex justify-between p-2 bg-slate-50 rounded-xl">
                   <span className="text-slate-500">Active Tables:</span>
                   <span className={`font-bold ${
-                    db.tables.filter((t) => t.status !== 'AVAILABLE').length > 0 ? 'text-amber-600' : 'text-emerald-600'
+                    db.tables.filter((t) => t.status !== 'AVAILABLE').length > 0 ? 'text-amber-600' : 'text-emerald-700'
                   }`}>
                     {db.tables.filter((t) => t.status !== 'AVAILABLE').length} occupied
                   </span>
@@ -406,7 +406,7 @@ export const PosHeader: React.FC = () => {
                   }}
                   className="w-full py-2 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-xs font-bold text-jaman-navy transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-jaman-saffron" />
+                  <Calendar className="w-3.5 h-3.5 text-jaman-saffronText" />
                   <span>View Day History & Reports</span>
                 </button>
 
@@ -422,7 +422,7 @@ export const PosHeader: React.FC = () => {
                       : 'bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900'
                   }`}
                 >
-                  <Clock className={`w-3.5 h-3.5 ${activeShift ? 'text-jaman-saffron' : 'text-amber-700'}`} />
+                  <Clock className={`w-3.5 h-3.5 ${activeShift ? 'text-jaman-saffronText' : 'text-amber-700'}`} />
                   <span>{activeShift ? `Shift #${activeShift.shiftNumber ?? activeShift.id.slice(-2) ?? '01'} — Open Drawer` : 'Shift Closed — Open New Shift'}</span>
                 </button>
 
@@ -469,7 +469,7 @@ export const PosHeader: React.FC = () => {
         <button
           type="button"
           onClick={() => { sound.play('notification'); setIsNotifDrawerOpen(true); }}
-          className="relative w-8 h-8 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
+          className="relative w-11 h-11 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
           title="Notifications & System Events"
         >
           <Bell className="w-4 h-4" />
@@ -489,7 +489,7 @@ export const PosHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsHelpOpen((v) => !v)}
-            className="w-8 h-8 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
+            className="w-11 h-11 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
             title="Quick Help"
           >
             <HelpCircle className="w-4 h-4" />
@@ -518,19 +518,19 @@ export const PosHeader: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsChatbotOpen(true)}
-          className={`relative flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 ${
+          className={`min-h-11 relative flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 ${
             isChatbotOpen
               ? 'bg-jaman-navy text-white border-jaman-navy'
               : aiAlertCount > 0
-              ? 'bg-[#FFF4ED] hover:bg-[#FFE8D6] border-[#FDBA74] text-jaman-saffron'
-              : 'bg-white hover:bg-[#FFF4ED] border-jaman-border hover:border-[#FDBA74] text-jaman-navy hover:text-jaman-saffron'
+              ? 'bg-[#FFF4ED] hover:bg-[#FFE8D6] border-[#FDBA74] text-jaman-saffronText'
+              : 'bg-white hover:bg-[#FFF4ED] border-jaman-border hover:border-[#FDBA74] text-jaman-navy hover:text-jaman-saffronText'
           }`}
           title="JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)"
           aria-label="Open JAMAN AI Assistant"
         >
-          <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
+          <Sparkles className="w-3.5 h-3.5 text-jaman-saffronText" />
           <span className="hidden md:inline tracking-tight">JAMAN AI</span>
-          {ai.locked && <Lock className="w-3 h-3 text-slate-400" aria-label="Locked"><title>Not enabled for your restaurant</title></Lock>}
+          {ai.locked && <Lock className="w-3 h-3 text-slate-500" aria-label="Locked"><title>Not enabled for your restaurant</title></Lock>}
           {aiAlertCount > 0 && !isChatbotOpen && (
             <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-rose-600 text-white text-[10px] font-bold px-1 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
               {aiAlertCount}
@@ -544,7 +544,7 @@ export const PosHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setProfileDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-1.5 bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border px-2 py-1 rounded-xl transition-colors shadow-2xs text-jaman-navy cursor-pointer"
+            className="min-h-11 flex items-center gap-1.5 bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border px-2 py-1 rounded-xl transition-colors shadow-2xs text-jaman-navy cursor-pointer"
             title={allSystemsOk ? 'User Profile & Session Options — All Systems OK' : 'User Profile & Session Options — Hardware needs attention'}
           >
             <div className="relative w-6 h-6 rounded-lg bg-jaman-saffron text-white flex items-center justify-center font-bold text-xs">
@@ -559,11 +559,11 @@ export const PosHeader: React.FC = () => {
               <span className="text-xs font-bold leading-tight truncate max-w-[110px]">
                 {currentUser?.fullName || 'Staff'}
               </span>
-              <span className="text-[10px] text-slate-400 uppercase font-bold tracking-tight">
+              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tight">
                 {currentUser?.roleId?.replace('role-', '').replace('-', ' ') || 'Staff'}
               </span>
             </div>
-            <ChevronDown className="w-3 h-3 text-slate-400" />
+            <ChevronDown className="w-3 h-3 text-slate-500" />
           </button>
 
           {/* Profile Dropdown Popover */}
@@ -605,7 +605,7 @@ export const PosHeader: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5 text-slate-600">
-                    <Server className={`w-3 h-3 ${hardwareStatus.localDb ? 'text-emerald-600' : 'text-rose-600'}`} />
+                    <Server className={`w-3 h-3 ${hardwareStatus.localDb ? 'text-emerald-700' : 'text-rose-600'}`} />
                     Local Database
                   </span>
                   <span className={`font-bold ${hardwareStatus.localDb ? 'text-emerald-700' : 'text-rose-700'}`}>
@@ -621,7 +621,7 @@ export const PosHeader: React.FC = () => {
                   className="w-full flex items-center justify-between cursor-pointer rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jaman-saffron/60"
                 >
                   <span className="flex items-center gap-1.5 text-slate-600">
-                    <Printer className={`w-3 h-3 ${isPrinterOffline ? 'text-rose-600' : 'text-emerald-600'}`} />
+                    <Printer className={`w-3 h-3 ${isPrinterOffline ? 'text-rose-600' : 'text-emerald-700'}`} />
                     Thermal Printer
                   </span>
                   <span className={`font-bold ${isPrinterOffline ? 'text-rose-700' : 'text-emerald-700'}`}>
@@ -630,7 +630,7 @@ export const PosHeader: React.FC = () => {
                 </button>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5 text-slate-600">
-                    <ChefHat className={`w-3 h-3 ${kdsConnected ? 'text-emerald-600' : 'text-amber-600'}`} />
+                    <ChefHat className={`w-3 h-3 ${kdsConnected ? 'text-emerald-700' : 'text-amber-600'}`} />
                     KDS Kitchen Sync
                   </span>
                   <span className={`font-bold ${kdsConnected ? 'text-emerald-700' : 'text-amber-700'}`}>
@@ -639,7 +639,7 @@ export const PosHeader: React.FC = () => {
                 </div>
                 <button type="button" onClick={toggleNetworkStatus} className="w-full flex items-center justify-between cursor-pointer rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jaman-saffron/60">
                   <span className="flex items-center gap-1.5 text-slate-600">
-                    {isOnline ? <Wifi className="w-3 h-3 text-emerald-600" /> : <WifiOff className="w-3 h-3 text-amber-600" />}
+                    {isOnline ? <Wifi className="w-3 h-3 text-emerald-700" /> : <WifiOff className="w-3 h-3 text-amber-600" />}
                     LAN / Cloud Sync
                   </span>
                   <span className={`font-bold ${isOnline ? 'text-emerald-700' : 'text-amber-700'}`}>
@@ -657,7 +657,7 @@ export const PosHeader: React.FC = () => {
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-slate-700 cursor-pointer"
                 >
-                  <Clock className="w-3.5 h-3.5 text-jaman-saffron" />
+                  <Clock className="w-3.5 h-3.5 text-jaman-saffronText" />
                   <span>Current Shift & Drawer</span>
                 </button>
 
@@ -681,7 +681,7 @@ export const PosHeader: React.FC = () => {
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-slate-700 cursor-pointer"
                 >
-                  <Printer className="w-3.5 h-3.5 text-emerald-600" />
+                  <Printer className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Thermal Printer & Queue</span>
                 </button>
 

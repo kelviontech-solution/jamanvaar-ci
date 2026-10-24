@@ -355,11 +355,11 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
     <div className="space-y-6 max-w-7xl mx-auto select-none pb-12">
       
       {/* 1. HEADER & QUICK ACTIONS */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
-              Customer Relationship Management (CRM)
+              Customers & Loyalty
             </h1>
             <span className="bg-amber-100 text-amber-900 font-bold text-xs px-2.5 py-0.5 rounded-full border border-amber-200">
               LOYALTY & 360 INTELLIGENCE

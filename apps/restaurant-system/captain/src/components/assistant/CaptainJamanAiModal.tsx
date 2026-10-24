@@ -168,7 +168,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
           {/* Active AI Query Response */}
           {response && (
             <div className="p-4 rounded-2xl bg-white border-2 border-jaman-saffron shadow-sm text-xs space-y-2 animate-in fade-in">
-              <div className="flex items-center gap-1.5 font-bold text-jaman-saffron">
+              <div className="flex items-center gap-1.5 font-bold text-jaman-saffronText">
                 <Bot className="w-4 h-4" />
                 <span>Real-Time Floor Answer:</span>
               </div>
@@ -181,7 +181,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
 
         {/* Preloaded Captain Query Chips Footer */}
         <div className="p-4 bg-white border-t border-jaman-border space-y-2.5">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
             Preloaded Captain Floor Inquiries:
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -200,7 +200,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
                 className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
                   activeQuery === chip.id
                     ? 'bg-jaman-saffron text-white shadow-xs'
-                    : 'bg-jaman-cream hover:bg-[#FFF4ED] border border-slate-200 hover:border-jaman-saffron text-slate-700 hover:text-jaman-saffron'
+                    : 'bg-jaman-cream hover:bg-[#FFF4ED] border border-slate-200 hover:border-jaman-saffron text-slate-700 hover:text-jaman-saffronText'
                 }`}
               >
                 {chip.label}

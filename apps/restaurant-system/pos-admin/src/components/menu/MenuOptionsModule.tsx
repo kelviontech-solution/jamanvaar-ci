@@ -104,7 +104,7 @@ export const MenuPublishPanel: React.FC<{ showToast: (m: string) => void; change
           </div>
         )}
       </div>
-      {status && !dirty && <p className="text-[11px] text-emerald-700 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> {status.counts.items} dishes in {status.counts.categories} categories are live.</p>}
+      {status && !dirty && <p className="text-[11px] text-emerald-700 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> {status.counts.items} {status.counts.items === 1 ? 'dish' : 'dishes'} in {status.counts.categories} {status.counts.categories === 1 ? 'category is' : 'categories are'} live.</p>}
     </div>
   );
 };

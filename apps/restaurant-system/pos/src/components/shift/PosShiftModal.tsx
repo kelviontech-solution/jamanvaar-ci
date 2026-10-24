@@ -61,7 +61,7 @@ export const PosShiftModal: React.FC = () => {
         {/* Header */}
         <div className="bg-jaman-navy text-white p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <Clock className="w-5 h-5 text-jaman-saffron" />
+            <Clock className="w-5 h-5 text-jaman-saffronText" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Shift & Cash Drawer Management</h2>
               <span className="text-xs text-slate-300">Register shift • Cashier: {currentUser?.fullName}</span>
@@ -136,19 +136,19 @@ export const PosShiftModal: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Opened At</span>
+                    <span className="text-slate-500 block text-[10px]">Opened At</span>
                     <strong className="text-jaman-navy">{new Date(currentShift.openedAt).toLocaleTimeString()}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Opening Float</span>
+                    <span className="text-slate-500 block text-[10px]">Opening Float</span>
                     <strong className="text-jaman-navy font-mono">₹{currentShift.openingCash}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Total Sales</span>
+                    <span className="text-slate-500 block text-[10px]">Total Sales</span>
                     <strong className="text-emerald-700 font-mono font-bold text-sm">₹{currentShift.totalSales}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Orders Count</span>
+                    <span className="text-slate-500 block text-[10px]">Orders Count</span>
                     <strong className="text-jaman-navy">{currentShift.totalOrders} bills</strong>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export const PosShiftModal: React.FC = () => {
                 <div className="bg-jaman-navy text-white p-3.5 rounded-xl flex items-center justify-between mt-2">
                   <div>
                     <span className="text-[10px] text-slate-300 uppercase font-bold block">Expected Cash in Drawer</span>
-                    <span className="text-xs text-slate-400">(Opening Float + Cash Sales ± Cash Move)</span>
+                    <span className="text-xs text-slate-500">(Opening Float + Cash Sales ± Cash Move)</span>
                   </div>
                   <span className="text-xl font-black font-mono text-emerald-400">
                     ₹{currentShift.expectedCash}

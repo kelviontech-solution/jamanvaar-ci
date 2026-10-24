@@ -49,7 +49,7 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-              <RotateCcw className="w-5 h-5 text-jaman-saffron" />
+              <RotateCcw className="w-5 h-5 text-jaman-saffronText" />
             </div>
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Repeat Previous Order</h2>
@@ -78,14 +78,14 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
                         <span className="font-extrabold text-sm text-jaman-navy">
                           {selectedOrder.orderNumber}
                         </span>
-                        <span className="text-[10px] font-black bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74] px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-black bg-[#FFF4ED] text-jaman-saffronText border border-[#FDBA74] px-2 py-0.5 rounded-full">
                           Token #{selectedOrder.tokenNumber}
                         </span>
                         <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
                           {selectedOrder.orderType}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                         <Clock className="w-3 h-3" />
                         <span>{formatTime(selectedOrder.createdAt)}</span>
                         {selectedOrder.customerName && (
@@ -98,7 +98,7 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[10px] text-slate-400 font-semibold block">TOTAL AMOUNT</span>
+                      <span className="text-[10px] text-slate-500 font-semibold block">TOTAL AMOUNT</span>
                       <span className="text-lg font-black font-mono text-jaman-navy">
                         {formatINR(selectedOrder.totalAmount)}
                       </span>
@@ -113,7 +113,7 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
                         className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs"
                       >
                         <div className="flex items-center gap-2">
-                          <span className="font-black text-jaman-saffron font-mono w-6 text-center">
+                          <span className="font-black text-jaman-saffronText font-mono w-6 text-center">
                             {it.quantity}×
                           </span>
                           <span className="font-bold text-jaman-navy">{it.name}</span>
@@ -135,7 +135,7 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
               {/* Other Recent Orders Selector */}
               {recentOrders.length > 1 && (
                 <div className="space-y-2 pt-2">
-                  <span className="text-xs font-black text-slate-400 uppercase tracking-wider block">
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-wider block">
                     Pick from Recent Orders:
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -158,7 +158,7 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
                               {formatINR(ord.totalAmount)}
                             </span>
                           </div>
-                          <div className="text-[11px] text-slate-400 truncate mt-1">
+                          <div className="text-[11px] text-slate-500 truncate mt-1">
                             {ord.items.map((i) => `${i.quantity}x ${i.name}`).join(', ')}
                           </div>
                         </button>
@@ -169,10 +169,10 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
               )}
             </>
           ) : (
-            <div className="h-48 flex flex-col items-center justify-center text-center text-slate-400 my-auto">
+            <div className="h-48 flex flex-col items-center justify-center text-center text-slate-500 my-auto">
               <ShoppingBag className="w-10 h-10 text-slate-300 mb-2 stroke-1" />
               <span className="text-sm font-bold text-slate-600">No previous orders found</span>
-              <span className="text-xs text-slate-400 mt-0.5">Start billing items from the menu catalog</span>
+              <span className="text-xs text-slate-500 mt-0.5">Start billing items from the menu catalog</span>
             </div>
           )}
         </div>

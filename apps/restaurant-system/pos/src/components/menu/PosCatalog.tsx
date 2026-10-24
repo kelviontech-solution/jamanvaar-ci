@@ -10,10 +10,8 @@ import { useCategoryGroups } from './useCategoryGroups';
 import {
   Utensils,
   Settings2,
-  Zap,
-  Plus,
   Search,
-  X, UtensilsCrossed, Leaf, Wheat, Drumstick } from 'lucide-react';
+  X } from 'lucide-react';
 
 /**
  * Format category names for clean, readable touchscreen display
@@ -178,95 +176,49 @@ export const PosCatalog: React.FC = () => {
     });
   }, [selectedCategory, displayCategoryGroups, dietaryFilter, searchQuery, db.menuItems]);
 
-  // Calculate real most-ordered items from local sales data
-  const popularQuickAddItems = useMemo(() => {
-    const salesMap = new Map<string, number>();
-    db.orders.forEach((ord) => {
-      ord.items?.forEach((item) => {
-        salesMap.set(item.menuItemId, (salesMap.get(item.menuItemId) || 0) + item.quantity);
-      });
-    });
-
-    const sorted = [...db.menuItems]
-      .filter((i) => i.isAvailable)
-      .sort((a, b) => {
-        const salesA = salesMap.get(a.id) || 0;
-        const salesB = salesMap.get(b.id) || 0;
-        if (salesB !== salesA) return salesB - salesA;
-        return (b.isPopular ? 1 : 0) - (a.isPopular ? 1 : 0);
-      });
-
-    return sorted.slice(0, 5);
-  }, [db.orders, db.menuItems]);
-
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent space-y-2.5 select-none min-w-0">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent space-y-2 select-none min-w-0">
       <CashierSpeedBar />
 
-      {/* DIETARY FILTERS + QUICK ADD */}
-      <div className="flex items-center justify-between gap-2 shrink-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {/* Left: Food Type Dietary Filter Pills */}
-        <div className="flex items-center gap-1.5 shrink-0">
+      {/* One calm row: food-type filter, the active search, and the menu manager. */}
+      <div className="flex items-center justify-between gap-2 shrink-0">
+        <div role="group" aria-label="Food type" className="inline-flex items-center gap-0.5 p-1 rounded-xl bg-white border border-jaman-border">
           {[
-            { id: 'ALL', label: 'All', Icon: UtensilsCrossed },
-            { id: 'VEG', label: 'Veg', Icon: Leaf },
-            { id: 'JAIN', label: 'Jain', Icon: Wheat },
-            { id: 'NON_VEG', label: 'Non-Veg', Icon: Drumstick }
+            { id: 'ALL', label: 'All' },
+            { id: 'VEG', label: 'Veg' },
+            { id: 'JAIN', label: 'Jain' },
+            { id: 'NON_VEG', label: 'Non-Veg' }
           ].map((df) => {
             const active = dietaryFilter === df.id;
             return (
               <button
                 key={df.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => setDietaryFilter(df.id as any)}
-                className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 flex items-center gap-1.5 cursor-pointer active:scale-95 border ${
-                  active
-                    ? 'bg-[#FFF2E8] border-jaman-saffron text-jaman-saffron'
-                    : 'bg-white border-jaman-border text-jaman-navy hover:border-jaman-saffron/50'
+                className={`min-h-9 px-3.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  active ? 'bg-[#FFF2E8] text-jaman-saffronText' : 'text-slate-600 hover:text-jaman-navy'
                 }`}
               >
-                <df.Icon className="w-4 h-4 shrink-0" />
-                <span>{df.label}</span>
+                {df.label}
               </button>
             );
           })}
         </div>
 
-        {/* Middle: Quick Add Chips */}
-        <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto shrink min-w-0">
-          <div className="flex items-center gap-1 bg-[#FFF4ED] border border-[#FDBA74] min-h-[38px] px-3 py-1 rounded-2xl text-xs font-bold text-jaman-saffron shrink-0">
-            <Zap className="w-3 h-3 fill-jaman-saffron" />
-            <span>QUICK:</span>
-          </div>
-
-          {popularQuickAddItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => usePosStore.getState().quickAddOrCustomize(item)}
-              className="min-h-[38px] bg-white border border-jaman-border hover:border-jaman-saffron hover:bg-[#FFFDFB] px-3 py-1 rounded-2xl text-xs font-bold text-jaman-navy flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 shrink-0 whitespace-nowrap cursor-pointer"
-              title={`1-Tap Add ${item.name} (₹${item.price})`}
-            >
-              <span className="truncate max-w-[130px]">{item.name}</span>
-              <span className="font-mono text-jaman-saffron font-bold text-xs">₹{item.price}</span>
-              <Plus className="w-3 h-3 text-jaman-saffron stroke-[3]" />
-            </button>
-          ))}
-        </div>
-
-        {/* Right side: Search Status indicator & Manage Menu button */}
-        <div className="flex items-center gap-1.5 ml-auto shrink-0">
+        <div className="flex items-center gap-2 ml-auto min-w-0">
           {searchQuery && (
-            <div className="flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] px-2.5 py-1 rounded-lg text-xs shrink-0 animate-in fade-in">
-              <Search className="w-3.5 h-3.5 text-jaman-saffron" />
-              <span className="text-slate-600 font-bold truncate max-w-[110px]">"{searchQuery}"</span>
+            <div className="flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] pl-2.5 pr-1 h-9 rounded-xl text-xs min-w-0">
+              <Search className="w-3.5 h-3.5 text-jaman-saffronText shrink-0" aria-hidden="true" />
+              <span className="text-slate-700 font-semibold truncate max-w-[140px]">"{searchQuery}"</span>
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="w-4 h-4 rounded bg-orange-200/60 hover:bg-rose-100 text-jaman-saffron hover:text-rose-600 flex items-center justify-center font-bold cursor-pointer"
+                className="w-7 h-7 rounded-lg hover:bg-orange-200/60 text-jaman-saffronText flex items-center justify-center cursor-pointer"
                 title="Clear Search"
+                aria-label="Clear search"
               >
-                <X className="w-3 h-3 stroke-[3]" />
+                <X className="w-3.5 h-3.5 stroke-[3]" />
               </button>
             </div>
           )}
@@ -289,30 +241,30 @@ export const PosCatalog: React.FC = () => {
                 () => setIsMenuManagerOpen(true)
               );
             }}
-            className="min-h-[38px] px-3.5 py-1 bg-white hover:bg-[#FFF4ED] border border-jaman-border hover:border-[#FDBA74] text-jaman-navy hover:text-jaman-saffron rounded-2xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 cursor-pointer"
+            className="min-h-10 px-3.5 bg-white hover:bg-[#FFF4ED] border border-jaman-border hover:border-[#FDBA74] text-jaman-navy hover:text-jaman-saffronText rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             title="Open Menu Manager & Prebuilt Starter Library (30 Types)"
           >
-            <Settings2 className="w-3.5 h-3.5 text-jaman-saffron" />
-            <span className="hidden md:inline">Menu</span>
+            <Settings2 className="w-4 h-4 text-jaman-saffronText" aria-hidden="true" />
+            <span>Menu</span>
           </button>
         </div>
       </div>
 
       {/* MENU GRID (Spacious 3-4 column layout with large, high-legibility cards) */}
-      <div className="flex-1 overflow-y-auto p-3 scrollbar-thin bg-white border border-jaman-border rounded-2xl shadow-2xs">
+      <div className="flex-1 overflow-y-auto p-3.5 scrollbar-thin bg-white border border-jaman-border rounded-2xl">
         {filteredMenuItems.length > 0 ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(196px,1fr))] gap-2.5 pb-1">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(172px,1fr))] gap-3 pb-1">
             {filteredMenuItems.map((item) => (
               <PosProductCard key={item.id} item={item} />
             ))}
           </div>
         ) : (
           <div className="h-64 flex flex-col items-center justify-center text-center p-6 bg-white rounded-2xl border border-jaman-border shadow-2xs space-y-3">
-            <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shadow-xs">
+            <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffronText flex items-center justify-center shadow-xs">
               <Utensils className="w-7 h-7" />
             </div>
             <h3 className="text-base font-bold text-jaman-navy">No dishes match your selection</h3>
-            <p className="text-xs text-slate-400 max-w-sm">
+            <p className="text-xs text-slate-500 max-w-sm">
               Try choosing "All Menu" or clearing the active search filter to view all dishes.
             </p>
             <button

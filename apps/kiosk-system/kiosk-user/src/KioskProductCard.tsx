@@ -53,7 +53,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
         <p className="kiosk-product-description text-[#4A5568] line-clamp-2" aria-hidden={!description || undefined}>{description}</p>
 
         <div className="kiosk-product-price mt-auto min-w-0">
-          <div data-kiosk-price className="text-xl font-black text-jaman-saffron leading-tight tabular-nums">
+          <div data-kiosk-price className="text-xl font-black text-jaman-saffronText leading-tight tabular-nums">
             {formatINR(item.price)}
             {hasModifiers && <span className="text-xs font-semibold text-[#4A5568] ml-1">+</span>}
           </div>

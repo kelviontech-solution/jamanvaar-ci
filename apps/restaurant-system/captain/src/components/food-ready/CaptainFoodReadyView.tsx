@@ -44,7 +44,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-4 rounded-3xl border border-jaman-border shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
-            <Flame className="w-5 h-5 text-emerald-600 fill-emerald-600" />
+            <Flame className="w-5 h-5 text-emerald-700 fill-emerald-600" />
             <h2 className="text-xl font-bold text-jaman-navy">Food Ready for Delivery</h2>
             <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
               {activeFoodReady.length} Dishes Ready
@@ -120,7 +120,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
                             <span className="font-extrabold text-xs text-jaman-navy block">
                               {it.dishName}
                             </span>
-                            <span className="text-[11px] font-bold text-slate-400">
+                            <span className="text-[11px] font-bold text-slate-500">
                               {it.station || 'Kitchen'} • {it.kotNumber || 'KOT'}
                             </span>
                           </div>
@@ -168,7 +168,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
       ) : (
         /* Empty State */
         <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
-          <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center">
+          <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-700 mx-auto flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-jaman-navy">{search.trim() ? 'No ready food matches your search' : 'All Food Delivered & Served!'}</h3>

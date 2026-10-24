@@ -182,7 +182,7 @@ export const KioskPrinterSettingsModal: React.FC<KioskPrinterSettingsModalProps>
                     onClick={() => applyDetected(p)}
                     className="w-full flex items-center gap-2 p-2 rounded-lg bg-white border border-jaman-border hover:border-brand text-left cursor-pointer"
                   >
-                    <Usb className="w-4 h-4 text-slate-400 shrink-0" />
+                    <Usb className="w-4 h-4 text-slate-500 shrink-0" />
                     <span className="truncate text-xs font-bold text-jaman-navy">{p.name}</span>
                   </button>
                 ))}
@@ -193,7 +193,7 @@ export const KioskPrinterSettingsModal: React.FC<KioskPrinterSettingsModalProps>
                     onClick={() => applyDetected(p)}
                     className="w-full flex items-center gap-2 p-2 rounded-lg bg-white border border-jaman-border hover:border-brand text-left cursor-pointer"
                   >
-                    <Wifi className="w-4 h-4 text-slate-400 shrink-0" />
+                    <Wifi className="w-4 h-4 text-slate-500 shrink-0" />
                     <span className="truncate text-xs font-bold text-jaman-navy">Network printer {p.ip}</span>
                   </button>
                 ))}
@@ -204,7 +204,7 @@ export const KioskPrinterSettingsModal: React.FC<KioskPrinterSettingsModalProps>
                     onClick={() => applyDetected({ kind: 'SERIAL', port: portName })}
                     className="w-full flex items-center gap-2 p-2 rounded-lg bg-white border border-jaman-border hover:border-brand text-left cursor-pointer"
                   >
-                    <Cable className="w-4 h-4 text-slate-400 shrink-0" />
+                    <Cable className="w-4 h-4 text-slate-500 shrink-0" />
                     <span className="truncate text-xs font-bold text-jaman-navy">Serial port {portName}</span>
                   </button>
                 ))}

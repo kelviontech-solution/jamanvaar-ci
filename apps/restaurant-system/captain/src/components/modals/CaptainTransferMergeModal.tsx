@@ -51,7 +51,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
       <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <GitMerge className="w-5 h-5 text-jaman-saffron" />
+            <GitMerge className="w-5 h-5 text-jaman-saffronText" />
             <h3 className="text-lg font-bold text-jaman-navy">
               {mode === 'TRANSFER' ? 'Transfer Table' : 'Merge Tables'}
             </h3>
@@ -60,7 +60,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
             type="button"
             aria-label="Close transfer or merge"
             onClick={onClose}
-            className="p-1 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            className="p-1 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-600 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

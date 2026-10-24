@@ -43,14 +43,14 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-jaman-saffron" />
+            <MessageSquare className="w-5 h-5 text-jaman-saffronText" />
             <h3 className="text-lg font-bold text-jaman-navy">Send Staff Message</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="p-1 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-1 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-600 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -111,7 +111,7 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
                 onClick={() => setPreset(msg)}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold text-left transition-all cursor-pointer ${
                   preset === msg
-                    ? 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]'
+                    ? 'bg-[#FFF4ED] text-jaman-saffronText border border-[#FDBA74]'
                     : 'bg-jaman-cream text-slate-600 border border-transparent hover:border-slate-200'
                 }`}
               >

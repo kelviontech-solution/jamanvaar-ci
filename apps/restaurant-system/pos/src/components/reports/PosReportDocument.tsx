@@ -45,7 +45,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
           </div>
 
           <div className="text-left sm:text-right border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0">
-            <span className="text-[10px] font-black tracking-widest text-jaman-saffron uppercase block">
+            <span className="text-[10px] font-black tracking-widest text-jaman-saffronText uppercase block">
               OPERATIONAL AUDIT REPORT
             </span>
             <h2 className="text-lg font-black text-white">{data.title}</h2>
@@ -55,7 +55,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
       ) : design === 'MODERN' ? (
         <div className="bg-jaman-cream border-2 border-jaman-border p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span className="text-[10px] font-black text-jaman-saffron uppercase tracking-wider block">
+            <span className="text-[10px] font-black text-jaman-saffronText uppercase tracking-wider block">
               EXECUTIVE MANAGEMENT REPORT
             </span>
             <h1 className="text-xl font-black text-jaman-navy">{data.title}</h1>
@@ -67,7 +67,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
             <span className="text-xs font-mono font-bold bg-white border border-jaman-border px-3 py-1 rounded-xl inline-block shadow-2xs">
               <CalendarDays className="w-3 h-3 inline -mt-0.5 mr-1" />{data.periodLabel}
             </span>
-            <span className="text-[10px] text-slate-400 block mt-1">
+            <span className="text-[10px] text-slate-500 block mt-1">
               Generated: {data.generatedAt}
             </span>
           </div>
@@ -78,7 +78,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
             <h1 className="text-base font-black text-jaman-navy">{restName.toUpperCase()} — {data.title.toUpperCase()}</h1>
             <span className="text-[10px] text-slate-500">GSTIN: {gstin} • Period: {data.periodLabel}</span>
           </div>
-          <div className="text-right text-[10px] text-slate-400 font-mono">
+          <div className="text-right text-[10px] text-slate-500 font-mono">
             {data.generatedAt}
           </div>
         </div>
@@ -93,8 +93,8 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
           </div>
           <div className="text-left sm:text-right">
             <h2 className="text-base font-black text-jaman-navy uppercase">{data.title}</h2>
-            <span className="text-xs text-jaman-saffron font-bold block">{data.periodLabel}</span>
-            <span className="text-[10px] text-slate-400 block">Generated: {data.generatedAt}</span>
+            <span className="text-xs text-jaman-saffronText font-bold block">{data.periodLabel}</span>
+            <span className="text-[10px] text-slate-500 block">Generated: {data.generatedAt}</span>
           </div>
         </div>
       )}
@@ -102,45 +102,45 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
       {/* 2. PRIMARY KPI METRICS */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-[#FFFDFB] border border-jaman-border shadow-2xs space-y-1">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+          <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">
             Total Billed (incl. GST)
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-jaman-navy">
             {formatINR(s.netSales)}
           </div>
-          <span className="text-[10px] font-bold text-emerald-600 block">
+          <span className="text-[10px] font-bold text-emerald-700 block">
             ● {s.ordersCount} Total Orders
           </span>
         </div>
 
         <div className="p-4 rounded-2xl bg-[#FFFDFB] border border-jaman-border shadow-2xs space-y-1">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+          <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">
             Average Order Value
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-jaman-navy">
             {formatINR(s.avgOrderValue)}
           </div>
-          <span className="text-[10px] text-slate-400 block">Per bill average</span>
+          <span className="text-[10px] text-slate-500 block">Per bill average</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-[#FFFDFB] border border-jaman-border shadow-2xs space-y-1">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+          <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">
             Cash Collections
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-amber-700">
             {formatINR(s.paymentBreakdown.cash)}
           </div>
-          <span className="text-[10px] text-slate-400 block">Drawer cash collected</span>
+          <span className="text-[10px] text-slate-500 block">Drawer cash collected</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-[#FFFDFB] border border-jaman-border shadow-2xs space-y-1">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+          <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">
             GST & Taxes
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-blue-700">
             {formatINR(s.totalTax)}
           </div>
-          <span className="text-[10px] text-slate-400 block">CGST + SGST</span>
+          <span className="text-[10px] text-slate-500 block">CGST + SGST</span>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
             <span className="font-black text-xs uppercase tracking-wider text-jaman-navy">
               Financial & Tax Breakdown
             </span>
-            <span className="text-[10px] font-mono text-slate-400">AUDIT</span>
+            <span className="text-[10px] font-mono text-slate-500">AUDIT</span>
           </div>
 
           <div className="space-y-2 text-xs">
@@ -191,7 +191,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
             <span className="font-black text-xs uppercase tracking-wider text-jaman-navy">
               Settlement Mix & Tender Allocation
             </span>
-            <span className="text-[10px] font-mono text-slate-400">{reconciliation}</span>
+            <span className="text-[10px] font-mono text-slate-500">{reconciliation}</span>
           </div>
 
           <div className="space-y-2 text-xs">
@@ -229,7 +229,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
           <h3 className="font-black text-xs uppercase tracking-wider text-jaman-navy">
             Top Selling Dishes & Menu Velocity
           </h3>
-          <span className="text-[10px] text-slate-400 font-mono">
+          <span className="text-[10px] text-slate-500 font-mono">
             {data.topItems.length} items ranked
           </span>
         </div>
@@ -249,7 +249,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
             <tbody className="divide-y divide-slate-100">
               {data.topItems.slice(0, 10).map((it, idx) => (
                 <tr key={it.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-2 px-3 font-mono text-slate-400">{idx + 1}</td>
+                  <td className="py-2 px-3 font-mono text-slate-500">{idx + 1}</td>
                   <td className="py-2 px-3 font-bold text-jaman-navy">{it.name}</td>
                   <td className="py-2 px-3 text-slate-500 text-[11px]">{it.categoryName || 'Main Course'}</td>
                   <td className="py-2 px-3 text-right font-mono font-bold text-jaman-navy">{it.quantitySold}</td>
@@ -259,7 +259,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
               ))}
               {data.topItems.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-6 text-center text-slate-400">
+                  <td colSpan={6} className="py-6 text-center text-slate-500">
                     No completed dish sales recorded for this business period.
                   </td>
                 </tr>
@@ -303,7 +303,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
       )}
 
       {/* 6. AUDIT FOOTER */}
-      <div className="pt-4 border-t border-jaman-border flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 gap-2">
+      <div className="pt-4 border-t border-jaman-border flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-500 gap-2">
         <span>{restName} • JAMANVAAR POS Operational Audit System</span>
         <span>{config.footerMessage || 'Thank you for your valued patronage'}</span>
       </div>

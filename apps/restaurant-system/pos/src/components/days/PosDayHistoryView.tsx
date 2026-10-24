@@ -107,7 +107,7 @@ export const PosDayHistoryView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
-            <CalendarDays className="w-6 h-6 text-jaman-saffron" />
+            <CalendarDays className="w-6 h-6 text-jaman-saffronText" />
             <span>Business Days & Day History</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -250,7 +250,7 @@ export const PosDayHistoryView: React.FC = () => {
 
         {/* Search */}
         <div className="relative min-w-[240px] flex-1 max-w-sm">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
@@ -267,7 +267,7 @@ export const PosDayHistoryView: React.FC = () => {
           <h3 className="font-extrabold text-xs uppercase tracking-wider text-jaman-navy">
             Permanent Day Archives ({filteredDays.length})
           </h3>
-          <span className="text-[10px] text-slate-400 font-mono">AUTHORITATIVE</span>
+          <span className="text-[10px] text-slate-500 font-mono">AUTHORITATIVE</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -287,7 +287,7 @@ export const PosDayHistoryView: React.FC = () => {
                 <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3">
                   <div>
                     <h4 className="text-base font-black text-jaman-navy">{summary.display_date}</h4>
-                    <span className="text-[11px] font-mono text-slate-400">{summary.business_day_id}</span>
+                    <span className="text-[11px] font-mono text-slate-500">{summary.business_day_id}</span>
                   </div>
 
                   <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
@@ -301,13 +301,13 @@ export const PosDayHistoryView: React.FC = () => {
 
                 {/* Net Sales & Orders Count */}
                 <div className="space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                  <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider">
                     Total Billed (incl. GST)
                   </span>
                   <div className="text-2xl font-black font-mono text-jaman-navy">
                     {formatINR(summary.net_sales)}
                   </div>
-                  <span className="text-xs font-bold text-emerald-600 block">
+                  <span className="text-xs font-bold text-emerald-700 block">
                     ● {summary.completed_orders} of {summary.total_orders} Orders Billed
                   </span>
                 </div>
@@ -315,22 +315,22 @@ export const PosDayHistoryView: React.FC = () => {
                 {/* Tender Breakdown Mini-Row */}
                 <div className="grid grid-cols-3 gap-1.5 p-2.5 bg-jaman-cream rounded-2xl text-[11px] border border-jaman-border/60">
                   <div>
-                    <span className="text-slate-400 text-[9px] block uppercase">Cash</span>
+                    <span className="text-slate-500 text-[9px] block uppercase">Cash</span>
                     <strong className="font-mono text-slate-800">{formatINR(summary.cash_sales)}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[9px] block uppercase">UPI</span>
+                    <span className="text-slate-500 text-[9px] block uppercase">UPI</span>
                     <strong className="font-mono text-slate-800">{formatINR(summary.upi_sales)}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[9px] block uppercase">Card</span>
+                    <span className="text-slate-500 text-[9px] block uppercase">Card</span>
                     <strong className="font-mono text-slate-800">{formatINR(summary.card_sales)}</strong>
                   </div>
                 </div>
 
                 {/* Footer & Actions */}
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     {isClosed ? `Closed: ${closedTime}` : 'Active'}
                   </span>
 

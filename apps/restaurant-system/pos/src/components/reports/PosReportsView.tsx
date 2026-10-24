@@ -160,7 +160,7 @@ Dispatched to ${printer.name}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-jaman-saffron" />
+            <BarChart3 className="w-6 h-6 text-jaman-saffronText" />
             <span>POS Operational Reports</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -184,7 +184,7 @@ Dispatched to ${printer.name}
             className="px-3 py-2 rounded-xl bg-white border border-jaman-border hover:border-slate-400 text-xs font-bold text-jaman-navy flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="Preview full report document"
           >
-            <Eye className="w-4 h-4 text-jaman-saffron" />
+            <Eye className="w-4 h-4 text-jaman-saffronText" />
             <span>Preview Report</span>
           </button>
 
@@ -222,7 +222,7 @@ Dispatched to ${printer.name}
               onClick={() => setCsvMenuOpen((o) => !o)}
               className="px-3 py-2 rounded-xl bg-white border border-jaman-border hover:border-slate-400 text-xs font-bold text-jaman-navy flex items-center gap-1.5 shadow-2xs"
             >
-              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+              <FileSpreadsheet className="w-4 h-4 text-emerald-700" />
               <span>Export CSV</span>
               <ChevronDown className="w-3 h-3 opacity-60" />
             </button>
@@ -289,14 +289,14 @@ Dispatched to ${printer.name}
         {/* Custom Date Pickers */}
         {selectedPeriod === 'CUSTOM' && (
           <div className="flex items-center gap-2 text-xs font-bold animate-in fade-in">
-            <span className="text-slate-400">From:</span>
+            <span className="text-slate-500">From:</span>
             <input
               type="date"
               value={customStartDate}
               onChange={(e) => setCustomStartDate(e.target.value)}
               className="bg-jaman-cream border border-jaman-border rounded-xl px-2.5 py-1 text-xs font-bold text-jaman-navy focus:outline-none"
             />
-            <span className="text-slate-400">To:</span>
+            <span className="text-slate-500">To:</span>
             <input
               type="date"
               value={customEndDate}
@@ -308,7 +308,7 @@ Dispatched to ${printer.name}
 
         {/* Template Style Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold text-slate-400">Report Design:</span>
+          <span className="text-[11px] font-bold text-slate-500">Report Design:</span>
           <select
             value={selectedDesign}
             onChange={(e) => setSelectedDesign(e.target.value as ReportDesign)}

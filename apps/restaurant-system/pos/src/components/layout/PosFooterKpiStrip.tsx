@@ -28,29 +28,29 @@ export const PosFooterKpiStrip: React.FC = () => {
         {/* Sales */}
         <button
           onClick={() => setActiveTab('REPORTS')}
-          className="flex items-center gap-1.5 hover:text-jaman-saffron transition-colors pr-3 border-r border-jaman-border"
+          className="flex items-center gap-1.5 hover:text-jaman-saffronText transition-colors pr-3 border-r border-jaman-border"
           title="Click to open Sales Reports"
         >
-          <TrendingUp className="w-3.5 h-3.5 text-jaman-saffron" />
-          <span className="text-slate-400 text-[11px]">Today Sales:</span>
+          <TrendingUp className="w-3.5 h-3.5 text-jaman-saffronText" />
+          <span className="text-slate-500 text-[11px]">Today Sales:</span>
           <strong className="font-mono font-bold text-jaman-navy text-xs">{formatINR(todaySales)}</strong>
         </button>
 
         {/* Orders */}
         <button
           onClick={() => setActiveTab('ORDERS')}
-          className="flex items-center gap-1.5 hover:text-emerald-600 transition-colors pr-3 border-r border-jaman-border"
+          className="flex items-center gap-1.5 hover:text-emerald-700 transition-colors pr-3 border-r border-jaman-border"
           title="Click to view Live Orders"
         >
-          <ShoppingBag className="w-3.5 h-3.5 text-emerald-600" />
-          <span className="text-slate-400 text-[11px]">Orders:</span>
+          <ShoppingBag className="w-3.5 h-3.5 text-emerald-700" />
+          <span className="text-slate-500 text-[11px]">Orders:</span>
           <strong className="font-mono font-bold text-jaman-navy text-xs">{totalOrdersCount}</strong>
         </button>
 
         {/* AOV */}
         <div className="hidden sm:flex items-center gap-1.5 pr-3 border-r border-jaman-border">
           <Clock className="w-3.5 h-3.5 text-blue-600" />
-          <span className="text-slate-400 text-[11px]">AOV:</span>
+          <span className="text-slate-500 text-[11px]">AOV:</span>
           <strong className="font-mono font-bold text-jaman-navy text-xs">{formatINR(aov)}</strong>
         </div>
 
@@ -61,7 +61,7 @@ export const PosFooterKpiStrip: React.FC = () => {
           title="Click to open Floor Plan"
         >
           <LayoutGrid className="w-3.5 h-3.5 text-amber-600" />
-          <span className="text-slate-400 text-[11px]">Tables:</span>
+          <span className="text-slate-500 text-[11px]">Tables:</span>
           <strong className="font-mono font-bold text-jaman-navy text-xs">
             {occupancyPct}% ({occupiedTables.length}/{tables.length})
           </strong>
@@ -74,7 +74,7 @@ export const PosFooterKpiStrip: React.FC = () => {
           title="Click to open Kitchen KOTs"
         >
           <ChefHat className="w-3.5 h-3.5 text-rose-600" />
-          <span className="text-slate-400 text-[11px]">Pending KOT:</span>
+          <span className="text-slate-500 text-[11px]">Pending KOT:</span>
           <strong className="font-mono font-bold text-jaman-navy text-xs">{pendingKots.length}</strong>
         </button>
       </div>
@@ -82,7 +82,7 @@ export const PosFooterKpiStrip: React.FC = () => {
       {/* Right: Security & Sync Status */}
       <div className="flex items-center gap-2 shrink-0 text-[11px] text-slate-500">
         <div className="flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-lg font-bold shadow-2xs">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
           <span>Local-first billing</span>
         </div>
       </div>

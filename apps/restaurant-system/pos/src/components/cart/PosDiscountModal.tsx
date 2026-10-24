@@ -214,7 +214,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
         {/* Header */}
         <div className="bg-jaman-cream border-b border-jaman-border p-4 sm:p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-center text-jaman-saffron">
+            <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-center text-jaman-saffronText">
               <Tag className="w-5 h-5" />
             </div>
             <div>
@@ -225,7 +225,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-2xl hover:bg-slate-200 text-slate-400 hover:text-jaman-navy transition-colors"
+            className="p-2 rounded-2xl hover:bg-slate-200 text-slate-500 hover:text-jaman-navy transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -298,7 +298,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
                         {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
                       </div>
                       <span className="font-bold truncate">{it.item.name}</span>
-                      <span className="text-[10px] text-slate-400 font-medium">x{it.quantity}</span>
+                      <span className="text-[10px] text-slate-500 font-medium">x{it.quantity}</span>
                     </div>
                     <span className="font-mono font-bold">{formatINR(it.itemTotal)}</span>
                   </div>
@@ -359,14 +359,14 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
                 className="w-full h-12 px-4 rounded-2xl border-2 border-jaman-border focus:border-jaman-saffron text-lg font-mono font-bold text-jaman-navy outline-none transition-colors"
                 autoFocus
               />
-              <span className="absolute right-4 top-3 text-slate-400 font-bold">
+              <span className="absolute right-4 top-3 text-slate-500 font-bold">
                 {discountType === 'PERCENTAGE' ? '%' : '₹'}
               </span>
             </div>
 
             {/* Quick Preset Buttons */}
             <div className="flex items-center gap-1.5 pt-1 overflow-x-auto">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight shrink-0 mr-1">Presets:</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight shrink-0 mr-1">Presets:</span>
               {(discountType === 'PERCENTAGE' ? PERCENT_PRESETS : FIXED_PRESETS).map((p) => (
                 <button
                   key={p}
@@ -417,7 +417,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
 
           {reason === 'Other' && (
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+              <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
                 Custom Reason Details:
               </label>
               <input
@@ -437,7 +437,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
               <span className="font-mono font-bold">{formatINR(preview.rawSubtotal)}</span>
             </div>
 
-            <div className="flex justify-between text-emerald-600 font-bold">
+            <div className="flex justify-between text-emerald-700 font-bold">
               <span>Calculated Discount:</span>
               <span className="font-mono">- {formatINR(preview.calculatedDiscount)}</span>
             </div>

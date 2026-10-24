@@ -50,9 +50,9 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-jaman-border shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-jaman-saffron" />
+            <ShoppingBag className="w-5 h-5 text-jaman-saffronText" />
             <h2 className="text-lg sm:text-xl font-bold text-jaman-navy">Active Dining Orders</h2>
-            <span className="bg-[#FFF4ED] text-jaman-saffron text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#FDBA74]">
+            <span className="bg-[#FFF4ED] text-jaman-saffronText text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#FDBA74]">
               {activeDiningTables.length} Active Tables
             </span>
           </div>
@@ -63,7 +63,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
 
         {/* Search */}
         <div className="relative w-full sm:w-auto sm:min-w-[200px] sm:max-w-xs">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
@@ -102,7 +102,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
                       className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase ${
                         isBillReq
                           ? 'bg-purple-100 text-purple-800 border border-purple-300'
-                          : 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]'
+                          : 'bg-[#FFF4ED] text-jaman-saffronText border border-[#FDBA74]'
                       }`}
                     >
                       {table.status}
@@ -117,7 +117,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
                           serviceStatus.tone === 'ready'
                             ? 'text-emerald-700'
                             : serviceStatus.tone === 'none'
-                            ? 'text-slate-400'
+                            ? 'text-slate-500'
                             : 'text-jaman-navy'
                         }`}
                       >
@@ -138,7 +138,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
                     className="w-full min-h-[44px] py-2.5 sm:py-3 px-4 rounded-xl sm:rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-bold text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex items-center justify-between"
                   >
                     <span>Open Table Workspace</span>
-                    <ArrowRight className="w-4 h-4 text-jaman-saffron" />
+                    <ArrowRight className="w-4 h-4 text-jaman-saffronText" />
                   </button>
 
                   {!isBillReq && (
@@ -158,7 +158,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
         </div>
       ) : (
         <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
-          <ShoppingBag className="w-12 h-12 text-slate-400 mx-auto" />
+          <ShoppingBag className="w-12 h-12 text-slate-500 mx-auto" />
           <h3 className="text-lg font-bold text-jaman-navy">No Active Table Orders</h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             All floor tables are currently clear. When you seat guests and send a KOT, active orders will show here.

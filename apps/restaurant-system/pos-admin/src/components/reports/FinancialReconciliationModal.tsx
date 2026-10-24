@@ -45,7 +45,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
 
   return (
     <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
-      <div role="dialog" aria-modal="true" aria-label="Financial reconciliation" className="bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+      <div className="bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         {/* Header */}
         <div className="p-5 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">

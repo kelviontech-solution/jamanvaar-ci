@@ -7,7 +7,7 @@ import { Platform } from '@jamanvaar/api';
 import { PosRecoveryService } from '../services/recoveryService';
 import { lanMeshSync, SyncOutboxEngine, StaffSession, verifyPinWithSync, type RefundApprovalScope } from '@jamanvaar/sync';
 import { deviceFetch as posDeviceFetch } from '../cloud/cloudClient';
-import { SessionPersistence, AuthStatus, calculateCart, resolveModifierGroups, dishNeedsChoiceBeforeAdd, clampItemQuantity, validateModifiers, priceSavedUnpaidOrder } from '@jamanvaar/business';
+import { SessionPersistence, AuthStatus, calculateCart, resolveModifierGroups, defaultModifierSelection, selectionToModifiers, missingRequiredGroups, clampItemQuantity, validateModifiers, priceSavedUnpaidOrder } from '@jamanvaar/business';
 import { generateUUID } from '@jamanvaar/utils';
 import { outstandingBillAmount } from '@jamanvaar/utils';
 
@@ -982,11 +982,15 @@ export const usePosStore = create<PosState>((set, get) => {
         console.warn(`Cannot add unavailable dish "${item.name}" to cart.`);
         return;
       }
+      // A tap adds the dish straight away using the dish's own default choices (for example size "Regular"); the
+      // minimum quantity is honoured by addItemToCart. Customization opens from the edit control, or here only when a
+      // required choice has no default, since a dish must never reach an order with a required choice unmade.
       const groups = resolveModifierGroups(item, db.modifierGroups);
-      if (dishNeedsChoiceBeforeAdd(item, groups)) {
+      const defaults = defaultModifierSelection(groups);
+      if (missingRequiredGroups(groups, defaults).length > 0) {
         get().setCustomizingItem(item);
       } else {
-        get().addItemToCart(item);
+        get().addItemToCart(item, selectionToModifiers(groups, defaults), '', item.minQuantity ?? 1);
       }
     },
 

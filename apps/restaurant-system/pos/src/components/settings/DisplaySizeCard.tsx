@@ -16,7 +16,7 @@ export const DisplaySizeCard: React.FC = () => {
     <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
-          <Monitor className="w-5 h-5 text-jaman-saffron" />
+          <Monitor className="w-5 h-5 text-jaman-saffronText" />
           <h3 className="font-bold text-sm text-jaman-navy">Screen size</h3>
         </div>
         <span className="text-[10px] font-black bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">{effective}%</span>

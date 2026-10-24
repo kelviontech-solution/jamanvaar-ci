@@ -40,7 +40,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-jaman-border shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
-            <ChefHat className="w-5 h-5 text-jaman-saffron" />
+            <ChefHat className="w-5 h-5 text-jaman-saffronText" />
             <h2 className="text-xl font-bold text-jaman-navy">Live KOT Monitor</h2>
             <span className="bg-jaman-cream text-slate-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-jaman-border">
               {kots.length} Tickets
@@ -157,7 +157,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenSendMessage(kot.tableNumber || '')}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffron font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffronText font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Message Kitchen</span>
@@ -180,7 +180,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
         </div>
       ) : (
         <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
-          <ChefHat className="w-12 h-12 text-slate-400 mx-auto" />
+          <ChefHat className="w-12 h-12 text-slate-500 mx-auto" />
           <h3 className="text-lg font-bold text-jaman-navy">No KOT Tickets Match</h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             Try switching filters to view all kitchen tickets.

@@ -121,7 +121,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
-              Staff & Role-Based Access (RBAC)
+              Team & Permissions
             </h1>
             <span className="bg-emerald-50 text-emerald-800 font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-emerald-200/70">
               SECURE PERMISSIONS

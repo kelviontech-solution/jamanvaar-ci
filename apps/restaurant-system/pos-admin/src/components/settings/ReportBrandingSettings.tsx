@@ -288,11 +288,11 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
       </div>
 
       {/* Live Preview Card */}
-      <div className="bg-jaman-cream p-5 rounded-2xl border border-slate-300 shadow-2xs space-y-3">
+      <div className="bg-jaman-cream p-5 rounded-2xl border border-jaman-border space-y-3">
         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
           LIVE DOCUMENT HEADER PREVIEW:
         </span>
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-left">
             {logoUrl && (
               <img

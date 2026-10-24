@@ -8,10 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        slate: { 500: '#5B6B82' },
         jaman: {
           navy: '#0B253A',
           deepNavy: '#0B2B39',
           saffron: '#E66817',
+          // The same orange, one step deeper, for orange *text* on light surfaces (5:1 instead of 3:1).
+          saffronText: '#B04A0B',
           orange: '#F97316',
           ivory: '#FBF9F5',
           cream: '#FAF7F2',

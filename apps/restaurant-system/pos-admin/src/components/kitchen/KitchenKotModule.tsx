@@ -98,9 +98,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto select-none">
-      <KitchenStationsPanel/>
-      
+    <div className="space-y-6 select-none">
       {/* Header & Quick Action Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -134,12 +132,12 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-emerald-200 bg-emerald-50/40 shadow-xs space-y-1">
-          <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">Ready For Pickup</span>
-          <div className="text-2xl font-bold text-emerald-900 font-mono">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-1">
+          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Ready For Pickup</span>
+          <div className="text-2xl font-bold text-jaman-navy tabular-nums">
             {stats.ready} Tickets
           </div>
-          <span className="text-[11px] text-emerald-700 font-bold block">
+          <span className="text-[11px] text-slate-500 font-bold block">
             Awaiting Captain delivery
           </span>
         </div>
@@ -393,6 +391,8 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
         </div>
       )}
 
+      {/* Station setup is a rarely-used reference tool, so it follows the live queue instead of leading the page. */}
+      <KitchenStationsPanel/>
     </div>
   );
 };

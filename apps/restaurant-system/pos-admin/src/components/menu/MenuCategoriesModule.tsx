@@ -255,19 +255,19 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
       {csvPreview && <MenuCsvPreviewModal key={JSON.stringify(csvPreview)} preview={csvPreview} onClose={() => setCsvPreview(null)} />}
       {cleanupOpen && <MenuDuplicateModal onClose={() => setCleanupOpen(false)} />}
       {consistencyOpen && <ChannelConsistencyModal onClose={() => setConsistencyOpen(false)} />}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Menu & Catalog Manager</h1>
             <span className="bg-orange-50 text-brand font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
-              {menuItems.filter(item => !item.archivedAt).length} ITEMS
+              {menuItems.filter(item => !item.archivedAt).length} {menuItems.filter(item => !item.archivedAt).length === 1 ? 'ITEM' : 'ITEMS'}
             </span>
           </div>
           <p className="text-xs text-[#4A5568] mt-0.5">Create, edit dishes, adjust pricing, upload device photos, and import templates.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <button type="button" disabled={publishing || !menuItems.length} onClick={() => void publish()} className="min-h-11 px-3.5 py-2 rounded-xl bg-jaman-navy text-white text-xs font-bold disabled:opacity-50">{publishing ? 'Publishing…' : 'Publish to QR / Kiosk'}</button>
+          <button type="button" disabled={publishing || !menuItems.length} onClick={() => void publish()} className="min-h-11 px-3.5 py-2 rounded-xl bg-white border border-brand/40 text-brand hover:bg-brand/[0.06] text-xs font-bold disabled:opacity-50 cursor-pointer">{publishing ? 'Publishing…' : 'Publish to QR / Kiosk'}</button>
           <button
             onClick={() => onOpenItemModal(null)}
             className="min-h-11 px-3.5 py-2 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
@@ -278,7 +278,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
 
           <button
             onClick={() => onOpenCategoryModal(null)}
-            className="min-h-11 px-3.5 py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="min-h-11 px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy hover:bg-[#F8F6F0] text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Category</span>
@@ -396,7 +396,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             }`}
           >
             <MenuCategoryIcon name="All Categories" size="md" />
-            <span className="text-left">All Categories<span className="block mt-0.5 text-[10px] font-medium text-slate-500">{menuItems.filter(item => !item.archivedAt).length} dishes</span></span>
+            <span className="text-left">All Categories<span className="block mt-0.5 text-[10px] font-medium text-slate-500">{menuItems.filter(item => !item.archivedAt).length} {menuItems.filter(item => !item.archivedAt).length === 1 ? 'dish' : 'dishes'}</span></span>
           </button>
 
           {[...categories].sort((a, b) => a.sortOrder - b.sortOrder).map((c: Category) => {
@@ -415,7 +415,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
               >
                 {cover && <CachedImg src={cover} alt={`${c.name} category cover`} className="w-10 h-10 rounded-lg object-cover border border-white shrink-0" />}
                 <MenuCategoryIcon name={c.name} iconName={c.iconName} />
-                <span className="text-left">{c.name}<span className="block mt-0.5 text-[10px] font-medium text-slate-500">{dishes.length} dishes{c.qrVisible === false ? ' · Hidden from QR' : ''}</span></span>
+                <span className="text-left">{c.name}<span className="block mt-0.5 text-[10px] font-medium text-slate-500">{dishes.length} {dishes.length === 1 ? 'dish' : 'dishes'}{c.qrVisible === false ? ' · Hidden from QR' : ''}</span></span>
               </button>
             </div>
           ); })}
@@ -631,7 +631,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                 setComboToEdit(null);
                 setIsComboModalOpen(true);
               }}
-              className="min-h-11 px-4 py-2bg-jaman-navy text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+              className="min-h-11 px-4 py-2 bg-jaman-navy text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
             >
               + Create First Combo
             </button>

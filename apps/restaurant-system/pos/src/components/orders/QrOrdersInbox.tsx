@@ -50,7 +50,7 @@ export function QrOrdersInbox({ actor }: { actor: string }) {
   return (
     <>
     <div className="mb-4 rounded-2xl border-2 border-jaman-saffron bg-white p-3 shrink-0" data-testid="qr-inbox">
-      <div className="flex items-center gap-2 text-sm font-black text-jaman-navy mb-2"><QrCode className="w-4 h-4 text-jaman-saffron" /> New QR orders ({pending.length})</div>
+      <div className="flex items-center gap-2 text-sm font-black text-jaman-navy mb-2"><QrCode className="w-4 h-4 text-jaman-saffronText" /> New QR orders ({pending.length})</div>
       {message && <div className="text-xs text-slate-600 mb-2">{message}</div>}
       {cancellationsPending.length > 0 && <div role="status" className="mb-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">Cancellation awaiting approval and sync: {cancellationsPending.map(o => o.orderNumber).join(', ')}. Kitchen tickets remain active until confirmed.</div>}
       <div className="grid gap-2">

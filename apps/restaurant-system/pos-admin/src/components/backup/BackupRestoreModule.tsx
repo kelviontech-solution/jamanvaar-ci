@@ -355,7 +355,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
             straight back over it). Disabled once this console is actually connected to a restaurant's
             cloud account, rather than offering a button that either silently no-ops or, if "fixed" to
             push, would wipe real production data with placeholder dishes. */}
-        <div className={`bg-white rounded-2xl p-5 sm:p-6 border shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${cloudReady ? 'border-slate-200 opacity-60' : 'border-rose-200/80'}`}>
+        <div className={`bg-white rounded-2xl p-5 sm:p-6 border shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${cloudReady ? 'border-jaman-border opacity-60' : 'border-rose-200/80'}`}>
           <div className="flex items-start gap-4">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${cloudReady ? 'bg-slate-100 text-slate-500' : 'bg-rose-50 text-rose-600'}`}>
               <AlertTriangle className="w-6 h-6" />

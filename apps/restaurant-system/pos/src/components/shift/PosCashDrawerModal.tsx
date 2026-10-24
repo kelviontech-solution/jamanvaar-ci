@@ -80,7 +80,7 @@ export const PosCashDrawerModal: React.FC = () => {
         {/* Header */}
         <div className="bg-jaman-navy text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CircleDollarSign className="w-5 h-5 text-jaman-saffron" />
+            <CircleDollarSign className="w-5 h-5 text-jaman-saffronText" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Cash In / Cash Out</h2>
               <span className="text-xs text-slate-300">Drawer Movement Audit Entry</span>

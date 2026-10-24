@@ -53,7 +53,7 @@ export const PosCustomersView: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4 shrink-0">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
-            <Users className="w-6 h-6 text-jaman-saffron" />
+            <Users className="w-6 h-6 text-jaman-saffronText" />
             <span>Customer Directory & CRM</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -73,13 +73,13 @@ export const PosCustomersView: React.FC = () => {
       {/* Search */}
       <div className="mb-4 shrink-0 max-w-md">
         <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by phone number or guest name..."
-            className="w-full bg-white border border-jaman-border rounded-xl pl-9 pr-3 py-2 text-xs font-semibold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron shadow-2xs"
+            aria-label="Search customers" placeholder="Search by phone number or guest name..."
+            className="w-full bg-white border border-jaman-border rounded-xl pl-9 pr-3 py-2 text-xs font-semibold text-jaman-navy placeholder:text-slate-500 focus:outline-none focus:border-jaman-saffron shadow-2xs"
           />
         </div>
       </div>
@@ -108,7 +108,7 @@ export const PosCustomersView: React.FC = () => {
                       <h3 className="font-bold text-sm text-jaman-navy leading-tight">
                         {account.name || 'Valued Guest'}
                       </h3>
-                      <span className="text-xs text-slate-400 font-mono">{account.phone}</span>
+                      <span className="text-xs text-slate-500 font-mono">{account.phone}</span>
                     </div>
                   </div>
 
@@ -129,7 +129,7 @@ export const PosCustomersView: React.FC = () => {
                   onClick={() => handleAttachToCart(account)}
                   className="w-full py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs flex items-center justify-center gap-1 shadow-2xs"
                 >
-                  <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffron" />
+                  <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffronText" />
                   <span>Attach to Current Order</span>
                 </button>
               </div>
@@ -144,7 +144,7 @@ export const PosCustomersView: React.FC = () => {
           <div className="bg-white border border-jaman-border rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-jaman-navy">Register New Customer</h3>
-              <button aria-label="Close customer registration" onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600">
+              <button aria-label="Close customer registration" onClick={() => setShowCreateModal(false)} className="text-slate-500 hover:text-slate-600">
                 <X className="w-4 h-4" />
               </button>
             </div>

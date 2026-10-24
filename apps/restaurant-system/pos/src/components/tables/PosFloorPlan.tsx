@@ -106,7 +106,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
     >
       <div className="flex items-start justify-between gap-1">
         <div>
-          <span className="text-[10px] font-bold uppercase text-slate-400 block leading-tight">
+          <span className="text-[10px] font-bold uppercase text-slate-500 block leading-tight">
             {table.zone || "Hall"}
           </span>
           <div className="flex items-center gap-2">
@@ -114,7 +114,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
               T-{table.tableNumber}
             </h3>
             {table.qrStatus === 'ACTIVE' && (
-              <span className="text-[9px] font-black bg-amber-50 text-jaman-saffron border border-[#FED7AA] px-1.5 py-0.2 rounded flex items-center gap-0.5" title="QR ordering active for this table">
+              <span className="text-[9px] font-black bg-amber-50 text-jaman-saffronText border border-[#FED7AA] px-1.5 py-0.2 rounded flex items-center gap-0.5" title="QR ordering active for this table">
                 <QrCode className="w-2.5 h-2.5" />
                 <span>QR</span>
               </span>
@@ -128,7 +128,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
 
       <div className="my-2 space-y-1">
         <div className="flex items-center gap-1.5 text-xs text-slate-500">
-          <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <Users className="w-3.5 h-3.5 text-slate-500 shrink-0" />
           <span>{table.capacity} Seater</span>
           {table.currentGuests != null && table.currentGuests > 0 && (
             <span className="text-jaman-navy font-bold ml-1">· {table.currentGuests} guests</span>
@@ -136,7 +136,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
         </div>
 
         {isAvailable && !hold && (
-          <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-semibold">
+          <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
             <CheckCircle2 className="w-3 h-3" />
             <span>Vacant &amp; Ready</span>
           </div>
@@ -155,7 +155,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
         )}
         {activeOrder && (
           <div className="pt-1.5 border-t border-slate-100 flex items-baseline justify-between">
-            <span className="text-[10px] text-slate-400">Order:</span>
+            <span className="text-[10px] text-slate-500">Order:</span>
             <span className="font-mono font-extrabold text-sm text-jaman-navy">
               {formatINR(activeOrder.totalAmount ?? 0)}
             </span>
@@ -255,7 +255,7 @@ export const PosFloorPlan: React.FC = () => {
       <div className="flex flex-wrap items-start justify-between gap-4 mb-4 shrink-0">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
-            <LayoutGrid className="w-6 h-6 text-jaman-saffron" />
+            <LayoutGrid className="w-6 h-6 text-jaman-saffronText" />
             <span>Floor Plan &amp; Dining Tables</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -308,7 +308,7 @@ export const PosFloorPlan: React.FC = () => {
       {/* Zone Filter */}
       {zones.length > 0 && (
         <div className="flex items-center gap-1.5 flex-wrap mb-4 shrink-0">
-          <span className="text-[10px] font-bold uppercase text-slate-400 mr-1">Zone:</span>
+          <span className="text-[10px] font-bold uppercase text-slate-500 mr-1">Zone:</span>
           <button
             onClick={() => setSelectedZone("ALL")}
             className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${selectedZone === "ALL" ? "bg-jaman-navy text-white shadow-xs" : "bg-white border border-jaman-border text-slate-600 hover:bg-slate-50"}`}

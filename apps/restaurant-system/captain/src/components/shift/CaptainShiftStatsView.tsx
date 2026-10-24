@@ -53,7 +53,7 @@ export const CaptainShiftStatsView: React.FC = () => {
         {/* Shift Timer */}
         <div className="bg-white/10 p-3 rounded-2xl border border-white/10 flex items-center gap-2 self-stretch sm:self-auto justify-between sm:justify-start">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-            <Clock className="w-4 h-4 text-jaman-saffron" />
+            <Clock className="w-4 h-4 text-jaman-saffronText" />
             <span>Shift Time:</span>
           </div>
           <span className="text-sm font-bold font-mono text-white">
@@ -65,69 +65,69 @@ export const CaptainShiftStatsView: React.FC = () => {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
         <div className="p-4 rounded-2xl bg-white border border-jaman-border shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-            <Users className="w-4 h-4 text-emerald-600" />
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+            <Users className="w-4 h-4 text-emerald-700" />
             <span>Tables Served</span>
           </div>
           <span className="text-2xl sm:text-3xl font-bold font-mono text-jaman-navy block">
             {shiftStats.tablesServed}
           </span>
-          <span className="text-[11px] text-slate-400 font-semibold">Today's completed seatings</span>
+          <span className="text-[11px] text-slate-500 font-semibold">Today's completed seatings</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-jaman-border shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-            <ShoppingBag className="w-4 h-4 text-jaman-saffron" />
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+            <ShoppingBag className="w-4 h-4 text-jaman-saffronText" />
             <span>Orders Taken</span>
           </div>
           <span className="text-2xl sm:text-3xl font-bold font-mono text-jaman-navy block">
             {shiftStats.ordersTaken}
           </span>
-          <span className="text-[11px] text-slate-400 font-semibold">Live order sessions</span>
+          <span className="text-[11px] text-slate-500 font-semibold">Live order sessions</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-jaman-border shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-            <Flame className="w-4 h-4 text-emerald-600" />
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+            <Flame className="w-4 h-4 text-emerald-700" />
             <span>Food Delivered</span>
           </div>
           <span className="text-2xl sm:text-3xl font-bold font-mono text-jaman-navy block">
             {shiftStats.foodServed}
           </span>
-          <span className="text-[11px] text-slate-400 font-semibold">Ready dishes served to tables</span>
+          <span className="text-[11px] text-slate-500 font-semibold">Ready dishes served to tables</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-jaman-border shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
             <Receipt className="w-4 h-4 text-purple-600" />
             <span>Bills Requested</span>
           </div>
           <span className="text-2xl sm:text-3xl font-bold font-mono text-jaman-navy block">
             {shiftStats.billsRequested}
           </span>
-          <span className="text-[11px] text-slate-400 font-semibold">Table settlements initiated</span>
+          <span className="text-[11px] text-slate-500 font-semibold">Table settlements initiated</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-jaman-border shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
             <Award className="w-4 h-4 text-amber-600" />
             <span>Assigned Tables</span>
           </div>
           <span className="text-2xl sm:text-3xl font-bold font-mono text-jaman-navy block">
             {assignedCount}
           </span>
-          <span className="text-[11px] text-slate-400 font-semibold">{assignedTables.length ? assignedTables.map(table => `Table ${table.tableNumber}${table.zone ? ` (${table.zone})` : ''}`).join(', ') : 'No tables assigned. Ask your manager to assign your floor.'}</span>
+          <span className="text-[11px] text-slate-500 font-semibold">{assignedTables.length ? assignedTables.map(table => `Table ${table.tableNumber}${table.zone ? ` (${table.zone})` : ''}`).join(', ') : 'No tables assigned. Ask your manager to assign your floor.'}</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-jaman-border shadow-2xs space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
             <Timer className="w-4 h-4 text-blue-600" />
             <span>Currently Active</span>
           </div>
           <span className="text-2xl sm:text-3xl font-bold font-mono text-jaman-navy block">
             {activeOccupied}
           </span>
-          <span className="text-[11px] text-slate-400 font-semibold">Seated tables on floor</span>
+          <span className="text-[11px] text-slate-500 font-semibold">Seated tables on floor</span>
         </div>
       </div>
 

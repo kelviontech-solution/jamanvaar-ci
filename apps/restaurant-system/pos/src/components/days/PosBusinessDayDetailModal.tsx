@@ -203,7 +203,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                   {isClosed ? (<span className="inline-flex items-center gap-1"><Lock className="w-3 h-3" />CLOSED (READ-ONLY)</span>) : 'ACTIVE DAY'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono">
+              <p className="text-xs text-slate-500 font-mono">
                 {businessDay.id} • Opened: {new Date(businessDay.openedAt).toLocaleTimeString('en-IN')} by {businessDay.openedBy}
               </p>
             </div>
@@ -223,7 +223,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               onClick={() => setIsOrdersModalOpen(true)}
               className="px-3 py-1.5 bg-jaman-cream hover:bg-[#F0EBE1] border border-jaman-border text-jaman-navy rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
-              <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffron" />
+              <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffronText" />
               <span>View Orders ({orders.length})</span>
             </button>
 
@@ -234,7 +234,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               disabled={isDownloadingPdf}
               className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-jaman-saffron" />
+              <Download className="w-3.5 h-3.5 text-jaman-saffronText" />
               <span>Download PDF</span>
             </button>
 
@@ -265,7 +265,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
+              className="p-1.5 text-slate-500 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -277,49 +277,49 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
           {/* 1. Primary Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
+              <span className="text-[10px] font-black uppercase text-slate-500 block tracking-wider">
                 Total Billed (incl. GST)
               </span>
               <div className="text-2xl font-black font-mono text-jaman-navy mt-0.5">
                 {formatINR(businessDay.netSales)}
               </div>
-              <span className="text-[10px] text-emerald-600 font-bold mt-1 inline-block">
+              <span className="text-[10px] text-emerald-700 font-bold mt-1 inline-block">
                 ● {businessDay.orderCount} Orders Billed
               </span>
             </div>
 
             <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
+              <span className="text-[10px] font-black uppercase text-slate-500 block tracking-wider">
                 Cash Collections
               </span>
               <div className="text-2xl font-black font-mono text-amber-700 mt-0.5">
                 {formatINR(businessDay.cashSales)}
               </div>
-              <span className="text-[10px] text-slate-400 font-medium mt-1 inline-block">
+              <span className="text-[10px] text-slate-500 font-medium mt-1 inline-block">
                 Drawer cash collected
               </span>
             </div>
 
             <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
+              <span className="text-[10px] font-black uppercase text-slate-500 block tracking-wider">
                 UPI / Dynamic QR
               </span>
               <div className="text-2xl font-black font-mono text-blue-700 mt-0.5">
                 {formatINR(businessDay.upiSales)}
               </div>
-              <span className="text-[10px] text-slate-400 font-medium mt-1 inline-block">
+              <span className="text-[10px] text-slate-500 font-medium mt-1 inline-block">
                 Direct digital settlement
               </span>
             </div>
 
             <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
+              <span className="text-[10px] font-black uppercase text-slate-500 block tracking-wider">
                 Total {gstLabels().total}
               </span>
               <div className="text-2xl font-black font-mono text-purple-700 mt-0.5">
                 {formatINR(businessDay.tax)}
               </div>
-              <span className="text-[10px] text-slate-400 font-medium mt-1 inline-block">
+              <span className="text-[10px] text-slate-500 font-medium mt-1 inline-block">
                 CGST + SGST
               </span>
             </div>
@@ -333,7 +333,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                 <h3 className="font-extrabold text-xs uppercase tracking-wider text-jaman-navy">
                   Financial & Revenue Audit
                 </h3>
-                <span className="text-[10px] font-mono text-slate-400">STATEMENT</span>
+                <span className="text-[10px] font-mono text-slate-500">STATEMENT</span>
               </div>
 
               <div className="space-y-2 text-xs">
@@ -408,7 +408,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-100 font-black text-sm text-jaman-navy">
                   <span>Actual Closing Cash Count:</span>
-                  <span className="font-mono text-jaman-saffron">
+                  <span className="font-mono text-jaman-saffronText">
                     {businessDay.closingCash !== undefined ? formatINR(businessDay.closingCash) : 'Not Closed Yet'}
                   </span>
                 </div>
@@ -422,14 +422,14 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               <h3 className="font-extrabold text-xs uppercase tracking-wider text-jaman-navy">
                 Top Selling Items ({topItems.length})
               </h3>
-              <span className="text-[10px] text-slate-400 font-mono">RANKED BY QTY</span>
+              <span className="text-[10px] text-slate-500 font-mono">RANKED BY QTY</span>
             </div>
 
             <div className="divide-y divide-slate-100 max-h-48 overflow-y-auto text-xs">
               {topItems.slice(0, 8).map((it, idx) => (
                 <div key={idx} className="flex justify-between items-center py-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-slate-400 w-5">{idx + 1}.</span>
+                    <span className="font-mono text-slate-500 w-5">{idx + 1}.</span>
                     <strong className="text-jaman-navy">{it.name}</strong>
                   </div>
                   <div className="flex items-center gap-4">

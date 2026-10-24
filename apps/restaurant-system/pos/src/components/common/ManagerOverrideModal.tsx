@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { ManagerOverrideRepository, StaffRepository } from '@jamanvaar/database';
@@ -173,7 +174,7 @@ export const ManagerOverrideModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
       <div className="bg-jaman-cream border-2 border-amber-500 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col items-center">
         <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center mb-3">
           <ShieldAlert className="w-7 h-7 text-amber-600" />
@@ -266,6 +267,6 @@ export const ManagerOverrideModal: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

@@ -427,12 +427,12 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
   const activeFilterCount = Object.entries(filters).filter(([_, v]) => v && v !== 'ALL').length;
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto pb-12">
+    <div className="space-y-5 pb-12">
       {/* 1. TOP HEADER & ACTION BAR */}
       <div className="bg-white border border-jaman-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex flex-col gap-4">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
                 Reports & Analytics
               </h1>
@@ -460,9 +460,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setIsDesignModalOpen(true)}
-              className="min-h-11 px-3.5 py-2 bg-brand/[0.07] hover:bg-[#FFE8DA] border border-brand/30 text-brand rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="min-h-11 px-3.5 py-2 bg-white hover:bg-[#F8F6F0] border border-jaman-border text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer active:scale-95"
             >
-              <Palette className="w-3.5 h-3.5" />
+              <Palette className="w-3.5 h-3.5 text-slate-500" />
               <span>Report Design</span>
             </button>
 
@@ -476,9 +476,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
 
             <button
               onClick={() => setIsPreviewModalOpen(true)}
-              className="min-h-11 px-3.5 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="min-h-11 px-3.5 py-2 bg-white hover:bg-[#F8F6F0] border border-jaman-border text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer active:scale-95"
             >
-              <Printer className="w-3.5 h-3.5" />
+              <Printer className="w-3.5 h-3.5 text-slate-500" />
               <span>Print Report</span>
             </button>
 
@@ -725,9 +725,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
         {/* High-Level Metric Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {/* Gross Sales */}
-          <button type="button" onClick={() => setDrillDownMetric('GROSS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[11px] font-bold text-slate-500 uppercase block">Gross Sales</span>
-            <div className="text-lg font-mono font-bold text-jaman-navy">
+          <button type="button" onClick={() => setDrillDownMetric('GROSS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-4 rounded-2xl bg-white border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Gross Sales</span>
+            <div className="text-2xl font-bold tabular-nums text-jaman-navy">
               {formatINR(summary.grossSales.current)}
             </div>
             {summary.grossSales.diffPercent !== undefined && (
@@ -741,27 +741,27 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
           </button>
 
           {/* Discounts */}
-          <button type="button" onClick={() => setDrillDownMetric('DISCOUNTS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[11px] font-bold text-slate-500 uppercase block">Discounts</span>
-            <div className="text-lg font-mono font-bold text-rose-600">
+          <button type="button" onClick={() => setDrillDownMetric('DISCOUNTS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-4 rounded-2xl bg-white border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Discounts</span>
+            <div className="text-2xl font-bold tabular-nums text-jaman-navy">
               -{formatINR(summary.discountAmount.current)}
             </div>
             <span className="text-[11px] text-slate-500 font-semibold block">Promotions</span>
           </button>
 
           {/* GST */}
-          <button type="button" onClick={() => setDrillDownMetric('TAX')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[11px] font-bold text-slate-500 uppercase block">{gstLabels().total}</span>
-            <div className="text-lg font-mono font-bold text-brand">
+          <button type="button" onClick={() => setDrillDownMetric('TAX')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-4 rounded-2xl bg-white border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">{gstLabels().total}</span>
+            <div className="text-2xl font-bold tabular-nums text-jaman-navy">
               {formatINR(summary.totalTax.current)}
             </div>
             <span className="text-[11px] text-slate-500 font-semibold block">CGST + SGST</span>
           </button>
 
           {/* Net Sales */}
-          <button type="button" onClick={() => setDrillDownMetric('NET')} className="text-left cursor-pointer hover:ring-2 hover:ring-emerald-400/40 transition-all p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-1">
-            <span className="text-[11px] font-bold text-emerald-900 uppercase block">Net Collected</span>
-            <div className="text-xl font-mono font-bold text-emerald-950">
+          <button type="button" onClick={() => setDrillDownMetric('NET')} className="text-left cursor-pointer hover:ring-2 hover:ring-emerald-400/40 transition-all p-4 rounded-2xl bg-white border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Net Collected</span>
+            <div className="text-2xl font-bold tabular-nums text-jaman-navy">
               {formatINR(summary.netSales.current)}
             </div>
             {summary.netSales.diffPercent !== undefined && (
@@ -775,9 +775,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
           </button>
 
           {/* Orders Count */}
-          <button type="button" onClick={() => setDrillDownMetric('ORDERS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[11px] font-bold text-slate-500 uppercase block">Total Orders</span>
-            <div className="text-lg font-mono font-bold text-jaman-navy">
+          <button type="button" onClick={() => setDrillDownMetric('ORDERS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-4 rounded-2xl bg-white border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Orders</span>
+            <div className="text-2xl font-bold tabular-nums text-jaman-navy">
               {summary.ordersCount.current}
             </div>
             {summary.ordersCount.diffPercent !== undefined && (
@@ -791,9 +791,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
           </button>
 
           {/* AOV */}
-          <button type="button" onClick={() => setDrillDownMetric('AOV')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[11px] font-bold text-slate-500 uppercase block">Average Ticket</span>
-            <div className="text-lg font-mono font-bold text-slate-800">
+          <button type="button" onClick={() => setDrillDownMetric('AOV')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-4 rounded-2xl bg-white border border-jaman-border space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Average Ticket</span>
+            <div className="text-2xl font-bold tabular-nums text-jaman-navy">
               ₹{summary.avgOrderValue.current}
             </div>
             <span className="text-[11px] text-slate-500 font-semibold block">Avg per bill</span>

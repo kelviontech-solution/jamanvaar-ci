@@ -537,7 +537,7 @@ export const PosPaymentModal: React.FC = () => {
         <div className="bg-jaman-cream border-b border-jaman-border p-4 sm:p-5 flex flex-wrap gap-3 items-center justify-between shrink-0">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-black text-jaman-saffron uppercase tracking-wider bg-[#FFF4ED] px-2 py-0.5 rounded border border-[#FDBA74]">
+              <span className="text-[11px] font-black text-jaman-saffronText uppercase tracking-wider bg-[#FFF4ED] px-2 py-0.5 rounded border border-[#FDBA74]">
                 {staffText('Payment & Settlement')}
               </span>
               <span className="text-xs text-slate-500 font-mono font-bold uppercase">
@@ -557,7 +557,7 @@ export const PosPaymentModal: React.FC = () => {
                 className={`px-2.5 py-1 rounded-xl border text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
                   cart.discountAmount > 0
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-2xs'
-                    : 'bg-[#FFF4ED] border-[#FDBA74] text-jaman-saffron hover:bg-[#FFE8D6]'
+                    : 'bg-[#FFF4ED] border-[#FDBA74] text-jaman-saffronText hover:bg-[#FFE8D6]'
                 }`}
               >
                 <Tag className="w-3.5 h-3.5" />
@@ -571,7 +571,7 @@ export const PosPaymentModal: React.FC = () => {
               {cart.discountAmount > 0 && (
                 <>
                   <span>•</span>
-                  <span className="text-slate-400 line-through font-mono">Gross: {formatINR(cart.subtotal)}</span>
+                  <span className="text-slate-500 line-through font-mono">Gross: {formatINR(cart.subtotal)}</span>
                 </>
               )}
               {selectedCustomer && (
@@ -597,7 +597,7 @@ export const PosPaymentModal: React.FC = () => {
             >
               {isFullyAllocated ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                   <span>FULLY ALLOCATED ({formatINR(totalAllocated)} / {formatINR(totalPayable)})</span>
                 </>
               ) : isOverAllocated ? (
@@ -615,7 +615,7 @@ export const PosPaymentModal: React.FC = () => {
 
             <button
               onClick={closePayment}
-              className="p-2 rounded-2xl hover:bg-slate-200 text-slate-400 hover:text-jaman-navy transition-colors"
+              className="p-2 rounded-2xl hover:bg-slate-200 text-slate-500 hover:text-jaman-navy transition-colors"
               title="Close (Esc)"
             >
               <X className="w-6 h-6" />
@@ -644,7 +644,7 @@ export const PosPaymentModal: React.FC = () => {
             
             {/* PAYMENT METHOD CARDS (Includes Split Payment Card as 6th option) */}
             <div className="space-y-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                 Select Payment Method:
               </span>
 
@@ -676,14 +676,14 @@ export const PosPaymentModal: React.FC = () => {
                         }`}>
                           <Icon className="w-4 h-4" />
                         </div>
-                        <span className="text-[10px] text-slate-400 font-mono bg-slate-100 px-1.5 py-0.2 rounded">
+                        <span className="text-[10px] text-slate-500 font-mono bg-slate-100 px-1.5 py-0.2 rounded">
                           [{ch.keyNumber}]
                         </span>
                       </div>
 
                       <div className="mt-2">
                         <span className="text-xs font-black text-jaman-navy block">{staffText(ch.label)}</span>
-                        <span className="text-[10px] text-slate-400 block truncate">{ch.sublabel}</span>
+                        <span className="text-[10px] text-slate-500 block truncate">{ch.sublabel}</span>
                       </div>
 
                       <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between">
@@ -717,18 +717,18 @@ export const PosPaymentModal: React.FC = () => {
                     }`}>
                       <Split className="w-4 h-4" />
                     </div>
-                    <span className="text-[10px] text-slate-400 font-mono bg-slate-100 px-1.5 py-0.2 rounded">
+                    <span className="text-[10px] text-slate-500 font-mono bg-slate-100 px-1.5 py-0.2 rounded">
                       [S]
                     </span>
                   </div>
 
                   <div className="mt-2">
                     <span className="text-xs font-black text-jaman-navy block">Split Payment</span>
-                    <span className="text-[10px] text-slate-400 block truncate">Cash + UPI / Multi</span>
+                    <span className="text-[10px] text-slate-500 block truncate">Cash + UPI / Multi</span>
                   </div>
 
                   <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between">
-                    <span className="font-mono font-black text-xs text-jaman-saffron">
+                    <span className="font-mono font-black text-xs text-jaman-saffronText">
                       {isSplitMode ? 'Split Active' : 'Multi-Tender'}
                     </span>
                     {isSplitMode && (
@@ -745,7 +745,7 @@ export const PosPaymentModal: React.FC = () => {
               type="button"
               onClick={() => setIsGuestSplitOpen(true)}
               disabled={guestSplitLines.filter((l) => l.amount > 0).length === 0}
-              className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-jaman-saffron/60 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffron text-sm font-black flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-jaman-saffron/60 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffronText text-sm font-black flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Split className="w-4 h-4" />
               <span>{guestPlan ? `Split between ${guestPlan.guests.length} guests: change` : 'Split the bill by guest or seat'}</span>
@@ -756,7 +756,7 @@ export const PosPaymentModal: React.FC = () => {
               <div className="bg-jaman-cream border-2 border-jaman-border rounded-2xl p-4 sm:p-5 space-y-4 animate-in fade-in">
                 <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
                   <div className="flex items-center gap-2">
-                    <Split className="w-4 h-4 text-jaman-saffron" />
+                    <Split className="w-4 h-4 text-jaman-saffronText" />
                     <span className="text-xs font-black text-jaman-navy uppercase tracking-wide">
                       Split Bill Payment
                     </span>
@@ -767,7 +767,7 @@ export const PosPaymentModal: React.FC = () => {
                     onClick={handleSplit5050}
                     className="px-2.5 py-1 bg-white border border-jaman-border hover:border-jaman-saffron rounded-lg text-xs font-bold text-jaman-navy flex items-center gap-1 shadow-2xs"
                   >
-                    <Sparkles className="w-3 h-3 text-jaman-saffron" />
+                    <Sparkles className="w-3 h-3 text-jaman-saffronText" />
                     <span>50/50 Split</span>
                   </button>
                 </div>
@@ -776,7 +776,7 @@ export const PosPaymentModal: React.FC = () => {
                   <ul className="space-y-1.5" aria-label="Guest shares">
                     {guestPlan.guests.map((g) => (
                       <li key={g.label} className="flex items-center justify-between bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy">
-                        <span>{g.label} <span className="text-slate-400 font-medium">pays by {g.method === 'CASH' ? 'cash' : g.method === 'UPI' ? 'UPI' : 'card'}</span></span>
+                        <span>{g.label} <span className="text-slate-500 font-medium">pays by {g.method === 'CASH' ? 'cash' : g.method === 'UPI' ? 'UPI' : 'card'}</span></span>
                         <span className="font-mono font-black">₹{g.total.toFixed(2)}</span>
                       </li>
                     ))}
@@ -788,20 +788,21 @@ export const PosPaymentModal: React.FC = () => {
                 <div className="bg-white p-3.5 rounded-xl border border-jaman-border space-y-2">
                   <div className="flex items-center justify-between text-xs font-bold text-jaman-navy">
                     <div className="flex items-center gap-2">
-                      <Banknote className="w-4 h-4 text-jaman-saffron" />
+                      <Banknote className="w-4 h-4 text-jaman-saffronText" />
                       <span>1. Method: {CHANNELS.find((c) => c.id === splitPrimaryChannel)?.label} Amount</span>
                     </div>
-                    <span className="text-[11px] text-slate-400">Enter cash amount:</span>
+                    <span className="text-[11px] text-slate-500">Enter cash amount:</span>
                   </div>
 
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-black text-slate-400 text-lg">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-black text-slate-500 text-lg">
                       ₹
                     </span>
                     <input
                       type="number"
                       value={allocations[splitPrimaryChannel] || ''}
                       onChange={(e) => handlePrimarySplitAmountChange(e.target.value)}
+                      aria-label={`${splitPrimaryChannel} amount`}
                       placeholder="0.00"
                       className="w-full bg-jaman-cream border-2 border-jaman-border focus:border-jaman-saffron rounded-xl pl-8 pr-3 py-2 text-xl font-mono font-black text-jaman-navy focus:outline-none"
                     />
@@ -834,13 +835,14 @@ export const PosPaymentModal: React.FC = () => {
                   </div>
 
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-black text-slate-400 text-lg">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-black text-slate-500 text-lg">
                       ₹
                     </span>
                     <input
                       type="number"
                       value={allocations[splitSecondaryChannel] || ''}
                       onChange={(e) => handleSecondarySplitAmountChange(e.target.value)}
+                      aria-label={`${splitSecondaryChannel} amount`}
                       placeholder="0.00"
                       className="w-full bg-jaman-cream border-2 border-jaman-border focus:border-jaman-saffron rounded-xl pl-8 pr-3 py-2 text-xl font-mono font-black text-jaman-navy focus:outline-none"
                     />
@@ -855,11 +857,12 @@ export const PosPaymentModal: React.FC = () => {
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-bold text-slate-700">Cash Note Given by Guest:</span>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-slate-400 text-[11px]">Note (₹):</span>
+                        <span className="text-slate-500 text-[11px]">Note (₹):</span>
                         <input
                           type="number"
                           value={cashReceivedInput}
                           onChange={(e) => setCashReceivedInput(e.target.value)}
+                          aria-label="Cash received"
                           className="w-24 bg-white border border-jaman-border focus:border-jaman-saffron rounded-lg px-2 py-1 text-right font-mono font-black text-xs text-jaman-navy focus:outline-none"
                         />
                       </div>
@@ -933,7 +936,7 @@ export const PosPaymentModal: React.FC = () => {
                 </div>
 
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono font-black text-slate-400 text-xl">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono font-black text-slate-500 text-xl">
                     ₹
                   </span>
                   <input
@@ -941,6 +944,7 @@ export const PosPaymentModal: React.FC = () => {
                     step="any"
                     value={allocations[activeChannel] || ''}
                     onChange={(e) => handleDirectChannelAmountChange(activeChannel, e.target.value)}
+                    aria-label={`${activeChannel} amount`}
                     placeholder="0.00"
                     className="w-full bg-white border-2 border-jaman-border focus:border-jaman-saffron rounded-2xl pl-10 pr-4 py-3 text-2xl font-mono font-black text-jaman-navy focus:outline-none transition-colors shadow-2xs"
                   />
@@ -952,10 +956,10 @@ export const PosPaymentModal: React.FC = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                       <div>
                         <span className="font-bold text-slate-700 block">Cash Tendered / Note Handed Over:</span>
-                        <span className="text-[11px] text-slate-400">e.g. ₹500, ₹1000, ₹2000, ₹3000</span>
+                        <span className="text-[11px] text-slate-500">e.g. ₹500, ₹1000, ₹2000, ₹3000</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-slate-400 text-[11px]">Tendered (₹):</span>
+                        <span className="text-slate-500 text-[11px]">Tendered (₹):</span>
                         <input
                           type="number"
                           value={cashReceivedInput}
@@ -1083,7 +1087,7 @@ export const PosPaymentModal: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleSplit5050}
-                    className="text-[10px] font-bold text-jaman-saffron hover:underline flex items-center gap-1"
+                    className="text-[10px] font-bold text-jaman-saffronText hover:underline flex items-center gap-1"
                   >
                     <Sparkles className="w-3 h-3" />
                     <span>Split 50/50</span>
@@ -1102,7 +1106,7 @@ export const PosPaymentModal: React.FC = () => {
                 {cart.discountAmount > 0 ? (
                   <div className="flex justify-between items-center text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1.5 rounded-xl border border-emerald-200">
                     <div className="flex items-center gap-1 truncate max-w-[170px]">
-                      <Tag className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <Tag className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                       <span className="truncate">Discount {cart.discountReason ? `(${cart.discountReason})` : ''}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -1129,7 +1133,7 @@ export const PosPaymentModal: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsDiscountModalOpen(true)}
-                    className="w-full py-2 px-3 rounded-xl border border-dashed border-[#FDBA74] bg-[#FFF8F3] hover:bg-[#FFF2E8] text-jaman-saffron text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    className="w-full py-2 px-3 rounded-xl border border-dashed border-[#FDBA74] bg-[#FFF8F3] hover:bg-[#FFF2E8] text-jaman-saffronText text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <Tag className="w-3.5 h-3.5" />
                     <span>+ Add Order Discount / Coupon</span>
@@ -1178,7 +1182,7 @@ export const PosPaymentModal: React.FC = () => {
                           onClick={() => {
                             setActiveChannel(channel);
                           }}
-                          className="p-1 text-slate-400 hover:text-jaman-saffron rounded"
+                          className="p-1 text-slate-500 hover:text-jaman-saffronText rounded"
                           title="Edit"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -1189,7 +1193,7 @@ export const PosPaymentModal: React.FC = () => {
                             onClick={() => {
                               setAllocations((prev) => ({ ...prev, [channel]: 0 }));
                             }}
-                            className="p-1 text-slate-400 hover:text-rose-600 rounded"
+                            className="p-1 text-slate-500 hover:text-rose-600 rounded"
                             title="Remove"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1200,7 +1204,7 @@ export const PosPaymentModal: React.FC = () => {
                   ))}
 
                 {(Object.values(allocations).reduce((a, b) => a + b, 0) === 0) && (
-                  <div className="text-center py-4 text-xs text-slate-400">
+                  <div className="text-center py-4 text-xs text-slate-500">
                     No payment tender selected yet
                   </div>
                 )}
@@ -1232,7 +1236,7 @@ export const PosPaymentModal: React.FC = () => {
                 className={`w-full py-4 rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 ${
                   isReadyToSettle && !isProcessing
                     ? 'bg-gradient-to-r from-jaman-saffron to-[#F27E2B] hover:from-[#EA580C] hover:to-jaman-saffron text-white shadow-orange-500/25 cursor-pointer'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300/60'
+                    : 'bg-slate-200 text-slate-500 cursor-not-allowed border border-slate-300/60'
                 }`}
               >
                 {isProcessing ? (
@@ -1245,7 +1249,7 @@ export const PosPaymentModal: React.FC = () => {
                 )}
               </button>
 
-              <span className="text-[10px] text-slate-400 text-center block">
+              <span className="text-[10px] text-slate-500 text-center block">
                 {isFullyAllocated && !isReadyToSettle
                   ? `Confirm ${upiPortion > 0 && !upiConfirmed ? 'UPI' : ''}${
                       upiPortion > 0 && !upiConfirmed && cardPortion > 0 && !cardConfirmed ? ' & ' : ''

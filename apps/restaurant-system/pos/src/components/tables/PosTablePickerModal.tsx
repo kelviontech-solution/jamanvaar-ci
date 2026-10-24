@@ -137,7 +137,7 @@ export const PosTablePickerModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <button
             type="button"
             onClick={() => { onClose(); setActiveTab('TABLES'); }}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-jaman-navy hover:text-jaman-saffron min-h-[36px]"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-jaman-navy hover:text-jaman-saffronText min-h-[36px]"
           >
             <LayoutGrid className="w-4 h-4" aria-hidden="true" />
             Open full floor plan

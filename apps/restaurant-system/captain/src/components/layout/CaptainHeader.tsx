@@ -153,10 +153,10 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
               >
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <div className="flex items-center gap-1.5 font-bold text-xs">
-                    <Server className="w-3.5 h-3.5 text-jaman-saffron" />
+                    <Server className="w-3.5 h-3.5 text-jaman-saffronText" />
                     <span>Connection and alerts</span>
                   </div>
-                  <button onClick={() => setIsSyncInfoOpen(false)} aria-label="Close" className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer">
+                  <button onClick={() => setIsSyncInfoOpen(false)} aria-label="Close" className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-600 cursor-pointer">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -202,7 +202,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                   </button>
                 </div>
 
-                <p className="text-[11px] text-slate-400 text-center font-medium pt-1">
+                <p className="text-[11px] text-slate-500 text-center font-medium pt-1">
                   {conn.level === 'ok' ? 'Orders reach the kitchen and counter within a second.' : 'Orders are kept on this phone and sent as soon as the connection is back.'}
                 </p>
               </div>
@@ -213,7 +213,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenQuickMessage}
-            className="hidden sm:flex px-2.5 sm:px-3 py-1.5 min-h-[40px] rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffron font-extrabold text-xs items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="hidden sm:flex px-2.5 sm:px-3 py-1.5 min-h-[40px] rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffronText font-extrabold text-xs items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="Compose quick operational message to Kitchen, POS, or Manager"
             aria-label="Send message to Kitchen, POS or Manager"
           >
@@ -250,7 +250,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
               <div className="w-6 h-6 rounded-lg bg-jaman-saffron text-white flex items-center justify-center font-bold text-xs">
                 {currentCaptain?.name?.charAt(0) || '?'}
               </div>
-              <ChevronDown className="hidden sm:block w-3 h-3 text-slate-400" />
+              <ChevronDown className="hidden sm:block w-3 h-3 text-slate-500" />
             </button>
 
             {isProfileOpen && (
@@ -270,7 +270,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                       type="button"
                       role="menuitem"
                       onClick={() => { setIsProfileOpen(false); onOpenQuickMessage(); }}
-                      className="w-full min-h-[44px] flex items-center gap-2 px-3 rounded-xl bg-[#FFF4ED] border border-[#FDBA74] text-jaman-saffron font-extrabold text-sm text-left active:scale-[0.98] cursor-pointer"
+                      className="w-full min-h-[44px] flex items-center gap-2 px-3 rounded-xl bg-[#FFF4ED] border border-[#FDBA74] text-jaman-saffronText font-extrabold text-sm text-left active:scale-[0.98] cursor-pointer"
                     >
                       <MessageSquare className="w-4 h-4" />
                       <span>Send message</span>

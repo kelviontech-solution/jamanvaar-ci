@@ -19,7 +19,7 @@ const AGE_STYLE: Record<ExpoOrder['age']['level'], string> = {
 
 const DISH_STYLE: Record<string, string> = {
   READY: 'bg-emerald-100 border-emerald-400 text-emerald-900',
-  SERVED: 'bg-slate-100 border-slate-200 text-slate-400 line-through',
+  SERVED: 'bg-slate-100 border-slate-200 text-slate-500 line-through',
   PREPARING: 'bg-amber-50 border-amber-300 text-amber-900',
   PENDING: 'bg-amber-50 border-amber-300 text-amber-900'
 };
@@ -78,7 +78,7 @@ export const KdsExpoBoard: React.FC<Props> = ({ orders, orderTypeLabel, onServeO
 
             {o.tableNumber && captainHandlesService ? (
               <div
-                className={`w-full min-h-[48px] rounded-2xl text-sm font-black flex items-center justify-center gap-2 ${o.allReady ? 'bg-amber-50 border border-amber-300 text-amber-800' : 'bg-slate-100 text-slate-400'}`}
+                className={`w-full min-h-[48px] rounded-2xl text-sm font-black flex items-center justify-center gap-2 ${o.allReady ? 'bg-amber-50 border border-amber-300 text-amber-800' : 'bg-slate-100 text-slate-500'}`}
                 title="Only the captain who delivers this order to the table marks it served"
               >
                 {o.allReady ? <><Bell className="w-4 h-4" /> All ready: waiting for captain</> : 'Not everything is ready yet'}

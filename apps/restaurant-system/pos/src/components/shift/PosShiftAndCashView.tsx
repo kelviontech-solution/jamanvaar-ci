@@ -352,7 +352,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <Clock className="w-6 h-6 text-jaman-saffron" />
+            <Clock className="w-6 h-6 text-jaman-saffronText" />
             <h1 className="text-xl sm:text-2xl font-black text-jaman-navy"> {t("Shift & Cash Management")} </h1>
           </div>
           <p className="text-xs text-slate-500 mt-0.5"> {t("Manage cashier shifts, cash drawer movements, float reconciliation and settlements.")} </p>
@@ -405,7 +405,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           {/* Card Top: Shift Title & Status */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-jaman-saffron flex items-center justify-center font-black">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-jaman-saffronText flex items-center justify-center font-black">
                 <Clock className="w-6 h-6" />
               </div>
               <div>
@@ -426,7 +426,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
             {/* Quick Summary Pill */}
             <div className="text-right">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider"> {t("Expected Drawer Cash")} </span>
+              <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider"> {t("Expected Drawer Cash")} </span>
               <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy">
                 {formatINR(expectedDrawerCash)}
               </span>
@@ -436,16 +436,16 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           {/* Row 1: Primary Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div className="p-3.5 bg-jaman-cream rounded-2xl border border-jaman-border">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block"> {t("Total Shift Sales")} </span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block"> {t("Total Shift Sales")} </span>
               <strong className="text-xl font-black font-mono text-jaman-navy block mt-0.5">
                 {formatINR(totalShiftSales)}
               </strong>
-              <span className="text-[10px] text-emerald-600 font-bold mt-1 inline-block">
+              <span className="text-[10px] text-emerald-700 font-bold mt-1 inline-block">
                 ● {completedShiftOrders.length} {t("Completed Orders")} </span>
             </div>
 
             <div className="p-3.5 bg-jaman-cream rounded-2xl border border-jaman-border">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block"> {t("Cash Sales Added")} </span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block"> {t("Cash Sales Added")} </span>
               <strong className="text-xl font-black font-mono text-amber-700 block mt-0.5">
                 {formatINR(shiftCashSales)}
               </strong>
@@ -453,7 +453,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
             </div>
 
             <div className="p-3.5 bg-jaman-cream rounded-2xl border border-jaman-border">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block"> {t("UPI / Digital QR")} </span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block"> {t("UPI / Digital QR")} </span>
               <strong className="text-xl font-black font-mono text-blue-700 block mt-0.5">
                 {formatINR(shiftUpiSales)}
               </strong>
@@ -461,7 +461,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
             </div>
 
             <div className="p-3.5 bg-jaman-cream rounded-2xl border border-jaman-border">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block"> {t("Opening Cash Float")} </span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block"> {t("Opening Cash Float")} </span>
               <strong className="text-xl font-black font-mono text-purple-700 block mt-0.5">
                 {formatINR(activeShift.openingCash)}
               </strong>
@@ -476,7 +476,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
             <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border space-y-2 text-xs">
               <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
                 <h3 className="font-black uppercase tracking-wider text-xs text-jaman-navy"> {t("Cash Drawer Mathematical Reconciliation")} </h3>
-                <span className="text-[10px] font-mono text-slate-400"> {t("REAL-TIME MATH")} </span>
+                <span className="text-[10px] font-mono text-slate-500"> {t("REAL-TIME MATH")} </span>
               </div>
 
               <div className="space-y-1.5 text-slate-600">
@@ -498,7 +498,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-200/80 font-black text-sm text-jaman-navy">
                   <span> {t("= Current Expected Cash in Drawer:")} </span>
-                  <span className="font-mono text-jaman-saffron">{formatINR(expectedDrawerCash)}</span>
+                  <span className="font-mono text-jaman-saffronText">{formatINR(expectedDrawerCash)}</span>
                 </div>
               </div>
             </div>
@@ -507,7 +507,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
             <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border space-y-2 text-xs">
               <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
                 <h3 className="font-black uppercase tracking-wider text-xs text-jaman-navy"> {t("Shift Payment Channel Breakdown")} </h3>
-                <span className="text-[10px] font-mono text-slate-400"> {t("TENDER SETTLEMENT")} </span>
+                <span className="text-[10px] font-mono text-slate-500"> {t("TENDER SETTLEMENT")} </span>
               </div>
 
               <div className="space-y-1.5 text-slate-600">
@@ -539,14 +539,14 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <div className="flex items-center gap-2">
-                <CircleDollarSign className="w-4 h-4 text-jaman-saffron" />
+                <CircleDollarSign className="w-4 h-4 text-jaman-saffronText" />
                 <h3 className="font-black text-xs uppercase tracking-wider text-jaman-navy"> {t("Cash Movements in this Shift (")} {activeMovements.length})
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setCashMovementModalOpen(true)}
-                className="text-xs font-bold text-jaman-saffron hover:underline"
+                className="text-xs font-bold text-jaman-saffronText hover:underline"
               > {t("+ Record Movement")} </button>
             </div>
 
@@ -562,7 +562,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                       </span>
                       <div>
                         <strong className="text-jaman-navy block">{mov.reason}</strong>
-                        <span className="text-[10px] text-slate-400"> {t("By")} {mov.cashierName} • {new Date(mov.timestamp).toLocaleTimeString('en-IN')}
+                        <span className="text-[10px] text-slate-500"> {t("By")} {mov.cashierName} • {new Date(mov.timestamp).toLocaleTimeString('en-IN')}
                         </span>
                       </div>
                     </div>
@@ -576,14 +576,14 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 ))}
               </div>
             ) : (
-              <div className="py-6 text-center text-slate-400 text-xs"> {t("No cash in/out float adjustments recorded during this shift.")} </div>
+              <div className="py-6 text-center text-slate-500 text-xs"> {t("No cash in/out float adjustments recorded during this shift.")} </div>
             )}
           </div>
         </div>
       ) : (
         /* Empty State: No Active Shift */
         <div className="bg-white border-2 border-dashed border-slate-300 rounded-3xl p-10 text-center space-y-4 shadow-2xs">
-          <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 text-jaman-saffron mx-auto flex items-center justify-center">
+          <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 text-jaman-saffronText mx-auto flex items-center justify-center">
             <Lock className="w-8 h-8 opacity-60" />
           </div>
           <div className="space-y-1">
@@ -677,7 +677,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                       <span> {t("Counted Cash:")} </span>
                       <strong className="font-mono text-jaman-navy">{formatINR(shift.closingCash ?? shift.actualCash ?? 0)}</strong>
                     </div>
-                    <div className="text-[10px] text-slate-400 pt-1 border-t border-jaman-border/60">
+                    <div className="text-[10px] text-slate-500 pt-1 border-t border-jaman-border/60">
                       {new Date(shift.openedAt).toLocaleDateString('en-IN')} • {new Date(shift.openedAt).toLocaleTimeString('en-IN')} → {shift.closedAt ? new Date(shift.closedAt).toLocaleTimeString('en-IN') : 'Closed'}
                     </div>
                   </div>
@@ -724,18 +724,18 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-100 text-jaman-saffron flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-jaman-saffronText flex items-center justify-center font-bold">
                   <Unlock className="w-4 h-4" />
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-jaman-navy"> {t("Start New Cashier Shift")} </h3>
-                  <span className="text-[10px] text-slate-400"> {t("POS Terminal:")} {posTerminalId}</span>
+                  <span className="text-[10px] text-slate-500"> {t("POS Terminal:")} {posTerminalId}</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setOpenShiftModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
+                className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -818,13 +818,13 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-jaman-navy"> {t("Record Cash Movement")} </h3>
-                  <span className="text-[10px] text-slate-400"> {t("Shift #")} {activeShift?.shiftNumber ?? activeShift?.id?.slice(-2)} {t("Drawer")} </span>
+                  <span className="text-[10px] text-slate-500"> {t("Shift #")} {activeShift?.shiftNumber ?? activeShift?.id?.slice(-2)} {t("Drawer")} </span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setCashMovementModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
+                className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -922,13 +922,13 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-jaman-navy"> {t("Close Cashier Shift & Settle Drawer")} </h3>
-                  <span className="text-[10px] text-slate-400"> {t("Shift #")} {activeShift.shiftNumber ?? activeShift.id.slice(-2)} • {activeShift.cashierName}</span>
+                  <span className="text-[10px] text-slate-500"> {t("Shift #")} {activeShift.shiftNumber ?? activeShift.id.slice(-2)} • {activeShift.cashierName}</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setCloseShiftModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
+                className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -951,7 +951,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </div>
                 <div className="flex justify-between pt-1.5 border-t border-slate-100 font-bold text-sm text-jaman-navy">
                   <span> {t("Expected Drawer Cash:")} </span>
-                  <span className="font-mono text-jaman-saffron">{formatINR(expectedDrawerCash)}</span>
+                  <span className="font-mono text-jaman-saffronText">{formatINR(expectedDrawerCash)}</span>
                 </div>
               </div>
 
@@ -959,7 +959,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-2.5">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
                   <strong className="text-xs uppercase tracking-wider text-jaman-navy"> {t("Cash Drawer Denomination Count")} </strong>
-                  <span className="text-[10px] text-slate-400 font-mono"> {t("CURRENCY CALCULATOR")} </span>
+                  <span className="text-[10px] text-slate-500 font-mono"> {t("CURRENCY CALCULATOR")} </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -1060,7 +1060,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-jaman-navy"> {t("Shift Statement —")} {selectedHistoricalShift.id}</h3>
-                  <span className="text-[10px] text-slate-400"> {t("Cashier:")} {selectedHistoricalShift.cashierName} • {selectedHistoricalShift.posId}</span>
+                  <span className="text-[10px] text-slate-500"> {t("Cashier:")} {selectedHistoricalShift.cashierName} • {selectedHistoricalShift.posId}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -1083,7 +1083,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 <button
                   type="button"
                   onClick={() => setSelectedHistoricalShift(null)}
-                  className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
+                  className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1093,19 +1093,19 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
             <div className="p-5 overflow-y-auto space-y-4 text-xs">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <div className="bg-white p-3 rounded-2xl border border-jaman-border">
-                  <span className="text-[10px] text-slate-400 block font-bold uppercase"> {t("Total Sales")} </span>
+                  <span className="text-[10px] text-slate-500 block font-bold uppercase"> {t("Total Sales")} </span>
                   <strong className="font-mono text-base font-black text-jaman-navy">{formatINR(selectedHistoricalShift.totalSales)}</strong>
                 </div>
                 <div className="bg-white p-3 rounded-2xl border border-jaman-border">
-                  <span className="text-[10px] text-slate-400 block font-bold uppercase"> {t("Orders")} </span>
+                  <span className="text-[10px] text-slate-500 block font-bold uppercase"> {t("Orders")} </span>
                   <strong className="font-mono text-base font-black text-jaman-navy">{selectedHistoricalShift.totalOrders}</strong>
                 </div>
                 <div className="bg-white p-3 rounded-2xl border border-jaman-border">
-                  <span className="text-[10px] text-slate-400 block font-bold uppercase"> {t("Cash Sales")} </span>
+                  <span className="text-[10px] text-slate-500 block font-bold uppercase"> {t("Cash Sales")} </span>
                   <strong className="font-mono text-base font-black text-amber-700">{formatINR(selectedHistoricalShift.totalCashSales)}</strong>
                 </div>
                 <div className="bg-white p-3 rounded-2xl border border-jaman-border">
-                  <span className="text-[10px] text-slate-400 block font-bold uppercase"> {t("Counted Cash")} </span>
+                  <span className="text-[10px] text-slate-500 block font-bold uppercase"> {t("Counted Cash")} </span>
                   <strong className="font-mono text-base font-black text-jaman-navy">{formatINR(selectedHistoricalShift.closingCash || selectedHistoricalShift.actualCash || 0)}</strong>
                 </div>
               </div>

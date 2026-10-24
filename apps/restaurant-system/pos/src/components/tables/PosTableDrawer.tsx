@@ -82,7 +82,7 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
         <div className="bg-jaman-navy text-white p-5 flex items-center justify-between shrink-0">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase text-jaman-saffron">{table.zone || 'Dining Area'}</span>
+              <span className="text-xs font-bold uppercase text-jaman-saffronText">{table.zone || 'Dining Area'}</span>
               <span className="text-[10px] font-extrabold bg-white/20 text-white px-2 py-0.5 rounded-full uppercase">
                 {table.status}
               </span>
@@ -112,7 +112,7 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
               <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
                   <span className="font-bold text-xs text-jaman-navy">Active Order Items</span>
-                  <span className="text-xs font-semibold text-slate-400 font-mono">
+                  <span className="text-xs font-semibold text-slate-500 font-mono">
                     Token #{activeOrder.tokenNumber}
                   </span>
                 </div>
@@ -122,7 +122,7 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
                     <div key={idx} className="pt-2 first:pt-0 flex items-start justify-between text-xs">
                       <div>
                         <div className="font-bold text-jaman-navy">{it.name}</div>
-                        <div className="text-[11px] text-slate-400">
+                        <div className="text-[11px] text-slate-500">
                           ₹{it.unitPrice} × {it.quantity}
                           {it.specialInstructions ? ` (${it.specialInstructions})` : ''}
                         </div>
@@ -146,7 +146,7 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
               {showTransferMode && (
                 <div className="bg-white border-2 border-jaman-saffron rounded-2xl p-4 space-y-3 shadow-md">
                   <div className="flex items-center gap-2 text-xs font-bold text-jaman-navy">
-                    <ArrowRightLeft className="w-4 h-4 text-jaman-saffron" />
+                    <ArrowRightLeft className="w-4 h-4 text-jaman-saffronText" />
                     <span>Select Target Table to Move Order</span>
                   </div>
 
@@ -228,7 +228,7 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
                   onClick={handleAddItems}
                   className="py-3 px-3 rounded-xl bg-white border border-jaman-border hover:border-jaman-saffron text-jaman-navy font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-colors"
                 >
-                  <Plus className="w-4 h-4 text-jaman-saffron" />
+                  <Plus className="w-4 h-4 text-jaman-saffronText" />
                   <span>Add Dishes</span>
                 </button>
 
@@ -262,7 +262,7 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
               <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
               <div>
                 <h3 className="font-bold text-base text-jaman-navy">Table is Available</h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   No active orders on this table. Ready to seat new guests.
                 </p>
               </div>

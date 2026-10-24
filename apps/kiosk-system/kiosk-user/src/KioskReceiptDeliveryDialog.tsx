@@ -95,7 +95,7 @@ export function KioskReceiptDeliveryDialog({ channel, onClose, onDone, onActivit
       </button>
     </div>}>
     {result?.success ? <section className="text-center py-6 sm:py-10 space-y-4" role="status" aria-live="polite">
-      <CheckCircle2 className="w-16 h-16 mx-auto text-emerald-600" />
+      <CheckCircle2 className="w-16 h-16 mx-auto text-emerald-700" />
       <h3 className="text-2xl font-extrabold text-jaman-navy">{email ? 'Email sent' : 'WhatsApp bill sent'}</h3>
       <p className="text-base text-slate-600 break-words">{result.message}</p>
       <p className="text-sm text-slate-500">{email ? 'Check your inbox or spam folder for your bill.' : 'Check your WhatsApp messages for your bill.'}</p>
@@ -107,7 +107,7 @@ export function KioskReceiptDeliveryDialog({ channel, onClose, onDone, onActivit
       <div className="flex items-center gap-2">
         {!email && <span className="rounded-xl bg-jaman-ivory border border-jaman-border p-3 font-bold text-jaman-navy">+91</span>}
         <div className="flex-1 min-w-0 relative">
-          {email ? <Mail className="absolute left-3 top-4 w-5 h-5 text-jaman-saffron" /> : <MessageCircle className="absolute left-3 top-4 w-5 h-5 text-jaman-saffron" />}
+          {email ? <Mail className="absolute left-3 top-4 w-5 h-5 text-jaman-saffronText" /> : <MessageCircle className="absolute left-3 top-4 w-5 h-5 text-jaman-saffronText" />}
           <input ref={input} id="kiosk-receipt-recipient" type="text" inputMode="none" readOnly disabled={sending} autoComplete="off" autoCapitalize="none" spellCheck={false}
             value={value} placeholder={email ? 'you@example.com' : '98765 43210'} aria-describedby="kiosk-receipt-input-help"
             onSelect={() => { if (input.current) selection.current = { start: input.current.selectionStart ?? value.length, end: input.current.selectionEnd ?? value.length }; }}

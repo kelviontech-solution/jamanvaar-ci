@@ -55,13 +55,13 @@ export const DetectedPrintersPanel: React.FC<{ onAdded: () => void; showToast: (
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div>
           <h3 className="font-bold text-sm text-jaman-navy">Find printers</h3>
-          <span className="text-[10px] text-slate-400">Looks for USB / Windows printers, network printers and serial ports</span>
+          <span className="text-[10px] text-slate-500">Looks for USB / Windows printers, network printers and serial ports</span>
         </div>
         <button
           type="button"
           onClick={scan}
           disabled={scanning}
-          className="px-2.5 py-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffron border border-[#FDBA74] rounded-xl font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
+          className="px-2.5 py-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffronText border border-[#FDBA74] rounded-xl font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${scanning ? 'animate-spin' : ''}`} />
           <span>{scanning ? 'Scanning…' : 'Scan'}</span>
