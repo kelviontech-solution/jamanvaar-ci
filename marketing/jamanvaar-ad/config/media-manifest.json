@@ -1,0 +1,1316 @@
+{
+  "project": "Jamanvaar advertisement",
+  "assets": [
+    {
+      "path": "assets/fonts/Jakarta.ttf",
+      "bytes": 176288,
+      "sha256": "89b3fb38aa0d275d7a731d0d817a4f1622b316b4d7fbdedcf02ee9099ff68bc8",
+      "source": "Google Fonts: Plus Jakarta Sans",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "assets/fonts/OFL.txt"
+    },
+    {
+      "path": "assets/fonts/OFL.txt",
+      "bytes": 4402,
+      "sha256": "995c7199cab65954f545996326755daee7b63cc6b42b06c13da1f9502ab08a99"
+    },
+    {
+      "path": "assets/gsap.min.js",
+      "bytes": 72779,
+      "sha256": "c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280",
+      "source": "GSAP 3.14.2 via jsDelivr; local copy for reproducibility"
+    },
+    {
+      "path": "assets/logo/jamanvaar.png",
+      "bytes": 539367,
+      "sha256": "ff889104473b7ee26c71fff7d8821a0dffd84ecc5d6c4efda145991aa6f73db9",
+      "source": "Official repository asset",
+      "original": "cloud/super-admin-web/public/assets/branding/jamanvaar-logo.png",
+      "modified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 1205,
+            "height": 670
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/music/ATTRIBUTION.txt",
+      "bytes": 501,
+      "sha256": "ec27cde57067a257cd460c833ea7f77a8a2a25cf1e128b0f6fb30350df1a3572",
+      "source": "Inspired - Kevin MacLeod",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "See assets/music/ATTRIBUTION.txt; on-screen credit included"
+    },
+    {
+      "path": "assets/music/bed.wav",
+      "bytes": 9600222,
+      "sha256": "f63a3e4b1073904539d76b2d0d6175467b779c3da39c29a82de04285352abe44",
+      "source": "Inspired - Kevin MacLeod",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "See assets/music/ATTRIBUTION.txt; on-screen credit included",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "50.000000"
+        }
+      }
+    },
+    {
+      "path": "assets/music/Inspired-Kevin-MacLeod.mp3",
+      "bytes": 9156393,
+      "sha256": "40b1af74145cedac77814d060155ad4658e04efa14d1b649decedc98fbb25f69",
+      "source": "Inspired - Kevin MacLeod",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "See assets/music/ATTRIBUTION.txt; on-screen credit included",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "286.066969"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/admin-capture.webm",
+      "bytes": 207874,
+      "sha256": "7d7f06bad3f936bdf86f5a03a4d0d6b7c034a2d73b7a7817a9b064f5cf0db246",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "9.520000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/admin.png",
+      "bytes": 106163,
+      "sha256": "223f9516fb2b37ea49088fc515e687b55ed78a4fa632974f529d7bdd54b42355",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/kds-capture.webm",
+      "bytes": 184926,
+      "sha256": "447e1863bcf4f1d69e801f61c4a281c6b3c826b074023a7e4a4dff37dca5cc95",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "6.880000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/kds-ticket.png",
+      "bytes": 26844,
+      "sha256": "c4b9ccedbb09febba3446fb2ce961c62f16677898681a4cd1067f21f114b87cd",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 447,
+            "height": 411
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/kds.png",
+      "bytes": 92837,
+      "sha256": "40b5305f147f0422b3caa3b14870d27e881b18a59a5a4d1addefb5de77210ceb",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/kiosk-capture.webm",
+      "bytes": 297307,
+      "sha256": "0e8437cfc2e0cc9fad231d25bb5bb1611c1784fa55e09641db9a99a6c8c74867",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 720,
+            "height": 1280
+          }
+        ],
+        "format": {
+          "duration": "7.520000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/kiosk-menu.png",
+      "bytes": 617053,
+      "sha256": "a3fefff59b6d400c7583fe29615174dcfd404add14fee92fbe6777497b320ebf",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 720,
+            "height": 1280
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/kiosk-welcome.png",
+      "bytes": 322047,
+      "sha256": "065f9ded9420ed5a117b4b20758b485455a7cc1570dffea86d7f37c932af22b7",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 720,
+            "height": 1280
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/pos-capture.webm",
+      "bytes": 279406,
+      "sha256": "12f3989f5dac6a94d50400ce7ece697510ca5dc876778b2dbb1df18fdcde505d",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "9.520000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/pos-cart.png",
+      "bytes": 44085,
+      "sha256": "ab231e0a7516dd6f468639c6e1898bc3ffa2b56f02feeb18cf3c32bf62d9de7d",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 447,
+            "height": 834
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/pos.png",
+      "bytes": 106796,
+      "sha256": "8d26329c8d0e0eabe7250db57c77557439151c309c2e614236a96288243da43f",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/qr-capture.webm",
+      "bytes": 163415,
+      "sha256": "de30053b1f36add13050be9d41062ca4441877d92475f8a11492aa4ea24e5c04",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 480,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "4.080000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/qr-debug.png",
+      "bytes": 244296,
+      "sha256": "bc86bbe29ff0762b7ec020d534a2f6fcba0e3572713c2bf51a5e6af3c9303a2d",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 480,
+            "height": 960
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/qr-menu.png",
+      "bytes": 247372,
+      "sha256": "c7366e2a3db93ab8e08d4c61a579e4f7da400f8a31f4423dd4539912b77bf13a",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 480,
+            "height": 960
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@02b2b3fe2dc6ba3c1d46d3dc01fae67e.webm",
+      "bytes": 196106,
+      "sha256": "d90292b215cad2e61515791f3ca7e3971430c79f0b14a6b79de836a4185ae13f",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "8.000000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@07fac9b9d2975c57c48c50ebd621a980.webm",
+      "bytes": 279406,
+      "sha256": "12f3989f5dac6a94d50400ce7ece697510ca5dc876778b2dbb1df18fdcde505d",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "9.520000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@11ebc90cc1be9e10822adad409b51b29.webm",
+      "bytes": 168751,
+      "sha256": "5e82315e98f13d7bb06d3b3e49e08c40be0580500973700bae46492a777e1295",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "9.440000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@1d23fbf64a5713d6047a371c4b0adfb8.webm",
+      "bytes": 207874,
+      "sha256": "7d7f06bad3f936bdf86f5a03a4d0d6b7c034a2d73b7a7817a9b064f5cf0db246",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "9.520000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@31cbcac2810c9c3845e01aed8df4e9d0.webm",
+      "bytes": 279172,
+      "sha256": "c1d53211942eaff678c7900533f9a13f322481ec06e15b95a0e6b73daf4823c8",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "9.680000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@4ad1893a381ff4a9770ed6cba2642734.webm",
+      "bytes": 38161,
+      "sha256": "61a4858fac0def7c25457dedb458f90b0ff40553e63cec69d49d950f4a32ed8d",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 480,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "33.760000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@785998a68f4868cb95294f9917c96a81.webm",
+      "bytes": 47568,
+      "sha256": "5ef06249ae455fd9204f2ae75a3839ac59ce2c72cab9d01c43f9da94eda15996",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 480,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "32.520000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@972a458f8332e8b4ae61c050a883f883.webm",
+      "bytes": 260525,
+      "sha256": "5e1c929fe6dd9788900055e21c15a2f43cdc9b744d4997e7858b910371fc83ab",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "13.880000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@a5cce86717dd33b74199c67b6db4d304.webm",
+      "bytes": 163415,
+      "sha256": "de30053b1f36add13050be9d41062ca4441877d92475f8a11492aa4ea24e5c04",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 480,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "4.080000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@a929b430f2edff65f2b554346722eea0.webm",
+      "bytes": 184926,
+      "sha256": "447e1863bcf4f1d69e801f61c4a281c6b3c826b074023a7e4a4dff37dca5cc95",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "6.880000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@d00ca7a00a40513f2dfd12032efea698.webm",
+      "bytes": 119929,
+      "sha256": "c6d4177c2ae616a535bb3679f8e6340742a260a51a1e7fedb9ca498274fe558b",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "6.640000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@d60072498bbd49989a12c4fd50b40c4b.webm",
+      "bytes": 164584,
+      "sha256": "37f856bd7d2d6dd089bd82fc710b930a61945419c1d4ce727dcba70145b168ee",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 480,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "4.080000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@d62f2d0a6e3956c76507281011a6d6b4.webm",
+      "bytes": 297307,
+      "sha256": "0e8437cfc2e0cc9fad231d25bb5bb1611c1784fa55e09641db9a99a6c8c74867",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 720,
+            "height": 1280
+          }
+        ],
+        "format": {
+          "duration": "7.520000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@d8d1d16925e5048261496487b5f8ce11.webm",
+      "bytes": 264431,
+      "sha256": "8e2f453f342d9a4568c0afa16109e0de72f5a1e5aa2daa04492888cf54d3c67e",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 720,
+            "height": 1280
+          }
+        ],
+        "format": {
+          "duration": "8.480000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@db40ffcf8275687e7d0049f79b03b43e.webm",
+      "bytes": 157633,
+      "sha256": "724005cad7e6e23d7ac66e9481136f80da0b37bbed48e12e712b680ef2ddaf97",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 480,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "4.840000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@ee75cf90f63739a17260051c7ef41db2.webm",
+      "bytes": 196255,
+      "sha256": "be5da57489d1b01e62b932f4a1f817e8f27c730b43f796ac6157c828970bcb43",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "6.840000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@eef8fdb4519b2620982857e6c7b592b7.webm",
+      "bytes": 167918,
+      "sha256": "a3964756d86f7797dc55bab131755743253a2e82573634198710063224c33a20",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 1440,
+            "height": 960
+          }
+        ],
+        "format": {
+          "duration": "8.080000"
+        }
+      }
+    },
+    {
+      "path": "assets/product-recordings/raw/page@fc847662b13e2a043719cdda9977d434.webm",
+      "bytes": 308210,
+      "sha256": "703184f6c13763b61a61d18dafe8a1c9e9b1dfb58c10c0ebb68394f07c717add",
+      "source": "Playwright capture of real repository components with fictional local data",
+      "authenticationVerified": false,
+      "backendVerified": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "vp8",
+            "width": 720,
+            "height": 1280
+          }
+        ],
+        "format": {
+          "duration": "7.520000"
+        }
+      }
+    },
+    {
+      "path": "assets/restaurant-footage/kitchen.jpg",
+      "bytes": 320396,
+      "sha256": "87ab5e549cd7a11e0d7140085b51e6a9aa1a30475384deb4b7ea095c6ba21cc3",
+      "source": "Built-in image_gen",
+      "type": "AI-generated illustrative photograph, animated in composition",
+      "realCustomer": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mjpeg",
+            "width": 1672,
+            "height": 941
+          }
+        ],
+        "format": {
+          "duration": "0.040000"
+        }
+      }
+    },
+    {
+      "path": "assets/restaurant-footage/kitchen.png",
+      "bytes": 2056640,
+      "sha256": "02330f4fb6ff845c4074a99fe5e7c74b322fe728916837d2c8077c2753a854f7",
+      "source": "Built-in image_gen",
+      "type": "AI-generated illustrative photograph, animated in composition",
+      "realCustomer": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 1672,
+            "height": 941
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/restaurant-footage/phone.jpg",
+      "bytes": 351124,
+      "sha256": "82cd6c1a844816815de492e7c75b8c38845e698d7b49ca346e1ef9aa2ac1245f",
+      "source": "Built-in image_gen",
+      "type": "AI-generated illustrative photograph, animated in composition",
+      "realCustomer": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mjpeg",
+            "width": 1672,
+            "height": 941
+          }
+        ],
+        "format": {
+          "duration": "0.040000"
+        }
+      }
+    },
+    {
+      "path": "assets/restaurant-footage/phone.png",
+      "bytes": 2219375,
+      "sha256": "e288ead71217ea718c542eb854fde0000622087e1bf21540e20f51d891ef33fa",
+      "source": "Built-in image_gen",
+      "type": "AI-generated illustrative photograph, animated in composition",
+      "realCustomer": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 1672,
+            "height": 941
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/restaurant-footage/restaurant.jpg",
+      "bytes": 306055,
+      "sha256": "a5ff0e73f459189d86e0984761cd7ca9e27f4cc2a75a16b122ff5bc6b5393f80",
+      "source": "Built-in image_gen",
+      "type": "AI-generated illustrative photograph, animated in composition",
+      "realCustomer": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mjpeg",
+            "width": 1672,
+            "height": 941
+          }
+        ],
+        "format": {
+          "duration": "0.040000"
+        }
+      }
+    },
+    {
+      "path": "assets/restaurant-footage/restaurant.png",
+      "bytes": 2074844,
+      "sha256": "56218382335985921c2f100000220b0e38d0a95ee772dcbfd98b80b4f24e1708",
+      "source": "Built-in image_gen",
+      "type": "AI-generated illustrative photograph, animated in composition",
+      "realCustomer": false,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "png",
+            "width": 1672,
+            "height": 941
+          }
+        ],
+        "format": {}
+      }
+    },
+    {
+      "path": "assets/voiceover/admin.mp3",
+      "bytes": 19872,
+      "sha256": "af1bf64128f4374f8891d0266b08502b8dc3287952ac450a5db1c414f0e40430",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "3.312000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/admin.wav",
+      "bytes": 315982,
+      "sha256": "14b32e2f2f121db9538598be8c7578fd6cc82293fb15ba92bf06ee002d5ffff3",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "3.290667"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/brand.mp3",
+      "bytes": 18432,
+      "sha256": "62488d412908c77727f5365d293d47b45d45e6a07873224692fd79b450f8c6d4",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "3.072000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/brand.wav",
+      "bytes": 292942,
+      "sha256": "1abfcb940df008c000308ce289bc4ddfafabbbb0f819c42b0cfac00c61449932",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "3.050667"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/closing.mp3",
+      "bytes": 30384,
+      "sha256": "f6c9977b17506c55fbbadb3285eaf912aee2efef68d03f56a2eb7ab8b286feba",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "5.064000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/closing.wav",
+      "bytes": 484174,
+      "sha256": "c11291414b9c4bb1c4840c872a1d951b1a5310ac2a7bbc2c6dbc2e38d1bd746f",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "5.042667"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/kds.mp3",
+      "bytes": 28944,
+      "sha256": "03ef4066283b41a34f0f0e88d23fd3ddaf97dab0613b7a91bd2db19f3b6157c2",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "4.824000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/kds.wav",
+      "bytes": 461134,
+      "sha256": "b5f65d9c7a76eb4a40dfd29bedc2ea4804a43f274577197c64e4adc50d1e92d1",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "4.802667"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/kiosk.mp3",
+      "bytes": 29808,
+      "sha256": "89a248017bf726c50c70245110653f1a68b8acd559bb565117b00a9ac7b2d67a",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "4.968000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/kiosk.wav",
+      "bytes": 474958,
+      "sha256": "e67c5504f9c2d435cf68feaa622aeba628bfa30efd1576ccfc44399b754c63fc",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "4.946667"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/mix.wav",
+      "bytes": 9600222,
+      "sha256": "36bcb441320c430bec36b08b49269e48f02476024ec2ac8c304b4a774ecc5dca",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "50.000000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/NARRATION.md",
+      "bytes": 643,
+      "sha256": "003b21db9b7fe0ce9635799d10a464842a98a565e2a22f3fe5ab244b0e0f4dd1",
+      "source": "Configurable narration script"
+    },
+    {
+      "path": "assets/voiceover/opening.mp3",
+      "bytes": 35856,
+      "sha256": "c317e4f3d59d055023eec0288ced53e0a1799cd5cc6398b495d667236dc041ac",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "5.976000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/opening.wav",
+      "bytes": 444996,
+      "sha256": "eb343089ba692f729b96974be37528cce0c686cd31b9ce57273c5246f486bfef",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "4.634563"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/pos.mp3",
+      "bytes": 32256,
+      "sha256": "ae52c5ff0e2e8574a245b8eab83fcd7da5844a5b1654ff136004d1c4bbf6bf9b",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "5.376000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/pos.wav",
+      "bytes": 514126,
+      "sha256": "044207c41d7e2b84711ebffccbf0f23be6e022fdb3831367e7f9bd0c24a66bfc",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "5.354667"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/qr.mp3",
+      "bytes": 30960,
+      "sha256": "5395354c0e0ada586822145bd628ff4734ddbd64b8aaea472b33d10c393f6c16",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "5.160000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/qr.wav",
+      "bytes": 493390,
+      "sha256": "7966bf25d0df114c6f02408c3b52aca58e053f2df21179bc51e9aff2235e692f",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "5.138667"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/whatsapp.mp3",
+      "bytes": 37008,
+      "sha256": "8dd163a3eba12fbfbda8f853f42c27998c227d2edf48fff6bbfd70bf23737ff8",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "24000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "6.168000"
+        }
+      }
+    },
+    {
+      "path": "assets/voiceover/whatsapp.wav",
+      "bytes": 540588,
+      "sha256": "f3031a3b648fd3d180eec2575533c1ea6c4ec35f9a858514ea5754e2d6c375ca",
+      "source": "Free Edge online TTS; en-IN-PrabhatNeural; mixed locally",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 1
+          }
+        ],
+        "format": {
+          "duration": "5.630313"
+        }
+      }
+    }
+  ],
+  "missing": [
+    "No runnable Vartalaap / WhatsApp ordering app or authentic chat recording found",
+    "No physical printer, live payments, kitchen integration or customer phone delivery verified by this capture",
+    "No verified sales phone number or public marketing website supplied; omitted"
+  ],
+  "generatedImagePrompts": [
+    {
+      "asset": "assets/restaurant-footage/restaurant.png",
+      "prompt": "Premium believable contemporary Indian restaurant in Ahmedabad during daytime service. Indian owner in ivory shirt observes waiter serving guests. Cream stone, sage upholstery, brass pendants, plants, natural skin texture, 35mm, horizontal 16:9; no logos, text, fake interfaces or watermarks."
+    },
+    {
+      "asset": "assets/restaurant-footage/phone.png",
+      "prompt": "Indian couple at sunlit contemporary cafe, Indian woman in emerald blouse using phone facing away from camera, paneer tikka and copper servingware, cream and teal, natural light, 50mm hospitality photography, horizontal 16:9; no interface, logo, text, QR or watermarks."
+    },
+    {
+      "asset": "assets/restaurant-footage/kitchen.png",
+      "prompt": "Indian chef finishing paneer dishes in clean contemporary restaurant kitchen, warm natural light, stainless steel, cream and sage, another chef in background, blank monitor on left, realistic premium hospitality photo, horizontal 16:9; no invented interface, text, logo or watermark."
+    }
+  ]
+}

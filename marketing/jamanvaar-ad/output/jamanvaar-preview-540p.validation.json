@@ -1,0 +1,30 @@
+{
+  "file": "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\marketing\\jamanvaar-ad\\output\\jamanvaar-preview-540p.mp4",
+  "bytes": 2069889,
+  "duration": 50.0,
+  "width": 540,
+  "height": 960,
+  "fps": "30/1",
+  "videoCodec": "h264",
+  "pixelFormat": "yuv420p",
+  "audioCodec": "aac",
+  "audioSampleRate": "48000",
+  "audioChannels": 2,
+  "peakDb": -4.2,
+  "meanDb": -19.2,
+  "loudness": {
+    "input_i": "-16.79",
+    "input_tp": "-4.17",
+    "input_lra": "4.20",
+    "input_thresh": "-27.08",
+    "output_i": "-16.12",
+    "output_tp": "-3.38",
+    "output_lra": "4.00",
+    "output_thresh": "-26.34",
+    "normalization_type": "dynamic",
+    "target_offset": "0.12"
+  },
+  "fullDecodePassed": true,
+  "blackFrameEvents": [],
+  "audioMeasuredNotListened": true
+}

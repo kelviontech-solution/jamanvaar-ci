@@ -1,0 +1,83 @@
+[
+  {
+    "id": "opening",
+    "start": 0.15,
+    "duration": 4.634563,
+    "file": "assets/voiceover/opening.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1.2851612903225806
+  },
+  {
+    "id": "brand",
+    "start": 5.15,
+    "duration": 3.050667,
+    "file": "assets/voiceover/brand.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1
+  },
+  {
+    "id": "pos",
+    "start": 9.15,
+    "duration": 5.354667,
+    "file": "assets/voiceover/pos.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1
+  },
+  {
+    "id": "qr",
+    "start": 15.15,
+    "duration": 5.138667,
+    "file": "assets/voiceover/qr.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1
+  },
+  {
+    "id": "whatsapp",
+    "start": 21.15,
+    "duration": 5.630313,
+    "file": "assets/voiceover/whatsapp.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1.0916814159292034
+  },
+  {
+    "id": "kiosk",
+    "start": 27.15,
+    "duration": 4.946667,
+    "file": "assets/voiceover/kiosk.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1
+  },
+  {
+    "id": "kds",
+    "start": 33.15,
+    "duration": 4.802667,
+    "file": "assets/voiceover/kds.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1
+  },
+  {
+    "id": "admin",
+    "start": 39.15,
+    "duration": 3.290667,
+    "file": "assets/voiceover/admin.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1
+  },
+  {
+    "id": "closing",
+    "start": 43.15,
+    "duration": 5.042667,
+    "file": "assets/voiceover/closing.wav",
+    "provider": "Microsoft Edge online speech, free endpoint",
+    "voice": "en-IN-PrabhatNeural",
+    "speedAdjustment": 1
+  }
+]

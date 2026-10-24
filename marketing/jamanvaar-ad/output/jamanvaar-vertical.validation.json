@@ -1,0 +1,30 @@
+{
+  "file": "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\marketing\\jamanvaar-ad\\output\\jamanvaar-vertical.mp4",
+  "bytes": 14495224,
+  "duration": 50.0,
+  "width": 1080,
+  "height": 1920,
+  "fps": "30/1",
+  "videoCodec": "h264",
+  "pixelFormat": "yuv420p",
+  "audioCodec": "aac",
+  "audioSampleRate": "48000",
+  "audioChannels": 2,
+  "peakDb": -4.4,
+  "meanDb": -19.2,
+  "loudness": {
+    "input_i": "-16.77",
+    "input_tp": "-4.42",
+    "input_lra": "4.20",
+    "input_thresh": "-27.05",
+    "output_i": "-16.12",
+    "output_tp": "-3.47",
+    "output_lra": "3.90",
+    "output_thresh": "-26.34",
+    "normalization_type": "dynamic",
+    "target_offset": "0.12"
+  },
+  "fullDecodePassed": true,
+  "blackFrameEvents": [],
+  "audioMeasuredNotListened": true
+}

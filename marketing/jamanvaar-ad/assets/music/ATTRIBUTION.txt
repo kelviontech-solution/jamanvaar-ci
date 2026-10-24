@@ -1,0 +1,7 @@
+Inspired by Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0
+https://creativecommons.org/licenses/by/4.0/
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1600022
+Audio: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Inspired.mp3
+Changes: 50-second excerpt from 00:24, fades, gain, ducking under narration, mix normalization.
+Attribution is included on the closing card and in video metadata. Preserve it when republishing.

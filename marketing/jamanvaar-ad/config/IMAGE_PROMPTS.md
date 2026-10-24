@@ -1,0 +1,15 @@
+# Generated image prompts
+
+All three images used the built-in `image_gen` tool with an opaque background. The original PNGs and JPEG playback derivatives are saved in `assets/restaurant-footage/`.
+
+## restaurant.png
+
+Use case: photorealistic-natural. Asset type: a cinematic still for Jamanvaar restaurant technology advertisement, no graphic design or lettering. Create a premium, believable contemporary Indian restaurant in Ahmedabad during warm daytime service. A confident Indian restaurant owner in a crisp ivory shirt stands on the right in the midground, observing a smiling waiter delivering beautiful food to seated guests. Cream stone, restrained sage upholstery, brass pendant lighting, living plants, warm sunlight, natural skin texture, professional hospitality photography, subtle film grain, 35mm lens. Wide horizontal 16:9 composition, human action across the center and right, quiet darker greenery on the left with space for future white titles. Restaurant food in foreground adds depth. No logos, no words, no signage, no fake software interfaces, no watermarks. Photorealistic live-action aesthetic, aspirational but real, bright premium brand commercial.
+
+## phone.png
+
+Use case: photorealistic-natural. Asset type: premium restaurant technology advertisement lifestyle photograph. Horizontal 16:9 cinematic commercial still. A stylish young Indian couple at a sunlit modern Indian cafe table; focus on the Indian woman in an emerald blouse smiling gently while holding a smartphone naturally, seen over her shoulder with phone display facing away from the camera (absolutely no legible interface). Beautiful paneer tikka, copper servingware, cream stone table, teal upholstery, lush plants, soft brass pendant lights, warm natural sunlight. Food, hands and people anatomically realistic. Subjects in center and right with spacious cream restaurant interior on left. Luxury hospitality photography, believable Ahmedabad cafe, 50mm lens, shallow depth of field. No logos, no text, no QR code, no messaging bubbles, no watermarks. An illustrative moment of using a phone at a restaurant, no implied payment or successful order.
+
+## kitchen.png
+
+Use case: photorealistic-natural. Asset type: cinematic lifestyle image for restaurant technology advertisement. Horizontal 16:9 crop. A friendly Indian chef in a fresh white jacket finishing paneer dishes in an exceptionally clean contemporary restaurant pass kitchen, warm natural light through a large frosted window, stainless steel, restrained cream and sage wall colors. Another chef working in the softly blurred background. A sleek kitchen display monitor on the left seen slightly from the side with blank matte charcoal screen, no text or UI, plausible real restaurant hardware. Chef's attentive face and beautifully plated food at center-right. Premium commercial photography, 35mm lens, natural skin texture, bright and uplifting. No logos, no invented interface, no words, no readable tickets, no watermarks. Calm organized hospitality service rather than a dark dramatic kitchen.

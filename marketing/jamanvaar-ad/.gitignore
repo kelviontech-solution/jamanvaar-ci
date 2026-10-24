@@ -1,0 +1,7 @@
+.tools/
+node_modules/
+.hyperframes/
+output/frames/
+output/intermediate/
+__pycache__/
+*.log

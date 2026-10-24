@@ -1,0 +1,141 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 10
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "duration": 50,
+    "samples": [
+      2.778,
+      8.333,
+      13.889,
+      19.444,
+      25,
+      30.556,
+      36.111,
+      41.667,
+      47.222
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 0,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      2.778,
+      13.889,
+      25,
+      36.111,
+      47.222
+    ],
+    "checked": 18,
+    "passed": 18
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 2 text elements stay under it for 0.5 s or more, the smallest \"Music: Inspired — Kevin MacLeod · CC ...\" at 26 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Music: Inspired — Kevin MacLeod · CC BY 4.0",
+        "selector": "p.music-credit",
+        "dataAttributes": {},
+        "sourceFile": "compositions/closing.html",
+        "bbox": {
+          "x": 112,
+          "y": 1303,
+          "width": 544.73,
+          "height": 33
+        },
+        "time": 43.25,
+        "times": [
+          43.25,
+          43.25
+        ],
+        "fontPx": 26,
+        "floorPx": 28,
+        "seconds": 6.75,
+        "elements": [
+          {
+            "selector": "p.music-credit",
+            "text": "Music: Inspired — Kevin MacLeod · CC BY 4.0",
+            "fontPx": 26,
+            "time": 43.25,
+            "seconds": 6.75
+          },
+          {
+            "selector": "#closing-world > p:nth-of-type(2)",
+            "text": "Products and features depend on your selected plan.",
+            "fontPx": 26,
+            "time": 43.25,
+            "seconds": 6.75
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 400
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  },
+  "saved": {
+    "id": "c1d400c7-23a1-4c27-827b-abb263ff2b95",
+    "revision": null,
+    "report": "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\marketing\\jamanvaar-ad\\.hyperframes\\artifacts\\checks\\c1d400c7-23a1-4c27-827b-abb263ff2b95.json",
+    "attribution": "inputs-changed"
+  },
+  "_meta": {
+    "version": "0.8.185",
+    "latestVersion": "0.8.185",
+    "updateAvailable": false
+  }
+}

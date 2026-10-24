@@ -1,0 +1,114 @@
+[
+  {
+    "product": "pos",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "source": "Actual repository components with fictional isolated data",
+    "runtimeErrors": [],
+    "images": [
+      {
+        "src": "/assets/branding/jamanvaar-logo.png",
+        "loaded": true
+      }
+    ],
+    "backendOperationsVerified": false
+  },
+  {
+    "product": "qr",
+    "viewport": {
+      "width": 480,
+      "height": 960
+    },
+    "source": "Actual repository components with fictional isolated data",
+    "runtimeErrors": [],
+    "images": [
+      {
+        "src": "/q/assets/branding/jamanvaar-logo.png",
+        "loaded": true
+      },
+      {
+        "src": "http://127.0.0.1:5470/assets/menu/template-photos-v1/dish-0c2f4f7947bce2.webp",
+        "loaded": true
+      },
+      {
+        "src": "http://127.0.0.1:5470/assets/menu/template-photos-v1/dish-0c2f4f7947bce2.webp",
+        "loaded": true
+      },
+      {
+        "src": "http://127.0.0.1:5470/assets/menu/template-photos-v1/dish-7dd26e7342d183.webp",
+        "loaded": true
+      },
+      {
+        "src": "http://127.0.0.1:5470/assets/menu/template-photos-v1/dish-9f5e8d7362659d.webp",
+        "loaded": true
+      }
+    ],
+    "backendOperationsVerified": false
+  },
+  {
+    "product": "kiosk",
+    "viewport": {
+      "width": 720,
+      "height": 1280
+    },
+    "source": "Actual repository components with fictional isolated data",
+    "runtimeErrors": [],
+    "images": [
+      {
+        "src": "/assets/branding/jamanvaar-logo.png",
+        "loaded": true
+      },
+      {
+        "src": "/assets/menu/template-photos-v1/dish-7dd26e7342d183.webp",
+        "loaded": true
+      },
+      {
+        "src": "/assets/menu/template-photos-v1/dish-0c2f4f7947bce2.webp",
+        "loaded": true
+      },
+      {
+        "src": "/assets/menu/template-photos-v1/dish-370b29076d2df7.webp",
+        "loaded": true
+      },
+      {
+        "src": "/assets/menu/template-photos-v1/dish-571cb35f35d187.webp",
+        "loaded": true
+      }
+    ],
+    "backendOperationsVerified": false
+  },
+  {
+    "product": "kds",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "source": "Actual repository components with fictional isolated data",
+    "runtimeErrors": [],
+    "images": [
+      {
+        "src": "/assets/branding/jamanvaar-logo.png",
+        "loaded": true
+      }
+    ],
+    "backendOperationsVerified": false
+  },
+  {
+    "product": "admin",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "source": "Actual repository components with fictional isolated data",
+    "runtimeErrors": [],
+    "images": [
+      {
+        "src": "/qr/assets/branding/jamanvaar-logo.png",
+        "loaded": true
+      }
+    ],
+    "backendOperationsVerified": false
+  }
+]

@@ -1,0 +1,213 @@
+{
+  "project": "Jamanvaar restaurant technology advertisement",
+  "durationSeconds": 50,
+  "fps": 30,
+  "outputs": [
+    {
+      "file": "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\marketing\\jamanvaar-ad\\output\\jamanvaar-vertical.mp4",
+      "bytes": 14495224,
+      "duration": 50.0,
+      "width": 1080,
+      "height": 1920,
+      "fps": "30/1",
+      "videoCodec": "h264",
+      "pixelFormat": "yuv420p",
+      "audioCodec": "aac",
+      "audioSampleRate": "48000",
+      "audioChannels": 2,
+      "peakDb": -4.4,
+      "meanDb": -19.2,
+      "loudness": {
+        "input_i": "-16.77",
+        "input_tp": "-4.42",
+        "input_lra": "4.20",
+        "input_thresh": "-27.05",
+        "output_i": "-16.12",
+        "output_tp": "-3.47",
+        "output_lra": "3.90",
+        "output_thresh": "-26.34",
+        "normalization_type": "dynamic",
+        "target_offset": "0.12"
+      },
+      "fullDecodePassed": true,
+      "blackFrameEvents": [],
+      "audioMeasuredNotListened": true
+    },
+    {
+      "file": "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\marketing\\jamanvaar-ad\\output\\jamanvaar-landscape.mp4",
+      "bytes": 14590398,
+      "duration": 50.0,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "videoCodec": "h264",
+      "pixelFormat": "yuv420p",
+      "audioCodec": "aac",
+      "audioSampleRate": "48000",
+      "audioChannels": 2,
+      "peakDb": -4.4,
+      "meanDb": -19.2,
+      "loudness": {
+        "input_i": "-16.77",
+        "input_tp": "-4.42",
+        "input_lra": "4.20",
+        "input_thresh": "-27.05",
+        "output_i": "-16.12",
+        "output_tp": "-3.47",
+        "output_lra": "3.90",
+        "output_thresh": "-26.34",
+        "normalization_type": "dynamic",
+        "target_offset": "0.12"
+      },
+      "fullDecodePassed": true,
+      "blackFrameEvents": [],
+      "audioMeasuredNotListened": true
+    },
+    {
+      "file": "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\marketing\\jamanvaar-ad\\output\\jamanvaar-preview-540p.mp4",
+      "bytes": 2069889,
+      "duration": 50.0,
+      "width": 540,
+      "height": 960,
+      "fps": "30/1",
+      "videoCodec": "h264",
+      "pixelFormat": "yuv420p",
+      "audioCodec": "aac",
+      "audioSampleRate": "48000",
+      "audioChannels": 2,
+      "peakDb": -4.2,
+      "meanDb": -19.2,
+      "loudness": {
+        "input_i": "-16.79",
+        "input_tp": "-4.17",
+        "input_lra": "4.20",
+        "input_thresh": "-27.08",
+        "output_i": "-16.12",
+        "output_tp": "-3.38",
+        "output_lra": "4.00",
+        "output_thresh": "-26.34",
+        "normalization_type": "dynamic",
+        "target_offset": "0.12"
+      },
+      "fullDecodePassed": true,
+      "blackFrameEvents": [],
+      "audioMeasuredNotListened": true
+    }
+  ],
+  "productCaptures": [
+    {
+      "product": "pos",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "source": "Actual repository components with fictional isolated data",
+      "runtimeErrors": [],
+      "images": [
+        {
+          "src": "/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "backendOperationsVerified": false
+    },
+    {
+      "product": "qr",
+      "viewport": {
+        "width": 480,
+        "height": 960
+      },
+      "source": "Actual repository components with fictional isolated data",
+      "runtimeErrors": [],
+      "images": [
+        {
+          "src": "/q/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:5470/assets/menu/template-photos-v1/dish-0c2f4f7947bce2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:5470/assets/menu/template-photos-v1/dish-0c2f4f7947bce2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:5470/assets/menu/template-photos-v1/dish-7dd26e7342d183.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:5470/assets/menu/template-photos-v1/dish-9f5e8d7362659d.webp",
+          "loaded": true
+        }
+      ],
+      "backendOperationsVerified": false
+    },
+    {
+      "product": "kiosk",
+      "viewport": {
+        "width": 720,
+        "height": 1280
+      },
+      "source": "Actual repository components with fictional isolated data",
+      "runtimeErrors": [],
+      "images": [
+        {
+          "src": "/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/template-photos-v1/dish-7dd26e7342d183.webp",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/template-photos-v1/dish-0c2f4f7947bce2.webp",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/template-photos-v1/dish-370b29076d2df7.webp",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/template-photos-v1/dish-571cb35f35d187.webp",
+          "loaded": true
+        }
+      ],
+      "backendOperationsVerified": false
+    },
+    {
+      "product": "kds",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "source": "Actual repository components with fictional isolated data",
+      "runtimeErrors": [],
+      "images": [
+        {
+          "src": "/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "backendOperationsVerified": false
+    },
+    {
+      "product": "admin",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "source": "Actual repository components with fictional isolated data",
+      "runtimeErrors": [],
+      "images": [
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "backendOperationsVerified": false
+    }
+  ],
+  "review": "REVIEW.md",
+  "manifest": "config/media-manifest.json"
+}

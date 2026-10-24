@@ -1,0 +1,18 @@
+{
+  "file": "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\marketing\\jamanvaar-ad\\output\\jamanvaar-preview-render.mp4",
+  "bytes": 8271723,
+  "duration": 50.0,
+  "width": 1080,
+  "height": 1920,
+  "fps": "30/1",
+  "videoCodec": "h264",
+  "pixelFormat": "yuv420p",
+  "audioCodec": "aac",
+  "audioSampleRate": "48000",
+  "audioChannels": 2,
+  "peakDb": -4.4,
+  "meanDb": -19.2,
+  "fullDecodePassed": true,
+  "blackFrameEvents": [],
+  "audioMeasuredNotListened": true
+}

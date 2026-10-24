@@ -1,0 +1,111 @@
+{
+  "brand": "Jamanvaar",
+  "company": "KelvionTech",
+  "tagline": "Smarter Ordering. Simpler Restaurant Operations.",
+  "cta": "Book Your Personalised Demo",
+  "contact": "kelviontech@gmail.com",
+  "website": "",
+  "fps": 30,
+  "duration": 50,
+  "voice": "en-IN-PrabhatNeural",
+  "scenes": [
+    {
+      "id": "opening",
+      "start": 0,
+      "duration": 5,
+      "title": "Great food.\nGreat service.",
+      "subtitle": "Give both the right technology.",
+      "kind": "photo",
+      "asset": "assets/restaurant-footage/restaurant.jpg",
+      "label": "Illustrative imagery",
+      "narration": "Great food. Great service. Give both the right technology."
+    },
+    {
+      "id": "brand",
+      "start": 5,
+      "duration": 4,
+      "title": "Meet Jamanvaar",
+      "subtitle": "Restaurant technology by KelvionTech",
+      "kind": "brand",
+      "label": "A range of restaurant solutions",
+      "narration": "Meet Jamanvaar, by Kelvion Tech."
+    },
+    {
+      "id": "pos",
+      "start": 9,
+      "duration": 6,
+      "title": "POS & Billing",
+      "subtitle": "Your menu. Your counter. Your orders.",
+      "kind": "screen",
+      "asset": "assets/product-recordings/pos.png",
+      "label": "Actual product components · Local demo",
+      "narration": "Manage your menu, billing, and counter orders with Jamanvaar POS."
+    },
+    {
+      "id": "qr",
+      "start": 15,
+      "duration": 6,
+      "title": "Scan. Browse.\nOrder.",
+      "subtitle": "QR ordering, at your guests' fingertips.",
+      "kind": "phone",
+      "asset": "assets/product-recordings/qr-menu.png",
+      "label": "Actual QR menu · Local demo",
+      "narration": "Let guests explore your digital menu and order from their phones."
+    },
+    {
+      "id": "whatsapp",
+      "start": 21,
+      "duration": 6,
+      "title": "Meet them on\nWhatsApp.",
+      "subtitle": "WhatsApp Ordering · Vartalaap",
+      "kind": "photo",
+      "asset": "assets/restaurant-footage/phone.jpg",
+      "label": "Illustrative imagery · Workflow demo on request",
+      "narration": "Explore WhatsApp ordering with Vartalaap. Another way to reach your customers."
+    },
+    {
+      "id": "kiosk",
+      "start": 27,
+      "duration": 6,
+      "title": "A little more\nself-service.",
+      "subtitle": "Jamanvaar Self-Service Kiosk",
+      "kind": "kiosk",
+      "asset": "assets/product-recordings/kiosk-welcome.png",
+      "asset2": "assets/product-recordings/kiosk-menu.png",
+      "label": "Actual kiosk components · Local preview",
+      "narration": "Offer a convenient self-service experience with Jamanvaar Kiosk."
+    },
+    {
+      "id": "kds",
+      "start": 33,
+      "duration": 6,
+      "title": "Keep the kitchen\nin the picture.",
+      "subtitle": "Kitchen Display & Management",
+      "kind": "screen",
+      "asset": "assets/product-recordings/kds.png",
+      "label": "Illustrative kitchen / Actual local ticket preview",
+      "narration": "Help your kitchen team stay organised with digital kitchen tickets."
+    },
+    {
+      "id": "admin",
+      "start": 39,
+      "duration": 4,
+      "title": "Your restaurant.\nA clearer view.",
+      "subtitle": "Tools for your day-to-day operations.",
+      "kind": "screen",
+      "asset": "assets/product-recordings/admin.png",
+      "label": "Actual QR owner console · Local demo",
+      "narration": "A clearer view of everyday operations."
+    },
+    {
+      "id": "closing",
+      "start": 43,
+      "duration": 7,
+      "title": "Your restaurant.\nSmarter technology.",
+      "subtitle": "Smarter ordering. Simpler restaurant operations.",
+      "kind": "closing",
+      "label": "Products and features depend on your selected plan.",
+      "narration": "Jamanvaar by Kelvion Tech. Book your personalised demo."
+    }
+  ]
+}
