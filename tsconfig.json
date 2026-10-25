@@ -51,5 +51,9 @@
   // a leading-slash specifier, so these files are excluded the same way
   // cloud/** and docs/** are: a different, independently-validated file tree,
   // not a real gap in this project's own type coverage (EC-11).
-  "exclude": ["cloud/**", "docs/**", "tooling/qa/**", "node_modules"]
+  //
+  // marketing/** is a HyperFrames video project (compositions, capture/build
+  // scripts) with its own throwaway dev fixtures, not part of this project's
+  // app workspaces — same reasoning as cloud/** and docs/**.
+  "exclude": ["cloud/**", "docs/**", "tooling/qa/**", "marketing/**", "node_modules"]
 }

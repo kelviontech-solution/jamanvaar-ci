@@ -9,7 +9,9 @@ export function KioskSearchKeyboard({
   title,
   confirmLabel = 'Show results',
   placeholder = 'Type a name or option',
-  ariaLabel = 'Touch search text'
+  ariaLabel = 'Touch search text',
+  startNumeric = false,
+  mask = false
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -19,8 +21,12 @@ export function KioskSearchKeyboard({
   confirmLabel?: string;
   placeholder?: string;
   ariaLabel?: string;
+  /** Opens straight into the numeric row — for PIN-style fields where letters never apply. */
+  startNumeric?: boolean;
+  /** Shows dots instead of the typed characters — for a staff PIN on a public-facing screen. */
+  mask?: boolean;
 }) {
-  const [numbers, setNumbers] = useState(false);
+  const [numbers, setNumbers] = useState(startNumeric);
   const rows = numbers ? ['1234567890', '-_.()&/'] : ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
   return (
     <Modal
@@ -38,7 +44,7 @@ export function KioskSearchKeyboard({
         aria-label={ariaLabel}
         inputMode="none"
         readOnly
-        value={value}
+        value={mask ? '•'.repeat(value.length) : value}
         className="w-full rounded-xl border p-4 text-lg mb-4"
         placeholder={placeholder}
       />

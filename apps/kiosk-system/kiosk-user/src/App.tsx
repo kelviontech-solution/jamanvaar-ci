@@ -399,7 +399,7 @@ export default function KioskUserApp() {
   const [optionSearch, setOptionSearch] = useState('');
   // F19: coupon entry and the customization note had no themed on-screen keyboard of their own,
   // unlike search and the receipt email field — this reuses the exact same keyboard overlay.
-  const [searchTarget, setSearchTarget] = useState<'menu'|'options'|'coupon'|'instructions'|null>(null);
+  const [searchTarget, setSearchTarget] = useState<'menu'|'options'|'coupon'|'instructions'|'staffPin'|null>(null);
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
   const [activeItemQuantity, setActiveItemQuantity] = useState<number>(1);
   const [selectedModifiers, setSelectedModifiers] = useState<SelectedModifier[]>([]);
@@ -4246,7 +4246,9 @@ export default function KioskUserApp() {
             type="password"
             maxLength={4}
             value={staffPin}
-            onChange={(e) => setStaffPin(e.target.value)}
+            inputMode="none"
+            readOnly
+            onClick={() => setSearchTarget('staffPin')}
             aria-label="Staff PIN"
             placeholder="••••"
             className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-jaman-navy"
@@ -4446,11 +4448,13 @@ export default function KioskUserApp() {
       )}
     </div>
       {searchTarget && <KioskSearchKeyboard
-        title={searchTarget === 'menu' ? 'Search dishes' : searchTarget === 'options' ? 'Search dish options' : searchTarget === 'coupon' ? 'Enter coupon code' : 'Kitchen note / special instructions'}
-        value={searchTarget === 'menu' ? searchQuery : searchTarget === 'options' ? optionSearch : searchTarget === 'coupon' ? couponCodeInput : specialInstructions}
-        onChange={searchTarget === 'menu' ? setSearchQuery : searchTarget === 'options' ? setOptionSearch : searchTarget === 'coupon' ? (v: string) => { setCouponCodeInput(v.toUpperCase()); setCouponError(null); } : setSpecialInstructions}
+        title={searchTarget === 'menu' ? 'Search dishes' : searchTarget === 'options' ? 'Search dish options' : searchTarget === 'coupon' ? 'Enter coupon code' : searchTarget === 'staffPin' ? 'Staff Manager Mode PIN' : 'Kitchen note / special instructions'}
+        value={searchTarget === 'menu' ? searchQuery : searchTarget === 'options' ? optionSearch : searchTarget === 'coupon' ? couponCodeInput : searchTarget === 'staffPin' ? staffPin : specialInstructions}
+        onChange={searchTarget === 'menu' ? setSearchQuery : searchTarget === 'options' ? setOptionSearch : searchTarget === 'coupon' ? (v: string) => { setCouponCodeInput(v.toUpperCase()); setCouponError(null); } : searchTarget === 'staffPin' ? (v: string) => setStaffPin(v.slice(0, 4)) : setSpecialInstructions}
         confirmLabel={searchTarget === 'menu' || searchTarget === 'options' ? 'Show results' : 'Done'}
-        placeholder={searchTarget === 'coupon' ? 'Coupon code' : searchTarget === 'instructions' ? 'e.g. Less spicy, no onion' : undefined}
+        placeholder={searchTarget === 'coupon' ? 'Coupon code' : searchTarget === 'instructions' ? 'e.g. Less spicy, no onion' : searchTarget === 'staffPin' ? '4-digit PIN' : undefined}
+        startNumeric={searchTarget === 'staffPin'}
+        mask={searchTarget === 'staffPin'}
         onClose={() => setSearchTarget(null)}
       />}
     </JAMANVAARStartup>
