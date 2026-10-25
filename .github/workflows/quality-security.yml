@@ -14,13 +14,20 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87
       - run: cargo install cargo-audit --version 0.22.2 --locked
+      # RUSTSEC-2026-0367/0368/0369: the zip crate's extract() path, pulled in transitively by
+      # tauri-plugin-updater (pinned to the zip ^4 line) to unpack signed update bundles. No 4.x
+      # release backports the fix and tauri-plugin-updater has not yet moved to zip >=9, so there
+      # is no compatible version to update to (confirmed via `cargo update -p zip --dry-run`,
+      # 2026-10-25). Exploiting these requires getting past the updater's own Ed25519 signature
+      # check first. Remove this ignore list once tauri-plugin-updater ships on a patched zip.
       - name: Audit all native application lockfiles
         run: |
-          cargo audit --file apps/restaurant-system/pos/src-tauri/Cargo.lock
-          cargo audit --file apps/restaurant-system/pos-admin/src-tauri/Cargo.lock
-          cargo audit --file apps/restaurant-system/captain/src-tauri/Cargo.lock
-          cargo audit --file apps/restaurant-system/kds/src-tauri/Cargo.lock
-          cargo audit --file apps/kiosk-system/kiosk-user/src-tauri/Cargo.lock
+          IGNORE="--ignore RUSTSEC-2026-0367 --ignore RUSTSEC-2026-0368 --ignore RUSTSEC-2026-0369"
+          cargo audit $IGNORE --file apps/restaurant-system/pos/src-tauri/Cargo.lock
+          cargo audit $IGNORE --file apps/restaurant-system/pos-admin/src-tauri/Cargo.lock
+          cargo audit $IGNORE --file apps/restaurant-system/captain/src-tauri/Cargo.lock
+          cargo audit $IGNORE --file apps/restaurant-system/kds/src-tauri/Cargo.lock
+          cargo audit $IGNORE --file apps/kiosk-system/kiosk-user/src-tauri/Cargo.lock
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 25
