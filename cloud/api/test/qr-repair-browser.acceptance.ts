@@ -1,5 +1,5 @@
 import { beforeAll, afterAll, describe, expect, it } from 'vitest';
-import { chromium, type Browser, type Page } from 'playwright';
+import { chromium, type Browser, type Page, type Route, type Response as PlaywrightResponse } from 'playwright';
 import { createServer, request as proxyRequest, type Server } from 'node:http';
 import { existsSync, statSync, createReadStream, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, extname, sep } from 'node:path';
@@ -142,7 +142,7 @@ describe('real QR customer browser acceptance on isolated API', () => {
     });
     browser = await chromium.launch({ channel: 'chrome', headless: true });
     page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-    page.on('pageerror', (error) => pageErrors.push(error.message));
+    page.on('pageerror', (error: Error) => pageErrors.push(error.message));
   });
 
   afterAll(async () => {
@@ -188,7 +188,7 @@ describe('real QR customer browser acceptance on isolated API', () => {
     expect(await page.getByPlaceholder('Any special requests?').inputValue()).toBe('Keep these instructions');
   });
   it('recovers a real quote after an injected price-check outage without losing the cart', async () => {
-    await page.route('**/api/v1/public/qr/*/quote', (route) =>
+    await page.route('**/api/v1/public/qr/*/quote', (route: Route) =>
       route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Temporary acceptance-test quote outage' }) })
     );
     await page.getByRole('button', { name: /^← Cart$/ }).click();
@@ -200,7 +200,7 @@ describe('real QR customer browser acceptance on isolated API', () => {
     expect(await page.getByPlaceholder('How should we call you?').inputValue()).toBe('Browser Guest');
   });
   it('places exactly one valid counter order, retains instructions and restores its status after reload', async () => {
-    const response = page.waitForResponse((response) => response.request().method() === 'POST' && new URL(response.url()).pathname.endsWith('/orders'));
+    const response = page.waitForResponse((response: PlaywrightResponse) => response.request().method() === 'POST' && new URL(response.url()).pathname.endsWith('/orders'));
     await page.getByRole('button', { name: /^Place order/ }).click();
     const placed = await response;
     expect(placed.status()).toBe(201);
