@@ -59,13 +59,17 @@ describe('JAMANVAAR Restaurant Admin — Day-Wise Orders Module & Drill-Down', (
   });
 
   it('should correctly attribute late night orders (e.g. 01:30 AM) to previous business day', () => {
-    // 01:30 AM local time on August 29 with 6:00 AM start hour belongs to August 28 business day
-    const lateNightDate = new Date(2026, 7, 29, 1, 30, 0);
+    // 01:30 AM IST on August 29 with 6:00 AM start hour belongs to August 28 business day.
+    // getBusinessDateKey always reasons in Asia/Kolkata (B2-017), so the fixture must pin an
+    // explicit +05:30 offset rather than `new Date(2026, 7, 29, 1, 30, 0)` — that constructor
+    // uses the *host machine's* local timezone, which is IST on a dev box but UTC on CI, where
+    // 1:30 AM UTC is already 7:00 AM IST and would wrongly land in the next business day.
+    const lateNightDate = new Date('2026-08-29T01:30:00+05:30');
     const businessKey = DayOrdersService.getBusinessDateKey(lateNightDate, 6);
     expect(businessKey).toBe('2026-08-28');
 
-    // 08:30 AM on August 29 belongs to August 29 business day
-    const morningDate = new Date(2026, 7, 29, 8, 30, 0);
+    // 08:30 AM IST on August 29 belongs to August 29 business day
+    const morningDate = new Date('2026-08-29T08:30:00+05:30');
     const morningKey = DayOrdersService.getBusinessDateKey(morningDate, 6);
     expect(morningKey).toBe('2026-08-29');
   });
