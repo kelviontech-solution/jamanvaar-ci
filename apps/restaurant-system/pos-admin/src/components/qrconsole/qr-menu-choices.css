@@ -1,11 +1,11 @@
 .qr-menu-choices {
   grid-column: 1/-1;
-  background: white;
-  border: 1px solid #dce3e8;
-  border-radius: 16px;
+  background:white;
+  border:1px solid #dce3e8;
+  border-radius:16px;
   padding: 18px;
   min-width: 0;
-  color: #163347;
+  color:#163347;
 }
 .qr-menu-choices h4 {
   font-size: 17px;
@@ -16,7 +16,7 @@
   font-size: 13px;
   line-height: 1.6;
   margin: 8px 0 14px;
-  color: #526476;
+  color:#526476;
 }
 .qr-menu-choices-actions {
   display: flex;
@@ -31,10 +31,10 @@
   gap: 6px;
   min-height: 44px;
   padding: 9px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 11px;
-  background: white;
-  color: #163347;
+  border:1px solid #cbd5e1;
+  border-radius:11px;
+  background:white;
+  color:#163347;
   font-size: 13px;
   font-weight: 650;
 }
@@ -53,9 +53,9 @@
   width: 100%;
   min-height: 44px;
   margin-top: 6px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  background: white;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  background:white;
   padding: 9px 10px;
   font-size: 16px;
   font-weight: 400;
@@ -65,8 +65,8 @@
   outline-offset: 2px;
 }
 .qr-menu-choice-group {
-  border: 1px solid #dce3e8;
-  border-radius: 12px;
+  border:1px solid #dce3e8;
+  border-radius:12px;
   padding: 14px;
   margin: 16px 0;
   min-width: 0;
@@ -84,7 +84,7 @@
   gap: 10px;
   align-items: end;
   padding: 12px 0;
-  border-top: 1px solid #e2e8f0;
+  border-top:1px solid #e2e8f0;
 }
 .qr-menu-choices label.qr-menu-choice-availability {
   display: flex;
@@ -105,7 +105,7 @@
 }
 .qr-menu-choices-limits small {
   font-size: 12px;
-  color: #64748b;
+  color:#64748b;
 }
 .qr-menu-choice-summary {
   list-style: none;
@@ -118,18 +118,18 @@
   justify-content: space-between;
   gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px solid #eef2f6;
+  border-bottom:1px solid #eef2f6;
   font-size: 14px;
   overflow-wrap: anywhere;
 }
 .qr-menu-choices p.qr-menu-choices-help {
   font-size: 12px;
-  color: #64748b;
+  color:#64748b;
 }
 .qr-menu-choices-empty {
-  background: #f5f8fa;
+  background:#f5f8fa;
   padding: 12px;
-  border-radius: 10px;
+  border-radius:10px;
 }
 @media (max-width: 650px) {
   .qr-menu-choices {

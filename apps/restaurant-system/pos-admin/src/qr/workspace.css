@@ -749,3 +749,118 @@
 .qr-admin-app .qr-tool-search input {width:100%;min-width:0;min-height:44px;padding:10px;border:1px solid var(--qr-line);border-radius:12px;background:white;font:inherit;font-size:14px;}
 @media (max-width:639px){.qr-admin-app .qr-tool-search input{font-size:16px;}}
 .qr-admin-app .qr-nav-hint {font-size:12px;line-height:1.5;color:#607270;padding:8px 4px;margin:0;}
+
+/* =============================================================================================================
+   Integrated QR admin: two independent panes.
+   The sidebar and the page content each scroll inside their own box, sized by the space the Restaurant Admin shell
+   actually leaves them (not by viewport arithmetic), so scrolling one never moves the other.
+   ============================================================================================================= */
+.qr-admin-app.qr-admin-app--integrated {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.qr-admin-app--integrated .qr-console--workspace {
+  height: 100%;
+  min-height: 0;
+}
+.qr-admin-app--integrated :is(.qr-admin-sidebar, .qr-workspace-page) {
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #d9d2c5 transparent;
+}
+@media (min-width: 1101px) {
+  .qr-admin-app--integrated .qr-console--workspace {
+    overflow: hidden;
+    grid-template-columns: 264px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .qr-admin-app--integrated .qr-admin-sidebar {
+    position: static;
+    top: auto;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+  .qr-admin-app--integrated .qr-workspace-page {
+    height: 100%;
+    min-height: 0;
+    max-width: none;
+    overflow-y: auto;
+  }
+}
+/* Narrow screens: the sidebar is a drawer, so the page is the only scrolling pane. */
+@media (max-width: 1100px) {
+  .qr-admin-app--integrated .qr-console--workspace {
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Shared tokens: the later overrides above tinted the sidebar and cards green-grey. */
+.qr-admin-app .qr-admin-sidebar {
+  background: #faf8f5;
+  border-color: #eae3d6;
+  padding: 14px 12px;
+}
+.qr-admin-app .qr-workspace-page :is(.rounded-2xl, .rounded-xl).bg-white {
+  border-color: var(--qr-line);
+  box-shadow: none;
+}
+.qr-admin-app .qr-nav-group button {
+  min-height: 44px;
+  border-radius: 12px;
+}
+.qr-admin-app .qr-nav-subpages button {
+  min-height: 40px;
+}
+
+/* The sticky "Needs attention" card sticks to the top of the scrolling page pane, not to a header that is no longer inside it. */
+.qr-admin-app--integrated { --qr-attention-top: 12px; }
+.qr-admin-app--integrated .qr-payments-workspace .qr-task-tabs { top: 0; }
+
+/* One page-title size across Restaurant Admin and the QR workspace. */
+.qr-admin-app .qr-page-heading h1 { font-size: 24px; line-height: 1.33; letter-spacing: -0.01em; }
+@media (max-width: 640px) { .qr-admin-app .qr-page-heading h1 { font-size: 20px; } }
+
+/* Standalone QR Admin (/qr/admin): a fixed application frame. The header stays put and the sidebar and the page
+   scroll independently, exactly like the QR tab inside Restaurant Admin. */
+@media (min-width: 1101px) {
+  .qr-admin-app:not(.qr-admin-app--integrated) { height: 100dvh; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .qr-admin-app:not(.qr-admin-app--integrated) .qr-admin-header { position: static; flex: none; }
+  .qr-admin-app:not(.qr-admin-app--integrated) .qr-admin-content { flex: 1 1 auto; width: 100%; min-height: 0; margin: 0; overflow: hidden; }
+  .qr-admin-app:not(.qr-admin-app--integrated) .qr-console--workspace { height: 100%; min-height: 0; overflow: hidden; grid-template-columns: 264px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  .qr-admin-app:not(.qr-admin-app--integrated) .qr-admin-sidebar { position: static; top: auto; height: 100%; max-height: 100%; overflow-y: auto; padding-bottom: 60px; }
+  .qr-admin-app:not(.qr-admin-app--integrated) .qr-workspace-page { height: 100%; min-height: 0; max-width: none; overflow-y: auto; }
+  .qr-admin-app:not(.qr-admin-app--integrated) { --qr-attention-top: 12px; }
+  .qr-admin-app:not(.qr-admin-app--integrated) .qr-payments-workspace .qr-task-tabs { top: 0; }
+}
+.qr-admin-app:not(.qr-admin-app--integrated) :is(.qr-admin-sidebar, .qr-workspace-page) { overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #d9d2c5 transparent; }
+
+/* ---- QR Admin consistency layer: one card, one tab, one summary-row and one section-heading standard ---- */
+.qr-admin-app .qr-order-attention { box-shadow: none; border-radius: 16px; }
+.qr-admin-app .qr-attention-heading h2 { font-size: 16px; font-weight: 700; }
+.qr-admin-app .qr-order-attention:not(.has-urgent) .qr-attention-heading h2 span { background: rgb(191 84 15 / 0.12); color: var(--qr-orange); }
+.qr-admin-app .qr-menu-view-switch { border-color: var(--qr-line); }
+.qr-admin-app .qr-menu-view-switch button { border-color: var(--qr-line); }
+.qr-admin-app .qr-menu-view-switch button[aria-current="page"] { background: rgb(191 84 15 / 0.1); border-color: rgb(191 84 15 / 0.35); color: var(--qr-orange); }
+.qr-admin-app .qr-menu-view-switch button[aria-current="page"] small { opacity: 1; }
+/* Collapsible rows (More about today, Branch setup, Filter dates...) share one size and weight. */
+.qr-admin-app .qr-health-card { padding: 4px 20px; }
+.qr-admin-app .qr-health-card > summary, .qr-admin-app .qr-health-summary { font-size: 14px; font-weight: 700; color: var(--qr-ink); padding: 14px 0; }
+.qr-admin-app .qr-health-card[open] > .qr-health-summary { margin-bottom: 4px; }
+/* Operations Hub header and empty state sit in the same card as every other section. */
+.qr-admin-app .ops-console > header { background: #fff; border: 1px solid var(--qr-line); border-radius: 16px; padding: 18px 20px; }
+.qr-admin-app .ops-empty { background: #fff; border: 1px solid var(--qr-line); border-radius: 16px; }
+/* Sidebar header and search label read as the same small caption as the group labels. */
+.qr-admin-app .qr-sidebar-title { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #68788a; }
+.qr-admin-app .qr-tool-search { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #68788a; }
+/* Every QR page uses the full content width, so cards line up with the page heading and its action chips. */
+.qr-admin-app .qr-workspace-page :is(.max-w-2xl, .max-w-3xl, .max-w-4xl, .max-w-5xl) { max-width: none; }
+/* The step you are on is "disabled" (you cannot re-click it) but must still read at full strength. */
+.qr-admin-app :is(.qr-task-tabs, .qr-website-journey) button[aria-current]:disabled { opacity: 1; }
+/* "Needs attention" is a normal card in the page flow; it used to float over the cards below while scrolling. */
+.qr-admin-app .qr-order-attention { position: static; }
+/* No bar floats over the content below it while the page scrolls: save bars, payment tabs and the page-editor toolbar all stay in flow. */
+.qr-admin-app :is(.qr-capabilities-save, .qr-payments-workspace .qr-task-tabs, .qpb-toolbar, .qr-rule-save) { position: static; box-shadow: none; }

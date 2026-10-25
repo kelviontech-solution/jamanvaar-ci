@@ -399,7 +399,7 @@ function QrConsoleContent({
         {tab === "SERVICE" && <QrServiceOperations />}
         {tab === "PICKUP" && <QrPickupOperations />}
         {tab === "PERFORMANCE" && <QrMenuPerformance />}
-        {tab === "SUPPORT" && <SupportTicketsModule showToast={showToast} />}
+        {tab === "SUPPORT" && <SupportTicketsModule showToast={showToast} embedded />}
         {tab === "BRAND" && <QrBrandStudio />}
         {tab === 'RESTAURANT_PAGE' && <QrRestaurantPage onNavigate={(next,scope)=>void navigate(next,'Settings',scope)} />}
         {tab === 'WEBSITE_QR' && <QrRestaurantPageQr onNavigate={(next,scope)=>void navigate(next,'Settings',scope)}/>}
@@ -1301,8 +1301,9 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
   if (error) return <div className="text-sm text-rose-700">{error}</div>;
   if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
   return (
-    <div className="rounded-2xl border border-jaman-border bg-white divide-y max-w-2xl">
-      <div className="p-4"><DisplayPreferences showButtonSetting={false} /></div>
+    <div className="space-y-4 max-w-3xl">
+    <DisplayPreferences showButtonSetting={false} />
+    <div className="rounded-2xl border border-jaman-border bg-white divide-y overflow-hidden">
       <div className="p-4 bg-jaman-ivory rounded-t-2xl" role="status">
         <strong className="block text-sm text-jaman-navy">
           Mobile online payment:{" "}
@@ -1339,6 +1340,7 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
           />
         </label>
       ))}
+    </div>
     </div>
   );
 }

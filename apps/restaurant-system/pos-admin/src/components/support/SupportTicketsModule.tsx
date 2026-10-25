@@ -66,10 +66,12 @@ const errorText = (err: unknown, fallback: string) => (err instanceof CloudApiEr
 
 interface Props {
   showToast: (msg: string) => void;
+  /** Inside the QR workspace, whose page heading already names the page. */
+  embedded?: boolean;
 }
 
 /** Raise a problem to the JAMANVAAR support team and follow the answer: this restaurant's own tickets only. */
-export const SupportTicketsModule: React.FC<Props> = ({ showToast }) => {
+export const SupportTicketsModule: React.FC<Props> = ({ showToast, embedded = false }) => {
   const cloudReady = isCloudConnected() && isCloudLoggedIn();
   const [tickets, setTickets] = useState<SupportTicketRow[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -136,9 +138,9 @@ export const SupportTicketsModule: React.FC<Props> = ({ showToast }) => {
   }
 
   return (
-    <div className="max-w-4xl space-y-5">
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
+    <div className={`${embedded ? "" : "max-w-4xl "}space-y-5`}>
+      <div className={`flex items-start gap-3 flex-wrap ${embedded ? "justify-end" : "justify-between"}`}>
+        <div className={embedded ? "sr-only" : undefined}>
           <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Help & Support</h1>
           <p className="text-xs sm:text-sm text-[#4A5568] mt-0.5">Tell the JAMANVAAR team what is wrong. They reply here, and you can add screenshots.</p>
         </div>

@@ -837,7 +837,7 @@ export default function PosAdminApp() {
 
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
           {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD' && activeTab !== 'QR_ORDERING') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6 max-w-xl"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">{branchScopeReady ? "Orders, tables, staff and devices belong to one branch at a time — pick one below." : 'Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.'}</p>{branchScopeReady && <div className="mt-4 -mx-2"><AdminBranchWorkspace onReady={() => setBranchScopeReady(true)} /></div>}</div></main> :
-          <main key={activeTab} className={`jv-page-enter flex-1 overflow-y-auto ${activeTab === 'QR_ORDERING' ? '' : 'jv-page p-3 sm:p-6 pb-24 sm:pb-24'} bg-jaman-cream min-h-0 min-w-0`}>
+          <main key={activeTab} className={`jv-page-enter flex-1 ${activeTab === 'QR_ORDERING' ? 'overflow-hidden' : 'overflow-y-auto jv-page p-3 sm:p-6 pb-24 sm:pb-24'} bg-jaman-cream min-h-0 min-w-0`}>
             <SettingsScopeNotice page={activeTab} onNavigate={page=>setActiveTab(page as PosAdminTab)}/>
             {/* TAB 1: DASHBOARD */}
             {activeTab === 'OPERATIONS_HUB' && branchScopeReady && <OperationsConsole branchId={activeAdminBranch}/>}
@@ -847,7 +847,7 @@ export default function PosAdminApp() {
             {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard onTask={task=>void openAttentionTask(task)} branchId={activeAdminBranch ?? 'all'} taskPages={isKioskAdmin ? ['SYNC','MENU'] : undefined} onNavigate={(page,entry) => {if(activeAdminBranch === 'all'){showToast('Choose the branch you want to manage in the Workspace selector.');return;}setDashboardBillingEntry(entry);setActiveTab(page);}}/></>}
 
             {/* TAB 2: DIGITAL ORDERING & QR SUITE */}
-            {activeTab === 'QR_ORDERING' && <div className="qr-admin-app flex-1 min-w-0 overflow-y-auto"><QrConsole layout="integrated" onBack={() => setActiveTab('DASHBOARD')} onViewPlan={() => setActiveTab('LICENSE')} showToast={showToast} /></div>}
+            {activeTab === 'QR_ORDERING' && <div className="qr-admin-app qr-admin-app--integrated h-full min-h-0 min-w-0"><QrConsole layout="integrated" onBack={() => setActiveTab('DASHBOARD')} onViewPlan={() => setActiveTab('LICENSE')} showToast={showToast} /></div>}
 
             {/* TAB 3: BILLING / INVOICES */}
             {activeTab === 'BILLING_SALES' && (

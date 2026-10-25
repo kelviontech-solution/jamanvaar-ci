@@ -21,7 +21,7 @@ describe('Restaurant Admin UI audit fixes', () => {
 
   it('keeps one page-title scale for module pages and clears the floating assistant at the bottom', () => {
     expect(admin('index.css')).toMatch(/\.jv-page h1\[class\]\s*\{[^}]*font-size: 1\.5rem/);
-    expect(admin('App.tsx')).toContain("'jv-page p-3 sm:p-6 pb-24 sm:pb-24'");
+    expect(admin('App.tsx')).toContain("overflow-y-auto jv-page p-3 sm:p-6 pb-24 sm:pb-24");
   });
 
   it('does not repeat instructional copy on the dashboard', () => {
