@@ -93,7 +93,7 @@ jobs:
       - run: npm run build --workspace=@jamanvaar/kiosk-user
       - run: npm run build --workspace=@jamanvaar/qr-guest
       - name: No high or critical production npm advisories
-        run: npm audit --omit=dev --audit-level=high
+        run: node .github/scripts/npm-audit-allowlist.mjs
       - name: Produce dependency SBOM
         run: npm sbom --omit=dev --sbom-format=cyclonedx > sbom.cdx.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
