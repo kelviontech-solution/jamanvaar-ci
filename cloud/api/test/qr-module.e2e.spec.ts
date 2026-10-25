@@ -29,7 +29,7 @@ const action = async (id: string, type: string, token = admin, reason?: string) 
 const verify = (id: string, paymentId: string, orderId: string, signature?: string) => http().post(`/api/v1/public/qr/orders/${id}/verify-payment`).send({paymentId,signature:signature??createHmac('sha256',secret).update(`${orderId}|${paymentId}`).digest('hex')});
 
 beforeAll(async()=>{
- Object.assign(process.env,{QR_PAYMENT_CHECKOUT_MODE:'STANDARD',RAZORPAY_KEY_ID:'rzp_test_isolated',RAZORPAY_KEY_SECRET:secret,RAZORPAY_WEBHOOK_SECRET:secret,QR_ORDER_BASE_URL:'http://localhost:5290'});
+ Object.assign(process.env,{QR_PAYMENT_CHECKOUT_MODE:'STANDARD',RAZORPAY_KEY_ID:'rzp_test_isolated',RAZORPAY_KEY_SECRET:secret,RAZORPAY_WEBHOOK_SECRET:secret,QR_ORDER_BASE_URL:'http://localhost:5290',PAYMENT_CREDENTIAL_ENCRYPTION_KEY:Buffer.alloc(32,7).toString('base64')});
  app=await createTestApp();prisma=app.get(PrismaService);gateway=app.get(RazorpayGatewayService);
  vi.spyOn(gateway,'createCheckoutOrder').mockImplementation(async i=>({id:`order_${i.reference.replace(/[^a-z0-9]/gi,'')}`,receipt:i.reference,amount:i.amount,currency:i.currency}));
  vi.spyOn(gateway,'fetchCheckoutPayments').mockResolvedValue([]);
@@ -49,7 +49,7 @@ beforeAll(async()=>{
  for(const [b,table,tok] of [[branch,'table-a',admin],[branchB,'table-b',adminB]]){const r=await auth('post',`/api/v1/restaurant/qr/tables/${table}/generate`,tok).send({branchId:b});expect(r.status,JSON.stringify(r.body)).toBe(201);if(b===branch)qr=r.body.url.split('/q/')[1];else qrB=r.body.url.split('/q/')[1];}
  await prisma.runAsTenant(restaurantId,tx=>tx.restaurantPaymentConnection.create({data:{restaurantId,status:'ACTIVE'}}));
 },120000);
-afterAll(async()=>{vi.restoreAllMocks();if(restaurantId)await prisma.runAsPlatform(tx=>tx.restaurant.deleteMany({where:{id:restaurantId}}));if(planId)await prisma.runAsPlatform(tx=>tx.plan.deleteMany({where:{id:planId}}));await prisma.platformUser.deleteMany({where:{email}});await app?.close();for(const k of ['QR_PAYMENT_CHECKOUT_MODE','RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET'])delete process.env[k];});
+afterAll(async()=>{vi.restoreAllMocks();if(restaurantId)await prisma.runAsPlatform(tx=>tx.restaurant.deleteMany({where:{id:restaurantId}}));if(planId)await prisma.runAsPlatform(tx=>tx.plan.deleteMany({where:{id:planId}}));await prisma.platformUser.deleteMany({where:{email}});await app?.close();for(const k of ['QR_PAYMENT_CHECKOUT_MODE','RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET','PAYMENT_CREDENTIAL_ENCRYPTION_KEY'])delete process.env[k];});
 
 it('sells QR with admin access but no POS, using the same canonical published menu',async()=>{
  const enabled=await auth('get','/api/v1/restaurant/qr/entitlement');expect(enabled.status).toBe(200);expect(enabled.body.enabled).toBe(true);
